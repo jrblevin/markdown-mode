@@ -3,7 +3,7 @@
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; Maintainer: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; Created: May 24, 2007
-;; $Id: markdown-mode.el,v 1.1 2007/05/25 15:46:44 jrblevin Exp $
+;; $Id: markdown-mode.el,v 1.2 2007/05/25 15:47:20 jrblevin Exp $
 ;; Keywords: Markdown major mode
 
 ;; Copyright (C) 2007 Jason Blevins
@@ -50,6 +50,10 @@
 
 ;; Changelog:
 ;; ==========
+;; Revision 1.2:
+;;   * Added element insertion commands and keys for links, horizontal rules,
+;;     headers, inline code, and bold and italic text.
+;;
 ;; Revision 1.1:
 ;;   * Initial revision.
 ;;   * Basic syntax highlighting support.
@@ -63,15 +67,17 @@
 ;; * Allow for code fragments with double backticks.
 ;; * Add customizable variables for HR style and length, bold and
 ;;   italic style, etc.
-;; * Element insertion commands.
 
-(defconst markdown-mode-version "$Revision: 1.1 $")
+(defconst markdown-mode-version "$Revision: 1.2 $")
 
-;;;-------------------------------------
-;;; Regular expressions
+;; A hook for users to run their own code when the mode is loaded.
+(defvar markdown-mode-hook nil)
 
-;;; Links
-(defconst regex-link-inline "\\(!?\\[.+?\\]\\)\\((.+?)\\)"
+;;-------------------------------------
+;; Regular expressions
+
+;; Links
+(defconst regex-link-inline "\\(!?\\[.+?\\]\\)\\((.*)\\)"
   "Regular expression for a [text](file) or an image link ![text](file)")
 (defconst regex-link-reference "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
   "Regular expression for a reference link [text][id]")
@@ -79,8 +85,8 @@
   "^\s*\\(\\[.+?\\]\\):\s*\\([^\s\n]+\\).*$"
   "Regular expression for a link definition [id]: ...")
 
-;;;-------------------------------------
-;;; Font lock
+;;-------------------------------------
+;; Font lock
 
 (defconst markdown-mode-font-lock-keywords
   (list
@@ -125,16 +131,92 @@
    )
   "Syntax highlighting for Markdown files.")
 
-;;;-------------------------------------
-;;; Mode definition
+;;-------------------------------------
+;; Element Insertion
 
-(define-derived-mode markdown-mode text-mode "Markdown"
+(defun wrap-or-insert (s1 s2)
+ "Insert the strings s1 and s2 around the current region or just insert them
+if there is no region selected."
+ (if (and transient-mark-mode mark-active)
+     (let ((a (region-beginning)) (b (region-end)))
+       (kill-region a b)
+       (insert s1)
+       (yank)
+       (insert s2))
+   (insert s1 s2)))
+
+(defun markdown-insert-hr ()
+  "Insert a horizonal rule."
+  (interactive)
+  (insert "* * * * *\n"))
+
+(defun markdown-insert-bold ()
+  "Make the active region bold or insert an empty bold word."
+  (interactive)
+  (wrap-or-insert "**" "**")
+  (backward-char 2))
+
+(defun markdown-insert-italic ()
+  "Make the active region italic or insert an empty italic word."
+  (interactive)
+  (wrap-or-insert "*" "*")
+  (backward-char 1))
+
+(defun markdown-insert-code ()
+  "Format the active region as inline code or insert an empty inline code
+fragment."
+  (interactive)
+  (wrap-or-insert "`" "`")
+  (backward-char 1))
+
+(defun markdown-insert-link ()
+  "Creates an empty link of the form []().  If there is an active region,
+this text will be used for the link text."
+  (interactive)
+  (wrap-or-insert "[" "]")
+  (insert "()")
+  (backward-char 1))
+
+(defun markdown-insert-header (n)
+  "Creates a level n header.  If there is an active region, it is used as the
+header text."
+  (interactive "P")
+  (unless n				; Test to see if n is defined
+    (setq n 1))				; Default to level 1 header
+  (let (hdr)
+    (dotimes (count n hdr)
+      (setq hdr (concat "#" hdr)))	; Build a ### header string
+    (setq hdrl (concat hdr " "))
+    (setq hdrr (concat " " hdr))
+    (wrap-or-insert hdrl hdrr))
+  (backward-char (+ 1 n)))
+
+;;-------------------------------------
+;; Keymap
+
+(defvar markdown-mode-map
+  (let ((markdown-mode-map (make-keymap)))
+    (define-key markdown-mode-map "\C-cl" 'markdown-insert-link)
+    (define-key markdown-mode-map "\C-ch" 'markdown-insert-header)
+    (define-key markdown-mode-map "\C-cb" 'markdown-insert-bold)
+    (define-key markdown-mode-map "\C-ci" 'markdown-insert-italic)
+    (define-key markdown-mode-map "\C-cc" 'markdown-insert-code)
+    (define-key markdown-mode-map "\C-cr" 'markdown-insert-hr)
+    markdown-mode-map)
+  "Keymap for Markdown major mode")
+
+;;-------------------------------------
+;; Mode definition
+
+(define-derived-mode markdown-mode fundamental-mode "Markdown"
   "Major mode for editing Markdown files."
   ;; Font lock.
   (set (make-local-variable 'font-lock-defaults)
        '(markdown-mode-font-lock-keywords))
   (set (make-local-variable 'font-lock-multiline) t))
 
+;(add-to-list 'auto-mode-alist '("\\.mdml$" . markdown-mode))
+
 (provide 'markdown-mode)
 
-;;; end markdown-mode.el
+;; end markdown-mode.el
