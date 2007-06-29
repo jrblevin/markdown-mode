@@ -1,9 +1,8 @@
 ;;; markdown-mode.el --- Major mode to edit Markdown files in Emacs
 ;;
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
-;; Maintainer: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; Created: May 24, 2007
-;; $Id: markdown-mode.el,v 1.3 2007/06/05 03:29:43 jrblevin Exp $
+;; $Id: markdown-mode.el,v 1.4 2007/06/29 19:00:40 jrblevin Exp $
 ;; Keywords: Markdown major mode
 ;;
 ;; Copyright (C) 2007 Jason Blevins
@@ -56,8 +55,11 @@
 ;; * itex font lock support:
 ;;   + Equation references: (eq:reference) or \eqref{reference}.
 ;;   + Separate font locking for \label{} elements in side \[ \] equations.
+;; * Treat * or _  surrounded by spaces as literals.
+;; * When inserting links (maybe other elements), the selected text remains
+;;   in the paste buffer.
 
-(defconst markdown-mode-version "$Revision: 1.3 $")
+(defconst markdown-mode-version "$Revision: 1.4 $")
 
 ;; A hook for users to run their own code when the mode is loaded.
 (defvar markdown-mode-hook nil)
@@ -99,7 +101,7 @@
 (defconst regex-link-reference "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
   "Regular expression for a reference link [text][id]")
 (defconst regex-reference-definition
-  "^\s*\\(\\[.+?\\]\\):\s*\\([^\s\n]+\\).*$"
+  "^\\s*\\(\\[.+?\\]\\):\\s*\\([^\\s\n]+\\).*$"
   "Regular expression for a link definition [id]: ...")
 
 
@@ -115,8 +117,8 @@
    (cons ".*\n?===*" 'font-lock-function-name-face)     ; === headers
    (cons ".*\n?---*" 'font-lock-function-name-face)     ; --- headers
    (cons "^#+ .*$" 'font-lock-function-name-face)	; ### Headers
-   (cons "^\\*[\\*\s]*$" 'font-lock-function-name-face) ; * * * style HRs
-   (cons "^-[-\s]*$" 'font-lock-function-name-face)	; - - - style HRs
+   (cons "^\\*[\\*\\s]*$" 'font-lock-function-name-face) ; * * * style HRs
+   (cons "^-[-\\s]*$" 'font-lock-function-name-face)	; - - - style HRs
    ;; Blockquotes
    (cons "^>.*$" 'font-lock-comment-face)            ; > blockquote
    ;; Bold
@@ -371,6 +373,15 @@ which case it is turned into a blockquote region."
 (provide 'markdown-mode)
 
 ;;; Change log
+;;
+;; 2007-06-29 Jason Blevins <jrblevin@sdf.lonestar.org>
+;;   * Changed \s to \\s in regexps to fix the Emacs 21 "Invalid escape
+;;     character syntax." error.  Thanks to Edward O'Connor for the fix.
+;;   * Revision 1.4.
+;;
+;; 2007-06-05 Jason Blevins <jrblevin@sdf.lonestar.org>
+;;   * Revision 1.3.
+;;
 ;; 2007-05-29 Jason Blevins <jrblevin@sdf.lonestar.org>
 ;;   * Added support for equals and dash style headings.
 ;;   * Added markdown-show-version.
