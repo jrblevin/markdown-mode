@@ -2,7 +2,7 @@
 ;;
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; Created: May 24, 2007
-;; $Id: markdown-mode.el,v 1.4 2007/06/29 19:00:40 jrblevin Exp $
+;; $Id: markdown-mode.el,v 1.5 2007/10/11 16:43:23 jrblevin Exp $
 ;; Keywords: Markdown major mode
 ;;
 ;; Copyright (C) 2007 Jason Blevins
@@ -20,46 +20,139 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-;;
-;; Supported Emacsen:
-;; ==================
-;; This mode has only been tested on Emacs 22.0.  Please let me know
-;; if there are problems on other versions.
-;;
-;; Installation:
-;; =============
-;; Add the following lines to your .emacs file to associate
-;; markdown-mode with .mdml files.   There doesn't seem to be
-;; a consensus on an official file extension so you can change
-;; this to .text, .md, .mdt, or whatever you call your markdown
-;; files.
-;;
-;;   (autoload 'markdown-mode "markdown-mode.el"
-;;   	"Major mode for editing Markdown files" t)
-;;   (setq auto-mode-alist
-;;     (cons '("\\.mdml$" . markdown-mode) auto-mode-alist))
-;;
+;; 
+;; Emacs markdown-mode
+;; ===================
+;; 
+;; [markdown-mode][] is a major mode for [GNU Emacs][] which provides syntax
+;; highlighting and supporting commands for editing [Markdown][] files.  It
+;; provides keybindings and commands for inserting Markdown elements and to
+;; assist in calling Markdown to parse the source code or preview the document
+;; in a browser.  It also, optionally, provides syntax highlighting for
+;; [wiki links](#itex) and embedded [itex](#itex) mathematical expressions.
+;; 
+;; Markdown is a simple plain-text-based markup language for documents designed
+;; to be translated into HTML.  It is designed to be as readable as possible.
+;; Markdown is also the name of the original text-to-HTML conversion tool
+;; written in Perl.  Since its creation it has become very popular and has been
+;; integrated into a number of wiki and weblog packages (see the [links](#links)
+;; below).
+;; 
+;; markdown-mode is free software, licensed under the [GNU GPL][].
+;; 
+;;  [markdown-mode]: http://jrblevin.freeshell.org/software/markdown-mode
+;;  [GNU Emacs]:     http://www.gnu.org/software/emacs
+;;  [Markdown]:      http://daringfireball.net/projects/markdown
+;;  [GNU GPL]:       http://www.gnu.org/copyleft/gpl.html
+;; 
+;; Download
+;; --------
+;; 
+;; The latest version is [markdown-mode 1.5][current], released on October 11,
+;; 2007.  This [documentation](readme.txt) is also available in its original
+;; Markdown form.
+;; 
+;; This release contains significant changes from the previous version,
+;; particularly in the area of syntax highlighting.  There are still a few
+;; highlighting quirks, but these are mostly side effects of using Emacs'
+;; multi-line font lock rather than using a custom function to parse the
+;; document.  All [previous versions][archive], such as
+;; [markdown-mode-1.4.el](archive/markdown-mode-1.4.el), are still available as
+;; well.
+;; 
+;; This mode has only been tested on Emacs 21.4 and 22.0.  Please let me know
+;; if there are problems on other versions.  If you find any bugs, such as
+;; syntax highlighting issues that aren't already acknowledged in the TODO
+;; list, please [email](mailto:jrblevin@sdf.lonestar.org) me a test case to
+;; look at.
+;; 
+;; markdown-mode is also available in the Debian [emacs-goodies-el][]
+;; package, as of the 27.0-1 revision.
+;; 
+;; [current]: http://jrblevin.freeshell.org/software/markdown-mode/markdown-mode.el
+;; [archive]: http://jrblevin.freeshell.org/software/markdown-mode/archive
+;; [emacs-goodies-el]: http://packages.debian.org/emacs%2Dgoodies%2Del
+;; 
+;; Installation
+;; ------------
+;; 
+;; Add the following lines to your `.emacs` file to associate markdown-mode with
+;; `.mdml` files.  There doesn't seem to be a consensus on an official file
+;; extension so you can change this to `.text`, `.md`, `.mdt`, or whatever you
+;; call your markdown files.
+;; 
+;;     (autoload 'markdown-mode "markdown-mode.el"
+;;        "Major mode for editing Markdown files" t)
+;;     (setq auto-mode-alist
+;;        (cons '("\\.mdml$" . markdown-mode) auto-mode-alist))
+;; 
 ;; Make sure to place this file somewhere in the load-path.
-;;
-;; Description:
-;; ============
-;; This mode provides basic syntax highlighting, element insertion
-;; commands, and preview commands for Markdown files.  The latest version
-;; should always be available from
-;; http://jrblevin.freeshell.org/software/markdown-mode.
-;;
-;; TODO:
-;; =====
-;; * Recognize inline HTML.
-;; * Bold at the beginning of a line is mistaken to be a list item.
-;; * itex font lock support:
-;;   + Equation references: (eq:reference) or \eqref{reference}.
-;;   + Separate font locking for \label{} elements in side \[ \] equations.
-;; * Treat * or _  surrounded by spaces as literals.
-;; * When inserting links (maybe other elements), the selected text remains
-;;   in the paste buffer.
+;; 
+;; Instiki and itex
+;; ----------------
+;; 
+;; Besides supporting the basic Markdown syntax, this mode also includes support
+;; for documents including embedded mathematics written [itex][] and syntax
+;; highlighting for `[[Wiki Links]]`.  These features are designed for editing
+;; pages on math-enabled wikis such as [Instiki][].  One way to do this is to simply
+;; copy the text from your browser to Emacs, edit the page using markdown-mode,
+;; and then copy it back when you are finished.  The other way is to use a
+;; plugin such as [Mozex][] for Mozilla/Firefox which allows you to call an
+;; external editor such as Emacs to edit textareas.  You can also tell [Mozex][]
+;; to give the temporary file a particular extension, such as `.mdml`, so that
+;; markdown-mode will be loaded automatically.
+;; 
+;; To enable syntax highlighting for itex equations and wiki links, edit
+;; `markdown-mode.el` and change `(defvar markdown-enable-itex nil)` to
+;; `(defvar markdown-enable-itex t)`.
+;; 
+;;  [itex]:    http://golem.ph.utexas.edu/~distler/blog/itex2MMLcommands.html
+;;  [Instiki]: http://golem.ph.utexas.edu/instiki
+;;  [Mozex]:   http://mozex.mozdev.org
+;; 
+;; 
+;; Usage
+;; -----
+;; 
+;; No configuration is necessary, although there are a few things that can be
+;; customized (<kbd>M-x customize-mode</kbd>).
+;; 
+;; The element insertion keybindings are based on those of [html-helper-mode][].
+;; Commands are grouped by prefixes based on their function.  For example,
+;; commands dealing with headers begin with <kdb>C-c C-t</kbd>.  You can obtain
+;; a list of keybindings by pressing <kbd>C-c C-h</kbd> in Emacs.
+;; 
+;; Some commands behave differently depending on whether there is an active
+;; selection.  For example, if there is no active selection <kbd>C-c C-a l</kbd>
+;; will simply insert an empty `[]()` link.  Otherwise, it will use the selected
+;; text as the link text.  Most other formatting commands behave similarly.
+;; 
+;; TODO
+;; ----
+;; 
+;; * Highlight inline HTML.
+;; * itex: Separate font locking for `\label{}` elements inside equations.
+;; * When inserting links (and maybe other elements), the selected should not
+;;   remain in the kill ring.
+;; * Indentation and filling of list items.
+;; * A complete syntax table.
+;; * Hanging indents of list items are highlighted as preformatted text.
+;; * Use abbrev for quick entry of itex math mode symbols.
+;; * Multi-line font lock in Emacs can be unreliable.  What we really need is
+;;   a custom syntax-highlighting function.
 
-(defconst markdown-mode-version "$Revision: 1.4 $")
+
+;;; User Customizable Variables ===============================================
+
+;; To enable itex/wiki syntax highlighting, change to
+;; (defvar markdown-enable-itex t)
+(defvar markdown-enable-itex nil)
+
+
+;;; Customizable variables ====================================================
+
+;; Current revision
+(defconst markdown-mode-version "$Revision: 1.5 $")
 
 ;; A hook for users to run their own code when the mode is loaded.
 (defvar markdown-mode-hook nil)
@@ -93,67 +186,205 @@
   :type 'boolean)
 
 
+;;; Font lock faces ==========================================================
+
+;; Make new faces based on existing ones
+
+;;; This is not available in Emacs 21 so it has been disabled until 
+;;; something can be built from scratch.  If you are running Emacs 22 and
+;;; want to underline line breaks, uncomment this face and the associated
+;;; regular expression below.
+
+;(copy-face 'nobreak-space 'markdown-font-lock-line-break-face)
+
+(defface markdown-font-lock-bold-face '((t (:inherit bold)))
+  "`markdown-mode' face used to highlight **bold** and __bold__ text.")
+(defface markdown-font-lock-italic-face '((t (:inherit italic)))
+  "`markdown-mode' face used to highlight *italic* and _italic_ text.")
+(defface markdown-font-lock-inline-code-face '((t (:inherit fixed-pitch)))
+  "`markdown-mode' face used to highlight `inline code` fragments.")
+
+;;; If you prefer to highlight italic/bold/code using colors, rather than
+;;; with italic and bold and fixed faces, uncomment the following lines.
+
+;(copy-face 'font-lock-variable-name-face 'markdown-font-lock-italic-face)
+;(copy-face 'font-lock-type-face 'markdown-font-lock-bold-face)
+;(copy-face 'font-lock-builtin-face 'markdown-font-lock-inline-code-face)
+
+(copy-face 'font-lock-function-name-face 'markdown-font-lock-header-face)
+(copy-face 'font-lock-variable-name-face 'markdown-font-lock-list-face)
+(copy-face 'font-lock-comment-face 'markdown-font-lock-blockquote-face)
+(copy-face 'font-lock-constant-face 'markdown-font-lock-link-face)
+(copy-face 'font-lock-type-face 'markdown-font-lock-reference-face)
+(copy-face 'font-lock-string-face 'markdown-font-lock-url-face)
+(copy-face 'font-lock-builtin-face 'markdown-font-lock-math-face)
+
+;; Define the extra font lock faces
+;(defvar markdown-font-lock-line-break-face 'markdown-font-lock-line-break-face
+;  "Face name to use for line breaks.")
+(defvar markdown-font-lock-italic-face 'markdown-font-lock-italic-face
+  "Face name to use for italics.")
+(defvar markdown-font-lock-bold-face 'markdown-font-lock-bold-face
+  "Face name to use for bold.")
+(defvar markdown-font-lock-header-face 'markdown-font-lock-header-face
+  "Face name to use for headers.")
+(defvar markdown-font-lock-inline-code-face 'markdown-font-lock-inline-code-face
+  "Face name to use for inline code.")
+(defvar markdown-font-lock-list-face 'markdown-font-lock-list-face
+  "Face name to use for list items.")
+(defvar markdown-font-lock-blockquote-face 'markdown-font-lock-blockquote-face
+  "Face name to use for blockquotes and code blocks.")
+(defvar markdown-font-lock-link-face 'markdown-font-lock-link-face
+  "Face name to use for links.")
+(defvar markdown-font-lock-reference-face 'markdown-font-lock-reference-face
+  "Face name to use for references.")
+(defvar markdown-font-lock-url-face 'markdown-font-lock-url-face
+  "Face name to use for URLs.")
+(defvar markdown-font-lock-math-face 'markdown-font-lock-math-face
+  "Face name to use for itex expressions.")
+
+
 ;;; Regular expressions =======================================================
 
 ;; Links
-(defconst regex-link-inline "\\(!?\\[.+?\\]\\)\\((.*)\\)"
+(defconst regex-link-inline "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
   "Regular expression for a [text](file) or an image link ![text](file)")
 (defconst regex-link-reference "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
   "Regular expression for a reference link [text][id]")
 (defconst regex-reference-definition
-  "^\\s*\\(\\[.+?\\]\\):\\s*\\([^\\s\n]+\\).*$"
+  "^ \\{0,3\\}\\(\\[.+?\\]\\):[ ]?\\(.*?\\)\\(\"[^\"]+?\"\\)?$"
   "Regular expression for a link definition [id]: ...")
+
+;; itex/LaTeX
+(defconst markdown-regex-latex-expression
+  "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
+  "Regular expression for itex $..$ or $$..$$ math mode expressions")
+
+(defconst markdown-regex-latex-display
+    "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
+  "Regular expression for itex \[..\] display mode expressions")
 
 
 ;;; Font lock =================================================================
 
-(defconst markdown-mode-font-lock-keywords
+(defconst markdown-mode-font-lock-keywords-basic
   (list
-   ;; Latex/itex
-;   (cons "\\\\\\[[^$]+\\\\\\]" 'font-lock-string-face)
-;   (cons "\\$\\$[^$]+\\$\\$" 'font-lock-string-face)
-;   (cons "\\$[^$]+\\$" 'font-lock-string-face)
-   ;; Headers and (Horizontal Rules)
-   (cons ".*\n?===*" 'font-lock-function-name-face)     ; === headers
-   (cons ".*\n?---*" 'font-lock-function-name-face)     ; --- headers
-   (cons "^#+ .*$" 'font-lock-function-name-face)	; ### Headers
-   (cons "^\\*[\\*\\s]*$" 'font-lock-function-name-face) ; * * * style HRs
-   (cons "^-[-\\s]*$" 'font-lock-function-name-face)	; - - - style HRs
-   ;; Blockquotes
-   (cons "^>.*$" 'font-lock-comment-face)            ; > blockquote
-   ;; Bold
-   (cons "[^\\]?\\*\\*.+?\\*\\*" 'font-lock-type-face)     ; **bold**
-   (cons "[^\\]?__.+?__" 'font-lock-type-face)             ; __bold__
-   ;; Italic
-   (cons "[^\\]?\\*.+?\\*" 'font-lock-variable-name-face)  ; *italic*
-   (cons "[^\\]?_.+?_" 'font-lock-variable-name-face)      ; _italic_
-   ;; Lists
-   (cons "^[0-9]+\\." 'font-lock-variable-name-face) ; Numbered list
-   (cons "^\\*" 'font-lock-variable-name-face)	     ; Level 1 (no indent)
-   (cons "^\\+" 'font-lock-variable-name-face)	     ; Level 1 (no indent)
-   (cons "^\\-" 'font-lock-variable-name-face)	     ; Level 1 (no indent)
-   (cons "^  [ ]*\\*" 'font-lock-variable-name-face) ; Level 2 (two or more)
-   (cons "^  [ ]*\\+" 'font-lock-variable-name-face) ; Level 2 (two or more)
-   (cons "^  [ ]*\\-" 'font-lock-variable-name-face) ; Level 2 (two or more)
-   ;; Links
-   (cons regex-link-inline '(1 'font-lock-string-face t))
-   (cons regex-link-inline '(2 'font-lock-constant-face t))
-   (cons regex-link-reference '(1 'font-lock-string-face t))
-   (cons regex-link-reference '(2 'font-lock-comment-face t))
-   (cons regex-reference-definition '(1 'font-lock-comment-face t))
-   (cons regex-reference-definition '(2 'font-lock-constant-face t))
-   ;; Wiki links
-;   (cons "\\[\\[\\w+\\]\\]" 'font-lock-string-face)  ; Standard wiki link
-   (cons "\\[\\[.+\\]\\]" 'font-lock-string-face)
-   ;; Code
-   (cons "``.+?``" 'font-lock-constant-face)         ; ``inline code``
-   (cons "`.+?`" 'font-lock-constant-face)           ; `inline code`
-   (cons "^    .*$" 'font-lock-constant-face)        ;     code block
+   ;;;
+   ;;; Code ----------------------------------------------------------
+   ;;;
+   ;; Double backtick style ``inline code``
+   (cons "``.+?``" 'markdown-font-lock-inline-code-face)
+   ;; Single backtick style `inline code`
+   (cons "`.+?`" 'markdown-font-lock-inline-code-face)
+   ;; Four-space indent style code block
+   (cons "^    .*$" 'markdown-font-lock-blockquote-face)
+   ;;;
+   ;;; Headers and Horizontal Rules ----------------------------------
+   ;;;
+   ;; Equals style headers (===)
+   (cons ".*\n===+" 'markdown-font-lock-header-face)
+   ;; Hyphen style headers (---)
+   (cons ".*\n---+" 'markdown-font-lock-header-face)
+   ;; Hash style headers (###)
+   (cons "^#+ .*$" 'markdown-font-lock-header-face)
+   ;; Asterisk style horizontal rules (* * *)
+   (cons "^\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*$" 'markdown-font-lock-header-face)
+   ;; Hyphen style horizontal rules (- - -)
+   (cons "^-[ ]?-[ ]?-[--- ]*$" 'markdown-font-lock-header-face)
+   ;;;
+   ;;; Special cases -------------------------------------------------
+   ;;;
+   ;; List item including bold
+   (cons "^\\s *\\* .*?[^\\\n]?\\(\\*\\*.*?[^\n\\]\\*\\*\\).*$"
+         '(1 'markdown-font-lock-bold-face))
+   ;; List item including italics
+   (cons "^\\* .*?[^\\\n]?\\(\\*.*?[^\n\\]\\*\\).*$"
+         '(1 'markdown-font-lock-italic-face))
+   ;;;
+   ;;; Lists ---------------------------------------------------------
+   ;;;
+   ;; Numbered lists (1. List item)
+   (cons "^[0-9]+\\.\\s " 'markdown-font-lock-list-face)
+   ;; Level 1 list item (no indent) (* List item)
+   (cons "^\\(\\*\\|\\+\\|-\\) " '(1 'markdown-font-lock-list-face))
+   ;; Level 2 list item (two or more spaces) (   * Second level list item)
+   (cons "^  [ ]*\\(\\*\\|\\+\\|-\\) " 'markdown-font-lock-list-face)
+   ;;;
+   ;;; Links ---------------------------------------------------------
+   ;;;
+   (cons regex-link-inline '(1 'markdown-font-lock-link-face t))
+   (cons regex-link-inline '(2 'markdown-font-lock-url-face t))
+   (cons regex-link-reference '(1 'markdown-font-lock-link-face t))
+   (cons regex-link-reference '(2 'markdown-font-lock-reference-face t))
+   (cons regex-reference-definition '(1 'markdown-font-lock-reference-face t))
+   (cons regex-reference-definition '(2 'markdown-font-lock-url-face t))
+   (cons regex-reference-definition '(3 'markdown-font-lock-link-face t))
+   ;;;
+   ;;; Bold ----------------------------------------------------------
+   ;;;
+   ;; **Asterisk** and _underscore_ style bold
+   (cons "[^\\]\\(\\(\\*\\*\\|__\\)\\(.\\|\n\\)*?[^\\]\\2\\)"
+         '(1 'markdown-font-lock-bold-face))
+   ;;;
+   ;;; Italic --------------------------------------------------------
+   ;;;
+   ;; *Asterisk* and _underscore_ style italic
+   (cons "[^\\]\\(\\(\\*\\|_\\)\\(.\\|\n\\)*?[^\\]\\2\\)"
+         '(1 'markdown-font-lock-italic-face))
+   ;;;
+   ;;; Blockquotes ---------------------------------------------------
+   ;;;
+   (cons "^>.*$" 'markdown-font-lock-blockquote-face)
+   ;;;
+   ;;; Hard line breaks ----------------------------------------------
+   ;;;
+   ;; Trailing whitespace (two spaces at end of line)
+;   (cons "  $" 'markdown-font-lock-line-break-face)
    )
   "Syntax highlighting for Markdown files.")
 
 
-;;; Element Insertion ==========================================================
+;; Includes additional Latex/itex/Instiki font lock keywords
+(defconst markdown-mode-font-lock-keywords-itex
+  (append
+    (list
+     ;;;
+     ;;; itex expressions --------------------------------------------
+     ;;;
+     ;; itex math mode $..$ or $$..$$
+     (cons markdown-regex-latex-expression '(2 markdown-font-lock-math-face))
+     ;; Display mode equations with brackets: \[ \]
+     (cons markdown-regex-latex-display 'markdown-font-lock-math-face)
+     ;;;
+     ;;; itex equation references ------------------------------------
+     ;;;
+     ;; Equation reference (eq:foo)
+     (cons "(eq:\\w+)" 'markdown-font-lock-reference-face)
+     ;; Equation reference \eqref
+     (cons "\\\\eqref{\\w+}" 'markdown-font-lock-reference-face)
+     ;; Wiki links
+     (cons "\\[\\[[^]]+\\]\\]" 'markdown-font-lock-link-face))
+    markdown-mode-font-lock-keywords-basic)
+  "Syntax highlighting for Markdown, itex, and wiki expressions.")
+
+
+(defvar markdown-mode-font-lock-keywords
+  (if markdown-enable-itex 
+      markdown-mode-font-lock-keywords-itex
+    markdown-mode-font-lock-keywords-basic)
+  "Default highlighting expressions for Markdown mode")
+
+
+;;; Syntax Table ==============================================================
+
+(defvar markdown-mode-syntax-table
+  (let ((markdown-mode-syntax-table (make-syntax-table)))
+    (modify-syntax-entry ?\" "w" markdown-mode-syntax-table)
+    markdown-mode-syntax-table)
+  "Syntax table for markdown-mode")
+
+
+;;; Element Insertion =========================================================
 
 (defun wrap-or-insert (s1 s2)
  "Insert the strings s1 and s2 around the current region or just insert them
@@ -170,9 +401,9 @@ if there is no region selected."
   "Insert a horizonal rule."
   (interactive)
   (let (hr)
-    (dotimes (count (- markdown-hr-length 1) hr)	; Count to n - 1
-      (setq hr (concat "* " hr)))	                ; Build HR string
-    (setq hr (concat hr "*\n"))				; Add the n-th *
+    (dotimes (count (- markdown-hr-length 1) hr)        ; Count to n - 1
+      (setq hr (concat "* " hr)))                       ; Build HR string
+    (setq hr (concat hr "*\n"))                         ; Add the n-th *
     (insert hr)))
 
 (defun markdown-insert-bold ()
@@ -243,11 +474,11 @@ this text will be used for the alternate text for the image."
   "Creates a level n header.  If there is an active region, it is used as the
 header text."
   (interactive "p")
-  (unless n				; Test to see if n is defined
-    (setq n 1))				; Default to level 1 header
+  (unless n                             ; Test to see if n is defined
+    (setq n 1))                         ; Default to level 1 header
   (let (hdr)
     (dotimes (count n hdr)
-      (setq hdr (concat "#" hdr)))	; Build a ### header string
+      (setq hdr (concat "#" hdr)))      ; Build a ### header string
     (setq hdrl (concat hdr " "))
     (setq hdrr (concat " " hdr))
     (wrap-or-insert hdrl hdrr))
@@ -260,14 +491,14 @@ insert a title."
   (interactive)
   (if (and transient-mark-mode mark-active)
       (let ((a (region-beginning))
-	    (b (region-end))
-	    (len 0)
-	    (hdr))
-	(setq len (- b a))
-	(dotimes (count len hdr)
-	  (setq hdr (concat "=" hdr)))	; Build a === title underline
-	(end-of-line)
-	(insert "\n" hdr "\n"))
+            (b (region-end))
+            (len 0)
+            (hdr))
+        (setq len (- b a))
+        (dotimes (count len hdr)
+          (setq hdr (concat "=" hdr)))  ; Build a === title underline
+        (end-of-line)
+        (insert "\n" hdr "\n"))
     (insert "\n==========\n")
     (backward-char 12)))
 
@@ -278,14 +509,14 @@ insert a section."
   (interactive)
   (if (and transient-mark-mode mark-active)
       (let ((a (region-beginning))
-	    (b (region-end))
-	    (len 0)
-	    (hdr))
-	(setq len (- b a))
-	(dotimes (count len hdr)
-	  (setq hdr (concat "-" hdr)))	; Build a --- section underline
-	(end-of-line)
-	(insert "\n" hdr "\n"))
+            (b (region-end))
+            (len 0)
+            (hdr))
+        (setq len (- b a))
+        (dotimes (count len hdr)
+          (setq hdr (concat "-" hdr)))  ; Build a --- section underline
+        (end-of-line)
+        (insert "\n" hdr "\n"))
     (insert "\n----------\n")
     (backward-char 12)))
 
@@ -333,10 +564,10 @@ which case it is turned into a blockquote region."
   "Run markdown on the current buffer and preview the output in another buffer."
   (interactive)
     (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-	(shell-command-on-region region-beginning region-end markdown-command
-				 "*markdown-output*" nil)
+        (shell-command-on-region region-beginning region-end markdown-command
+                                 "*markdown-output*" nil)
       (shell-command-on-region (point-min) (point-max) markdown-command
-			       "*markdown-output*" nil)))
+                               "*markdown-output*" nil)))
 
 (defun markdown-preview ()
   "Run markdown on the current buffer and preview the output in a browser."
@@ -356,10 +587,10 @@ which case it is turned into a blockquote region."
   "Blockquote an entire region."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (replace-regexp "^" "> ")))
+      (perform-replace "^" "> " nil 1 nil nil nil (region-beginning) (region-end))))
 
 
-;; Mode definition  ===========================================================
+;;; Mode definition  ==========================================================
 
 (define-derived-mode markdown-mode fundamental-mode "Markdown"
   "Major mode for editing Markdown files."
@@ -371,40 +602,5 @@ which case it is turned into a blockquote region."
 ;(add-to-list 'auto-mode-alist '("\\.mdml$" . markdown-mode))
 
 (provide 'markdown-mode)
-
-;;; Change log
-;;
-;; 2007-06-29 Jason Blevins <jrblevin@sdf.lonestar.org>
-;;   * Changed \s to \\s in regexps to fix the Emacs 21 "Invalid escape
-;;     character syntax." error.  Thanks to Edward O'Connor for the fix.
-;;   * Revision 1.4.
-;;
-;; 2007-06-05 Jason Blevins <jrblevin@sdf.lonestar.org>
-;;   * Revision 1.3.
-;;
-;; 2007-05-29 Jason Blevins <jrblevin@sdf.lonestar.org>
-;;   * Added support for equals and dash style headings.
-;;   * Added markdown-show-version.
-;;   * Ability to preview markdown output in a buffer (markdown) or
-;;     in a browser (markdown-preview).  Markdown command is customizable.
-;;   * Made HR length customizable through markdown-hr-length.
-;;   * Made bold and italic style customizable through markdown-bold-underscore
-;;     and markdown-italic-underscore.
-;;   * Made keybindings more like those of html-helper-mode.
-;;   * Added image insertion (markdown-insert-image).
-;;   * Font lock for code fragments with double backticks.
-;;   * Added blockquote-region function and insert-blockquote keybinding.
-;;   * Don't highlight escaped literals such as \* or \_.
-;;   * Added header insertion commands for H1-H5 (markdown-insert-header-n).
-;;
-;; 2007-05-25 Jason Blevins <jrblevin@sdf.lonestar.org>
-;;   * Added element insertion commands and keys for links, horizontal rules,
-;;     headers, inline code, and bold and italic text.
-;;   * Revision 1.2.
-;;
-;; 2007-05-24 Jason Blevins <jrblevin@sdf.lonestar.org>
-;;   * Initial revision.
-;;   * Basic syntax highlighting support.
-;;   * Revision 1.1.
 
 ;;; markdown-mode.el ends here
