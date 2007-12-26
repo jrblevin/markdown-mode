@@ -2,7 +2,7 @@
 ;;
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; Created: May 24, 2007
-;; $Id: markdown-mode.el,v 1.5 2007/10/11 16:43:23 jrblevin Exp $
+;; $Id: markdown-mode.el,v 1.51 2007/12/26 15:01:37 jrblevin Exp $
 ;; Keywords: Markdown major mode
 ;;
 ;; Copyright (C) 2007 Jason Blevins
@@ -152,7 +152,7 @@
 ;;; Customizable variables ====================================================
 
 ;; Current revision
-(defconst markdown-mode-version "$Revision: 1.5 $")
+(defconst markdown-mode-version "$Revision: 1.51 $")
 
 ;; A hook for users to run their own code when the mode is loaded.
 (defvar markdown-mode-hook nil)
@@ -197,20 +197,9 @@
 
 ;(copy-face 'nobreak-space 'markdown-font-lock-line-break-face)
 
-(defface markdown-font-lock-bold-face '((t (:inherit bold)))
-  "`markdown-mode' face used to highlight **bold** and __bold__ text.")
-(defface markdown-font-lock-italic-face '((t (:inherit italic)))
-  "`markdown-mode' face used to highlight *italic* and _italic_ text.")
-(defface markdown-font-lock-inline-code-face '((t (:inherit fixed-pitch)))
-  "`markdown-mode' face used to highlight `inline code` fragments.")
-
-;;; If you prefer to highlight italic/bold/code using colors, rather than
-;;; with italic and bold and fixed faces, uncomment the following lines.
-
-;(copy-face 'font-lock-variable-name-face 'markdown-font-lock-italic-face)
-;(copy-face 'font-lock-type-face 'markdown-font-lock-bold-face)
-;(copy-face 'font-lock-builtin-face 'markdown-font-lock-inline-code-face)
-
+(copy-face 'font-lock-variable-name-face 'markdown-font-lock-italic-face)
+(copy-face 'font-lock-type-face 'markdown-font-lock-bold-face)
+(copy-face 'font-lock-builtin-face 'markdown-font-lock-inline-code-face)
 (copy-face 'font-lock-function-name-face 'markdown-font-lock-header-face)
 (copy-face 'font-lock-variable-name-face 'markdown-font-lock-list-face)
 (copy-face 'font-lock-comment-face 'markdown-font-lock-blockquote-face)
