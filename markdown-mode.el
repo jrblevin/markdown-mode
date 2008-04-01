@@ -2,10 +2,9 @@
 ;;
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; Created: May 24, 2007
-;; $Id: markdown-mode.el,v 1.51 2007/12/26 15:01:37 jrblevin Exp $
 ;; Keywords: Markdown major mode
 ;;
-;; Copyright (C) 2007 Jason Blevins
+;; Copyright (C) 2007-2008 Jason Blevins
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -152,7 +151,7 @@
 ;;; Customizable variables ====================================================
 
 ;; Current revision
-(defconst markdown-mode-version "$Revision: 1.51 $")
+(defconst markdown-mode-version "1.6-dev")
 
 ;; A hook for users to run their own code when the mode is loaded.
 (defvar markdown-mode-hook nil)
@@ -593,3 +592,4 @@ which case it is turned into a blockquote region."
 (provide 'markdown-mode)
 
 ;;; markdown-mode.el ends here
+
