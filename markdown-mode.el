@@ -1,145 +1,22 @@
 ;;; markdown-mode.el --- Major mode to edit Markdown files in Emacs
-;;
-;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
-;; Created: May 24, 2007
-;; Keywords: Markdown major mode
-;;
-;; Copyright (C) 2007-2008 Jason Blevins
-;;
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
-;; any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-;; 
-;; Emacs markdown-mode
-;; ===================
-;; 
-;; [markdown-mode][] is a major mode for [GNU Emacs][] which provides syntax
-;; highlighting and supporting commands for editing [Markdown][] files.  It
-;; provides keybindings and commands for inserting Markdown elements and to
-;; assist in calling Markdown to parse the source code or preview the document
-;; in a browser.  It also, optionally, provides syntax highlighting for
-;; [wiki links](#itex) and embedded [itex](#itex) mathematical expressions.
-;; 
-;; Markdown is a simple plain-text-based markup language for documents designed
-;; to be translated into HTML.  It is designed to be as readable as possible.
-;; Markdown is also the name of the original text-to-HTML conversion tool
-;; written in Perl.  Since its creation it has become very popular and has been
-;; integrated into a number of wiki and weblog packages (see the [links](#links)
-;; below).
-;; 
-;; markdown-mode is free software, licensed under the [GNU GPL][].
-;; 
-;;  [markdown-mode]: http://jrblevin.freeshell.org/software/markdown-mode
-;;  [GNU Emacs]:     http://www.gnu.org/software/emacs
-;;  [Markdown]:      http://daringfireball.net/projects/markdown
-;;  [GNU GPL]:       http://www.gnu.org/copyleft/gpl.html
-;; 
-;; Download
-;; --------
-;; 
-;; The latest version is [markdown-mode 1.5][current], released on October 11,
-;; 2007.  This [documentation](readme.txt) is also available in its original
-;; Markdown form.
-;; 
-;; This release contains significant changes from the previous version,
-;; particularly in the area of syntax highlighting.  There are still a few
-;; highlighting quirks, but these are mostly side effects of using Emacs'
-;; multi-line font lock rather than using a custom function to parse the
-;; document.  All [previous versions][archive], such as
-;; [markdown-mode-1.4.el](archive/markdown-mode-1.4.el), are still available as
-;; well.
-;; 
-;; This mode has only been tested on Emacs 21.4 and 22.0.  Please let me know
-;; if there are problems on other versions.  If you find any bugs, such as
-;; syntax highlighting issues that aren't already acknowledged in the TODO
-;; list, please [email](mailto:jrblevin@sdf.lonestar.org) me a test case to
-;; look at.
-;; 
-;; markdown-mode is also available in the Debian [emacs-goodies-el][]
-;; package, as of the 27.0-1 revision.
-;; 
-;; [current]: http://jrblevin.freeshell.org/software/markdown-mode/markdown-mode.el
-;; [archive]: http://jrblevin.freeshell.org/software/markdown-mode/archive
-;; [emacs-goodies-el]: http://packages.debian.org/emacs%2Dgoodies%2Del
-;; 
-;; Installation
-;; ------------
-;; 
-;; Add the following lines to your `.emacs` file to associate markdown-mode with
-;; `.mdml` files.  There doesn't seem to be a consensus on an official file
-;; extension so you can change this to `.text`, `.md`, `.mdt`, or whatever you
-;; call your markdown files.
-;; 
-;;     (autoload 'markdown-mode "markdown-mode.el"
-;;        "Major mode for editing Markdown files" t)
-;;     (setq auto-mode-alist
-;;        (cons '("\\.mdml$" . markdown-mode) auto-mode-alist))
-;; 
-;; Make sure to place this file somewhere in the load-path.
-;; 
-;; Instiki and itex
-;; ----------------
-;; 
-;; Besides supporting the basic Markdown syntax, this mode also includes support
-;; for documents including embedded mathematics written [itex][] and syntax
-;; highlighting for `[[Wiki Links]]`.  These features are designed for editing
-;; pages on math-enabled wikis such as [Instiki][].  One way to do this is to simply
-;; copy the text from your browser to Emacs, edit the page using markdown-mode,
-;; and then copy it back when you are finished.  The other way is to use a
-;; plugin such as [Mozex][] for Mozilla/Firefox which allows you to call an
-;; external editor such as Emacs to edit textareas.  You can also tell [Mozex][]
-;; to give the temporary file a particular extension, such as `.mdml`, so that
-;; markdown-mode will be loaded automatically.
-;; 
-;; To enable syntax highlighting for itex equations and wiki links, edit
-;; `markdown-mode.el` and change `(defvar markdown-enable-itex nil)` to
-;; `(defvar markdown-enable-itex t)`.
-;; 
-;;  [itex]:    http://golem.ph.utexas.edu/~distler/blog/itex2MMLcommands.html
-;;  [Instiki]: http://golem.ph.utexas.edu/instiki
-;;  [Mozex]:   http://mozex.mozdev.org
-;; 
-;; 
-;; Usage
-;; -----
-;; 
-;; No configuration is necessary, although there are a few things that can be
-;; customized (<kbd>M-x customize-mode</kbd>).
-;; 
-;; The element insertion keybindings are based on those of [html-helper-mode][].
-;; Commands are grouped by prefixes based on their function.  For example,
-;; commands dealing with headers begin with <kdb>C-c C-t</kbd>.  You can obtain
-;; a list of keybindings by pressing <kbd>C-c C-h</kbd> in Emacs.
-;; 
-;; Some commands behave differently depending on whether there is an active
-;; selection.  For example, if there is no active selection <kbd>C-c C-a l</kbd>
-;; will simply insert an empty `[]()` link.  Otherwise, it will use the selected
-;; text as the link text.  Most other formatting commands behave similarly.
-;; 
-;; TODO
-;; ----
-;; 
-;; * Highlight inline HTML.
-;; * itex: Separate font locking for `\label{}` elements inside equations.
-;; * When inserting links (and maybe other elements), the selected should not
-;;   remain in the kill ring.
-;; * Indentation and filling of list items.
-;; * A complete syntax table.
-;; * Hanging indents of list items are highlighted as preformatted text.
-;; * Use abbrev for quick entry of itex math mode symbols.
-;; * Multi-line font lock in Emacs can be unreliable.  What we really need is
-;;   a custom syntax-highlighting function.
 
+;;; Copyright (C) 2007-2008 Jason Blevins
+;;;
+;;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
+
+;;; This program is free software; you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 2, or (at your option)
+;;; any later version.
+;;;
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program; if not, write to the Free Software
+;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 ;;; User Customizable Variables ===============================================
 
