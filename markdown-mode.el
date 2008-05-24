@@ -1,22 +1,140 @@
 ;;; markdown-mode.el --- Major mode to edit Markdown files in Emacs
 
-;;; Copyright (C) 2007-2008 Jason Blevins
-;;;
-;;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
+;; Copyright (C) 2007-2008 Jason Blevins
 
-;;; This program is free software; you can redistribute it and/or modify
-;;; it under the terms of the GNU General Public License as published by
-;;; the Free Software Foundation; either version 2, or (at your option)
-;;; any later version.
-;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU General Public License for more details.
-;;;
-;;; You should have received a copy of the GNU General Public License
-;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;; Version: 1.6-dev
+;; Keywords: Markdown major mode
+;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
+;; URL: http://jblevins.org/projects/markdown-mode
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program; if not, write to the Free Software
+;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+;;; Commentary:
+
+;; markdown-mode is a major mode for editing [Markdown][]-formatted
+;; text files in GNU Emacs.  markdown-mode is free software, licensed
+;; under the GNU GPL.
+;;
+;;  [Markdown]: http://daringfireball.net/projects/markdown/
+;;
+;; The latest version is markdown-mode 1.5, released on October 11, 2007:
+;;
+;;  * [markdown-mode.el][]
+;;  * [Screenshot][]
+;;  * [Release notes][]
+;;
+;; markdown-mode is also available in the Debian `emacs-goodies-el`
+;; package (beginning with revision 27.0-1).
+;;
+;;  [markdown-mode.el]: http://code.jblevins.org/markdown-mode/markdown-mode.el
+;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20071011-001.png
+;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-5
+
+;;; Installation:
+
+;; Make sure to place `markdown-mode.el` somewhere in the load-path and add
+;; the following lines to your `.emacs` file to associate markdown-mode
+;; with `.text` files:
+;;
+;;     (autoload 'markdown-mode "markdown-mode.el"
+;;        "Major mode for editing Markdown files" t)
+;;     (setq auto-mode-alist
+;;        (cons '("\\.text" . markdown-mode) auto-mode-alist))
+;;
+;; There is no consensus on an official file extension so change `.text` to
+;; `.mdwn`, `.md`, `.mdt`, or whatever you call your markdown files.
+
+;;; Usage:
+
+;; Although no configuration is necessary there are a few things that can
+;; be customized (`M-x customize-mode`).
+;;
+;; Keybindings are grouped by prefixes based on their function.  For
+;; example, commands dealing with headers begin with `C-c C-t`.  The
+;; primary commands in each group will are described below.  You can
+;; obtain a list of all keybindings by pressing `C-c C-h`.
+;;
+;; * Anchors: `C-c C-a`
+;;
+;;   `C-c C-a l` inserts inline links of the form [text](url).  Any text
+;;    in the region is used for the link text.
+;;
+;; * Commands: `C-c C-c`
+;;
+;;   `C-c C-c m` will run Markdown on the current buffer and preview the
+;;   output in another buffer while `C-c C-c p` runs Markdown on the
+;;   current buffer and previews the output in a browser.
+;;
+;; * Images: `C-c C-i`
+;;
+;;   `C-c C-i i` inserts an image, using the current region (if any) as
+;;   the alt text.
+;;
+;; * Physical styles: `C-c C-p`
+;;
+;;   These commands all act on text in the selected region, if any, and
+;;   insert empty markup fragments otherwise.  `C-c C-p b` makes the
+;;   selected text bold, `C-c C-p f` formats the region as fixed-width
+;;   text, and `C-c C-p i` is used for italic text.
+;;
+;; * Logical styles: `C-c C-s`
+;;
+;;   These commands all act on text in the selected region, if any, and
+;;   insert empty markup fragments otherwise.  Logical styles include
+;;   blockquote (`C-c C-s b`), code (`C-c C-s c`),
+;;   emphasis (`C-c C-s e`), and strong (`C-c C-s s`).
+;;
+;; * Headers: `C-c C-t`
+;;
+;;   All header commands use text in the region, if any, as the header
+;;   text.  To insert a hash-style level-n header, press `C-c C-t n`
+;;   where n is between 1 and 5.  For a top-level underline-style header
+;;   press `C-c C-t t` (mnemonic: title) and for a second-level
+;;   underline-style header press `C-c C-t s` (mnemonic: section).
+;;
+;; * Other commands
+;;
+;;   `C-c -` inserts a horizontal rule.
+
+;;; Extensions:
+
+;; Besides supporting the basic Markdown syntax, markdown-mode also
+;; includes syntax highlighting for `[[Wiki Links]]` and mathematical
+;; expressions written in LaTeX (only expressions denoted by `$..$`,
+;; `$$..$$`, or `\[..\]`).  To enable these features, edit
+;; `markdown-mode.el` and change `(defvar markdown-enable-itex nil)`
+;; to`(defvar markdown-enable-itex t)`.
+
+;;; Thanks:
+
+;; * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
+;; * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
+;; * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
+
+;;; Bugs:
+
+;; This mode has only been tested on Emacs 21.4 and 22.0.  Please let me
+;; know if there are problems on other versions.  If you find any bugs,
+;; such as syntax highlighting issues, please construct a test case and
+;; email me at <jrblevin@sdf.lonestar.org>.
+
+
+
+;;; Code:
 
 ;;; User Customizable Variables ===============================================
 
@@ -62,7 +180,9 @@
   :type 'boolean)
 
 
-;;; Font lock faces ==========================================================
+;;; Font lock =================================================================
+
+;; Faces ----------------------------------------------------------------------
 
 ;; Make new faces based on existing ones
 
@@ -108,8 +228,7 @@
 (defvar markdown-font-lock-math-face 'markdown-font-lock-math-face
   "Face name to use for itex expressions.")
 
-
-;;; Regular expressions =======================================================
+;; Regular expressions  -------------------------------------------------------
 
 ;; Links
 (defconst regex-link-inline "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
@@ -120,17 +239,13 @@
   "^ \\{0,3\\}\\(\\[.+?\\]\\):[ ]?\\(.*?\\)\\(\"[^\"]+?\"\\)?$"
   "Regular expression for a link definition [id]: ...")
 
-;; itex/LaTeX
+;; LaTeX
 (defconst markdown-regex-latex-expression
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
   "Regular expression for itex $..$ or $$..$$ math mode expressions")
-
 (defconst markdown-regex-latex-display
     "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions")
-
-
-;;; Font lock =================================================================
 
 (defconst markdown-mode-font-lock-keywords-basic
   (list
@@ -239,6 +354,7 @@
     markdown-mode-font-lock-keywords-basic)
   "Default highlighting expressions for Markdown mode")
 
+
 
 ;;; Syntax Table ==============================================================
 
@@ -248,6 +364,7 @@
     markdown-mode-syntax-table)
   "Syntax table for markdown-mode")
 
+
 
 ;;; Element Insertion =========================================================
 
@@ -393,6 +510,13 @@ which case it is turned into a blockquote region."
       (blockquote-region)
     (insert "> ")))
 
+(defun blockquote-region ()
+  "Blockquote an entire region."
+  (interactive)
+  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+      (perform-replace "^" "> " nil 1 nil nil nil (region-beginning) (region-end))))
+
+
 
 ;;; Keymap ====================================================================
 
@@ -422,8 +546,9 @@ which case it is turned into a blockquote region."
     markdown-mode-map)
   "Keymap for Markdown major mode")
 
+
 
-;;; Markdown ==================================================================
+;;; Commands ==================================================================
 
 (defun markdown ()
   "Run markdown on the current buffer and preview the output in another buffer."
@@ -440,22 +565,14 @@ which case it is turned into a blockquote region."
   (markdown)
   (browse-url-of-buffer "*markdown-output*"))
 
+
 
-;;; Utilities =================================================================
+;;; Mode definition  ==========================================================
 
 (defun markdown-show-version ()
   "Show the version number in the minibuffer."
   (interactive)
   (message "markdown-mode, version %s" markdown-mode-version))
-
-(defun blockquote-region ()
-  "Blockquote an entire region."
-  (interactive)
-  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (perform-replace "^" "> " nil 1 nil nil nil (region-beginning) (region-end))))
-
-
-;;; Mode definition  ==========================================================
 
 (define-derived-mode markdown-mode fundamental-mode "Markdown"
   "Major mode for editing Markdown files."
@@ -464,9 +581,8 @@ which case it is turned into a blockquote region."
        '(markdown-mode-font-lock-keywords))
   (set (make-local-variable 'font-lock-multiline) t))
 
-;(add-to-list 'auto-mode-alist '("\\.mdml$" . markdown-mode))
+;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
 (provide 'markdown-mode)
 
 ;;; markdown-mode.el ends here
-
