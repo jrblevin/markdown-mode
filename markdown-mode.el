@@ -124,6 +124,7 @@
 ;; * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
 ;; * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
 ;; * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
+;; * Greg Bognar <greg_bognar@hms.harvard.edu> for a patch for (markdown).
 
 ;;; Bugs:
 
@@ -554,7 +555,7 @@ which case it is turned into a blockquote region."
   "Run markdown on the current buffer and preview the output in another buffer."
   (interactive)
     (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-        (shell-command-on-region region-beginning region-end markdown-command
+        (shell-command-on-region (region-beginning) (region-end) markdown-command
                                  "*markdown-output*" nil)
       (shell-command-on-region (point-min) (point-max) markdown-command
                                "*markdown-output*" nil)))
