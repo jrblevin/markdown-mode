@@ -44,6 +44,12 @@
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20071011-001.png
 ;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-5
 
+;;; Dependencies:
+
+;; markdown-mode requires easymenu, a standard package since GNU Emacs
+;; 19 and XEmacs 19, which provides a uniform interface for creating
+;; menus in GNU Emacs and XEmacs.
+
 ;;; Installation:
 
 ;; Make sure to place `markdown-mode.el` somewhere in the load-path and add
@@ -124,7 +130,7 @@
 ;; * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
 ;; * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
 ;; * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
-;; * Greg Bognar <greg_bognar@hms.harvard.edu> for a patch for (markdown).
+;; * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and a patch.
 
 ;;; Bugs:
 
@@ -136,6 +142,8 @@
 
 
 ;;; Code:
+
+(require 'easymenu)
 
 ;;; User Customizable Variables ===============================================
 
@@ -547,6 +555,36 @@ which case it is turned into a blockquote region."
     markdown-mode-map)
   "Keymap for Markdown major mode")
 
+;;; Menu ==================================================================
+
+(easy-menu-define markdown-mode-menu markdown-mode-map
+  "Menu for Markdown mode"
+  '("Markdown"
+    ["Compile" markdown]
+    ["Preview" markdown-preview]
+    "---"
+    ("Headers (setext)"
+     ["Insert Title" markdown-insert-title]
+     ["Insert Section" markdown-insert-section])
+    ("Headers (atx)"
+     ["First level" markdown-insert-header-1]
+     ["Second level" markdown-insert-header-2]
+     ["Third level" markdown-insert-header-3]
+     ["Fourth level" markdown-insert-header-4]
+     ["Fifth level" markdown-insert-header-5])
+    "---"
+    ["Bold" markdown-insert-bold]
+    ["Italic" markdown-insert-italic]
+    ["Blockquote" markdown-insert-blockquote]
+    ["Code" markdown-insert-code]
+    "---"
+    ["Insert inline link" markdown-insert-link]
+    ["Insert image" markdown-insert-image]
+    ["Insert horizontal rule" markdown-insert-hr]
+    "---"
+    ["Version" markdown-show-version]
+    ))
+
 
 
 ;;; Commands ==================================================================
@@ -580,7 +618,9 @@ which case it is turned into a blockquote region."
   ;; Font lock.
   (set (make-local-variable 'font-lock-defaults)
        '(markdown-mode-font-lock-keywords))
-  (set (make-local-variable 'font-lock-multiline) t))
+  (set (make-local-variable 'font-lock-multiline) t)
+  ;; For menu support in XEmacs
+  (easy-menu-add markdown-mode-menu markdown-mode-map))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
