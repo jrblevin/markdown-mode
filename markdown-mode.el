@@ -182,9 +182,10 @@
 ;;; Customizable variables ====================================================
 
 (defgroup markdown nil
-  "Markdown mode."
+  "Major mode for editing text files in Markdown format."
   :prefix "markdown-"
-  :group 'languages)
+  :group 'wp
+  :link '(url-link "http://jblevins.org/projects/markdown-mode/"))
 
 (defcustom markdown-command "markdown"
   "Command to run markdown."
