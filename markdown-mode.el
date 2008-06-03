@@ -283,11 +283,11 @@
   :type '(face))
 
 ;; Links
-(defconst regex-link-inline "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
+(defconst markdown-regex-link-inline "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
   "Regular expression for a [text](file) or an image link ![text](file)")
-(defconst regex-link-reference "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
+(defconst markdown-regex-link-reference "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
   "Regular expression for a reference link [text][id]")
-(defconst regex-reference-definition
+(defconst markdown-regex-reference-definition
   "^ \\{0,3\\}\\(\\[.+?\\]\\):[ ]?\\(.*?\\)\\(\"[^\"]+?\"\\)?$"
   "Regular expression for a link definition [id]: ...")
 
@@ -344,13 +344,13 @@
    ;;;
    ;;; Links ---------------------------------------------------------
    ;;;
-   (cons regex-link-inline '(1 'markdown-link-face t))
-   (cons regex-link-inline '(2 'markdown-url-face t))
-   (cons regex-link-reference '(1 'markdown-link-face t))
-   (cons regex-link-reference '(2 'markdown-reference-face t))
-   (cons regex-reference-definition '(1 'markdown-reference-face t))
-   (cons regex-reference-definition '(2 'markdown-url-face t))
-   (cons regex-reference-definition '(3 'markdown-link-face t))
+   (cons markdown-regex-link-inline '(1 'markdown-link-face t))
+   (cons markdown-regex-link-inline '(2 'markdown-url-face t))
+   (cons markdown-regex-link-reference '(1 'markdown-link-face t))
+   (cons markdown-regex-link-reference '(2 'markdown-reference-face t))
+   (cons markdown-regex-reference-definition '(1 'markdown-reference-face t))
+   (cons markdown-regex-reference-definition '(2 'markdown-url-face t))
+   (cons markdown-regex-reference-definition '(3 'markdown-link-face t))
    ;;;
    ;;; Bold ----------------------------------------------------------
    ;;;
