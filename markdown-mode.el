@@ -282,97 +282,88 @@
   :group 'markdown-faces
   :type '(face))
 
-;; Links
-(defconst markdown-regex-link-inline "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
+
+(defconst markdown-regex-link-inline
+  "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
   "Regular expression for a [text](file) or an image link ![text](file)")
-(defconst markdown-regex-link-reference "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
+
+(defconst markdown-regex-link-reference
+  "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
   "Regular expression for a reference link [text][id]")
+
 (defconst markdown-regex-reference-definition
-  "^ \\{0,3\\}\\(\\[.+?\\]\\):[ ]?\\(.*?\\)\\(\"[^\"]+?\"\\)?$"
+  "^ \\{0,3\\}\\(\\[.+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
   "Regular expression for a link definition [id]: ...")
 
-;; LaTeX
+(defconst markdown-regex-header-atx
+  "^\\(#+ \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for atx-style (hash mark) headers")
+
+(defconst markdown-regex-header-setext
+  "^\\(.*\\)\n\\(===+\\|---+\\)$"
+  "Regular expression for setext-style (underline) headers")
+
+(defconst markdown-regex-hr
+  "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
+  "Regular expression for matching Markdown horizontal rules")
+
+(defconst markdown-regex-code
+  "\\(^\\|[^\\]\\)\\(\\(`\\{1,2\\}\\)\\([^ \\]\\|[^ ].*?[^ \\]\\)\\3\\)"
+  "Regular expression for matching inline code fragments")
+
+(defconst markdown-regex-pre
+  "^    .*$"
+  "Regular expression for matching preformatted text sections")
+
+(defconst markdown-regex-list
+  "^[ \t]*\\([0-9]+\\.\\|[\\*\\+-]\\) "
+  "Regular expression for matching list markers")
+
+(defconst markdown-regex-bold
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\(.\\|\n\\)*?[^\\ ]\\3\\)"
+  "Regular expression for matching bold text")
+
+(defconst markdown-regex-italic
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n\\)*?[^\\ ]\\3\\)\\)"
+  "Regular expression for matching italic text")
+
+(defconst markdown-regex-blockquote
+  "^>.*$"
+  "Regular expression for matching blockquote lines")
+
+(defconst markdown-regex-line-break
+  "  $"
+  "Regular expression for matching line breaks")
+
 (defconst markdown-regex-latex-expression
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
   "Regular expression for itex $..$ or $$..$$ math mode expressions")
+
 (defconst markdown-regex-latex-display
     "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions")
 
 (defconst markdown-mode-font-lock-keywords-basic
   (list
-   ;;;
-   ;;; Code ----------------------------------------------------------
-   ;;;
-   ;; Double backtick style ``inline code``
-   (cons "``.+?``" 'markdown-inline-code-face)
-   ;; Single backtick style `inline code`
-   (cons "`.+?`" 'markdown-inline-code-face)
-   ;; Four-space indent style code block
-   (cons "^    .*$" 'markdown-blockquote-face)
-   ;;;
-   ;;; Headers and Horizontal Rules ----------------------------------
-   ;;;
-   ;; Equals style headers (===)
-   (cons ".*\n===+" 'markdown-header-face)
-   ;; Hyphen style headers (---)
-   (cons ".*\n---+" 'markdown-header-face)
-   ;; Hash style headers (###)
-   (cons "^#+ .*$" 'markdown-header-face)
-   ;; Asterisk style horizontal rules (* * *)
-   (cons "^\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*$" 'markdown-header-face)
-   ;; Hyphen style horizontal rules (- - -)
-   (cons "^-[ ]?-[ ]?-[--- ]*$" 'markdown-header-face)
-   ;;;
-   ;;; Special cases -------------------------------------------------
-   ;;;
-   ;; List item including bold
-   (cons "^\\s *\\* .*?[^\\\n]?\\(\\*\\*.*?[^\n\\]\\*\\*\\).*$"
-         '(1 'markdown-bold-face))
-   ;; List item including italics
-   (cons "^\\* .*?[^\\\n]?\\(\\*.*?[^\n\\]\\*\\).*$"
-         '(1 'markdown-italic-face))
-   ;;;
-   ;;; Lists ---------------------------------------------------------
-   ;;;
-   ;; Numbered lists (1. List item)
-   (cons "^[0-9]+\\.\\s " 'markdown-list-face)
-   ;; Level 1 list item (no indent) (* List item)
-   (cons "^\\(\\*\\|\\+\\|-\\) " '(1 'markdown-list-face))
-   ;; Level 2 list item (two or more spaces) (   * Second level list item)
-   (cons "^  [ ]*\\(\\*\\|\\+\\|-\\) " 'markdown-list-face)
-   ;;;
-   ;;; Links ---------------------------------------------------------
-   ;;;
-   (cons markdown-regex-link-inline '(1 'markdown-link-face t))
-   (cons markdown-regex-link-inline '(2 'markdown-url-face t))
-   (cons markdown-regex-link-reference '(1 'markdown-link-face t))
-   (cons markdown-regex-link-reference '(2 'markdown-reference-face t))
-   (cons markdown-regex-reference-definition '(1 'markdown-reference-face t))
-   (cons markdown-regex-reference-definition '(2 'markdown-url-face t))
-   (cons markdown-regex-reference-definition '(3 'markdown-link-face t))
-   ;;;
-   ;;; Bold ----------------------------------------------------------
-   ;;;
-   ;; **Asterisk** and _underscore_ style bold
-   (cons "[^\\]\\(\\(\\*\\*\\|__\\)\\(.\\|\n\\)*?[^\\]\\2\\)"
-         '(1 'markdown-bold-face))
-   ;;;
-   ;;; Italic --------------------------------------------------------
-   ;;;
-   ;; *Asterisk* and _underscore_ style italic
-   (cons "[^\\]\\(\\(\\*\\|_\\)\\(.\\|\n\\)*?[^\\]\\2\\)"
-         '(1 'markdown-italic-face))
-   ;;;
-   ;;; Blockquotes ---------------------------------------------------
-   ;;;
-   (cons "^>.*$" 'markdown-blockquote-face)
-   ;;;
-   ;;; Hard line breaks ----------------------------------------------
-   ;;;
-   ;; Trailing whitespace (two spaces at end of line)
-   (cons "  $" 'markdown-line-break-face)
-   )
+   (cons markdown-regex-code markdown-inline-code-face)
+   (cons markdown-regex-pre markdown-blockquote-face)
+   (cons markdown-regex-header-setext markdown-header-face)
+   (cons markdown-regex-header-atx markdown-header-face)
+   (cons markdown-regex-list markdown-list-face)
+   (cons markdown-regex-hr markdown-header-face)
+   (cons markdown-regex-link-inline
+         '((1 markdown-link-face t)
+           (2 markdown-url-face t)))
+   (cons markdown-regex-link-reference
+         '((1 markdown-link-face t)
+           (2 markdown-reference-face t)))
+   (cons markdown-regex-reference-definition
+         '((1 markdown-reference-face t)
+           (2 markdown-url-face t)
+           (3 markdown-link-face t)))
+   (cons markdown-regex-bold '(2 markdown-bold-face))
+   (cons markdown-regex-italic '(2 markdown-italic-face))
+   (cons markdown-regex-blockquote markdown-blockquote-face))
   "Syntax highlighting for Markdown files.")
 
 
@@ -380,22 +371,16 @@
 (defconst markdown-mode-font-lock-keywords-itex
   (append
     (list
-     ;;;
-     ;;; itex expressions --------------------------------------------
-     ;;;
      ;; itex math mode $..$ or $$..$$
      (cons markdown-regex-latex-expression '(2 markdown-math-face))
      ;; Display mode equations with brackets: \[ \]
-     (cons markdown-regex-latex-display 'markdown-math-face)
-     ;;;
-     ;;; itex equation references ------------------------------------
-     ;;;
+     (cons markdown-regex-latex-display markdown-math-face)
      ;; Equation reference (eq:foo)
-     (cons "(eq:\\w+)" 'markdown-reference-face)
+     (cons "(eq:\\w+)" markdown-reference-face)
      ;; Equation reference \eqref
-     (cons "\\\\eqref{\\w+}" 'markdown-reference-face)
+     (cons "\\\\eqref{\\w+}" markdown-reference-face)
      ;; Wiki links
-     (cons "\\[\\[[^]]+\\]\\]" 'markdown-link-face))
+     (cons "\\[\\[[^]]+\\]\\]" markdown-link-face))
     markdown-mode-font-lock-keywords-basic)
   "Syntax highlighting for Markdown, itex, and wiki expressions.")
 
