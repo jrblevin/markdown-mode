@@ -131,6 +131,8 @@
 ;; * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
 ;; * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
 ;; * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and a patch.
+;; * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
+;; * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
 
 ;;; Bugs:
 
@@ -516,14 +518,14 @@ insert a section."
 which case it is turned into a blockquote region."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (blockquote-region)
+      (markdown-blockquote-region)
     (insert "> ")))
 
-(defun blockquote-region ()
-  "Blockquote an entire region."
-  (interactive)
-  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (perform-replace "^" "> " nil 1 nil nil nil (region-beginning) (region-end))))
+(defun markdown-blockquote-region (beg end &optional arg)
+  "Blockquote the region."
+  (interactive "*r\nP")
+  (if mark-active
+      (perform-replace "^" "> " nil 1 nil nil nil beg end)))
 
 
 
