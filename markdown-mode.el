@@ -76,8 +76,8 @@
 ;;
 ;; * Anchors: `C-c C-a`
 ;;
-;;   `C-c C-a l` inserts inline links of the form [text](url).  Any text
-;;    in the region is used for the link text.
+;;   `C-c C-a l` inserts inline links of the form [text](url).  If there
+;;   is an active region, text in the region is used for the link text.
 ;;
 ;; * Commands: `C-c C-c`
 ;;
@@ -87,34 +87,50 @@
 ;;
 ;; * Images: `C-c C-i`
 ;;
-;;   `C-c C-i i` inserts an image, using the current region (if any) as
+;;   `C-c C-i i` inserts an image, using the active region (if any) as
 ;;   the alt text.
 ;;
 ;; * Physical styles: `C-c C-p`
 ;;
-;;   These commands all act on text in the selected region, if any, and
+;;   These commands all act on text in the active region, if any, and
 ;;   insert empty markup fragments otherwise.  `C-c C-p b` makes the
 ;;   selected text bold, `C-c C-p f` formats the region as fixed-width
 ;;   text, and `C-c C-p i` is used for italic text.
 ;;
 ;; * Logical styles: `C-c C-s`
 ;;
-;;   These commands all act on text in the selected region, if any, and
+;;   These commands all act on text in the active region, if any, and
 ;;   insert empty markup fragments otherwise.  Logical styles include
-;;   blockquote (`C-c C-s b`), code (`C-c C-s c`),
+;;   blockquote (`C-c C-s b`), preformatted (`C-c C-s p`), code (`C-c C-s c`),
 ;;   emphasis (`C-c C-s e`), and strong (`C-c C-s s`).
 ;;
 ;; * Headers: `C-c C-t`
 ;;
-;;   All header commands use text in the region, if any, as the header
-;;   text.  To insert a hash-style level-n header, press `C-c C-t n`
-;;   where n is between 1 and 5.  For a top-level underline-style header
-;;   press `C-c C-t t` (mnemonic: title) and for a second-level
-;;   underline-style header press `C-c C-t s` (mnemonic: section).
+;;   All header commands use text in the active region, if any, as the
+;;   header text.  To insert an atx or hash style level-n header, press
+;;   `C-c C-t n` where n is between 1 and 5.  For a top-level setext or
+;;   underline style header press `C-c C-t t` (mnemonic: title) and for
+;;   a second-level underline-style header press `C-c C-t s`
+;;   (mnemonic: section).
 ;;
 ;; * Other commands
 ;;
 ;;   `C-c -` inserts a horizontal rule.
+;;
+;; Many of the commands described above behave differently depending on
+;; whether Transient Mark mode is enabled or not.  When it makes sense,
+;; if Transient Mark mode is on and a region is active, the command
+;; applies to the text in the region (e.g., `C-c C-p b` makes the region
+;; bold).  For users who prefer to work outside of Transient Mark mode,
+;; in Emacs 22 it can be enabled temporarily by pressing `C-SPC C-SPC`.
+;;
+;; When applicable, commands that specifically act on the region even
+;; outside of Transient Mark mode have the same keybinding as the with
+;; the exception of an additional `C-` prefix.  For example,
+;; `markdown-insert-blockquote` is bound to `C-c C-s b` and only acts on
+;; the region in Transient Mark mode while `markdown-blockquote-region`
+;; is bound to `C-c C-s C-b` and always applies to the region (when
+;; nonempty).
 
 ;;; Extensions:
 
