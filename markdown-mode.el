@@ -671,7 +671,7 @@ as preformatted text."
   (interactive)
   (message "markdown-mode, version %s" markdown-mode-version))
 
-(define-derived-mode markdown-mode fundamental-mode "Markdown"
+(define-derived-mode markdown-mode text-mode "Markdown"
   "Major mode for editing Markdown files."
   ;; Font lock.
   (set (make-local-variable 'font-lock-defaults)
