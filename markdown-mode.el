@@ -380,8 +380,9 @@
 ;;; Element Insertion =========================================================
 
 (defun wrap-or-insert (s1 s2)
- "Insert the strings s1 and s2 around the current region or just insert them
-if there is no region selected."
+ "Insert the strings S1 and S2.
+If Transient Mark mode is on and a region is active, wrap the strings S1
+and S2 around the region."
  (if (and transient-mark-mode mark-active)
      (let ((a (region-beginning)) (b (region-end)))
        (kill-region a b)
@@ -391,7 +392,7 @@ if there is no region selected."
    (insert s1 s2)))
 
 (defun markdown-insert-hr ()
-  "Insert a horizonal rule."
+  "Inserts a horizonal rule."
   (interactive)
   (let (hr)
     (dotimes (count (- markdown-hr-length 1) hr)        ; Count to n - 1
@@ -400,7 +401,8 @@ if there is no region selected."
     (insert hr)))
 
 (defun markdown-insert-bold ()
-  "Make the active region bold or insert an empty bold word."
+  "Inserts markup for a bold word or phrase.
+If Transient Mark mode is on and a region is active, it is made bold."
   (interactive)
   (if markdown-bold-underscore
       (wrap-or-insert "__" "__")
@@ -408,7 +410,8 @@ if there is no region selected."
   (backward-char 2))
 
 (defun markdown-insert-italic ()
-  "Make the active region italic or insert an empty italic word."
+  "Inserts markup for an italic word or phrase.
+If Transient Mark mode is on and a region is active, it is made italic."
   (interactive)
   (if markdown-italic-underscore
       (wrap-or-insert "_" "_")
@@ -416,71 +419,86 @@ if there is no region selected."
   (backward-char 1))
 
 (defun markdown-insert-code ()
-  "Format the active region as inline code or insert an empty inline code
-fragment."
+  "Inserts markup for an inline code fragment.
+If Transient Mark mode is on and a region is active, it is marked
+as inline code."
   (interactive)
   (wrap-or-insert "`" "`")
   (backward-char 1))
 
 (defun markdown-insert-link ()
-  "Creates an empty link of the form []().  If there is an active region,
-this text will be used for the link text."
+  "Inserts an inline link of the form []().
+If Transient Mark mode is on and a region is active, it is used
+as the link text."
   (interactive)
   (wrap-or-insert "[" "]")
   (insert "()")
   (backward-char 1))
 
 (defun markdown-insert-image ()
-  "Creates an empty image of the form ![]().  If there is an active region,
-this text will be used for the alternate text for the image."
+  "Inserts an inline image tag of the form ![]().
+If Transient Mark mode is on and a region is active, it is used
+as the alt text of the image."
   (interactive)
   (wrap-or-insert "![" "]")
   (insert "()")
   (backward-char 1))
 
 (defun markdown-insert-header-1 ()
-  "Creates a level 1 header"
+  "Inserts a first level atx-style (hash mark) header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (markdown-insert-header 1))
 
 (defun markdown-insert-header-2 ()
-  "Creates a level 2 header"
+  "Inserts a second level atx-style (hash mark) header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (markdown-insert-header 2))
 
 (defun markdown-insert-header-3 ()
-  "Creates a level 3 header"
+  "Inserts a third level atx-style (hash mark) header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (markdown-insert-header 3))
 
 (defun markdown-insert-header-4 ()
-  "Creates a level 4 header"
+  "Inserts a fourth level atx-style (hash mark) header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (markdown-insert-header 4))
 
 (defun markdown-insert-header-5 ()
-  "Creates a level 5 header"
+  "Inserts a fifth level atx-style (hash mark) header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (markdown-insert-header 5))
 
 (defun markdown-insert-header (n)
-  "Creates a level n header.  If there is an active region, it is used as the
-header text."
+  "Inserts an atx-style (hash mark) header.
+With no prefix argument, insert a level-1 header.  With prefix N,
+insert a level-N header.  If Transient Mark mode is on and the
+region is active, it is used as the header text."
   (interactive "p")
   (unless n                             ; Test to see if n is defined
     (setq n 1))                         ; Default to level 1 header
   (let (hdr)
     (dotimes (count n hdr)
-      (setq hdr (concat "#" hdr)))      ; Build a ### header string
+      (setq hdr (concat "#" hdr)))      ; Build a hash mark header string
     (setq hdrl (concat hdr " "))
     (setq hdrr (concat " " hdr))
     (wrap-or-insert hdrl hdrr))
   (backward-char (+ 1 n)))
 
 (defun markdown-insert-title ()
-  "Use the active region to create an \"equals\" style title or insert
-a blank title and move the cursor to the required position in order to
-insert a title."
+  "Insert a setext-style (underline) first level header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (if (and transient-mark-mode mark-active)
       (let ((a (region-beginning))
@@ -496,9 +514,9 @@ insert a title."
     (backward-char 12)))
 
 (defun markdown-insert-section ()
-  "Use the active region to create a dashed style section or insert
-a blank section and move the cursor to the required position in order to
-insert a section."
+  "Insert a setext-style (underline) second level header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
   (interactive)
   (if (and transient-mark-mode mark-active)
       (let ((a (region-beginning))
@@ -514,8 +532,9 @@ insert a section."
     (backward-char 12)))
 
 (defun markdown-insert-blockquote ()
-  "Start a blank blockquote section unless there is an active region, in
-which case it is turned into a blockquote region."
+  "Start a blockquote section (or blockquote the region).
+If Transient Mark mode is on and a region is active, it is used as
+the blockquote text."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
       (markdown-blockquote-region)
