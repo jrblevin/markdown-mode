@@ -379,7 +379,7 @@
 
 ;;; Element Insertion =========================================================
 
-(defun wrap-or-insert (s1 s2)
+(defun markdown-wrap-or-insert (s1 s2)
  "Insert the strings S1 and S2.
 If Transient Mark mode is on and a region is active, wrap the strings S1
 and S2 around the region."
@@ -405,8 +405,8 @@ and S2 around the region."
 If Transient Mark mode is on and a region is active, it is made bold."
   (interactive)
   (if markdown-bold-underscore
-      (wrap-or-insert "__" "__")
-    (wrap-or-insert "**" "**"))
+      (markdown-wrap-or-insert "__" "__")
+    (markdown-wrap-or-insert "**" "**"))
   (backward-char 2))
 
 (defun markdown-insert-italic ()
@@ -414,8 +414,8 @@ If Transient Mark mode is on and a region is active, it is made bold."
 If Transient Mark mode is on and a region is active, it is made italic."
   (interactive)
   (if markdown-italic-underscore
-      (wrap-or-insert "_" "_")
-    (wrap-or-insert "*" "*"))
+      (markdown-wrap-or-insert "_" "_")
+    (markdown-wrap-or-insert "*" "*"))
   (backward-char 1))
 
 (defun markdown-insert-code ()
@@ -423,7 +423,7 @@ If Transient Mark mode is on and a region is active, it is made italic."
 If Transient Mark mode is on and a region is active, it is marked
 as inline code."
   (interactive)
-  (wrap-or-insert "`" "`")
+  (markdown-wrap-or-insert "`" "`")
   (backward-char 1))
 
 (defun markdown-insert-link ()
@@ -431,7 +431,7 @@ as inline code."
 If Transient Mark mode is on and a region is active, it is used
 as the link text."
   (interactive)
-  (wrap-or-insert "[" "]")
+  (markdown-wrap-or-insert "[" "]")
   (insert "()")
   (backward-char 1))
 
@@ -440,7 +440,7 @@ as the link text."
 If Transient Mark mode is on and a region is active, it is used
 as the alt text of the image."
   (interactive)
-  (wrap-or-insert "![" "]")
+  (markdown-wrap-or-insert "![" "]")
   (insert "()")
   (backward-char 1))
 
@@ -492,7 +492,7 @@ region is active, it is used as the header text."
       (setq hdr (concat "#" hdr)))      ; Build a hash mark header string
     (setq hdrl (concat hdr " "))
     (setq hdrr (concat " " hdr))
-    (wrap-or-insert hdrl hdrr))
+    (markdown-wrap-or-insert hdrl hdrr))
   (backward-char (+ 1 n)))
 
 (defun markdown-insert-title ()
