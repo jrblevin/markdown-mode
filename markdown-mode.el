@@ -546,6 +546,22 @@ the blockquote text."
   (if mark-active
       (perform-replace "^" "> " nil 1 nil nil nil beg end)))
 
+(defun markdown-insert-pre ()
+  "Start a preformatted section (or apply to the region).
+If Transient Mark mode is on and a region is active, it is marked
+as preformatted text."
+  (interactive)
+  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+      (markdown-pre-region)
+    (insert "    ")))
+
+(defun markdown-pre-region (beg end &optional arg)
+  "Format the region as preformatted text."
+  (interactive "*r\nP")
+  (if mark-active
+      (perform-replace "^" "    " nil 1 nil nil nil beg end)))
+
+
 
 
 ;;; Keymap ====================================================================
@@ -567,6 +583,9 @@ the blockquote text."
     (define-key markdown-mode-map "\C-c\C-pf" 'markdown-insert-code)
     (define-key markdown-mode-map "\C-c\C-sc" 'markdown-insert-code)
     (define-key markdown-mode-map "\C-c\C-sb" 'markdown-insert-blockquote)
+    (define-key markdown-mode-map "\C-c\C-s\C-b" 'markdown-blockquote-region)
+    (define-key markdown-mode-map "\C-c\C-sp" 'markdown-insert-pre)
+    (define-key markdown-mode-map "\C-c\C-s\C-p" 'markdown-pre-region)
     (define-key markdown-mode-map "\C-c-" 'markdown-insert-hr)
     (define-key markdown-mode-map "\C-c\C-tt" 'markdown-insert-title)
     (define-key markdown-mode-map "\C-c\C-ts" 'markdown-insert-section)
@@ -597,6 +616,7 @@ the blockquote text."
     ["Bold" markdown-insert-bold]
     ["Italic" markdown-insert-italic]
     ["Blockquote" markdown-insert-blockquote]
+    ["Preformatted" markdown-insert-pre]
     ["Code" markdown-insert-code]
     "---"
     ["Insert inline link" markdown-insert-link]
