@@ -210,53 +210,77 @@
 
 ;;; Font lock =================================================================
 
-;; Faces ----------------------------------------------------------------------
+(require 'font-lock)
 
-;; Make new faces based on existing ones
+;; From Emacs 22.1
+(unless (boundp 'nobreak-space)
+  (defface nobreak-space
+    '((((class color) (min-colors 88)) :inherit escape-glyph :underline t)
+      (((class color) (min-colors 8)) :background "magenta")
+      (t :inverse-video t))
+    "Face for displaying nobreak space."
+    :group 'basic-faces
+    :version 22.1))
 
-;;; This is not available in Emacs 21 so it has been disabled until 
-;;; something can be built from scratch.  If you are running Emacs 22 and
-;;; want to underline line breaks, uncomment this face and the associated
-;;; regular expression below.
+(defgroup markdown-faces nil
+  "Faces used in Markdown Mode"
+  :group 'markdown
+  :group 'faces)
 
-;(copy-face 'nobreak-space 'markdown-font-lock-line-break-face)
+(defcustom markdown-italic-face 'font-lock-variable-name-face
+  "Italic text."
+  :group 'markdown-faces
+  :type '(face))
 
-(copy-face 'font-lock-variable-name-face 'markdown-font-lock-italic-face)
-(copy-face 'font-lock-type-face 'markdown-font-lock-bold-face)
-(copy-face 'font-lock-builtin-face 'markdown-font-lock-inline-code-face)
-(copy-face 'font-lock-function-name-face 'markdown-font-lock-header-face)
-(copy-face 'font-lock-variable-name-face 'markdown-font-lock-list-face)
-(copy-face 'font-lock-comment-face 'markdown-font-lock-blockquote-face)
-(copy-face 'font-lock-constant-face 'markdown-font-lock-link-face)
-(copy-face 'font-lock-type-face 'markdown-font-lock-reference-face)
-(copy-face 'font-lock-string-face 'markdown-font-lock-url-face)
-(copy-face 'font-lock-builtin-face 'markdown-font-lock-math-face)
+(defcustom markdown-bold-face 'font-lock-type-face
+  "Bold text"
+  :group 'markdown-faces
+  :type '(face))
 
-;; Define the extra font lock faces
-;(defvar markdown-font-lock-line-break-face 'markdown-font-lock-line-break-face
-;  "Face name to use for line breaks.")
-(defvar markdown-font-lock-italic-face 'markdown-font-lock-italic-face
-  "Face name to use for italics.")
-(defvar markdown-font-lock-bold-face 'markdown-font-lock-bold-face
-  "Face name to use for bold.")
-(defvar markdown-font-lock-header-face 'markdown-font-lock-header-face
-  "Face name to use for headers.")
-(defvar markdown-font-lock-inline-code-face 'markdown-font-lock-inline-code-face
-  "Face name to use for inline code.")
-(defvar markdown-font-lock-list-face 'markdown-font-lock-list-face
-  "Face name to use for list items.")
-(defvar markdown-font-lock-blockquote-face 'markdown-font-lock-blockquote-face
-  "Face name to use for blockquotes and code blocks.")
-(defvar markdown-font-lock-link-face 'markdown-font-lock-link-face
-  "Face name to use for links.")
-(defvar markdown-font-lock-reference-face 'markdown-font-lock-reference-face
-  "Face name to use for references.")
-(defvar markdown-font-lock-url-face 'markdown-font-lock-url-face
-  "Face name to use for URLs.")
-(defvar markdown-font-lock-math-face 'markdown-font-lock-math-face
-  "Face name to use for itex expressions.")
+(defcustom markdown-header-face 'font-lock-function-name-face
+  "Headers"
+  :group 'markdown-faces
+  :type '(face))
 
-;; Regular expressions  -------------------------------------------------------
+(defcustom markdown-inline-code-face 'font-lock-builtin-face
+  "Inline code"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-list-face 'font-lock-variable-name-face
+  "List item markers"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-blockquote-face 'font-lock-comment-face
+  "Blockquote sections and preformatted text"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-link-face 'font-lock-constant-face
+  "Link text"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-reference-face 'font-lock-type-face
+  "Link references"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-url-face 'font-lock-string-face
+  "URLs"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-math-face 'font-lock-builtin-face
+  "LaTeX expressions"
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-line-break-face 'nobreak-space
+  "Line breaks"
+  :group 'markdown-faces
+  :type '(face))
 
 ;; Links
 (defconst regex-link-inline "\\(!?\\[.*?\\]\\)\\(([^\\)]*)\\)"
@@ -281,73 +305,73 @@
    ;;; Code ----------------------------------------------------------
    ;;;
    ;; Double backtick style ``inline code``
-   (cons "``.+?``" 'markdown-font-lock-inline-code-face)
+   (cons "``.+?``" 'markdown-inline-code-face)
    ;; Single backtick style `inline code`
-   (cons "`.+?`" 'markdown-font-lock-inline-code-face)
+   (cons "`.+?`" 'markdown-inline-code-face)
    ;; Four-space indent style code block
-   (cons "^    .*$" 'markdown-font-lock-blockquote-face)
+   (cons "^    .*$" 'markdown-blockquote-face)
    ;;;
    ;;; Headers and Horizontal Rules ----------------------------------
    ;;;
    ;; Equals style headers (===)
-   (cons ".*\n===+" 'markdown-font-lock-header-face)
+   (cons ".*\n===+" 'markdown-header-face)
    ;; Hyphen style headers (---)
-   (cons ".*\n---+" 'markdown-font-lock-header-face)
+   (cons ".*\n---+" 'markdown-header-face)
    ;; Hash style headers (###)
-   (cons "^#+ .*$" 'markdown-font-lock-header-face)
+   (cons "^#+ .*$" 'markdown-header-face)
    ;; Asterisk style horizontal rules (* * *)
-   (cons "^\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*$" 'markdown-font-lock-header-face)
+   (cons "^\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*$" 'markdown-header-face)
    ;; Hyphen style horizontal rules (- - -)
-   (cons "^-[ ]?-[ ]?-[--- ]*$" 'markdown-font-lock-header-face)
+   (cons "^-[ ]?-[ ]?-[--- ]*$" 'markdown-header-face)
    ;;;
    ;;; Special cases -------------------------------------------------
    ;;;
    ;; List item including bold
    (cons "^\\s *\\* .*?[^\\\n]?\\(\\*\\*.*?[^\n\\]\\*\\*\\).*$"
-         '(1 'markdown-font-lock-bold-face))
+         '(1 'markdown-bold-face))
    ;; List item including italics
    (cons "^\\* .*?[^\\\n]?\\(\\*.*?[^\n\\]\\*\\).*$"
-         '(1 'markdown-font-lock-italic-face))
+         '(1 'markdown-italic-face))
    ;;;
    ;;; Lists ---------------------------------------------------------
    ;;;
    ;; Numbered lists (1. List item)
-   (cons "^[0-9]+\\.\\s " 'markdown-font-lock-list-face)
+   (cons "^[0-9]+\\.\\s " 'markdown-list-face)
    ;; Level 1 list item (no indent) (* List item)
-   (cons "^\\(\\*\\|\\+\\|-\\) " '(1 'markdown-font-lock-list-face))
+   (cons "^\\(\\*\\|\\+\\|-\\) " '(1 'markdown-list-face))
    ;; Level 2 list item (two or more spaces) (   * Second level list item)
-   (cons "^  [ ]*\\(\\*\\|\\+\\|-\\) " 'markdown-font-lock-list-face)
+   (cons "^  [ ]*\\(\\*\\|\\+\\|-\\) " 'markdown-list-face)
    ;;;
    ;;; Links ---------------------------------------------------------
    ;;;
-   (cons regex-link-inline '(1 'markdown-font-lock-link-face t))
-   (cons regex-link-inline '(2 'markdown-font-lock-url-face t))
-   (cons regex-link-reference '(1 'markdown-font-lock-link-face t))
-   (cons regex-link-reference '(2 'markdown-font-lock-reference-face t))
-   (cons regex-reference-definition '(1 'markdown-font-lock-reference-face t))
-   (cons regex-reference-definition '(2 'markdown-font-lock-url-face t))
-   (cons regex-reference-definition '(3 'markdown-font-lock-link-face t))
+   (cons regex-link-inline '(1 'markdown-link-face t))
+   (cons regex-link-inline '(2 'markdown-url-face t))
+   (cons regex-link-reference '(1 'markdown-link-face t))
+   (cons regex-link-reference '(2 'markdown-reference-face t))
+   (cons regex-reference-definition '(1 'markdown-reference-face t))
+   (cons regex-reference-definition '(2 'markdown-url-face t))
+   (cons regex-reference-definition '(3 'markdown-link-face t))
    ;;;
    ;;; Bold ----------------------------------------------------------
    ;;;
    ;; **Asterisk** and _underscore_ style bold
    (cons "[^\\]\\(\\(\\*\\*\\|__\\)\\(.\\|\n\\)*?[^\\]\\2\\)"
-         '(1 'markdown-font-lock-bold-face))
+         '(1 'markdown-bold-face))
    ;;;
    ;;; Italic --------------------------------------------------------
    ;;;
    ;; *Asterisk* and _underscore_ style italic
    (cons "[^\\]\\(\\(\\*\\|_\\)\\(.\\|\n\\)*?[^\\]\\2\\)"
-         '(1 'markdown-font-lock-italic-face))
+         '(1 'markdown-italic-face))
    ;;;
    ;;; Blockquotes ---------------------------------------------------
    ;;;
-   (cons "^>.*$" 'markdown-font-lock-blockquote-face)
+   (cons "^>.*$" 'markdown-blockquote-face)
    ;;;
    ;;; Hard line breaks ----------------------------------------------
    ;;;
    ;; Trailing whitespace (two spaces at end of line)
-;   (cons "  $" 'markdown-font-lock-line-break-face)
+   (cons "  $" 'markdown-line-break-face)
    )
   "Syntax highlighting for Markdown files.")
 
@@ -360,18 +384,18 @@
      ;;; itex expressions --------------------------------------------
      ;;;
      ;; itex math mode $..$ or $$..$$
-     (cons markdown-regex-latex-expression '(2 markdown-font-lock-math-face))
+     (cons markdown-regex-latex-expression '(2 markdown-math-face))
      ;; Display mode equations with brackets: \[ \]
-     (cons markdown-regex-latex-display 'markdown-font-lock-math-face)
+     (cons markdown-regex-latex-display 'markdown-math-face)
      ;;;
      ;;; itex equation references ------------------------------------
      ;;;
      ;; Equation reference (eq:foo)
-     (cons "(eq:\\w+)" 'markdown-font-lock-reference-face)
+     (cons "(eq:\\w+)" 'markdown-reference-face)
      ;; Equation reference \eqref
-     (cons "\\\\eqref{\\w+}" 'markdown-font-lock-reference-face)
+     (cons "\\\\eqref{\\w+}" 'markdown-reference-face)
      ;; Wiki links
-     (cons "\\[\\[[^]]+\\]\\]" 'markdown-font-lock-link-face))
+     (cons "\\[\\[[^]]+\\]\\]" 'markdown-link-face))
     markdown-mode-font-lock-keywords-basic)
   "Syntax highlighting for Markdown, itex, and wiki expressions.")
 
