@@ -385,9 +385,9 @@ If Transient Mark mode is on and a region is active, wrap the strings S1
 and S2 around the region."
  (if (and transient-mark-mode mark-active)
      (let ((a (region-beginning)) (b (region-end)))
-       (kill-region a b)
+       (goto-char a)
        (insert s1)
-       (yank)
+       (goto-char (+ b (length s1)))
        (insert s2))
    (insert s1 s2)))
 
