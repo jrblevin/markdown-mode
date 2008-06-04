@@ -339,6 +339,14 @@
   "\\[\\[[^]]+\\]\\]"
   "Regular expression for matching wiki links")
 
+(defconst markdown-regex-uri
+  "<\\(acap\\|cid\\|data\\|dav\\|fax\\|file\\|ftp\\|gopher\\|http\\|https\\|imap\\|ldap\\|mailto\\|mid\\|modem\\|news\\|nfs\\|nntp\\|pop\\|prospero\\|rtsp\\|service\\|sip\\|tel\\|telnet\\|tip\\|urn\\|vemmi\\|wais\\)://[^>]*>"
+  "Regular expression for matching inline URIs")
+
+(defconst markdown-regex-email
+  "<\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+>"
+  "Regular expression for matching inline email addresses")
+
 (defconst markdown-regex-latex-expression
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
   "Regular expression for itex $..$ or $$..$$ math mode expressions")
@@ -368,7 +376,9 @@
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
    (cons markdown-regex-blockquote markdown-blockquote-face)
-   (cons markdown-regex-wiki-link markdown-link-face))
+   (cons markdown-regex-wiki-link markdown-link-face)
+   (cons markdown-regex-uri markdown-link-face)
+   (cons markdown-regex-email markdown-link-face))
   "Syntax highlighting for Markdown files.")
 
 
