@@ -145,10 +145,24 @@
 
 ;; Besides supporting the basic Markdown syntax, markdown-mode also
 ;; includes syntax highlighting for `[[Wiki Links]]` by default.
-;; Syntax highlighting for mathematical expressions written in LaTeX
-;; (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`) can be
-;; enabled by editing `markdown-mode.el` and changing
-;; `(defvar markdown-enable-itex nil)` to `(defvar markdown-enable-itex t)`.
+;;
+;; [SmartyPants][] support is possible by customizing `markdown-command`.
+;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
+;; then you can set `markdown-command` to `"markdown | smartypants"`.
+;; You can do this either by using `M-x customize-group markdown`
+;; or by placing the following in your `.emacs` file:
+;;
+;;     (defun markdown-custom ()
+;;       "markdown-mode-hook"
+;;       (setq markdown-command "markdown | smartypants"))
+;;     (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
+;;
+;; Experimental syntax highlighting for mathematical expressions written
+;; in LaTeX (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`)
+;; can be enabled by editing `markdown-mode.el` and changing `(defvar
+;; markdown-enable-itex nil)` to `(defvar markdown-enable-itex t)`.
+;;
+;; [SmartyPants]: http://daringfireball.net/projects/smartypants/
 
 ;;; Thanks:
 
