@@ -135,11 +135,11 @@
 ;;; Extensions:
 
 ;; Besides supporting the basic Markdown syntax, markdown-mode also
-;; includes syntax highlighting for `[[Wiki Links]]` and mathematical
-;; expressions written in LaTeX (only expressions denoted by `$..$`,
-;; `$$..$$`, or `\[..\]`).  To enable these features, edit
-;; `markdown-mode.el` and change `(defvar markdown-enable-itex nil)`
-;; to`(defvar markdown-enable-itex t)`.
+;; includes syntax highlighting for `[[Wiki Links]]` by default.
+;; Syntax highlighting for mathematical expressions written in LaTeX
+;; (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`) can be
+;; enabled by editing `markdown-mode.el` and changing
+;; `(defvar markdown-enable-itex nil)` to `(defvar markdown-enable-itex t)`.
 
 ;;; Thanks:
 
@@ -165,7 +165,7 @@
 
 ;;; User Customizable Variables ===============================================
 
-;; To enable itex/wiki syntax highlighting, change to
+;; To enable LaTeX/itex syntax highlighting, change to
 ;; (defvar markdown-enable-itex t)
 (defvar markdown-enable-itex nil)
 
@@ -335,6 +335,10 @@
   "  $"
   "Regular expression for matching line breaks")
 
+(defconst markdown-regex-wiki-link
+  "\\[\\[[^]]+\\]\\]"
+  "Regular expression for matching wiki links")
+
 (defconst markdown-regex-latex-expression
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
   "Regular expression for itex $..$ or $$..$$ math mode expressions")
@@ -363,7 +367,8 @@
            (3 markdown-link-face t)))
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
-   (cons markdown-regex-blockquote markdown-blockquote-face))
+   (cons markdown-regex-blockquote markdown-blockquote-face)
+   (cons markdown-regex-wiki-link markdown-link-face))
   "Syntax highlighting for Markdown files.")
 
 
@@ -378,9 +383,7 @@
      ;; Equation reference (eq:foo)
      (cons "(eq:\\w+)" markdown-reference-face)
      ;; Equation reference \eqref
-     (cons "\\\\eqref{\\w+}" markdown-reference-face)
-     ;; Wiki links
-     (cons "\\[\\[[^]]+\\]\\]" markdown-link-face))
+     (cons "\\\\eqref{\\w+}" markdown-reference-face))
     markdown-mode-font-lock-keywords-basic)
   "Syntax highlighting for Markdown, itex, and wiki expressions.")
 
