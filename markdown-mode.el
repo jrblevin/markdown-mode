@@ -1003,6 +1003,7 @@ This is an exact copy of line-number-at-pos for use in emacs21."
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Outline mode
+  (make-local-variable 'outline-regexp)
   (setq outline-regexp "#+")
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t)))
