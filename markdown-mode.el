@@ -836,8 +836,33 @@ defined."
 
 ;;; Outline ===================================================================
 
+;; The following visibility cycling code was taken from org-mode
+;; by Carsten Dominik and adapted for markdown-mode.
+
 (defvar markdown-cycle-global-status 1)
 (defvar markdown-cycle-subtree-status nil)
+
+;; Based on org-end-of-subtree from org.el
+(defun markdown-end-of-subtree (&optional invisible-OK)
+  ;; This is an exact copy of the original function, but it uses
+  ;; `outline-back-to-heading', to make it work also in invisible
+  ;; trees.  And is uses an invisible-OK argument.
+  ;; Under Emacs this is not needed, but the old outline.el needs this fix.
+  (outline-back-to-heading invisible-OK)
+  (let ((first t)
+        (level (funcall outline-level)))
+    (while (and (not (eobp))
+                (or first (> (funcall outline-level) level)))
+      (setq first nil)
+      (outline-next-heading))
+    (if (memq (preceding-char) '(?\n ?\^M))
+        (progn
+          ;; Go to end of line before heading
+          (forward-char -1)
+          (if (memq (preceding-char) '(?\n ?\^M))
+              ;; leave blank line before heading
+              (forward-char -1)))))
+  (point))
 
 ;; Based on org-cycle from org.el.
 (defun markdown-cycle (&optional arg)
@@ -848,21 +873,20 @@ defined."
       (cond
        ((and (eq last-command this-command)
              (eq markdown-cycle-global-status 2))
-        ;; We just created the overview - now do table of contents
-        ;; This can be slow in very large buffers, so indicate action
+        ;; Move from overview to contents
         (hide-sublevels 1)
         (message "CONTENTS")
         (setq markdown-cycle-global-status 3))
 
        ((and (eq last-command this-command)
              (eq markdown-cycle-global-status 3))
-        ;; We just showed the table of contents - now show everything
+        ;; Move from contents to all
         (show-all)
         (message "SHOW ALL")
         (setq markdown-cycle-global-status 1))
 
        (t
-        ;; Default action: go to overview
+        ;; Defaults to overview
         (hide-body)
         (message "OVERVIEW")
         (setq markdown-cycle-global-status 2))))
@@ -870,10 +894,29 @@ defined."
      ((save-excursion (beginning-of-line 1) (looking-at outline-regexp))
       ;; At a heading: rotate between three different views
       (outline-back-to-heading)
+      (let ((goal-column 0) eoh eol eos)
+        ;; Determine boundaries
+        (save-excursion
+          (outline-back-to-heading)
+          (save-excursion
+            (beginning-of-line 2)
+            (while (and (not (eobp)) ;; this is like `next-line'
+                        (get-char-property (1- (point)) 'invisible))
+              (beginning-of-line 2)) (setq eol (point)))
+          (outline-end-of-heading)   (setq eoh (point))
+          (markdown-end-of-subtree t)
+          (skip-chars-forward " \t\n")
+          (beginning-of-line 1) ; in case this is an item
+          (setq eos (1- (point))))
+        ;; Find out what to do next and set `this-command'
       (cond
-         ((and (eq last-command this-command)
-               (eq markdown-cycle-subtree-status 'folded))
+         ((= eos eoh)
+          ;; Nothing is hidden behind this heading
+          (message "EMPTY ENTRY")
+          (setq markdown-cycle-subtree-status nil))
+         ((>= eol eos)
           ;; Entire subtree is hidden in one line: open it
+          (show-entry)
           (show-children)
           (message "CHILDREN")
           (setq markdown-cycle-subtree-status 'children))
@@ -887,7 +930,7 @@ defined."
           ;; Default action: hide the subtree.
           (hide-subtree)
           (message "FOLDED")
-          (setq markdown-cycle-subtree-status 'folded))))
+          (setq markdown-cycle-subtree-status 'folded)))))
 
      (t
       (message "TAB")
