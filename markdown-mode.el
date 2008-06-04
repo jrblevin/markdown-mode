@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2007, 2008 Jason Blevins
 
-;; Version: 1.6-dev
+;; Version: 1.6
 ;; Keywords: Markdown major mode
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; URL: http://jblevins.org/projects/markdown-mode/
@@ -31,7 +31,7 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest version is markdown-mode 1.5, released on October 11, 2007:
+;; The latest version is markdown-mode 1.6, released on June 4. 2008:
 ;;
 ;;  * [markdown-mode.el][]
 ;;  * [Screenshot][]
@@ -41,8 +41,8 @@
 ;; package (beginning with revision 27.0-1).
 ;;
 ;;  [markdown-mode.el]: http://code.jblevins.org/markdown-mode/markdown-mode.el
-;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20071011-001.png
-;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-5
+;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20080604-001.png
+;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-6
 
 ;;; Dependencies:
 
@@ -217,7 +217,7 @@
 ;;; Customizable variables ====================================================
 
 ;; Current revision
-(defconst markdown-mode-version "1.6-dev")
+(defconst markdown-mode-version "1.6")
 
 ;; A hook for users to run their own code when the mode is loaded.
 (defvar markdown-mode-hook nil)
