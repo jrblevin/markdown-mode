@@ -76,8 +76,10 @@
 ;;
 ;; * Anchors: `C-c C-a`
 ;;
-;;   `C-c C-a l` inserts inline links of the form [text](url).  If there
-;;   is an active region, text in the region is used for the link text.
+;;   `C-c C-a l` inserts inline links of the form `[text](url)`.  If
+;;   there is an active region, text in the region is used for the link
+;;   text.  `C-c C-a w` acts similarly for wiki links of the form
+;;   `[[WikiLink]]`.
 ;;
 ;; * Commands: `C-c C-c`
 ;;
@@ -474,6 +476,14 @@ as the link text."
   (insert "()")
   (backward-char 1))
 
+(defun markdown-insert-wiki-link ()
+  "Inserts a wiki link of the form [[WikiLink]].
+If Transient Mark mode is on and a region is active, it is used
+as the link text."
+  (interactive)
+  (markdown-wrap-or-insert "[[" "]]")
+  (backward-char 2))
+
 (defun markdown-insert-image ()
   "Inserts an inline image tag of the form ![]().
 If Transient Mark mode is on and a region is active, it is used
@@ -609,6 +619,7 @@ as preformatted text."
   (let ((markdown-mode-map (make-keymap)))
     ;; Element insertion
     (define-key markdown-mode-map "\C-c\C-al" 'markdown-insert-link)
+    (define-key markdown-mode-map "\C-c\C-aw" 'markdown-insert-wiki-link)
     (define-key markdown-mode-map "\C-c\C-ii" 'markdown-insert-image)
     (define-key markdown-mode-map "\C-c\C-t1" 'markdown-insert-header-1)
     (define-key markdown-mode-map "\C-c\C-t2" 'markdown-insert-header-2)
