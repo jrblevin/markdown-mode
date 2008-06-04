@@ -220,16 +220,6 @@
 
 (require 'font-lock)
 
-;; From Emacs 22.1
-(unless (boundp 'nobreak-space)
-  (defface nobreak-space
-    '((((class color) (min-colors 88)) :inherit escape-glyph :underline t)
-      (((class color) (min-colors 8)) :background "magenta")
-      (t :inverse-video t))
-    "Face for displaying nobreak space."
-    :group 'basic-faces
-    :version 22.1))
-
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
   :group 'markdown
@@ -284,12 +274,6 @@
   "LaTeX expressions"
   :group 'markdown-faces
   :type '(face))
-
-(defcustom markdown-line-break-face 'nobreak-space
-  "Line breaks"
-  :group 'markdown-faces
-  :type '(face))
-
 
 (defconst markdown-regex-link-inline
   "\\(!?\\[[^]]*?\\]\\)\\(([^\\)]*)\\)"
