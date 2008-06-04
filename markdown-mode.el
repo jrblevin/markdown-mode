@@ -88,9 +88,11 @@
 ;;   current buffer and previews the output in a browser.
 ;;
 ;;   `C-c C-c c` will check for undefined references.  If there are any,
-;;   a small buffer will open with a list.  Selecting a reference from
-;;   this list and pressing `RET` will insert a reference template at
-;;   the end of the buffer.
+;;   a small buffer will open with a list of undefined references and
+;;   the line numbers on which they appear.  In Emacs 22 and greater,
+;;   selecting a reference from this list and pressing `RET` will insert
+;;   an empty reference definition at the end of the buffer.  Similarly,
+;;   selecting the line number will jump to the corresponding line.
 ;;
 ;; * Images: `C-c C-i`
 ;;
@@ -715,9 +717,9 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
             (let ((entry (assoc target missing)))
               (if (not entry)
                   (add-to-list 'missing (cons target
-                                              (list (cons label (line-number-at-pos)))) t)
+                                              (list (cons label (markdown-line-number-at-pos)))) t)
                 (setcdr entry
-                        (append (cdr entry) (list (cons label (line-number-at-pos))))))))))
+                        (append (cdr entry) (list (cons label (markdown-line-number-at-pos))))))))))
       missing)))
 
 (defun markdown-add-missing-ref-definition (ref buffer &optional recheck)
@@ -741,22 +743,24 @@ references so that REF disappears from the list of those links."
 ;; Button which adds an empty Markdown reference definition to the end
 ;; of buffer specified as its 'target-buffer property. Reference name
 ;; is button's label
-(define-button-type 'markdown-ref-button
-  'help-echo "Push to create an empty reference definition"
-  'face 'bold
-  'action (lambda (b)
-            (markdown-add-missing-ref-definition
-             (button-label b) (button-get b 'target-buffer) t)))
+(when (>= emacs-major-version 22)
+  (define-button-type 'markdown-ref-button
+    'help-echo "Push to create an empty reference definition"
+    'face 'bold
+    'action (lambda (b)
+              (markdown-add-missing-ref-definition
+               (button-label b) (button-get b 'target-buffer) t))))
 
 ;; Button jumping to line in buffer specified as its 'target-buffer
 ;; property. Line number is button's 'line property.
-(define-button-type 'goto-line-button
-  'help-echo "Push to go to this line"
-  'face 'italic
-  'action (lambda (b)
-            (message (button-get b 'buffer))
-            (switch-to-buffer-other-window (button-get b 'target-buffer))
-            (goto-line (button-get b 'target-line))))
+(when (>= emacs-major-version 22)
+  (define-button-type 'goto-line-button
+    'help-echo "Push to go to this line"
+    'face 'italic
+    'action (lambda (b)
+              (message (button-get b 'buffer))
+              (switch-to-buffer-other-window (button-get b 'target-buffer))
+              (goto-line (button-get b 'target-line)))))
 
 (defun markdown-check-refs (&optional silent)
   "Show all undefined Markdown references in current `markdown-mode' buffer.
@@ -787,22 +791,29 @@ defined."
         (newline 2)
         (dolist (ref refs)
           (let ((button-label (format "%s" (car ref))))
-            (insert-text-button button-label
-                                :type 'markdown-ref-button
-                                'target-buffer oldbuf)
-            (insert " (")
-            (dolist (occurency (cdr ref))
-              (let ((line (cdr occurency)))
-                (insert-button (number-to-string line)
-                               :type 'goto-line-button
-                               'target-buffer oldbuf
-                               'target-line line)
-                (insert " "))) (delete-backward-char 1)
-                (insert ")")
-                (newline))))
-      (view-buffer-other-window refbuf)
-      (goto-line 4))))
-
+            (if (>= emacs-major-version 22)
+                ;; Create a reference button in Emacs 22
+                (insert-text-button button-label
+                                    :type 'markdown-ref-button
+                                    'target-buffer oldbuf)
+              ;; Insert reference as text in Emacs < 22
+              (insert button-label)))
+          (insert " (")
+          (dolist (occurency (cdr ref))
+            (let ((line (cdr occurency)))
+              (if (>= emacs-major-version 22)
+                  ;; Create a line number button in Emacs 22
+                  (insert-button (number-to-string line)
+                                 :type 'goto-line-button
+                                 'target-buffer oldbuf
+                                 'target-line line)
+                ;; Insert line number as text in Emacs < 22
+                (insert (number-to-string line)))
+              (insert " "))) (delete-backward-char 1)
+          (insert ")")
+          (newline))
+        (view-buffer-other-window refbuf)
+        (goto-line 4)))))
 
 ;;; Commands ==================================================================
 
@@ -820,6 +831,21 @@ defined."
   (interactive)
   (markdown)
   (browse-url-of-buffer "*markdown-output*"))
+
+
+;;; Miscellaneous =============================================================
+
+(defun markdown-line-number-at-pos (&optional pos)
+  "Return (narrowed) buffer line number at position POS.
+If POS is nil, use current buffer location.
+This is an exact copy of line-number-at-pos for use in emacs21."
+  (let ((opoint (or pos (point))) start)
+    (save-excursion
+      (goto-char (point-min))
+      (setq start (point))
+      (goto-char opoint)
+      (forward-line 0)
+      (1+ (count-lines start (point))))))
 
 
 
