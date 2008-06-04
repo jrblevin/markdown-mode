@@ -186,6 +186,7 @@
 ;;; Code:
 
 (require 'easymenu)
+(require 'outline)
 
 ;;; User Customizable Variables ===============================================
 
@@ -645,6 +646,9 @@ as preformatted text."
     (define-key markdown-mode-map "\C-c-" 'markdown-insert-hr)
     (define-key markdown-mode-map "\C-c\C-tt" 'markdown-insert-title)
     (define-key markdown-mode-map "\C-c\C-ts" 'markdown-insert-section)
+    ;; Visibility cycling
+    (define-key markdown-mode-map (kbd "<tab>") 'markdown-cycle)
+    (define-key markdown-mode-map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
     ;; Markdown functions
     (define-key markdown-mode-map "\C-c\C-cm" 'markdown)
     (define-key markdown-mode-map "\C-c\C-cp" 'markdown-preview)
@@ -829,6 +833,73 @@ defined."
         (view-buffer-other-window refbuf)
         (goto-line 4)))))
 
+
+;;; Outline ===================================================================
+
+(defvar markdown-cycle-global-status 1)
+(defvar markdown-cycle-subtree-status nil)
+
+;; Based on org-cycle from org.el.
+(defun markdown-cycle (&optional arg)
+  "Visibility cycling for Markdown mode."
+  (interactive "P")
+  (cond
+     ((eq arg t) ;; Global cycling
+      (cond
+       ((and (eq last-command this-command)
+             (eq markdown-cycle-global-status 2))
+        ;; We just created the overview - now do table of contents
+        ;; This can be slow in very large buffers, so indicate action
+        (hide-sublevels 1)
+        (message "CONTENTS")
+        (setq markdown-cycle-global-status 3))
+
+       ((and (eq last-command this-command)
+             (eq markdown-cycle-global-status 3))
+        ;; We just showed the table of contents - now show everything
+        (show-all)
+        (message "SHOW ALL")
+        (setq markdown-cycle-global-status 1))
+
+       (t
+        ;; Default action: go to overview
+        (hide-body)
+        (message "OVERVIEW")
+        (setq markdown-cycle-global-status 2))))
+
+     ((save-excursion (beginning-of-line 1) (looking-at outline-regexp))
+      ;; At a heading: rotate between three different views
+      (outline-back-to-heading)
+      (cond
+         ((and (eq last-command this-command)
+               (eq markdown-cycle-subtree-status 'folded))
+          ;; Entire subtree is hidden in one line: open it
+          (show-children)
+          (message "CHILDREN")
+          (setq markdown-cycle-subtree-status 'children))
+         ((and (eq last-command this-command)
+               (eq markdown-cycle-subtree-status 'children))
+          ;; We just showed the children, now show everything.
+          (show-subtree)
+          (message "SUBTREE")
+          (setq markdown-cycle-subtree-status 'subtree))
+         (t
+          ;; Default action: hide the subtree.
+          (hide-subtree)
+          (message "FOLDED")
+          (setq markdown-cycle-subtree-status 'folded))))
+
+     (t
+      (message "TAB")
+      (indent-relative))))
+
+;; Based on org-shifttab from org.el.
+(defun markdown-shifttab (&optional arg)
+  "Global visibility cycling or move to previous table field.
+Calls `markdown-cycle' with argument t"
+  (interactive "P")
+  (markdown-cycle t))
+
 ;;; Commands ==================================================================
 
 (defun markdown ()
@@ -877,7 +948,11 @@ This is an exact copy of line-number-at-pos for use in emacs21."
        '(markdown-mode-font-lock-keywords))
   (set (make-local-variable 'font-lock-multiline) t)
   ;; For menu support in XEmacs
-  (easy-menu-add markdown-mode-menu markdown-mode-map))
+  (easy-menu-add markdown-mode-menu markdown-mode-map)
+  ;; Outline mode
+  (setq outline-regexp "#+")
+  ;; Cause use of ellipses for invisible text.
+  (add-to-invisibility-spec '(outline . t)))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
