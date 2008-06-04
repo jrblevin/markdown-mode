@@ -672,6 +672,10 @@ as preformatted text."
 (easy-menu-define markdown-mode-menu markdown-mode-map
   "Menu for Markdown mode"
   '("Markdown"
+    ("Show/Hide"
+     ["Cycle visibility" markdown-cycle (outline-on-heading-p)]
+     ["Cycle global visibility" markdown-shifttab])
+    "---"
     ["Compile" markdown]
     ["Preview" markdown-preview]
     "---"
