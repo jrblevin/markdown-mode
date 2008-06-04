@@ -290,7 +290,7 @@
   "Regular expression for a [text](file) or an image link ![text](file)")
 
 (defconst markdown-regex-link-reference
-  "\\(!?\\[.+?\\]\\)[ ]?\\(\\[.*?\\]\\)"
+  "\\(!?\\[[^]]+?\\]\\)[ ]?\\(\\[[^]]*?\\]\\)"
   "Regular expression for a reference link [text][id]")
 
 (defconst markdown-regex-reference-definition
