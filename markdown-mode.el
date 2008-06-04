@@ -385,7 +385,7 @@
 
 (defconst markdown-mode-font-lock-keywords-basic
   (list
-   (cons markdown-regex-code markdown-inline-code-face)
+   (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-pre markdown-blockquote-face)
    (cons markdown-regex-header-setext markdown-header-face)
    (cons markdown-regex-header-atx markdown-header-face)
