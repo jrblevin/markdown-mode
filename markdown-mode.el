@@ -140,6 +140,16 @@
 ;; the region in Transient Mark mode while `markdown-blockquote-region`
 ;; is bound to `C-c C-s C-b` and always applies to the region (when
 ;; nonempty).
+;;
+;; Markdown mode supports outline-minor-mode as well as org-mode-style
+;; visibility cycling for atx- or hash-style headers.  There are two
+;; types of visibility cycling: Pressing `S-TAB` cycles globally between
+;; the table of contents view (headers only), outline view (top-level
+;; headers only), and the full document view.  Pressing `TAB` while the
+;; point is at a header will cycle through levels of visibility for the
+;; subtree: completely folded, visiable children, and fully visible.
+;; Note that mixing hash and underline style headers will give undesired
+;; results.
 
 ;;; Extensions:
 
