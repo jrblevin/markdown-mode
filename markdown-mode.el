@@ -311,7 +311,7 @@
   "Regular expression for a reference link [text][id]")
 
 (defconst markdown-regex-reference-definition
-  "^ \\{0,3\\}\\(\\[.+?\\]\\): [ ]?\\(.*?\\)\\(\"[^\"]+?\"\\)?$"
+  "^ \\{0,3\\}\\(\\[.+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
   "Regular expression for a link definition [id]: ...")
 
 (defconst markdown-regex-header-atx
