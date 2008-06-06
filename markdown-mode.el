@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2007, 2008 Jason Blevins
 
-;; Version: 1.6
+;; Version: 1.7-dev
 ;; Keywords: Markdown major mode
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; URL: http://jblevins.org/projects/markdown-mode/
@@ -223,7 +223,7 @@
 ;;; Customizable variables ====================================================
 
 ;; Current revision
-(defconst markdown-mode-version "1.6")
+(defconst markdown-mode-version "1.7-dev")
 
 ;; A hook for users to run their own code when the mode is loaded.
 (defvar markdown-mode-hook nil)
