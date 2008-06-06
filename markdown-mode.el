@@ -389,8 +389,8 @@
    (cons markdown-regex-pre markdown-blockquote-face)
    (cons markdown-regex-header-setext markdown-header-face)
    (cons markdown-regex-header-atx markdown-header-face)
-   (cons markdown-regex-list markdown-list-face)
    (cons markdown-regex-hr markdown-header-face)
+   (cons markdown-regex-list markdown-list-face)
    (cons markdown-regex-link-inline
          '((1 markdown-link-face t)
            (2 markdown-url-face t)))
