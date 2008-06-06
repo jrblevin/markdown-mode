@@ -621,12 +621,39 @@ the blockquote text."
       (markdown-blockquote-region (region-beginning) (region-end))
     (insert "> ")))
 
+(defun markdown-block-region (beg end prefix)
+  "Format the region using a block prefix.
+The characters PREFIX will appear at the beginning of each line.
+Arguments BEG and END specify the beginning and end of the
+region."
+  (if mark-active
+      (save-excursion
+        (let ((endpos end))
+          ; Ensure that there is a leading blank line
+          (goto-char beg)
+          (while (not (looking-back "\n\n" 2))
+            (insert "\n")
+            (setq endpos (+ 1 endpos)))
+          ; Insert blockquote characters
+          (move-to-left-margin)
+          (while (< (point-at-bol) endpos)
+            (insert prefix)
+            (setq endpos (+ (length prefix) endpos))
+            (forward-line))
+          ; Move back before any blank lines at the end
+          (goto-char endpos)
+          (while (looking-back "\n" 1)
+            (backward-char))
+          ; Ensure one blank line at the end
+          (while (not (looking-at "\n\n"))
+            (insert "\n")
+            (backward-char))))))
+
 (defun markdown-blockquote-region (beg end)
   "Blockquote the region.
 Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
-  (if mark-active
-      (perform-replace "^" "> " nil 1 nil nil nil beg end)))
+  (markdown-block-region beg end "> "))
 
 (defun markdown-insert-pre ()
   "Start a preformatted section (or apply to the region).
@@ -641,8 +668,7 @@ as preformatted text."
   "Format the region as preformatted text.
 Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
-  (if mark-active
-      (perform-replace "^" "    " nil 1 nil nil nil beg end)))
+  (markdown-block-region beg end "    "))
 
 
 
