@@ -568,7 +568,7 @@ region is active, it is used as the header text."
   (interactive "p")
   (unless n                             ; Test to see if n is defined
     (setq n 1))                         ; Default to level 1 header
-  (let (hdr)
+  (let (hdr hdrl hdrr)
     (dotimes (count n hdr)
       (setq hdr (concat "#" hdr)))      ; Build a hash mark header string
     (setq hdrl (concat hdr " "))
@@ -618,7 +618,7 @@ If Transient Mark mode is on and a region is active, it is used as
 the blockquote text."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (markdown-blockquote-region)
+      (markdown-blockquote-region (region-beginning) (region-end))
     (insert "> ")))
 
 (defun markdown-blockquote-region (beg end)
@@ -634,7 +634,7 @@ If Transient Mark mode is on and a region is active, it is marked
 as preformatted text."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (markdown-pre-region)
+      (markdown-pre-region (region-beginning) (region-end))
     (insert "    ")))
 
 (defun markdown-pre-region (beg end)
