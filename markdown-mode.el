@@ -200,7 +200,13 @@
 ;; construct a test case and email me at <jrblevin@sdf.lonestar.org>.
 ;; Comments and patches are welcome!
 
+;;; History:
+
+;; markdown-mode was written and is maintained by Jason Blevins.  The
+;; first revision, 1.1, was released on May 24, 2007.
+
 
+
 
 ;;; Code:
 
@@ -267,57 +273,57 @@
   :type '(face))
 
 (defcustom markdown-bold-face 'font-lock-type-face
-  "Bold text"
+  "Bold text."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-header-face 'font-lock-function-name-face
-  "Headers"
+  "Headers."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-inline-code-face 'font-lock-builtin-face
-  "Inline code"
+  "Inline code."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-list-face 'font-lock-variable-name-face
-  "List item markers"
+  "List item markers."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-blockquote-face 'font-lock-comment-face
-  "Blockquote sections and preformatted text"
+  "Blockquote sections and preformatted text."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-link-face 'font-lock-constant-face
-  "Link text"
+  "Link text."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-reference-face 'font-lock-type-face
-  "Link references"
+  "Link references."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-url-face 'font-lock-string-face
-  "URLs"
+  "URLs."
   :group 'markdown-faces
   :type '(face))
 
 (defcustom markdown-math-face 'font-lock-builtin-face
-  "LaTeX expressions"
+  "LaTeX expressions."
   :group 'markdown-faces
   :type '(face))
 
 (defconst markdown-regex-link-inline
   "\\(!?\\[[^]]*?\\]\\)\\(([^\\)]*)\\)"
-  "Regular expression for a [text](file) or an image link ![text](file)")
+  "Regular expression for a [text](file) or an image link ![text](file).")
 
 (defconst markdown-regex-link-reference
   "\\(!?\\[[^]]+?\\]\\)[ ]?\\(\\[[^]]*?\\]\\)"
-  "Regular expression for a reference link [text][id]")
+  "Regular expression for a reference link [text][id].")
 
 (defconst markdown-regex-reference-definition
   "^ \\{0,3\\}\\(\\[.+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
@@ -325,63 +331,63 @@
 
 (defconst markdown-regex-header-atx
   "^\\(#+ \\)\\(.*?\\)\\($\\| #+$\\)"
-  "Regular expression for atx-style (hash mark) headers")
+  "Regular expression for atx-style (hash mark) headers.")
 
 (defconst markdown-regex-header-setext
   "^\\(.*\\)\n\\(===+\\|---+\\)$"
-  "Regular expression for setext-style (underline) headers")
+  "Regular expression for setext-style (underline) headers.")
 
 (defconst markdown-regex-hr
   "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
-  "Regular expression for matching Markdown horizontal rules")
+  "Regular expression for matching Markdown horizontal rules.")
 
 (defconst markdown-regex-code
   "\\(^\\|[^\\]\\)\\(\\(`\\{1,2\\}\\)\\([^ \\]\\|[^ ].*?[^ \\]\\)\\3\\)"
-  "Regular expression for matching inline code fragments")
+  "Regular expression for matching inline code fragments.")
 
 (defconst markdown-regex-pre
   "^    .*$"
-  "Regular expression for matching preformatted text sections")
+  "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
   "^[ \t]*\\([0-9]+\\.\\|[\\*\\+-]\\) "
-  "Regular expression for matching list markers")
+  "Regular expression for matching list markers.")
 
 (defconst markdown-regex-bold
   "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\(.\\|\n\\)*?[^\\ ]\\3\\)"
-  "Regular expression for matching bold text")
+  "Regular expression for matching bold text.")
 
 (defconst markdown-regex-italic
   "\\(^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n\\)*?[^\\ ]\\3\\)\\)"
-  "Regular expression for matching italic text")
+  "Regular expression for matching italic text.")
 
 (defconst markdown-regex-blockquote
   "^>.*$"
-  "Regular expression for matching blockquote lines")
+  "Regular expression for matching blockquote lines.")
 
 (defconst markdown-regex-line-break
   "  $"
-  "Regular expression for matching line breaks")
+  "Regular expression for matching line breaks.")
 
 (defconst markdown-regex-wiki-link
   "\\[\\[[^]]+\\]\\]"
-  "Regular expression for matching wiki links")
+  "Regular expression for matching wiki links.")
 
 (defconst markdown-regex-uri
   "<\\(acap\\|cid\\|data\\|dav\\|fax\\|file\\|ftp\\|gopher\\|http\\|https\\|imap\\|ldap\\|mailto\\|mid\\|modem\\|news\\|nfs\\|nntp\\|pop\\|prospero\\|rtsp\\|service\\|sip\\|tel\\|telnet\\|tip\\|urn\\|vemmi\\|wais\\)://[^>]*>"
-  "Regular expression for matching inline URIs")
+  "Regular expression for matching inline URIs.")
 
 (defconst markdown-regex-email
   "<\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+>"
-  "Regular expression for matching inline email addresses")
+  "Regular expression for matching inline email addresses.")
 
 (defconst markdown-regex-latex-expression
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
-  "Regular expression for itex $..$ or $$..$$ math mode expressions")
+  "Regular expression for itex $..$ or $$..$$ math mode expressions.")
 
 (defconst markdown-regex-latex-display
     "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
-  "Regular expression for itex \[..\] display mode expressions")
+  "Regular expression for itex \[..\] display mode expressions.")
 
 (defconst markdown-mode-font-lock-keywords-basic
   (list
@@ -427,10 +433,10 @@
 
 
 (defvar markdown-mode-font-lock-keywords
-  (if markdown-enable-itex 
+  (if markdown-enable-itex
       markdown-mode-font-lock-keywords-itex
     markdown-mode-font-lock-keywords-basic)
-  "Default highlighting expressions for Markdown mode")
+  "Default highlighting expressions for Markdown mode.")
 
 
 
@@ -440,7 +446,7 @@
   (let ((markdown-mode-syntax-table (make-syntax-table)))
     (modify-syntax-entry ?\" "w" markdown-mode-syntax-table)
     markdown-mode-syntax-table)
-  "Syntax table for markdown-mode")
+  "Syntax table for `markdown-mode'.")
 
 
 
@@ -459,7 +465,7 @@ and S2 around the region."
    (insert s1 s2)))
 
 (defun markdown-insert-hr ()
-  "Inserts a horizonal rule."
+  "Insert a horizonal rule."
   (interactive)
   (let (hr)
     (dotimes (count (- markdown-hr-length 1) hr)        ; Count to n - 1
@@ -468,7 +474,7 @@ and S2 around the region."
     (insert hr)))
 
 (defun markdown-insert-bold ()
-  "Inserts markup for a bold word or phrase.
+  "Insert markup for a bold word or phrase.
 If Transient Mark mode is on and a region is active, it is made bold."
   (interactive)
   (if markdown-bold-underscore
@@ -477,7 +483,7 @@ If Transient Mark mode is on and a region is active, it is made bold."
   (backward-char 2))
 
 (defun markdown-insert-italic ()
-  "Inserts markup for an italic word or phrase.
+  "Insert markup for an italic word or phrase.
 If Transient Mark mode is on and a region is active, it is made italic."
   (interactive)
   (if markdown-italic-underscore
@@ -486,7 +492,7 @@ If Transient Mark mode is on and a region is active, it is made italic."
   (backward-char 1))
 
 (defun markdown-insert-code ()
-  "Inserts markup for an inline code fragment.
+  "Insert markup for an inline code fragment.
 If Transient Mark mode is on and a region is active, it is marked
 as inline code."
   (interactive)
@@ -494,7 +500,7 @@ as inline code."
   (backward-char 1))
 
 (defun markdown-insert-link ()
-  "Inserts an inline link of the form []().
+  "Insert an inline link of the form []().
 If Transient Mark mode is on and a region is active, it is used
 as the link text."
   (interactive)
@@ -503,7 +509,7 @@ as the link text."
   (backward-char 1))
 
 (defun markdown-insert-wiki-link ()
-  "Inserts a wiki link of the form [[WikiLink]].
+  "Insert a wiki link of the form [[WikiLink]].
 If Transient Mark mode is on and a region is active, it is used
 as the link text."
   (interactive)
@@ -511,7 +517,7 @@ as the link text."
   (backward-char 2))
 
 (defun markdown-insert-image ()
-  "Inserts an inline image tag of the form ![]().
+  "Insert an inline image tag of the form ![]().
 If Transient Mark mode is on and a region is active, it is used
 as the alt text of the image."
   (interactive)
@@ -520,42 +526,42 @@ as the alt text of the image."
   (backward-char 1))
 
 (defun markdown-insert-header-1 ()
-  "Inserts a first level atx-style (hash mark) header.
+  "Insert a first level atx-style (hash mark) header.
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
   (markdown-insert-header 1))
 
 (defun markdown-insert-header-2 ()
-  "Inserts a second level atx-style (hash mark) header.
+  "Insert a second level atx-style (hash mark) header.
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
   (markdown-insert-header 2))
 
 (defun markdown-insert-header-3 ()
-  "Inserts a third level atx-style (hash mark) header.
+  "Insert a third level atx-style (hash mark) header.
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
   (markdown-insert-header 3))
 
 (defun markdown-insert-header-4 ()
-  "Inserts a fourth level atx-style (hash mark) header.
+  "Insert a fourth level atx-style (hash mark) header.
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
   (markdown-insert-header 4))
 
 (defun markdown-insert-header-5 ()
-  "Inserts a fifth level atx-style (hash mark) header.
+  "Insert a fifth level atx-style (hash mark) header.
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
   (markdown-insert-header 5))
 
 (defun markdown-insert-header (n)
-  "Inserts an atx-style (hash mark) header.
+  "Insert an atx-style (hash mark) header.
 With no prefix argument, insert a level-1 header.  With prefix N,
 insert a level-N header.  If Transient Mark mode is on and the
 region is active, it is used as the header text."
@@ -615,9 +621,10 @@ the blockquote text."
       (markdown-blockquote-region)
     (insert "> ")))
 
-(defun markdown-blockquote-region (beg end &optional arg)
-  "Blockquote the region."
-  (interactive "*r\nP")
+(defun markdown-blockquote-region (beg end)
+  "Blockquote the region.
+Arguments BEG and END specify the beginning and end of the region."
+  (interactive "*r")
   (if mark-active
       (perform-replace "^" "> " nil 1 nil nil nil beg end)))
 
@@ -630,9 +637,10 @@ as preformatted text."
       (markdown-pre-region)
     (insert "    ")))
 
-(defun markdown-pre-region (beg end &optional arg)
-  "Format the region as preformatted text."
-  (interactive "*r\nP")
+(defun markdown-pre-region (beg end)
+  "Format the region as preformatted text.
+Arguments BEG and END specify the beginning and end of the region."
+  (interactive "*r")
   (if mark-active
       (perform-replace "^" "    " nil 1 nil nil nil beg end)))
 
@@ -674,7 +682,7 @@ as preformatted text."
     ;; References
     (define-key markdown-mode-map "\C-c\C-cc" 'markdown-check-refs)
     markdown-mode-map)
-  "Keymap for Markdown major mode")
+  "Keymap for Markdown major mode.")
 
 ;;; Menu ==================================================================
 
@@ -721,8 +729,9 @@ as preformatted text."
 
 (defconst markdown-refcheck-buffer
   "*Undefined references for %BUFFER%*"
-  "Name of buffer which will contain a list of undefined
-references in `markdown-mode' buffer named %BUFFER%.")
+  "Pattern for name of buffer for listing undefined references.
+The string %BUFFER% will be replaced by the corresponding
+`markdown-mode' buffer name.")
 
 (defun markdown-has-reference-definition (reference)
     "Find out whether Markdown REFERENCE is defined.
@@ -867,10 +876,9 @@ defined."
 
 ;; Based on org-end-of-subtree from org.el
 (defun markdown-end-of-subtree (&optional invisible-OK)
-  ;; This is an exact copy of the original function, but it uses
-  ;; `outline-back-to-heading', to make it work also in invisible
-  ;; trees.  And is uses an invisible-OK argument.
-  ;; Under Emacs this is not needed, but the old outline.el needs this fix.
+  "Move to the end of the current subtree.
+Only visible heading lines are considered, unless INVISIBLE-OK is
+non-nil."
   (outline-back-to-heading invisible-OK)
   (let ((first t)
         (level (funcall outline-level)))
@@ -889,7 +897,10 @@ defined."
 
 ;; Based on org-cycle from org.el.
 (defun markdown-cycle (&optional arg)
-  "Visibility cycling for Markdown mode."
+  "Visibility cycling for Markdown mode.
+If ARG is t, perform global visibility cycling.  If the point is
+at an atx-style header, cycle visibility of the corresponding
+subtree.  Otherwise, insert a tab using `indent-relative'."
   (interactive "P")
   (cond
      ((eq arg t) ;; Global cycling
@@ -960,9 +971,9 @@ defined."
       (indent-relative))))
 
 ;; Based on org-shifttab from org.el.
-(defun markdown-shifttab (&optional arg)
-  "Global visibility cycling or move to previous table field.
-Calls `markdown-cycle' with argument t"
+(defun markdown-shifttab ()
+  "Global visibility cycling.
+Calls `markdown-cycle' with argument t."
   (interactive "P")
   (markdown-cycle t))
 
@@ -989,7 +1000,7 @@ Calls `markdown-cycle' with argument t"
 (defun markdown-line-number-at-pos (&optional pos)
   "Return (narrowed) buffer line number at position POS.
 If POS is nil, use current buffer location.
-This is an exact copy of line-number-at-pos for use in emacs21."
+This is an exact copy of `line-number-at-pos' for use in emacs21."
   (let ((opoint (or pos (point))) start)
     (save-excursion
       (goto-char (point-min))
