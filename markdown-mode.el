@@ -1015,6 +1015,9 @@ This is an exact copy of line-number-at-pos for use in emacs21."
   (set (make-local-variable 'font-lock-multiline) t)
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
+  ;; Make filling work with lists
+  (set (make-local-variable 'paragraph-start)
+       "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t*][0-9]+\\. ")
   ;; Outline mode
   (make-local-variable 'outline-regexp)
   (setq outline-regexp "#+")
