@@ -393,6 +393,7 @@
   (list
    (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-pre markdown-blockquote-face)
+   (cons markdown-regex-blockquote markdown-blockquote-face)
    (cons markdown-regex-header-setext markdown-header-face)
    (cons markdown-regex-header-atx markdown-header-face)
    (cons markdown-regex-hr markdown-header-face)
@@ -409,7 +410,6 @@
            (3 markdown-link-face t)))
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
-   (cons markdown-regex-blockquote markdown-blockquote-face)
    (cons markdown-regex-wiki-link markdown-link-face)
    (cons markdown-regex-uri markdown-link-face)
    (cons markdown-regex-email markdown-link-face))
