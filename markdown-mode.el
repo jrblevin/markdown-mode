@@ -1000,7 +1000,7 @@ subtree.  Otherwise, insert a tab using `indent-relative'."
 (defun markdown-shifttab ()
   "Global visibility cycling.
 Calls `markdown-cycle' with argument t."
-  (interactive "P")
+  (interactive)
   (markdown-cycle t))
 
 ;;; Commands ==================================================================
