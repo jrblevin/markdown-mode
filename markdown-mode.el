@@ -262,60 +262,92 @@
 
 (require 'font-lock)
 
+
+(defvar markdown-italic-face 'markdown-italic-face
+  "Face name to use for italic text.")
+
+(defvar markdown-bold-face 'markdown-bold-face
+  "Face name to use for bold text.")
+
+(defvar markdown-header-face 'markdown-header-face
+  "Face name to use for headers.")
+
+(defvar markdown-inline-code-face 'markdown-inline-code-face
+  "Face name to use for inline code.")
+
+(defvar markdown-list-face 'markdown-list-face
+  "Face name to use for list markers.")
+
+(defvar markdown-blockquote-face 'markdown-blockquote-face
+  "Face name to use for blockquote.")
+
+(defvar markdown-link-face 'markdown-link-face
+  "Face name to use for links.")
+
+(defvar markdown-reference-face 'markdown-reference-face
+  "Face name to use for reference.")
+
+(defvar markdown-url-face 'markdown-url-face
+  "Face name to use for URLs.")
+
+(defvar markdown-math-face 'markdown-math-face
+  "Face name to use for LaTeX expressions.")
+
+
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
   :group 'markdown
   :group 'faces)
 
-(defcustom markdown-italic-face 'font-lock-variable-name-face
-  "Italic text."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-italic-face
+  '((t :inherit font-lock-variable-name-face))
+  "Face for italic text."
+  :group 'markdown-faces)
 
-(defcustom markdown-bold-face 'font-lock-type-face
-  "Bold text."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-bold-face
+  '((t :inherit font-lock-type-face))
+  "Face for bold text."
+  :group 'markdown-faces)
 
-(defcustom markdown-header-face 'font-lock-function-name-face
-  "Headers."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-header-face
+  '((t :inherit font-lock-function-name-face))
+  "Face for headers."
+  :group 'markdown-faces)
 
-(defcustom markdown-inline-code-face 'font-lock-builtin-face
-  "Inline code."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-inline-code-face
+  '((t :inherit font-lock-builtin-face))
+  "Face for inline code."
+  :group 'markdown-faces)
 
-(defcustom markdown-list-face 'font-lock-variable-name-face
-  "List item markers."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-list-face
+  '((t :inherit font-lock-variable-name-face))
+  "Face for list item markers."
+  :group 'markdown-faces)
 
-(defcustom markdown-blockquote-face 'font-lock-comment-face
-  "Blockquote sections and preformatted text."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-blockquote-face
+  '((t :inherit font-lock-comment-face))
+  "Face for blockquote sections and preformatted text."
+  :group 'markdown-faces)
 
-(defcustom markdown-link-face 'font-lock-constant-face
-  "Link text."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-link-face
+  '((t :inherit font-lock-constant-face))
+  "Face for links."
+  :group 'markdown-faces)
 
-(defcustom markdown-reference-face 'font-lock-type-face
-  "Link references."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-reference-face
+  '((t :inherit font-lock-type-face))
+  "Face for link references."
+  :group 'markdown-faces)
 
-(defcustom markdown-url-face 'font-lock-string-face
-  "URLs."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-url-face
+  '((t :inherit markdown-link-face))
+  "Face for URLs."
+  :group 'markdown-faces)
 
-(defcustom markdown-math-face 'font-lock-builtin-face
-  "LaTeX expressions."
-  :group 'markdown-faces
-  :type '(face))
+(defface markdown-math-face
+  '((t :inherit font-lock-builtin-face))
+  "Face for LaTeX expressions."
+  :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
   "\\(!?\\[[^]]*?\\]\\)\\(([^\\)]*)\\)"
