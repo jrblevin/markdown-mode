@@ -719,7 +719,7 @@ Arguments BEG and END specify the beginning and end of the region."
 (defun markdown-indent-find-next-position (cur-pos positions)
   "Return the position after the index of CUR-POS in POSITIONS."
   (while (and positions
-			  (not (equal cur-pos (car positions))))
+              (not (equal cur-pos (car positions))))
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
@@ -727,9 +727,9 @@ Arguments BEG and END specify the beginning and end of the region."
   "Indent the current line using some heuristics."
   (interactive)
   (let (cur-pos
-		prev-line-pos
-		positions
-		computed-pos)
+        prev-line-pos
+        positions
+        computed-pos)
     (setq cur-pos (current-column))
 
     ;; Indentation of previous line
@@ -740,9 +740,9 @@ Arguments BEG and END specify the beginning and end of the region."
             (when (re-search-forward "\s+" (point-at-eol) t)
               (current-column))))
     (if pos
-		(progn
-		  (setq prev-line-pos pos)
-		  (setq positions (cons pos positions))))
+        (progn
+          (setq prev-line-pos pos)
+          (setq positions (cons pos positions))))
 
     ;; Position of the first non-list marker on the previous line
     (setq pos
@@ -756,29 +756,29 @@ Arguments BEG and END specify the beginning and end of the region."
 
     ;; Indentation of the previous line + tab-width
     (cond
-	 (prev-line-pos
-	  (setq positions (cons (+ (car positions) tab-width) positions)))
+     (prev-line-pos
+      (setq positions (cons (+ (car positions) tab-width) positions)))
 
-	 (t
-	  (setq positions (cons tab-width positions))))
+     (t
+      (setq positions (cons tab-width positions))))
 
-	;; Indentation of the previous line - tab-width
-	(if (and prev-line-pos
-			 (> prev-line-pos tab-width))
-		(setq positions (cons (- prev-line-pos tab-width) positions)))
+    ;; Indentation of the previous line - tab-width
+    (if (and prev-line-pos
+             (> prev-line-pos tab-width))
+        (setq positions (cons (- prev-line-pos tab-width) positions)))
 
-	;; Indentation of the bullet of any preceeding line
-	(setq pos
-		  (save-excursion
-			(catch 'break
-			  (while (not (equal (point) 0))
-				(forward-line -1)
-				(goto-char (point-at-bol))
-				(when (re-search-forward "\s*\\([0-9]\\.\\|[-\\*\\+]\\)" (point-at-eol) t)
-				  (throw 'break (- (current-column) (length (match-string 1))))))
-			  nil)))
-	(if pos
-		(setq positions (cons pos positions)))
+    ;; Indentation of the bullet of any preceeding line
+    (setq pos
+          (save-excursion
+            (catch 'break
+              (while (not (equal (point) 0))
+                (forward-line -1)
+                (goto-char (point-at-bol))
+                (when (re-search-forward "\s*\\([0-9]\\.\\|[-\\*\\+]\\)" (point-at-eol) t)
+                  (throw 'break (- (current-column) (length (match-string 1))))))
+              nil)))
+    (if pos
+        (setq positions (cons pos positions)))
 
 
     (setq positions (cons 0 (reverse positions)))
@@ -786,7 +786,7 @@ Arguments BEG and END specify the beginning and end of the region."
     ;; If the current column is any of the positions, remove all of the positions up-to
     ;; and including the current column
 
-	(setq computed-pos (markdown-indent-find-next-position cur-pos positions))
+    (setq computed-pos (markdown-indent-find-next-position cur-pos positions))
     (indent-line-to computed-pos)))
 
 
@@ -794,13 +794,13 @@ Arguments BEG and END specify the beginning and end of the region."
   "Insert a newline and optionally indent the next line."
   (interactive)
   (let (indent)
-	(if markdown-indent-on-enter
-		(setq indent
-			  (save-excursion
-				(goto-char (point-at-bol))
-				(if (re-search-forward "^\s" (point-at-eol) t) t))))
-	(insert "\n")
-	(if indent (funcall indent-line-function))))
+    (if markdown-indent-on-enter
+        (setq indent
+              (save-excursion
+                (goto-char (point-at-bol))
+                (if (re-search-forward "^\s" (point-at-eol) t) t))))
+    (insert "\n")
+    (if indent (funcall indent-line-function))))
 
 
 
