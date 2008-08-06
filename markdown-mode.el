@@ -259,12 +259,12 @@
   :type 'boolean)
 
 (defcustom markdown-indent-function 'markdown-indent-line
-  "Function to use to indent"
+  "Function to use to indent."
   :group 'markdown
   :type 'function)
 
 (defcustom markdown-indent-on-enter t
-  "Automatically indent new lines when enter key is pressed"
+  "Automatically indent new lines when enter key is pressed."
   :group 'markdown
   :type 'boolean)
 
@@ -665,9 +665,9 @@ the blockquote text."
 
 (defun markdown-block-region (beg end prefix)
   "Format the region using a block prefix.
-The characters PREFIX will appear at the beginning of each line.
 Arguments BEG and END specify the beginning and end of the
-region."
+region.The characters PREFIX will appear at the beginning
+of each line."
   (if mark-active
       (save-excursion
         (let ((endpos end))
@@ -717,14 +717,14 @@ Arguments BEG and END specify the beginning and end of the region."
 ;;; Indentation functions contributed by Bryan Kyle <bryan.kyle@gmail.com>..
 
 (defun markdown-indent-find-next-position (cur-pos positions)
-  "Returns the position after the index of cur-pos in positions"
+  "Return the position after the index of CUR-POS in POSITIONS."
   (while (and positions
 			  (not (equal cur-pos (car positions))))
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
 (defun markdown-indent-line ()
-  "Indents the current line using some heuristics"
+  "Indent the current line using some heuristics."
   (interactive)
   (let (cur-pos
 		prev-line-pos
@@ -791,6 +791,7 @@ Arguments BEG and END specify the beginning and end of the region."
 
 
 (defun markdown-enter-key ()
+  "Insert a newline and optionally indent the next line."
   (interactive)
   (let (indent)
 	(if markdown-indent-on-enter
