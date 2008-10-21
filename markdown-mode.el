@@ -277,8 +277,23 @@
   :group 'markdown-faces
   :type '(face))
 
-(defcustom markdown-header-face 'font-lock-function-name-face
-  "Headers."
+(defcustom markdown-header-face-1 'font-lock-function-name-face
+  "Level 1 headers."
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-header-face-2 'font-lock-function-name-face
+  "Level 2 headers."
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-header-face-3 'font-lock-function-name-face
+  "Level 3 headers."
+  :group 'markdown-faces
+  :type '(face))
+
+(defcustom markdown-header-face-4 'font-lock-function-name-face
+  "Level 4 headers."
   :group 'markdown-faces
   :type '(face))
 
@@ -329,13 +344,29 @@
   "^ \\{0,3\\}\\(\\[.+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
   "Regular expression for a link definition [id]: ...")
 
-(defconst markdown-regex-header-atx
-  "^\\(#+ \\)\\(.*?\\)\\($\\| #+$\\)"
-  "Regular expression for atx-style (hash mark) headers.")
+(defconst markdown-regex-header-1-atx
+  "^\\(# \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for level 1 atx-style (hash mark) headers.")
 
-(defconst markdown-regex-header-setext
-  "^\\(.*\\)\n\\(===+\\|---+\\)$"
-  "Regular expression for setext-style (underline) headers.")
+(defconst markdown-regex-header-2-atx
+  "^\\(## \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for level 2 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-3-atx
+  "^\\(### \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for level 3 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-4-atx
+  "^\\(#### \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for level 4 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-1-setext
+  "^\\(.*\\)\n\\(===+\\)$"
+  "Regular expression for level 1 setext-style (underline) headers.")
+
+(defconst markdown-regex-header-2-setext
+  "^\\(.*\\)\n\\(---+\\)$"
+  "Regular expression for level 2 setext-style (underline) headers.")
 
 (defconst markdown-regex-hr
   "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
@@ -394,9 +425,13 @@
    (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-pre markdown-blockquote-face)
    (cons markdown-regex-blockquote markdown-blockquote-face)
-   (cons markdown-regex-header-setext markdown-header-face)
-   (cons markdown-regex-header-atx markdown-header-face)
-   (cons markdown-regex-hr markdown-header-face)
+   (cons markdown-regex-header-1-setext markdown-header-face-1)
+   (cons markdown-regex-header-2-setext markdown-header-face-2)
+   (cons markdown-regex-header-1-atx markdown-header-face-1)
+   (cons markdown-regex-header-2-atx markdown-header-face-2)
+   (cons markdown-regex-header-3-atx markdown-header-face-3)
+   (cons markdown-regex-header-4-atx markdown-header-face-4)
+   (cons markdown-regex-hr markdown-header-face-1)
    (cons markdown-regex-list markdown-list-face)
    (cons markdown-regex-link-inline
          '((1 markdown-link-face t)
