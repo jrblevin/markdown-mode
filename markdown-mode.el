@@ -267,70 +267,70 @@
   :group 'markdown
   :group 'faces)
 
-(defcustom markdown-italic-face 'font-lock-variable-name-face
+(defvar markdown-italic-face 'markdown-italic-face)
+(defface markdown-italic-face '((t :inherit font-lock-variable-name-face))
   "Italic text."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-bold-face 'font-lock-type-face
+(defvar markdown-bold-face 'markdown-bold-face)
+(defface markdown-bold-face '((t :inherit font-lock-type-face))
   "Bold text."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-header-face-1 'font-lock-function-name-face
+(defvar markdown-header-face-1 'markdown-header-face-1)
+(defface markdown-header-face-1 '((t :inherit markdown-header-face))
   "Level 1 headers."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-header-face-2 'font-lock-function-name-face
+(defvar markdown-header-face-2 'markdown-header-face-2)
+(defface markdown-header-face-2 '((t :inherit markdown-header-face))
   "Level 2 headers."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-header-face-3 'font-lock-function-name-face
+(defvar markdown-header-face-3 'markdown-header-face-3)
+(defface markdown-header-face-3 '((t :inherit markdown-header-face))
   "Level 3 headers."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-header-face-4 'font-lock-function-name-face
+(defvar markdown-header-face-4 'markdown-header-face-4)
+(defface markdown-header-face-4 '((t :inherit markdown-header-face))
   "Level 4 headers."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-inline-code-face 'font-lock-builtin-face
+(defvar markdown-inline-code-face 'markdown-inline-code-face)
+(defface markdown-inline-code-face '((t inherit font-lock-builtin-face))
   "Inline code."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-list-face 'font-lock-variable-name-face
+(defvar markdown-list-face 'markdown-list-face)
+(defface markdown-list-face '((t :inherit font-lock-variable-name-face))
   "List item markers."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-blockquote-face 'font-lock-comment-face
+(defvar markdown-blockquote-face 'markdown-blockquote-face)
+(defface markdown-blockquote-face '((t :inherit font-lock-comment-face))
   "Blockquote sections and preformatted text."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-link-face 'font-lock-constant-face
+(defvar markdown-link-face 'markdown-link-face)
+(defface markdown-link-face '((t :inherit font-lock-constant-face))
   "Link text."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-reference-face 'font-lock-type-face
+(defvar markdown-reference-face 'markdown-reference-face)
+(defface markdown-reference-face '((t :inherit font-lock-type-face))
   "Link references."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-url-face 'font-lock-string-face
+(defvar markdown-url-face 'markdown-url-face)
+(defface markdown-url-face '((t :inherit font-lock-string-face))
   "URLs."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
-(defcustom markdown-math-face 'font-lock-builtin-face
+(defvar markdown-math-face 'markdown-math-face)
+(defface markdown-math-face '((t :inherit font-lock-builtin-face))
   "LaTeX expressions."
-  :group 'markdown-faces
-  :type '(face))
+  :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
   "\\(!?\\[[^]]*?\\]\\)\\(([^\\)]*)\\)"
@@ -420,19 +420,19 @@
     "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
-(defconst markdown-mode-font-lock-keywords-basic
+(defvar markdown-mode-font-lock-keywords-basic
   (list
    (cons markdown-regex-code '(2 markdown-inline-code-face))
-   (cons markdown-regex-pre markdown-blockquote-face)
-   (cons markdown-regex-blockquote markdown-blockquote-face)
-   (cons markdown-regex-header-1-setext markdown-header-face-1)
-   (cons markdown-regex-header-2-setext markdown-header-face-2)
-   (cons markdown-regex-header-1-atx markdown-header-face-1)
-   (cons markdown-regex-header-2-atx markdown-header-face-2)
-   (cons markdown-regex-header-3-atx markdown-header-face-3)
-   (cons markdown-regex-header-4-atx markdown-header-face-4)
-   (cons markdown-regex-hr markdown-header-face-1)
-   (cons markdown-regex-list markdown-list-face)
+   (cons markdown-regex-pre 'markdown-blockquote-face)
+   (cons markdown-regex-blockquote 'markdown-blockquote-face)
+   (cons markdown-regex-header-1-setext 'markdown-header-face-1)
+   (cons markdown-regex-header-2-setext 'markdown-header-face-2)
+   (cons markdown-regex-header-1-atx 'markdown-header-face-1)
+   (cons markdown-regex-header-2-atx 'markdown-header-face-2)
+   (cons markdown-regex-header-3-atx 'markdown-header-face-3)
+   (cons markdown-regex-header-4-atx 'markdown-header-face-4)
+   (cons markdown-regex-hr 'markdown-header-face)
+   (cons markdown-regex-list 'markdown-list-face)
    (cons markdown-regex-link-inline
          '((1 markdown-link-face t)
            (2 markdown-url-face t)))
@@ -443,11 +443,12 @@
          '((1 markdown-reference-face t)
            (2 markdown-url-face t)
            (3 markdown-link-face t)))
-   (cons markdown-regex-wiki-link markdown-link-face)
+   (cons markdown-regex-wiki-link 'markdown-link-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
-   (cons markdown-regex-uri markdown-link-face)
-   (cons markdown-regex-email markdown-link-face))
+   (cons markdown-regex-uri 'markdown-link-face)
+   (cons markdown-regex-email 'markdown-link-face)
+   )
   "Syntax highlighting for Markdown files.")
 
 
@@ -458,11 +459,11 @@
      ;; itex math mode $..$ or $$..$$
      (cons markdown-regex-latex-expression '(2 markdown-math-face))
      ;; Display mode equations with brackets: \[ \]
-     (cons markdown-regex-latex-display markdown-math-face)
+     (cons markdown-regex-latex-display 'markdown-math-face)
      ;; Equation reference (eq:foo)
-     (cons "(eq:\\w+)" markdown-reference-face)
+     (cons "(eq:\\w+)" 'markdown-reference-face)
      ;; Equation reference \eqref
-     (cons "\\\\eqref{\\w+}" markdown-reference-face))
+     (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
     markdown-mode-font-lock-keywords-basic)
   "Syntax highlighting for Markdown, itex, and wiki expressions.")
 
