@@ -183,6 +183,7 @@
 ;; * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
 ;; * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
 ;; * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
+;; * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
 
 ;;; Bugs:
 
@@ -257,79 +258,137 @@
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-indent-function 'markdown-indent-line
+  "Function to use to indent."
+  :group 'markdown
+  :type 'function)
+
+(defcustom markdown-indent-on-enter t
+  "Automatically indent new lines when enter key is pressed."
+  :group 'markdown
+  :type 'boolean)
 
 ;;; Font lock =================================================================
 
 (require 'font-lock)
+
+
+(defvar markdown-italic-face 'markdown-italic-face
+  "Face name to use for italic text.")
+
+(defvar markdown-bold-face 'markdown-bold-face
+  "Face name to use for bold text.")
+
+(defvar markdown-header-face 'markdown-header-face
+  "Face name to use as a base for headers.")
+
+(defvar markdown-header-face-1 'markdown-header-face-1
+  "Face name to use for level-1 headers.")
+
+(defvar markdown-header-face-2 'markdown-header-face-2
+  "Face name to use for level-2 headers.")
+
+(defvar markdown-header-face-3 'markdown-header-face-3
+  "Face name to use for level-3 headers.")
+
+(defvar markdown-header-face-4 'markdown-header-face-4
+  "Face name to use for level-4 headers.")
+
+(defvar markdown-inline-code-face 'markdown-inline-code-face
+  "Face name to use for inline code.")
+
+(defvar markdown-list-face 'markdown-list-face
+  "Face name to use for list markers.")
+
+(defvar markdown-blockquote-face 'markdown-blockquote-face
+  "Face name to use for blockquote.")
+
+(defvar markdown-link-face 'markdown-link-face
+  "Face name to use for links.")
+
+(defvar markdown-reference-face 'markdown-reference-face
+  "Face name to use for reference.")
+
+(defvar markdown-url-face 'markdown-url-face
+  "Face name to use for URLs.")
+
+(defvar markdown-math-face 'markdown-math-face
+  "Face name to use for LaTeX expressions.")
+
 
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
   :group 'markdown
   :group 'faces)
 
-(defvar markdown-italic-face 'markdown-italic-face)
-(defface markdown-italic-face '((t :inherit font-lock-variable-name-face))
-  "Italic text."
+(defface markdown-italic-face
+  '((t :inherit font-lock-variable-name-face))
+  "Face for italic text."
   :group 'markdown-faces)
 
-(defvar markdown-bold-face 'markdown-bold-face)
-(defface markdown-bold-face '((t :inherit font-lock-type-face))
-  "Bold text."
+(defface markdown-bold-face
+  '((t :inherit font-lock-type-face))
+  "Face for bold text."
   :group 'markdown-faces)
 
-(defvar markdown-header-face-1 'markdown-header-face-1)
-(defface markdown-header-face-1 '((t :inherit markdown-header-face))
-  "Level 1 headers."
+(defface markdown-header-face
+  '((t :inherit font-lock-function-name-face))
+  "Base face for headers."
   :group 'markdown-faces)
 
-(defvar markdown-header-face-2 'markdown-header-face-2)
-(defface markdown-header-face-2 '((t :inherit markdown-header-face))
-  "Level 2 headers."
+(defface markdown-header-face-1
+  '((t :inherit markdown-header-face))
+  "Face for level-1 headers."
   :group 'markdown-faces)
 
-(defvar markdown-header-face-3 'markdown-header-face-3)
-(defface markdown-header-face-3 '((t :inherit markdown-header-face))
-  "Level 3 headers."
+(defface markdown-header-face-2
+  '((t :inherit markdown-header-face))
+  "Face for level-2 headers."
   :group 'markdown-faces)
 
-(defvar markdown-header-face-4 'markdown-header-face-4)
-(defface markdown-header-face-4 '((t :inherit markdown-header-face))
-  "Level 4 headers."
+(defface markdown-header-face-3
+  '((t :inherit markdown-header-face))
+  "Face for level-3 headers."
   :group 'markdown-faces)
 
-(defvar markdown-inline-code-face 'markdown-inline-code-face)
-(defface markdown-inline-code-face '((t inherit font-lock-builtin-face))
-  "Inline code."
+(defface markdown-header-face-4
+  '((t :inherit markdown-header-face))
+  "Face for level-4 headers."
   :group 'markdown-faces)
 
-(defvar markdown-list-face 'markdown-list-face)
-(defface markdown-list-face '((t :inherit font-lock-variable-name-face))
-  "List item markers."
+(defface markdown-inline-code-face
+  '((t :inherit font-lock-builtin-face))
+  "Face for inline code."
   :group 'markdown-faces)
 
-(defvar markdown-blockquote-face 'markdown-blockquote-face)
-(defface markdown-blockquote-face '((t :inherit font-lock-comment-face))
-  "Blockquote sections and preformatted text."
+(defface markdown-list-face
+  '((t :inherit font-lock-variable-name-face))
+  "Face for list item markers."
   :group 'markdown-faces)
 
-(defvar markdown-link-face 'markdown-link-face)
-(defface markdown-link-face '((t :inherit font-lock-constant-face))
-  "Link text."
+(defface markdown-blockquote-face
+  '((t :inherit font-lock-comment-face))
+  "Face for blockquote sections and preformatted text."
   :group 'markdown-faces)
 
-(defvar markdown-reference-face 'markdown-reference-face)
-(defface markdown-reference-face '((t :inherit font-lock-type-face))
-  "Link references."
+(defface markdown-link-face
+  '((t :inherit font-lock-constant-face))
+  "Face for links."
   :group 'markdown-faces)
 
-(defvar markdown-url-face 'markdown-url-face)
-(defface markdown-url-face '((t :inherit font-lock-string-face))
-  "URLs."
+(defface markdown-reference-face
+  '((t :inherit font-lock-type-face))
+  "Face for link references."
   :group 'markdown-faces)
 
-(defvar markdown-math-face 'markdown-math-face)
-(defface markdown-math-face '((t :inherit font-lock-builtin-face))
-  "LaTeX expressions."
+(defface markdown-url-face
+  '((t :inherit markdown-link-face))
+  "Face for URLs."
+  :group 'markdown-faces)
+
+(defface markdown-math-face
+  '((t :inherit font-lock-builtin-face))
+  "Face for LaTeX expressions."
   :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
@@ -659,9 +718,9 @@ the blockquote text."
 
 (defun markdown-block-region (beg end prefix)
   "Format the region using a block prefix.
-The characters PREFIX will appear at the beginning of each line.
 Arguments BEG and END specify the beginning and end of the
-region."
+region.The characters PREFIX will appear at the beginning
+of each line."
   (if mark-active
       (save-excursion
         (let ((endpos end))
@@ -706,6 +765,95 @@ Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
   (markdown-block-region beg end "    "))
 
+;;; Indentation ====================================================================
+
+;;; Indentation functions contributed by Bryan Kyle <bryan.kyle@gmail.com>..
+
+(defun markdown-indent-find-next-position (cur-pos positions)
+  "Return the position after the index of CUR-POS in POSITIONS."
+  (while (and positions
+              (not (equal cur-pos (car positions))))
+    (setq positions (cdr positions)))
+  (or (cadr positions) 0))
+
+(defun markdown-indent-line ()
+  "Indent the current line using some heuristics."
+  (interactive)
+  (let (cur-pos
+        prev-line-pos
+        positions
+        computed-pos)
+    (setq cur-pos (current-column))
+
+    ;; Indentation of previous line
+    (setq pos
+          (save-excursion
+            (forward-line -1)
+            (goto-char (point-at-bol))
+            (when (re-search-forward "\s+" (point-at-eol) t)
+              (current-column))))
+    (if pos
+        (progn
+          (setq prev-line-pos pos)
+          (setq positions (cons pos positions))))
+
+    ;; Position of the first non-list marker on the previous line
+    (setq pos
+          (save-excursion
+            (forward-line -1)
+            (goto-char (point-at-bol))
+            (when (re-search-forward "\s*\\([0-9]\\.\\|[-\\*\\+]\\)\s*" (point-at-eol) t)
+              (current-column))))
+    (if pos
+        (setq positions (cons pos positions)))
+
+    ;; Indentation of the previous line + tab-width
+    (cond
+     (prev-line-pos
+      (setq positions (cons (+ (car positions) tab-width) positions)))
+
+     (t
+      (setq positions (cons tab-width positions))))
+
+    ;; Indentation of the previous line - tab-width
+    (if (and prev-line-pos
+             (> prev-line-pos tab-width))
+        (setq positions (cons (- prev-line-pos tab-width) positions)))
+
+    ;; Indentation of the bullet of any preceeding line
+    (setq pos
+          (save-excursion
+            (catch 'break
+              (while (not (equal (point) 0))
+                (forward-line -1)
+                (goto-char (point-at-bol))
+                (when (re-search-forward "\s*\\([0-9]\\.\\|[-\\*\\+]\\)" (point-at-eol) t)
+                  (throw 'break (- (current-column) (length (match-string 1))))))
+              nil)))
+    (if pos
+        (setq positions (cons pos positions)))
+
+
+    (setq positions (cons 0 (reverse positions)))
+
+    ;; If the current column is any of the positions, remove all of the positions up-to
+    ;; and including the current column
+
+    (setq computed-pos (markdown-indent-find-next-position cur-pos positions))
+    (indent-line-to computed-pos)))
+
+
+(defun markdown-enter-key ()
+  "Insert a newline and optionally indent the next line."
+  (interactive)
+  (let (indent)
+    (if markdown-indent-on-enter
+        (setq indent
+              (save-excursion
+                (goto-char (point-at-bol))
+                (if (re-search-forward "^\s" (point-at-eol) t) t))))
+    (insert "\n")
+    (if indent (funcall indent-line-function))))
 
 
 
@@ -735,6 +883,8 @@ Arguments BEG and END specify the beginning and end of the region."
     (define-key markdown-mode-map "\C-c-" 'markdown-insert-hr)
     (define-key markdown-mode-map "\C-c\C-tt" 'markdown-insert-title)
     (define-key markdown-mode-map "\C-c\C-ts" 'markdown-insert-section)
+	;; Indentation
+	(define-key markdown-mode-map "\C-m" 'markdown-enter-key)
     ;; Visibility cycling
     (define-key markdown-mode-map (kbd "<tab>") 'markdown-cycle)
     (define-key markdown-mode-map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
@@ -1030,7 +1180,7 @@ subtree.  Otherwise, insert a tab using `indent-relative'."
 
      (t
       (message "TAB")
-      (indent-relative))))
+      (funcall indent-line-function))))
 
 ;; Based on org-shifttab from org.el.
 (defun markdown-shifttab ()
@@ -1095,7 +1245,9 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (make-local-variable 'outline-regexp)
   (setq outline-regexp "#+")
   ;; Cause use of ellipses for invisible text.
-  (add-to-invisibility-spec '(outline . t)))
+  (add-to-invisibility-spec '(outline . t))
+  ;; Indentation
+  (setq indent-line-function markdown-indent-function))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
