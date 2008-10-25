@@ -184,6 +184,7 @@
 ;; * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
 ;; * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
 ;; * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
+;; * intrigeri <intrigeri@boum.org> for face customizations.
 
 ;;; Bugs:
 
