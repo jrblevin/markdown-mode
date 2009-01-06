@@ -31,7 +31,7 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest version is markdown-mode 1.6, released on June 4. 2008:
+;; The latest stable version is markdown-mode 1.6, released on June 4. 2008:
 ;;
 ;;  * [markdown-mode.el][]
 ;;  * [Screenshot][]
@@ -43,6 +43,17 @@
 ;;  [markdown-mode.el]: http://code.jblevins.org/markdown-mode/markdown-mode.el
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20080604-001.png
 ;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-6
+
+;; The latest development version can be downloaded directly
+;; ([markdown-mode.el][devel.el]) or it can be obtained from the
+;; (browsable and clonable) Git repository at
+;; <http://code.jblevins.org/markdown-mode.git>.  The entire repository,
+;; including the full project history, can be cloned via the Git protocol
+;; by running
+;;
+;;     git clone git://code.jblevins.org/markdown-mode.git
+;;
+;;  [devel.el]: http://code.jblevins.org/markdown-mode.git/plain/markdown-mode.el
 
 ;;; Dependencies:
 
