@@ -864,7 +864,7 @@ Arguments BEG and END specify the beginning and end of the region."
               (save-excursion
                 (goto-char (point-at-bol))
                 (if (re-search-forward "^\s" (point-at-eol) t) t))))
-    (insert "\n")
+    (newline)
     (if indent (funcall indent-line-function))))
 
 
