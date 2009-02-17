@@ -196,6 +196,7 @@
 ;; * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
 ;; * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
 ;; * intrigeri <intrigeri@boum.org> for face customizations.
+;; * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
 
 ;;; Bugs:
 
