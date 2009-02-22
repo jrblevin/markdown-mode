@@ -449,7 +449,7 @@
   "Regular expression for matching inline code fragments.")
 
 (defconst markdown-regex-pre
-  "^    .*$"
+  "^\\(    \\|\t\\).*$"
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
