@@ -100,6 +100,9 @@
 ;;     automatically indent new lines when the enter key is pressed
 ;;     (default: `t`)
 ;;
+;;   * `markdown-uri-types` - a list of protocols for URIs that
+;;     `markdown-mode' should highlight.
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
@@ -315,6 +318,15 @@
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-uri-types
+  '("acap" "cid" "data" "dav" "fax" "file" "ftp" "gopher" "http" "https"
+    "imap" "ldap" "mailto" "mid" "modem" "news" "nfs" "nntp" "pop" "prospero"
+    "rtsp" "service" "sip" "tel" "telnet" "tip" "urn" "vemmi" "wais")
+  "Link types for syntax highlighting of URIs."
+  :group 'markdown
+  :type 'list)
+
+
 ;;; Font lock =================================================================
 
 (require 'font-lock)
@@ -527,8 +539,17 @@
   "Regular expression for matching wiki links.")
 
 (defconst markdown-regex-uri
-  "<\\(acap\\|cid\\|data\\|dav\\|fax\\|file\\|ftp\\|gopher\\|http\\|https\\|imap\\|ldap\\|mailto\\|mid\\|modem\\|news\\|nfs\\|nntp\\|pop\\|prospero\\|rtsp\\|service\\|sip\\|tel\\|telnet\\|tip\\|urn\\|vemmi\\|wais\\)://[^>]*>"
+  (concat
+   "\\(" (mapconcat 'identity markdown-uri-types "\\|")
+   "\\):[^]\t\n\r<>,;() ]+")
   "Regular expression for matching inline URIs.")
+
+(defconst markdown-regex-angle-uri
+  (concat
+   "\\(<\\)\\("
+   (mapconcat 'identity markdown-uri-types "\\|")
+   "\\):[^]\t\n\r<>,;()]+\\(>\\)")
+  "Regular expression for matching inline URIs in angle brackets.")
 
 (defconst markdown-regex-email
   "<\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+>"
@@ -568,6 +589,7 @@
    (cons markdown-regex-wiki-link 'markdown-link-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
+   (cons markdown-regex-angle-uri 'markdown-link-face)
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
    )
