@@ -391,17 +391,17 @@ This will not take effect until Emacs is restarted."
   :group 'faces)
 
 (defface markdown-italic-face
-  '((t :inherit font-lock-variable-name-face))
+  '((t :inherit font-lock-variable-name-face :italic t))
   "Face for italic text."
   :group 'markdown-faces)
 
 (defface markdown-bold-face
-  '((t :inherit font-lock-type-face))
+  '((t :inherit font-lock-variable-name-face :bold t))
   "Face for bold text."
   :group 'markdown-faces)
 
 (defface markdown-header-face
-  '((t :inherit font-lock-function-name-face))
+  '((t :inherit font-lock-function-name-face :weight bold))
   "Base face for headers."
   :group 'markdown-faces)
 
@@ -426,27 +426,27 @@ This will not take effect until Emacs is restarted."
   :group 'markdown-faces)
 
 (defface markdown-inline-code-face
-  '((t :inherit font-lock-builtin-face))
+  '((t :inherit font-lock-constant-face))
   "Face for inline code."
   :group 'markdown-faces)
 
 (defface markdown-list-face
-  '((t :inherit font-lock-variable-name-face))
+  '((t :inherit font-lock-builtin-face))
   "Face for list item markers."
   :group 'markdown-faces)
 
 (defface markdown-blockquote-face
-  '((t :inherit font-lock-comment-face))
+  '((t :inherit font-lock-doc-face))
   "Face for blockquote sections."
   :group 'markdown-faces)
 
 (defface markdown-pre-face
-  '((t :inherit font-lock-comment-face))
+  '((t :inherit font-lock-constant-face))
   "Face for preformatted text."
   :group 'markdown-faces)
 
 (defface markdown-link-face
-  '((t :inherit font-lock-constant-face))
+  '((t :inherit font-lock-keyword-face))
   "Face for links."
   :group 'markdown-faces)
 
@@ -456,17 +456,17 @@ This will not take effect until Emacs is restarted."
   :group 'markdown-faces)
 
 (defface markdown-url-face
-  '((t :inherit markdown-link-face))
+  '((t :inherit font-lock-string-face))
   "Face for URLs."
   :group 'markdown-faces)
 
 (defface markdown-link-title-face
-  '((t :inherit font-lock-string-face))
+  '((t :inherit font-lock-comment-face))
   "Face for reference link titles."
   :group 'markdown-faces)
 
 (defface markdown-math-face
-  '((t :inherit font-lock-builtin-face))
+  '((t :inherit font-lock-string-face))
   "Face for LaTeX expressions."
   :group 'markdown-faces)
 
