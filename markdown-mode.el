@@ -75,11 +75,38 @@
 ;; There is no consensus on an official file extension so change `.text` to
 ;; `.mdwn`, `.md`, `.mdt`, or whatever you call your markdown files.
 
+;;; Customization:
+
+;; Although no configuration is *necessary* there are a few things
+;; that can be customized.  The `M-x customize-mode` command
+;; provides an interface to all of the possible customizations:
+;;
+;;   * `markdown-command` - the command used to run Markdown
+;;     (default: `markdown`).
+;;
+;;   * `markdown-hr-length` - the length of horizontal rules
+;;     (default: `5`).
+;;
+;;   * `markdown-bold-underscore` - set to a non-nil value to use two
+;;     underscores for bold instead of two asterisks (default: `nil`).
+;;
+;;   * `markdown-italic-underscore` - set to a non-nil value to use
+;;     underscores for italic instead of asterisks (default: `nil`).
+;;
+;;   * `markdown-indent-function` - the function to use for automatic
+;;     indentation (default: `markdown-indent-line`).
+;;
+;;   * `markdown-indent-on-enter` - set to a non-nil value to
+;;     automatically indent new lines when the enter key is pressed
+;;     (default: `t`)
+;;
+;; Additionally, the faces used for syntax highlighting can be modified to
+;; your liking by issuing `M-x customize-group RET markdown-faces`
+;; or by using the "Markdown Faces" link at the bottom of the mode
+;; customization screen.
+
 ;;; Usage:
 
-;; Although no configuration is necessary there are a few things that can
-;; be customized (`M-x customize-mode`).
-;;
 ;; Keybindings are grouped by prefixes based on their function.  For
 ;; example, commands dealing with headers begin with `C-c C-t`.  The
 ;; primary commands in each group will are described below.  You can
