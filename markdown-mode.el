@@ -185,8 +185,11 @@
 ;;
 ;; [SmartyPants]: http://daringfireball.net/projects/smartypants/
 
-;;; Thanks:
+;;; Acknowledgments:
 
+;; markdown-mode has benefited greatly from the efforts of the
+;; following people:
+;;
 ;; * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
 ;; * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
 ;; * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
