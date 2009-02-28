@@ -333,6 +333,9 @@
 (defvar markdown-url-face 'markdown-url-face
   "Face name to use for URLs.")
 
+(defvar markdown-link-title-face 'markdown-link-title-face
+  "Face name to use for reference link titles.")
+
 (defvar markdown-math-face 'markdown-math-face
   "Face name to use for LaTeX expressions.")
 
@@ -410,6 +413,11 @@
 (defface markdown-url-face
   '((t :inherit markdown-link-face))
   "Face for URLs."
+  :group 'markdown-faces)
+
+(defface markdown-link-title-face
+  '((t :inherit font-lock-string-face))
+  "Face for reference link titles."
   :group 'markdown-faces)
 
 (defface markdown-math-face
@@ -527,7 +535,7 @@
    (cons markdown-regex-reference-definition
          '((1 markdown-reference-face t)
            (2 markdown-url-face t)
-           (3 markdown-link-face t)))
+           (3 markdown-link-title-face t)))
    (cons markdown-regex-wiki-link 'markdown-link-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
