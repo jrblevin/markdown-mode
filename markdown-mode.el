@@ -152,7 +152,7 @@
 ;; is bound to `C-c C-s C-b` and always applies to the region (when
 ;; nonempty).
 ;;
-;; Markdown mode supports outline-minor-mode as well as org-mode-style
+;; markdown-mode supports outline-minor-mode as well as org-mode-style
 ;; visibility cycling for atx- or hash-style headers.  There are two
 ;; types of visibility cycling: Pressing `S-TAB` cycles globally between
 ;; the table of contents view (headers only), outline view (top-level
@@ -205,10 +205,10 @@
 
 ;;; Bugs:
 
-;; Markdown mode is developed and tested primarily using GNU Emacs 22
+;; markdown-mode is developed and tested primarily using GNU Emacs 22
 ;; although compatibility with GNU Emacs 21 is also a priority.
 ;;
-;; Presently Markdown mode does not attempt to distinguish between
+;; Presently markdown-mode does not attempt to distinguish between
 ;; multiple indentation levels and preformatted text (four or more
 ;; leading spaces).  I am not aware of a way to handle this using
 ;; Emacs's regexp-based font-lock facilities.  Implementing a more
