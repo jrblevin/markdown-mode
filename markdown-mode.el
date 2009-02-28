@@ -321,6 +321,9 @@
 (defvar markdown-blockquote-face 'markdown-blockquote-face
   "Face name to use for blockquote.")
 
+(defvar markdown-pre-face 'markdown-pre-face
+  "Face name to use for preformatted text.")
+
 (defvar markdown-link-face 'markdown-link-face
   "Face name to use for links.")
 
@@ -386,7 +389,12 @@
 
 (defface markdown-blockquote-face
   '((t :inherit font-lock-comment-face))
-  "Face for blockquote sections and preformatted text."
+  "Face for blockquote sections."
+  :group 'markdown-faces)
+
+(defface markdown-pre-face
+  '((t :inherit font-lock-comment-face))
+  "Face for preformatted text."
   :group 'markdown-faces)
 
 (defface markdown-link-face
@@ -500,7 +508,7 @@
 (defvar markdown-mode-font-lock-keywords-basic
   (list
    (cons markdown-regex-code '(2 markdown-inline-code-face))
-   (cons markdown-regex-pre 'markdown-blockquote-face)
+   (cons markdown-regex-pre 'markdown-pre-face)
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext 'markdown-header-face-1)
    (cons markdown-regex-header-2-setext 'markdown-header-face-2)
