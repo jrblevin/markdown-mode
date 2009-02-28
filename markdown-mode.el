@@ -1,6 +1,6 @@
 ;;; markdown-mode.el --- Major mode to edit Markdown files in Emacs
 
-;; Copyright (C) 2007, 2008 Jason Blevins
+;; Copyright (C) 2007, 2008, 2009 Jason Blevins
 
 ;; Version: 1.7-dev
 ;; Keywords: Markdown major mode
