@@ -33,9 +33,9 @@
 ;;
 ;; The latest stable version is markdown-mode 1.6, released on June 4. 2008:
 ;;
-;;  * [markdown-mode.el][]
-;;  * [Screenshot][]
-;;  * [Release notes][]
+;;    * [markdown-mode.el][]
+;;    * [Screenshot][]
+;;    * [Release notes][]
 ;;
 ;; markdown-mode is also available in the Debian `emacs-goodies-el`
 ;; package (beginning with revision 27.0-1).
@@ -112,57 +112,59 @@
 ;; primary commands in each group will are described below.  You can
 ;; obtain a list of all keybindings by pressing `C-c C-h`.
 ;;
-;; * Anchors: `C-c C-a`
+;;   * Anchors: `C-c C-a`
 ;;
-;;   `C-c C-a l` inserts inline links of the form `[text](url)`.  If
-;;   there is an active region, text in the region is used for the link
-;;   text.  `C-c C-a w` acts similarly for wiki links of the form
-;;   `[[WikiLink]]`.
+;;     `C-c C-a l` inserts inline links of the form `[text](url)`.  If
+;;     there is an active region, text in the region is used for the
+;;     link text.  `C-c C-a w` acts similarly for wiki links of the
+;;     form `[[WikiLink]]`.
 ;;
-;; * Commands: `C-c C-c`
+;;   * Commands: `C-c C-c`
 ;;
-;;   `C-c C-c m` will run Markdown on the current buffer and preview the
-;;   output in another buffer while `C-c C-c p` runs Markdown on the
-;;   current buffer and previews the output in a browser.
+;;     `C-c C-c m` will run Markdown on the current buffer and preview
+;;     the output in another buffer while `C-c C-c p` runs Markdown on
+;;     the current buffer and previews the output in a browser.
 ;;
-;;   `C-c C-c c` will check for undefined references.  If there are any,
-;;   a small buffer will open with a list of undefined references and
-;;   the line numbers on which they appear.  In Emacs 22 and greater,
-;;   selecting a reference from this list and pressing `RET` will insert
-;;   an empty reference definition at the end of the buffer.  Similarly,
-;;   selecting the line number will jump to the corresponding line.
+;;     `C-c C-c c` will check for undefined references.  If there are
+;;     any, a small buffer will open with a list of undefined
+;;     references and the line numbers on which they appear.  In Emacs
+;;     22 and greater, selecting a reference from this list and
+;;     pressing `RET` will insert an empty reference definition at the
+;;     end of the buffer.  Similarly, selecting the line number will
+;;     jump to the corresponding line.
 ;;
-;; * Images: `C-c C-i`
+;;   * Images: `C-c C-i`
 ;;
-;;   `C-c C-i i` inserts an image, using the active region (if any) as
-;;   the alt text.
+;;     `C-c C-i i` inserts an image, using the active region (if any)
+;;     as the alt text.
 ;;
-;; * Physical styles: `C-c C-p`
+;;   * Physical styles: `C-c C-p`
 ;;
-;;   These commands all act on text in the active region, if any, and
-;;   insert empty markup fragments otherwise.  `C-c C-p b` makes the
-;;   selected text bold, `C-c C-p f` formats the region as fixed-width
-;;   text, and `C-c C-p i` is used for italic text.
+;;     These commands all act on text in the active region, if any,
+;;     and insert empty markup fragments otherwise.  `C-c C-p b` makes
+;;     the selected text bold, `C-c C-p f` formats the region as
+;;     fixed-width text, and `C-c C-p i` is used for italic text.
 ;;
-;; * Logical styles: `C-c C-s`
+;;   * Logical styles: `C-c C-s`
 ;;
-;;   These commands all act on text in the active region, if any, and
-;;   insert empty markup fragments otherwise.  Logical styles include
-;;   blockquote (`C-c C-s b`), preformatted (`C-c C-s p`), code (`C-c C-s c`),
-;;   emphasis (`C-c C-s e`), and strong (`C-c C-s s`).
+;;     These commands all act on text in the active region, if any,
+;;     and insert empty markup fragments otherwise.  Logical styles
+;;     include blockquote (`C-c C-s b`), preformatted (`C-c C-s p`),
+;;     code (`C-c C-s c`), emphasis (`C-c C-s e`), and strong (`C-c
+;;     C-s s`).
 ;;
-;; * Headers: `C-c C-t`
+;;   * Headers: `C-c C-t`
 ;;
-;;   All header commands use text in the active region, if any, as the
-;;   header text.  To insert an atx or hash style level-n header, press
-;;   `C-c C-t n` where n is between 1 and 5.  For a top-level setext or
-;;   underline style header press `C-c C-t t` (mnemonic: title) and for
-;;   a second-level underline-style header press `C-c C-t s`
-;;   (mnemonic: section).
+;;     All header commands use text in the active region, if any, as
+;;     the header text.  To insert an atx or hash style level-n
+;;     header, press `C-c C-t n` where n is between 1 and 5.  For a
+;;     top-level setext or underline style header press `C-c C-t t`
+;;     (mnemonic: title) and for a second-level underline-style header
+;;     press `C-c C-t s` (mnemonic: section).
 ;;
-;; * Other commands
+;;   * Other commands
 ;;
-;;   `C-c -` inserts a horizontal rule.
+;;     `C-c -` inserts a horizontal rule.
 ;;
 ;; Many of the commands described above behave differently depending on
 ;; whether Transient Mark mode is enabled or not.  When it makes sense,
@@ -217,18 +219,18 @@
 ;; markdown-mode has benefited greatly from the efforts of the
 ;; following people:
 ;;
-;; * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
-;; * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
-;; * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
-;; * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and a patch.
-;; * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
-;; * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
-;; * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
-;; * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
-;; * intrigeri <intrigeri@boum.org> for face customizations.
-;; * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
-;; * Hilko Bengen <bengen@debian.org> for proper XHTML output.
-;; * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
+;;   * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
+;;   * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
+;;   * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
+;;   * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and a patch.
+;;   * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
+;;   * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
+;;   * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
+;;   * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
+;;   * intrigeri <intrigeri@boum.org> for face customizations.
+;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
+;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
+;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 
 ;;; Bugs:
 
