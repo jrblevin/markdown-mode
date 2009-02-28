@@ -197,6 +197,7 @@
 ;; * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
 ;; * intrigeri <intrigeri@boum.org> for face customizations.
 ;; * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
+;; * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 
 ;;; Bugs:
 
@@ -1207,11 +1208,28 @@ Calls `markdown-cycle' with argument t."
 (defun markdown ()
   "Run markdown on the current buffer and preview the output in another buffer."
   (interactive)
-    (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-        (shell-command-on-region (region-beginning) (region-end) markdown-command
-                                 "*markdown-output*" nil)
-      (shell-command-on-region (point-min) (point-max) markdown-command
-                               "*markdown-output*" nil)))
+  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+      (shell-command-on-region (region-beginning) (region-end) markdown-command
+                               "*markdown-output*" nil)
+    (shell-command-on-region (point-min) (point-max) markdown-command
+                             "*markdown-output*" nil))
+  (let (title)
+    (setq title (buffer-name))
+    (save-excursion
+      (set-buffer "*markdown-output*")
+      (goto-char (point-min))
+      (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+              "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
+              "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\n"
+              "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\n"
+              "<head>\n<title>")
+      (insert title)
+      (insert "</title>\n</head>\n\n"
+              "<body>\n\n")
+      (goto-char (point-max))
+      (insert "\n"
+              "</body>\n"
+              "</html>\n"))))
 
 (defun markdown-preview ()
   "Run markdown on the current buffer and preview the output in a browser."
