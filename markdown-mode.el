@@ -198,6 +198,7 @@
 ;; * intrigeri <intrigeri@boum.org> for face customizations.
 ;; * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
 ;; * Hilko Bengen <bengen@debian.org> for proper XHTML output.
+;; * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 
 ;;; Bugs:
 
