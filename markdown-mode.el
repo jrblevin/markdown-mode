@@ -875,7 +875,7 @@ Arguments BEG and END specify the beginning and end of the region."
           (save-excursion
             (forward-line -1)
             (goto-char (point-at-bol))
-            (when (re-search-forward "\\s+" (point-at-eol) t)
+            (when (re-search-forward "\\s +" (point-at-eol) t)
               (current-column))))
     (if pos
         (progn
@@ -887,7 +887,7 @@ Arguments BEG and END specify the beginning and end of the region."
           (save-excursion
             (forward-line -1)
             (goto-char (point-at-bol))
-            (when (re-search-forward "\\s*\\([0-9]\\.\\|[-\\*\\+]\\)\\s*" (point-at-eol) t)
+            (when (re-search-forward "\\s *\\([0-9]\\.\\|[-\\*\\+]\\)\\s *" (point-at-eol) t)
               (current-column))))
     (if pos
         (setq positions (cons pos positions)))
@@ -912,7 +912,7 @@ Arguments BEG and END specify the beginning and end of the region."
               (while (not (equal (point) 0))
                 (forward-line -1)
                 (goto-char (point-at-bol))
-                (when (re-search-forward "\\s*\\([0-9]\\.\\|[-\\*\\+]\\)" (point-at-eol) t)
+                (when (re-search-forward "\\s *\\([0-9]\\.\\|[-\\*\\+]\\)" (point-at-eol) t)
                   (throw 'break (- (current-column) (length (match-string 1))))))
               nil)))
     (if pos
@@ -936,7 +936,7 @@ Arguments BEG and END specify the beginning and end of the region."
         (setq indent
               (save-excursion
                 (goto-char (point-at-bol))
-                (if (re-search-forward "^\\s" (point-at-eol) t) t))))
+                (if (re-search-forward "^\\s " (point-at-eol) t) t))))
     (newline)
     (if indent (funcall indent-line-function))))
 
