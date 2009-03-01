@@ -381,6 +381,9 @@ This will not take effect until Emacs is restarted."
 (defvar markdown-link-title-face 'markdown-link-title-face
   "Face name to use for reference link titles.")
 
+(defvar markdown-comment-face 'markdown-comment-face
+  "Face name to use for HTML comments.")
+
 (defvar markdown-math-face 'markdown-math-face
   "Face name to use for LaTeX expressions.")
 
@@ -463,6 +466,11 @@ This will not take effect until Emacs is restarted."
 (defface markdown-link-title-face
   '((t :inherit font-lock-comment-face))
   "Face for reference link titles."
+  :group 'markdown-faces)
+
+(defface markdown-comment-face
+  '((t :inherit font-lock-comment-face))
+  "Face for HTML comments."
   :group 'markdown-faces)
 
 (defface markdown-math-face
@@ -567,8 +575,21 @@ This will not take effect until Emacs is restarted."
     "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
+; From html-helper-mode
+(defun markdown-match-comments (last)
+  "Matches HTML comments from the point to LAST"
+  (cond ((search-forward "<!--" last t)
+         (backward-char 4)
+         (let ((beg (point)))
+           (cond ((search-forward-regexp "--[ \t]*>" last t)
+                  (set-match-data (list beg (point)))
+                  t)
+                 (t nil))))
+        (t nil)))
+
 (defvar markdown-mode-font-lock-keywords-basic
   (list
+   '(markdown-match-comments 0 markdown-comment-face t t)
    (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-pre 'markdown-pre-face)
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
@@ -1334,6 +1355,15 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 (define-derived-mode markdown-mode text-mode "Markdown"
   "Major mode for editing Markdown files."
+  ;; Comments
+  (make-local-variable 'comment-start)
+  (setq comment-start "<!-- ")
+  (make-local-variable 'comment-end)
+  (setq comment-end " -->")
+  (make-local-variable 'comment-start-skip)
+  (setq comment-start-skip "<!--[ \t]*")
+  (make-local-variable 'comment-column)
+  (setq comment-column 0)
   ;; Font lock.
   (set (make-local-variable 'font-lock-defaults)
        '(markdown-mode-font-lock-keywords))
