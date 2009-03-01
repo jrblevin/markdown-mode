@@ -103,6 +103,9 @@
 ;;   * `markdown-uri-types` - a list of protocols for URIs that
 ;;     `markdown-mode' should highlight.
 ;;
+;;   * `markdown-enable-math` - syntax highlighting for
+;;     LaTeX fragments (default: `nil`).
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
@@ -210,12 +213,13 @@
 ;;       (setq markdown-command "markdown | smartypants"))
 ;;     (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
 ;;
+;; [SmartyPants]: http://daringfireball.net/projects/smartypants/
+;;
 ;; Experimental syntax highlighting for mathematical expressions written
 ;; in LaTeX (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`)
-;; can be enabled by editing `markdown-mode.el` and changing `(defvar
-;; markdown-enable-itex nil)` to `(defvar markdown-enable-itex t)`.
-;;
-;; [SmartyPants]: http://daringfireball.net/projects/smartypants/
+;; can be enabled by setting `markdown-enable-math` to a non-nil value,
+;; either via customize or by placing `(setq markdown-enable-itex t)`
+;; in `.emacs`, and restarting Emacs.
 
 ;;; Acknowledgments:
 
@@ -263,12 +267,6 @@
 
 (require 'easymenu)
 (require 'outline)
-
-;;; User Customizable Variables ===============================================
-
-;; To enable LaTeX/itex syntax highlighting, change to
-;; (defvar markdown-enable-itex t)
-(defvar markdown-enable-itex nil)
 
 
 ;;; Customizable variables ====================================================
@@ -325,6 +323,12 @@
   "Link types for syntax highlighting of URIs."
   :group 'markdown
   :type 'list)
+
+(defcustom markdown-enable-math nil
+  "Syntax highlighting for inline LaTeX expressions.
+This will not take effect until Emacs is restarted."
+  :group 'markdown
+  :type 'boolean)
 
 
 ;;; Font lock =================================================================
@@ -595,27 +599,23 @@
    )
   "Syntax highlighting for Markdown files.")
 
-
-;; Includes additional Latex/itex/Instiki font lock keywords
-(defconst markdown-mode-font-lock-keywords-itex
-  (append
-    (list
-     ;; itex math mode $..$ or $$..$$
-     (cons markdown-regex-latex-expression '(2 markdown-math-face))
-     ;; Display mode equations with brackets: \[ \]
-     (cons markdown-regex-latex-display 'markdown-math-face)
-     ;; Equation reference (eq:foo)
-     (cons "(eq:\\w+)" 'markdown-reference-face)
-     ;; Equation reference \eqref
-     (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
-    markdown-mode-font-lock-keywords-basic)
-  "Syntax highlighting for Markdown, itex, and wiki expressions.")
-
+(defconst markdown-mode-font-lock-keywords-latex
+  (list
+   ;; Math mode $..$ or $$..$$
+   (cons markdown-regex-latex-expression '(2 markdown-math-face))
+   ;; Display mode equations with brackets: \[ \]
+   (cons markdown-regex-latex-display 'markdown-math-face)
+   ;; Equation reference (eq:foo)
+   (cons "(eq:\\w+)" 'markdown-reference-face)
+   ;; Equation reference \eqref{foo}
+   (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
+  "Syntax highlighting for LaTeX fragments.")
 
 (defvar markdown-mode-font-lock-keywords
-  (if markdown-enable-itex
-      markdown-mode-font-lock-keywords-itex
-    markdown-mode-font-lock-keywords-basic)
+  (append
+   (if markdown-enable-math
+       markdown-mode-font-lock-keywords-latex)
+   markdown-mode-font-lock-keywords-basic)
   "Default highlighting expressions for Markdown mode.")
 
 
