@@ -330,6 +330,10 @@ This will not take effect until Emacs is restarted."
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-css-path nil
+  "CSS file to include in the output XHTML"
+  :group 'markdown
+  :type 'string)
 
 ;;; Font lock =================================================================
 
@@ -1316,7 +1320,12 @@ Calls `markdown-cycle' with argument t."
               "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\n"
               "<head>\n<title>")
       (insert title)
-      (insert "</title>\n</head>\n\n"
+      (insert "</title>\n")
+      (if markdown-css-path
+          (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen,projection,print\" href=\""
+                  markdown-css-path
+                  "\"  />\n"))
+      (insert "</head>\n\n"
               "<body>\n\n")
       (goto-char (point-max))
       (insert "\n"
