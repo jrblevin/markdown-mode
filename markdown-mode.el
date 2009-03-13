@@ -1322,7 +1322,7 @@ Calls `markdown-cycle' with argument t."
       (insert title)
       (insert "</title>\n")
       (if markdown-css-path
-          (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen,projection,print\" href=\""
+          (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
                   markdown-css-path
                   "\"  />\n"))
       (insert "</head>\n\n"
