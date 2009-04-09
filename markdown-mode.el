@@ -937,7 +937,7 @@ Arguments BEG and END specify the beginning and end of the region."
               (while (not (equal (point) 0))
                 (forward-line -1)
                 (goto-char (point-at-bol))
-                (when (re-search-forward "\\s *\\([0-9]\\.\\|[-\\*\\+]\\)" (point-at-eol) t)
+                (when (re-search-forward markdown-regex-list (point-at-eol) t)
                   (throw 'break (- (current-column) (length (match-string 1))))))
               nil)))
     (if pos
