@@ -40,20 +40,20 @@
 ;; markdown-mode is also available in the Debian `emacs-goodies-el`
 ;; package (beginning with revision 27.0-1).
 ;;
-;;  [markdown-mode.el]: http://code.jblevins.org/markdown-mode/markdown-mode.el
+;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20080604-001.png
 ;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-6
 
 ;; The latest development version can be downloaded directly
 ;; ([markdown-mode.el][devel.el]) or it can be obtained from the
 ;; (browsable and clonable) Git repository at
-;; <http://code.jblevins.org/markdown-mode.git>.  The entire repository,
+;; <http://jblevins.org/git/markdown-mode.git>.  The entire repository,
 ;; including the full project history, can be cloned via the Git protocol
 ;; by running
 ;;
-;;     git clone git://code.jblevins.org/markdown-mode.git
+;;     git clone git://jblevins.org/git/markdown-mode.git
 ;;
-;;  [devel.el]: http://code.jblevins.org/markdown-mode.git/plain/markdown-mode.el
+;;  [devel.el]: http://jblevins.org/git/markdown-mode.git/plain/markdown-mode.el
 
 ;;; Dependencies:
 
