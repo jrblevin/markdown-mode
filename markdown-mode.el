@@ -193,7 +193,7 @@
 ;; the table of contents view (headers only), outline view (top-level
 ;; headers only), and the full document view.  Pressing `TAB` while the
 ;; point is at a header will cycle through levels of visibility for the
-;; subtree: completely folded, visiable children, and fully visible.
+;; subtree: completely folded, visible children, and fully visible.
 ;; Note that mixing hash and underline style headers will give undesired
 ;; results.
 
