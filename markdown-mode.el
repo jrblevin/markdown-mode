@@ -934,7 +934,7 @@ Arguments BEG and END specify the beginning and end of the region."
     (setq pos
           (save-excursion
             (catch 'break
-              (while (not (equal (point) 0))
+              (while (not (equal (point) (point-min)))
                 (forward-line -1)
                 (goto-char (point-at-bol))
                 (when (re-search-forward markdown-regex-list (point-at-eol) t)
