@@ -258,7 +258,18 @@
 ;;; History:
 
 ;; markdown-mode was written and is maintained by Jason Blevins.  The
-;; first revision, 1.1, was released on May 24, 2007.
+;; first version was released on May 24, 2007.
+;;
+;;   * 2007-05-24: Version 1.1
+;;   * 2007-05-25: Version 1.2
+;;   * 2007-06-05: [Version 1.3][]
+;;   * 2007-06-29: Version 1.4
+;;   * 2008-05-24: [Version 1.5][]
+;;   * 2008-06-04: [Version 1.6][]
+;;
+;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
+;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
+;; [Version 1.6]: http://jblevins.org/projects/markdown-mode/rev-1-6
 
 
 
