@@ -241,8 +241,9 @@
 
 ;;; Bugs:
 
-;; markdown-mode is developed and tested primarily using GNU Emacs 22
-;; although compatibility with GNU Emacs 21 is also a priority.
+;; Although markdown-mode is developed and tested primarily using
+;; GNU Emacs 23, compatibility with GNU Emacs 21 and 22 is also a
+;; priority.
 ;;
 ;; Presently markdown-mode does not attempt to distinguish between
 ;; multiple indentation levels and preformatted text (four or more
