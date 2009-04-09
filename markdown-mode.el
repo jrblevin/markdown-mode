@@ -245,16 +245,17 @@
 ;; GNU Emacs 23, compatibility with GNU Emacs 21 and 22 is also a
 ;; priority.
 ;;
-;; Presently markdown-mode does not attempt to distinguish between
-;; multiple indentation levels and preformatted text (four or more
-;; leading spaces).  I am not aware of a way to handle this using
-;; Emacs's regexp-based font-lock facilities.  Implementing a more
-;; robust approach to syntax highlighting is a high-priority item for
-;; future work.
+;; markdown-mode's syntax highlighting is accomplished using the
+;; search-based fontification features of Emacs through a series of
+;; regular expressions.  Unfortunately, Emacs has trouble highlighting
+;; multi-line constructs using regular expressions and this creates
+;; several syntax-highlighting quirks such as mistaking indented
+;; lists for preformatted text, etc.  Making markdown-mode's syntax
+;; highlighting more robust through the use of matching functions
+;; or syntactic font lock is a high-priority item for future work.
 ;;
-;; If you find any bugs, such as syntax highlighting issues, please
-;; construct a test case and email me at <jrblevin@sdf.lonestar.org>.
-;; Comments and patches are welcome!
+;; If you find any bugs not mentioned here, please construct a test
+;; case and/or a patch and email me at <jrblevin@sdf.lonestar.org>.
 
 ;;; History:
 
