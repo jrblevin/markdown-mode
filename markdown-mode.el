@@ -1116,7 +1116,7 @@ When RECHECK is non-nil, BUFFER gets rechecked for undefined
 references so that REF disappears from the list of those links."
   (with-current-buffer buffer
       (when (not (eq major-mode 'markdown-mode))
-        (error "Not available in current mdoe"))
+        (error "Not available in current mode"))
       (goto-char (point-max))
       (indent-new-comment-line)
       (insert (concat ref ": ")))
