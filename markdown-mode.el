@@ -1396,7 +1396,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Make filling work with lists
   (set (make-local-variable 'paragraph-start)
-       "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t*][0-9]+\\. ")
+       "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t*][0-9]+\\.\\|^[ \t]*: ")
   ;; Outline mode
   (make-local-variable 'outline-regexp)
   (setq outline-regexp "#+")
