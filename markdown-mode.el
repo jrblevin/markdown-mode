@@ -165,7 +165,7 @@
 ;;
 ;;     All header commands use text in the active region, if any, as
 ;;     the header text.  To insert an atx or hash style level-n
-;;     header, press `C-c C-t n` where n is between 1 and 5.  For a
+;;     header, press `C-c C-t n` where n is between 1 and 6.  For a
 ;;     top-level setext or underline style header press `C-c C-t t`
 ;;     (mnemonic: title) and for a second-level underline-style header
 ;;     press `C-c C-t s` (mnemonic: section).
@@ -240,6 +240,7 @@
 ;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
+;;   * Alec Resnick <alec@sproutward.org> for bug reports.
 ;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph enhancements.
 
 ;;; Bugs:
@@ -377,6 +378,12 @@ This will not take effect until Emacs is restarted."
 (defvar markdown-header-face-4 'markdown-header-face-4
   "Face name to use for level-4 headers.")
 
+(defvar markdown-header-face-5 'markdown-header-face-5
+  "Face name to use for level-5 headers.")
+
+(defvar markdown-header-face-6 'markdown-header-face-6
+  "Face name to use for level-6 headers.")
+
 (defvar markdown-inline-code-face 'markdown-inline-code-face
   "Face name to use for inline code.")
 
@@ -446,6 +453,16 @@ This will not take effect until Emacs is restarted."
 (defface markdown-header-face-4
   '((t :inherit markdown-header-face))
   "Face for level-4 headers."
+  :group 'markdown-faces)
+
+(defface markdown-header-face-5
+  '((t :inherit markdown-header-face))
+  "Face for level-5 headers."
+  :group 'markdown-faces)
+
+(defface markdown-header-face-6
+  '((t :inherit markdown-header-face))
+  "Face for level-6 headers."
   :group 'markdown-faces)
 
 (defface markdown-inline-code-face
@@ -525,6 +542,14 @@ This will not take effect until Emacs is restarted."
 (defconst markdown-regex-header-4-atx
   "^\\(#### \\)\\(.*?\\)\\($\\| #+$\\)"
   "Regular expression for level 4 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-5-atx
+  "^\\(##### \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for level 5 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-6-atx
+  "^\\(###### \\)\\(.*?\\)\\($\\| #+$\\)"
+  "Regular expression for level 6 atx-style (hash mark) headers.")
 
 (defconst markdown-regex-header-1-setext
   "^\\(.*\\)\n\\(===+\\)$"
@@ -619,6 +644,8 @@ This will not take effect until Emacs is restarted."
    (cons markdown-regex-header-2-atx 'markdown-header-face-2)
    (cons markdown-regex-header-3-atx 'markdown-header-face-3)
    (cons markdown-regex-header-4-atx 'markdown-header-face-4)
+   (cons markdown-regex-header-5-atx 'markdown-header-face-5)
+   (cons markdown-regex-header-6-atx 'markdown-header-face-6)
    (cons markdown-regex-hr 'markdown-header-face)
    (cons markdown-regex-list 'markdown-list-face)
    (cons markdown-regex-link-inline
@@ -780,6 +807,13 @@ If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
   (markdown-insert-header 5))
+
+(defun markdown-insert-header-6 ()
+  "Insert a sixth level atx-style (hash mark) header.
+If Transient Mark mode is on and a region is active, it is used
+as the header text."
+  (interactive)
+  (markdown-insert-header 6))
 
 (defun markdown-insert-header (n)
   "Insert an atx-style (hash mark) header.
@@ -996,6 +1030,7 @@ Arguments BEG and END specify the beginning and end of the region."
     (define-key markdown-mode-map "\C-c\C-t3" 'markdown-insert-header-3)
     (define-key markdown-mode-map "\C-c\C-t4" 'markdown-insert-header-4)
     (define-key markdown-mode-map "\C-c\C-t5" 'markdown-insert-header-5)
+    (define-key markdown-mode-map "\C-c\C-t6" 'markdown-insert-header-6)
     (define-key markdown-mode-map "\C-c\C-pb" 'markdown-insert-bold)
     (define-key markdown-mode-map "\C-c\C-ss" 'markdown-insert-bold)
     (define-key markdown-mode-map "\C-c\C-pi" 'markdown-insert-italic)
@@ -1042,7 +1077,8 @@ Arguments BEG and END specify the beginning and end of the region."
      ["Second level" markdown-insert-header-2]
      ["Third level" markdown-insert-header-3]
      ["Fourth level" markdown-insert-header-4]
-     ["Fifth level" markdown-insert-header-5])
+     ["Fifth level" markdown-insert-header-5]
+     ["Sixth level" markdown-insert-header-6])
     "---"
     ["Bold" markdown-insert-bold]
     ["Italic" markdown-insert-italic]
