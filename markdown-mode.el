@@ -240,6 +240,7 @@
 ;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
+;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph enhancements.
 
 ;;; Bugs:
 
