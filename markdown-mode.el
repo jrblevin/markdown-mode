@@ -1368,6 +1368,12 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
       (forward-line 0)
       (1+ (count-lines start (point))))))
 
+(defun markdown-nobreak-p ()
+  "Returns nil if it is ok for fill-paragraph to insert a line
+  break at point"
+  ;; are we inside in square brackets
+  (looking-back "\\[[^]]*"))
+
 
 
 ;;; Mode definition  ==========================================================
@@ -1406,6 +1412,14 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (setq indent-line-function markdown-indent-function))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
+
+
+(add-hook 'markdown-mode-hook
+	  (lambda ()
+	    (make-local-variable 'fill-nobreak-predicate)
+	    (add-hook 'fill-nobreak-predicate 'markdown-nobreak-p)))
+
+
 
 (provide 'markdown-mode)
 
