@@ -1445,18 +1445,12 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (setq outline-regexp "#+")
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
-  ;; Indentation
+  ;; Indentation and filling
+  (make-local-variable 'fill-nobreak-predicate)
+  (add-hook 'fill-nobreak-predicate 'markdown-nobreak-p)
   (setq indent-line-function markdown-indent-function))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
-
-
-(add-hook 'markdown-mode-hook
-	  (lambda ()
-	    (make-local-variable 'fill-nobreak-predicate)
-	    (add-hook 'fill-nobreak-predicate 'markdown-nobreak-p)))
-
-
 
 (provide 'markdown-mode)
 
