@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2007, 2008, 2009 Jason Blevins
 
-;; Version: 1.7-dev
+;; Version: 1.7
 ;; Keywords: Markdown major mode
 ;; Author: Jason Blevins <jrblevin@sdf.lonestar.org>
 ;; URL: http://jblevins.org/projects/markdown-mode/
@@ -31,7 +31,7 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest stable version is markdown-mode 1.6, released on June 4. 2008:
+;; The latest stable version is markdown-mode 1.7, released on October 1, 2009:
 ;;
 ;;    * [markdown-mode.el][]
 ;;    * [Screenshot][]
@@ -44,7 +44,7 @@
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20080604-001.png
-;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-6
+;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-7
 
 ;; The latest development version can be downloaded directly
 ;; ([markdown-mode.el][devel.el]) or it can be obtained from the
@@ -272,10 +272,12 @@
 ;;   * 2007-06-29: Version 1.4
 ;;   * 2008-05-24: [Version 1.5][]
 ;;   * 2008-06-04: [Version 1.6][]
+;;   * 2008-10-01: [Version 1.7][]
 ;;
 ;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
 ;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
 ;; [Version 1.6]: http://jblevins.org/projects/markdown-mode/rev-1-6
+;; [Version 1.7]: http://jblevins.org/projects/markdown-mode/rev-1-7
 
 
 
