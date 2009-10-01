@@ -620,6 +620,10 @@ This will not take effect until Emacs is restarted."
     "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
+(defconst markdown-regex-list-indent
+  "^\\(\\s *\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\(\\s +\\)"
+  "Regular expression for matching indentation of list items.")
+
 ; From html-helper-mode
 (defun markdown-match-comments (last)
   "Matches HTML comments from the point to LAST"
@@ -936,42 +940,57 @@ Arguments BEG and END specify the beginning and end of the region."
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
+(defun markdown-prev-line-indent-p ()
+  "Return t if the previous line is indented."
+  (save-excursion
+    (forward-line -1)
+    (goto-char (point-at-bol))
+    (if (re-search-forward "^\\s " (point-at-eol) t) t)))
+
+(defun markdown-prev-line-indent ()
+  "Return the number of leading whitespace characters in the previous line."
+  (save-excursion
+    (forward-line -1)
+    (goto-char (point-at-bol))
+    (when (re-search-forward "^\\s +" (point-at-eol) t)
+        (current-column))))
+
+(defun markdown-prev-list-indent ()
+  "Return position of the first non-list-marker on the previous line."
+  (save-excursion
+    (forward-line -1)
+    (goto-char (point-at-bol))
+    (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
+        (current-column))))
+
 (defun markdown-indent-line ()
   "Indent the current line using some heuristics."
   (interactive)
-  (let (cur-pos
+  (if (markdown-prev-line-indent-p)
+      ;; If the current column is any of the positions, remove all
+      ;; of the positions up-to and including the current column
+      (indent-line-to
+       (markdown-indent-find-next-position
+        (current-column) (markdown-calc-indents)))))
+
+(defun markdown-calc-indents ()
+  "Return a list of indentation columns to cycle through."
+  (let (pos
         prev-line-pos
         positions
         computed-pos)
-    (setq cur-pos (current-column))
 
-    ;; Indentation of previous line
-    (setq pos
-          (save-excursion
-            (forward-line -1)
-            (goto-char (point-at-bol))
-            (when (re-search-forward "\\s +" (point-at-eol) t)
-              (current-column))))
-    (if pos
-        (progn
-          (setq prev-line-pos pos)
-          (setq positions (cons pos positions))))
+    ;; Previous line indent
+    (setq prev-line-pos (markdown-prev-line-indent))
+    (setq positions (cons prev-line-pos positions))
 
-    ;; Position of the first non-list marker on the previous line
-    (setq pos
-          (save-excursion
-            (forward-line -1)
-            (goto-char (point-at-bol))
-            (when (re-search-forward "\\s *\\([0-9]\\.\\|[-\\*\\+]\\)\\s *" (point-at-eol) t)
-              (current-column))))
-    (if pos
-        (setq positions (cons pos positions)))
+    ;; Previous non-list-marker indent
+    (setq positions (cons (markdown-prev-list-indent) positions))
 
     ;; Indentation of the previous line + tab-width
     (cond
      (prev-line-pos
-      (setq positions (cons (+ (car positions) tab-width) positions)))
-
+      (setq positions (cons (+ prev-line-pos tab-width) positions)))
      (t
       (setq positions (cons tab-width positions))))
 
@@ -980,40 +999,31 @@ Arguments BEG and END specify the beginning and end of the region."
              (> prev-line-pos tab-width))
         (setq positions (cons (- prev-line-pos tab-width) positions)))
 
-    ;; Indentation of the bullet of any preceeding line
+    ;; Indentation of preceeding list item
     (setq pos
           (save-excursion
+            (forward-line -1)
             (catch 'break
               (while (not (equal (point) (point-min)))
                 (forward-line -1)
                 (goto-char (point-at-bol))
-                (when (re-search-forward markdown-regex-list (point-at-eol) t)
-                  (throw 'break (- (current-column) (length (match-string 1))))))
+                (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
+                  (throw 'break (length (match-string 1)))))
               nil)))
     (if pos
         (setq positions (cons pos positions)))
 
-
+    ;; First column
     (setq positions (cons 0 (reverse positions)))
 
-    ;; If the current column is any of the positions, remove all of the positions up-to
-    ;; and including the current column
-
-    (setq computed-pos (markdown-indent-find-next-position cur-pos positions))
-    (indent-line-to computed-pos)))
-
+    positions))
 
 (defun markdown-enter-key ()
   "Insert a newline and optionally indent the next line."
   (interactive)
-  (let (indent)
-    (if markdown-indent-on-enter
-        (setq indent
-              (save-excursion
-                (goto-char (point-at-bol))
-                (if (re-search-forward "^\\s " (point-at-eol) t) t))))
-    (newline)
-    (if indent (funcall indent-line-function))))
+  (newline)
+  (if markdown-indent-on-enter
+      (funcall indent-line-function)))
 
 
 
