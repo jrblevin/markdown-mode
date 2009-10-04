@@ -1431,6 +1431,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (interactive)
   (message "markdown-mode, version %s" markdown-mode-version))
 
+;;;###autoload
 (define-derived-mode markdown-mode text-mode "Markdown"
   "Major mode for editing Markdown files."
   ;; Comments
