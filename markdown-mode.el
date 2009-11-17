@@ -1658,6 +1658,11 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
+(define-derived-mode gfm-mode markdown-mode "GFM"
+  "Major mode for editing GitHub Flavored Markdown files."
+  (auto-fill-mode 0)
+  (longlines-mode 1))
+
 (provide 'markdown-mode)
 
 ;;; markdown-mode.el ends here
