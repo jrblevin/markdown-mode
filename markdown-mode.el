@@ -1196,7 +1196,8 @@ references so that REF disappears from the list of those links."
     'action (lambda (b)
               (message (button-get b 'buffer))
               (switch-to-buffer-other-window (button-get b 'target-buffer))
-              (goto-line (button-get b 'target-line)))))
+              ;; use call-interactively to silence compiler
+              (call-interactively 'goto-line (button-get b 'target-line)))))
 
 (defun markdown-check-refs (&optional silent)
   "Show all undefined Markdown references in current `markdown-mode' buffer.
@@ -1245,11 +1246,12 @@ defined."
                                  'target-line line)
                 ;; Insert line number as text in Emacs < 22
                 (insert (number-to-string line)))
-              (insert " "))) (delete-backward-char 1)
+              (insert " "))) (delete-char -1)
           (insert ")")
           (newline))
         (view-buffer-other-window refbuf)
-        (goto-line 4)))))
+        (goto-char (point-min))
+        (forward-line 2)))))
 
 
 ;;; Outline ===================================================================
@@ -1375,7 +1377,7 @@ Calls `markdown-cycle' with argument t."
                              "*markdown-output*" nil))
   (let (title)
     (setq title (buffer-name))
-    (save-excursion
+    (save-current-buffer
       (set-buffer "*markdown-output*")
       (goto-char (point-min))
       (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
