@@ -280,13 +280,10 @@
 ;; [Version 1.7]: http://jblevins.org/projects/markdown-mode/rev-1-7
 
 
-
-
 ;;; Code:
 
 (require 'easymenu)
 (require 'outline)
-
 
 ;;; Customizable variables ====================================================
 
@@ -415,7 +412,6 @@ This will not take effect until Emacs is restarted."
 
 (defvar markdown-math-face 'markdown-math-face
   "Face name to use for LaTeX expressions.")
-
 
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
@@ -1056,8 +1052,8 @@ Arguments BEG and END specify the beginning and end of the region."
     (define-key markdown-mode-map "\C-c-" 'markdown-insert-hr)
     (define-key markdown-mode-map "\C-c\C-tt" 'markdown-insert-title)
     (define-key markdown-mode-map "\C-c\C-ts" 'markdown-insert-section)
-	;; Indentation
-	(define-key markdown-mode-map "\C-m" 'markdown-enter-key)
+    ;; Indentation
+    (define-key markdown-mode-map "\C-m" 'markdown-enter-key)
     ;; Visibility cycling
     (define-key markdown-mode-map (kbd "<tab>") 'markdown-cycle)
     (define-key markdown-mode-map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
@@ -1251,7 +1247,6 @@ defined."
         (view-buffer-other-window refbuf)
         (goto-line 4)))))
 
-
 ;;; Outline ===================================================================
 
 ;; The following visibility cycling code was taken from org-mode
@@ -1401,7 +1396,6 @@ Calls `markdown-cycle' with argument t."
   (interactive)
   (markdown)
   (browse-url-of-buffer "*markdown-output*"))
-
 
 ;;; Miscellaneous =============================================================
 
