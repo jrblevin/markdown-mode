@@ -102,6 +102,11 @@
 ;;     automatically indent new lines when the enter key is pressed
 ;;     (default: `t`)
 ;;
+;;   * `markdown-follow-wiki-link-on-enter` - set to a non-nil value
+;;     to automatically open a linked document in a new buffer if the
+;;     cursor is an wiki link
+;;     (default: `t`)
+;;
 ;;   * `markdown-uri-types` - a list of protocols for URIs that
 ;;     `markdown-mode' should highlight.
 ;;
@@ -202,7 +207,11 @@
 ;;; Extensions:
 
 ;; Besides supporting the basic Markdown syntax, markdown-mode also
-;; includes syntax highlighting for `[[Wiki Links]]` by default.
+;; includes syntax highlighting for `[[Wiki Links]]` by default. Wiki
+;; links may be followed automatically by hitting the enter key when
+;; your curser is on a wiki link or by hitting \C-c\C-f. The
+;; autofollowing on enter key may be controlled with the
+;; markdown-follow-wiki-link-on-enter customization.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command`.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -329,6 +338,12 @@
 
 (defcustom markdown-indent-on-enter t
   "Automatically indent new lines when enter key is pressed."
+  :group 'markdown
+  :type 'boolean)
+
+(defcustom markdown-follow-wiki-link-on-enter t
+  "Follow a wiki link (if the cursor is on such a link) when
+the enter key is pressed"
   :group 'markdown
   :type 'boolean)
 
@@ -590,7 +605,7 @@ This will not take effect until Emacs is restarted."
   "Regular expression for matching line breaks.")
 
 (defconst markdown-regex-wiki-link
-  "\\[\\[[^]]+\\]\\]"
+  "\\[\\[\\([^]]+\\)\\]\\]"
   "Regular expression for matching wiki links.")
 
 (defconst markdown-regex-uri
@@ -1016,12 +1031,20 @@ Arguments BEG and END specify the beginning and end of the region."
 
     positions))
 
-(defun markdown-enter-key ()
+(defun markdown-do-normal-return ()
   "Insert a newline and optionally indent the next line."
-  (interactive)
   (newline)
   (if markdown-indent-on-enter
       (funcall indent-line-function)))
+
+(defun markdown-enter-key ()
+  "If wiki link following is on and the word under the cursor is wiki
+link then open the linked document in the new buffer. Otherwise
+process the return in a normal way"
+  (interactive)
+  (if (and markdown-follow-wiki-link-on-enter (markdown-wiki-link-p))
+      (markdown-follow-wiki-link-at-point)
+    (markdown-do-normal-return)))
 
 
 
@@ -1052,6 +1075,9 @@ Arguments BEG and END specify the beginning and end of the region."
     (define-key markdown-mode-map "\C-c-" 'markdown-insert-hr)
     (define-key markdown-mode-map "\C-c\C-tt" 'markdown-insert-title)
     (define-key markdown-mode-map "\C-c\C-ts" 'markdown-insert-section)
+    ;; WikiLink Following
+    (define-key markdown-mode-map "\C-c\C-f"
+      'markdown-follow-wiki-link-at-point)
     ;; Indentation
     (define-key markdown-mode-map "\C-m" 'markdown-enter-key)
     ;; Visibility cycling
@@ -1396,6 +1422,50 @@ Calls `markdown-cycle' with argument t."
   (interactive)
   (markdown)
   (browse-url-of-buffer "*markdown-output*"))
+
+;;; WikiLink Following ========================================================
+
+(require 'thingatpt)
+
+(defun markdown-wiki-link-p ()
+  "Return non-nil when `point' is at a true wiki link.
+A true wiki link name matches `markdown-regex-wiki-link' but does not
+match the current file name after conversion This modifies the data
+returned by `match-data'.
+
+If optional argument SHORTCUT is non-nil, we assume that
+`markdown-regex-wiki-link' has just been searched for.  Note that the
+potential wiki link name must be available via `match-string'."
+  (let ((case-fold-search nil))
+    (and (thing-at-point-looking-at markdown-regex-wiki-link)
+	 (or (not buffer-file-name)
+	     (not (string-equal (buffer-file-name)
+				(markdown-convert-wiki-link-to-filename
+				 (match-string 1)))))
+	 (not (save-match-data
+		(save-excursion))))))
+
+(defun markdown-convert-wiki-link-to-filename (name)
+  "Converts a wiki link that may or may not contain spaces into a file
+name in the same manner as the markdown python extension."
+  (let ((new-ext (file-name-extension (buffer-file-name)))
+	(new-basename (replace-regexp-in-string "[[:space:]\n]" "_" name)))
+    (concat new-basename "." new-ext)))
+
+(defun markdown-follow-wiki-link (name)
+  "Follow the wiki link NAME by converting the name to a file name and
+calling `find-file` on that name."
+  (let ((filename (markdown-convert-wiki-link-to-filename name)))
+    (find-file filename)))
+
+(defun markdown-follow-wiki-link-at-point ()
+  "Find Wiki Link at point.
+See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
+  (interactive)
+  (if (markdown-wiki-link-p)
+      (markdown-follow-wiki-link (match-string 1))
+    (error "Point is not at a Wiki Link")))
+
 
 ;;; Miscellaneous =============================================================
 
