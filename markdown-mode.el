@@ -242,6 +242,7 @@
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
 ;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph enhancements.
+;;   * George Ogata <george.ogata@gmail.com> for fixing several warnings.
 
 ;;; Bugs:
 
