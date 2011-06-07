@@ -211,7 +211,9 @@
 ;; links may be followed automatically by hitting the enter key when
 ;; your curser is on a wiki link or by hitting `C-c C-f`. The
 ;; autofollowing on enter key may be controlled with the
-;; `markdown-follow-wiki-link-on-enter` customization.
+;; `markdown-follow-wiki-link-on-enter` customization.  Use `M-p` and
+;; `M-n` to quickly jump to the previous and next wiki links,
+;  respectively.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command`.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -1080,6 +1082,8 @@ process the return in a normal way"
     ;; WikiLink Following
     (define-key markdown-mode-map "\C-c\C-f"
       'markdown-follow-wiki-link-at-point)
+    (define-key markdown-mode-map "\M-n" 'markdown-next-wiki-link)
+    (define-key markdown-mode-map "\M-p" 'markdown-previous-wiki-link)
     ;; Indentation
     (define-key markdown-mode-map "\C-m" 'markdown-enter-key)
     ;; Visibility cycling
@@ -1470,6 +1474,23 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
       (markdown-follow-wiki-link (match-string 1))
     (error "Point is not at a Wiki Link")))
 
+(defun markdown-next-wiki-link ()
+  "Jump to next wiki link.
+See `markdown-wiki-link-p'."
+  (interactive)
+  (if (markdown-wiki-name-p)
+      ; At a wiki link already, move past it.
+      (goto-char (+ 1 (match-end 0))))
+  (save-match-data
+    ; Search for the next wiki link and move to the beginning.
+    (re-search-forward markdown-regex-wiki-link nil t)
+    (goto-char (match-beginning 0))))
+
+(defun markdown-previous-wiki-link ()
+  "Jump to previous wiki link.
+See `markdown-wiki-link-p'."
+  (interactive)
+  (re-search-backward markdown-regex-wiki-link nil t))
 
 ;;; Miscellaneous =============================================================
 
