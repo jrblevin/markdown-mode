@@ -285,7 +285,7 @@
 ;;   * 2007-06-29: Version 1.4
 ;;   * 2008-05-24: [Version 1.5][]
 ;;   * 2008-06-04: [Version 1.6][]
-;;   * 2008-10-01: [Version 1.7][]
+;;   * 2009-10-01: [Version 1.7][]
 ;;
 ;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
 ;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
