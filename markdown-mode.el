@@ -272,7 +272,7 @@
 ;; or syntactic font lock is a high-priority item for future work.
 ;;
 ;; If you find any bugs not mentioned here, please construct a test
-;; case and/or a patch and email me at <jrblevin@sdf.lonestar.org>.
+;; case and/or a patch and email me at <jrblevin@sdf.org>.
 
 ;;; History:
 
