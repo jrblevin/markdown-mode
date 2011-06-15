@@ -417,6 +417,9 @@ This will not take effect until Emacs is restarted."
 (defvar markdown-link-face 'markdown-link-face
   "Face name to use for links.")
 
+(defvar markdown-missing-link-face 'markdown-missing-link-face
+  "Face name to use for links where the linked file does not exist.")
+
 (defvar markdown-reference-face 'markdown-reference-face
   "Face name to use for reference.")
 
@@ -504,6 +507,13 @@ This will not take effect until Emacs is restarted."
 
 (defface markdown-link-face
   '((t :inherit font-lock-keyword-face))
+  "Face for links."
+  :group 'markdown-faces)
+
+(defface markdown-missing-link-face
+  '((t :inherit font-lock-keyword-face
+       :italic t :underline t :weight bold
+       :foreground "red3"))
   "Face for links."
   :group 'markdown-faces)
 
@@ -679,7 +689,6 @@ This will not take effect until Emacs is restarted."
          '((1 markdown-reference-face t)
            (2 markdown-url-face t)
            (3 markdown-link-title-face t)))
-   (cons markdown-regex-wiki-link 'markdown-link-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
    (cons markdown-regex-angle-uri 'markdown-link-face)
@@ -1430,7 +1439,7 @@ Calls `markdown-cycle' with argument t."
   (markdown)
   (browse-url-of-buffer "*markdown-output*"))
 
-;;; WikiLink Following ========================================================
+;;; WikiLink Following/Markup ========================================================
 
 (require 'thingatpt)
 
@@ -1491,6 +1500,83 @@ See `markdown-wiki-link-p'."
   (interactive)
   (re-search-backward markdown-regex-wiki-link nil t))
 
+(defun markdown-highlight-wiki-link (from to face)
+  "Highlight the wiki link under point"
+  (let ((ov (make-overlay from to)))
+    (overlay-put ov 'face face)))
+
+(defun markdown-unfontify-region-wiki-links (from to)
+  "Remove the face overlights used by `markdown-highlight-wiki-link'
+from the specified region"
+  (interactive "nfrom: \nnto: ")
+  (remove-overlays from to 'face markdown-link-face)
+  (remove-overlays from to 'face markdown-missing-link-face))
+
+(defun markdown-fontify-region-wiki-links (from to)
+  "Search a region for all wiki links. If a wiki link is found check
+to see if the backing file exists and highlight accordingly"
+  (goto-char from)
+  (while (re-search-forward markdown-regex-wiki-link to t)
+    (let ((highlight-beginning (match-beginning 0))
+	  (highlight-end (match-end 0))
+	  (file-name
+	   (markdown-convert-wiki-link-to-filename (match-string 1))))
+      (if (file-exists-p file-name)
+	  (markdown-highlight-wiki-link
+	   highlight-beginning highlight-end markdown-link-face)
+	(markdown-highlight-wiki-link
+	 highlight-beginning highlight-end markdown-missing-link-face)))))
+
+(defun markdown-extend-changed-region (from to)
+  "Extend the from/to region to the first newline before and the first
+newline after so we can correctly fontify all links"
+  ;; start looking for the first new line before 'from
+  (goto-char from)
+  (re-search-backward "\n" nil t)
+  (let ((new-from (point-min))
+	(new-to (point-max)))
+    (if (not (= (point) from))
+	(setq new-from (point)))
+    ;; do the same thing for the first new line after 'to
+    (goto-char to)
+    (re-search-forward "\n" nil t)
+    (if (not (= (point) to))
+	(setq new-to (point)))
+    (list new-from new-to)))
+
+(defun markdown-check-change-for-wiki-link (from to change)
+  "Designed to be used with the `after-change-functions' hook, checks
+the changed region for wiki links correctly rehighlighting any that
+occur"
+  (interactive "nfrom: \nnto: \nnchange: ")
+  (let* ((inhibit-point-motion-hooks t)
+	 (inhibit-quit t)
+	 (modified (buffer-modified-p))
+	 (buffer-undo-list t)
+	 (inhibit-read-only t)
+	 (inhibit-point-motion-hooks t)
+	 (inhibit-modification-hooks t)
+	 (current-point (point))
+	 deactivate-mark)
+    (unwind-protect
+	(save-restriction
+	  ;; Extend the region to fontify so that it starts
+	  ;; and ends at safe places.
+	  (multiple-value-bind (new-from new-to)
+	      (markdown-extend-changed-region from to)
+	    ;; Unfontify existing fontification (start from scratch)
+	    (markdown-unfontify-region-wiki-links new-from new-to)
+	    ;; Now do the fontification.
+	    (markdown-fontify-region-wiki-links new-from new-to)))
+      (unless modified
+	(restore-buffer-modified-p nil)))
+    (goto-char current-point)))
+
+(defun markdown-fontify-buffer-wiki-links ()
+  "Refontify all wiki links in the buffer"
+  (interactive)
+  (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
+
 ;;; Miscellaneous =============================================================
 
 (defun markdown-line-number-at-pos (&optional pos)
@@ -1548,7 +1634,21 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; Indentation and filling
   (make-local-variable 'fill-nobreak-predicate)
   (add-hook 'fill-nobreak-predicate 'markdown-nobreak-p)
-  (setq indent-line-function markdown-indent-function))
+  (setq indent-line-function markdown-indent-function)
+
+  ;; Anytime text changes make sure it gets fontified correctly
+  (make-local-hook 'after-change-functions)
+  (add-hook 'after-change-functions 'markdown-check-change-for-wiki-link t t)
+
+  ;; If we left the buffer there is a really good chance we where
+  ;; creating on of the wiki link documents. Make sure we get
+  ;; refontified when we come back
+  (make-local-hook 'window-configuration-change-hook)
+  (add-hook 'window-configuration-change-hook
+	    'markdown-fontify-buffer-wiki-links t t)
+
+  ;; do the initial link fontification
+  (markdown-fontify-buffer-wiki-links))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
