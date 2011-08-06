@@ -259,7 +259,7 @@
 ;;; Bugs:
 
 ;; Although markdown-mode is developed and tested primarily using
-;; GNU Emacs 23, compatibility with GNU Emacs 21 and 22 is also a
+;; GNU Emacs 24, compatibility with earlier Emacsen is also a
 ;; priority.
 ;;
 ;; markdown-mode's syntax highlighting is accomplished using the
