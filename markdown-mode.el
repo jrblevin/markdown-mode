@@ -1637,14 +1637,17 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (add-hook 'fill-nobreak-predicate 'markdown-nobreak-p)
   (setq indent-line-function markdown-indent-function)
 
+  ;; Prepare hooks for XEmacs compatibility
+  (when (featurep 'xemacs)
+      (make-local-hook 'after-change-functions)
+      (make-local-hook 'window-configuration-change-hook))
+
   ;; Anytime text changes make sure it gets fontified correctly
-  (make-local-hook 'after-change-functions)
   (add-hook 'after-change-functions 'markdown-check-change-for-wiki-link t t)
 
-  ;; If we left the buffer there is a really good chance we where
-  ;; creating on of the wiki link documents. Make sure we get
-  ;; refontified when we come back
-  (make-local-hook 'window-configuration-change-hook)
+  ;; If we left the buffer there is a really good chance we were
+  ;; creating one of the wiki link documents. Make sure we get
+  ;; refontified when we come back.
   (add-hook 'window-configuration-change-hook
 	    'markdown-fontify-buffer-wiki-links t t)
 
