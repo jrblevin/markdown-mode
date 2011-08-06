@@ -12,6 +12,7 @@
 ;; Copyright (C) 2009 Peter Williams <pezra@barelyenough.org>
 ;; Copyright (C) 2010 George Ogata <george.ogata@gmail.com>
 ;; Copyright (C) 2011 Eric Merritt <ericbmerritt@gmail.com>
+;; Copyright (C) 2011 Philippe Ivaldi <pivaldi@sfr.fr>
 
 ;; Version: 1.8-dev
 ;; Keywords: Markdown major mode
@@ -125,6 +126,9 @@
 ;;     LaTeX fragments (default: `nil').
 ;;
 ;;   * `markdown-css-path' - CSS file to link to in XHTML output.
+;;
+;;   * `markdown-xhtml-header-content' - additional content to include
+;;     in the XHTML <head> block.
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
@@ -273,6 +277,8 @@
 ;;   * George Ogata <george.ogata@gmail.com> for fixing several
 ;;     byte-compilation warnings.
 ;;   * Eric Merritt <ericbmerritt@gmail.com> for wiki link features.
+;;   * Philippe Ivaldi <pivaldi@sfr.fr> for XHTML output
+;;     customizations.
 
 ;;; Bugs:
 
@@ -384,6 +390,11 @@ This will not take effect until Emacs is restarted."
 
 (defcustom markdown-css-path ""
   "URL of CSS file to link to in the output XHTML."
+  :group 'markdown
+  :type 'string)
+
+(defcustom markdown-xhtml-header-content ""
+  "Additional content to include in the XHTML <head> block."
   :group 'markdown
   :type 'string)
 
@@ -1442,7 +1453,9 @@ Calls `markdown-cycle' with argument t."
           (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
                   markdown-css-path
                   "\"  />\n"))
-      (insert "</head>\n\n"
+      (when (> (length markdown-xhtml-header-content) 0)
+        (insert markdown-xhtml-header-content))
+      (insert "\n</head>\n\n"
               "<body>\n\n")
       (goto-char (point-max))
       (insert "\n"
