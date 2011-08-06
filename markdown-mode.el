@@ -327,6 +327,9 @@
 (defconst markdown-mode-version "1.7-dev"
   "Markdown mode version number.")
 
+(defconst markdown-output-buffer-name "*markdown-output*"
+  "Name of temporary buffer for markdown command output.")
+
 ;;; Customizable variables ====================================================
 
 (defvar markdown-mode-hook nil
@@ -1432,13 +1435,13 @@ Calls `markdown-cycle' with argument t."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
       (shell-command-on-region (region-beginning) (region-end) markdown-command
-                               "*markdown-output*" nil)
+                               markdown-output-buffer-name nil)
     (shell-command-on-region (point-min) (point-max) markdown-command
-                             "*markdown-output*" nil))
+                             markdown-output-buffer-name nil))
   (let (title)
     (setq title (buffer-name))
     (save-current-buffer
-      (set-buffer "*markdown-output*")
+      (set-buffer markdown-output-buffer-name)
       (goto-char (point-min))
       (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
               "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
@@ -1464,7 +1467,7 @@ Calls `markdown-cycle' with argument t."
   "Run `markdown' on the current buffer and preview the output in a browser."
   (interactive)
   (markdown)
-  (browse-url-of-buffer "*markdown-output*"))
+  (browse-url-of-buffer markdown-output-buffer-name))
 
 ;;; WikiLink Following/Markup ========================================================
 
