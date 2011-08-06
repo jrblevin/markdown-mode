@@ -322,16 +322,15 @@
 (require 'easymenu)
 (require 'outline)
 
-;;; Customizable variables ====================================================
+;;; Constants =================================================================
 
-;; Current revision
-(defconst markdown-mode-version "1.7-dev")
-
-;; A hook for users to run their own code when the mode is loaded.
-(defvar markdown-mode-hook nil)
-
+(defconst markdown-mode-version "1.7-dev"
+  "Markdown mode version number.")
 
 ;;; Customizable variables ====================================================
+
+(defvar markdown-mode-hook nil
+  "Hook runs when Markdown mode is loaded.")
 
 (defgroup markdown nil
   "Major mode for editing text files in Markdown format."
@@ -401,7 +400,6 @@ This will not take effect until Emacs is restarted."
 ;;; Font lock =================================================================
 
 (require 'font-lock)
-
 
 (defvar markdown-italic-face 'markdown-italic-face
   "Face name to use for italic text.")
