@@ -243,18 +243,22 @@
 ;;   * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
 ;;   * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix and
 ;;     GitHub Flavored Markdown mode (`gfm-mode').
-;;   * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and a patch.
+;;   * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and running
+;;     `markdown' with an active region.
 ;;   * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
 ;;   * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
 ;;   * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
 ;;   * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
-;;   * intrigeri <intrigeri@boum.org> for face customizations.
-;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el compatibility.
+;;   * Ben Voui <intrigeri@boum.org> for font-lock face customizations.
+;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el
+;;     compatibility and custom CSS.
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
-;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph enhancements.
-;;   * George Ogata <george.ogata@gmail.com> for fixing several warnings.
+;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph
+;;     enhancements.
+;;   * George Ogata <george.ogata@gmail.com> for fixing several
+;;     byte-compilation warnings.
 ;;   * Eric Merritt <ericbmerritt@gmail.com> for wiki link features.
 
 ;;; Bugs:
