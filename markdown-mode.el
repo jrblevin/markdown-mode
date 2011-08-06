@@ -365,7 +365,7 @@ This will not take effect until Emacs is restarted."
   :type 'boolean)
 
 (defcustom markdown-css-path nil
-  "CSS file to include in the output XHTML."
+  "CSS file to link to in the output XHTML."
   :group 'markdown
   :type 'string)
 
