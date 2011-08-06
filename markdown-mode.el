@@ -346,8 +346,7 @@
   :type 'boolean)
 
 (defcustom markdown-follow-wiki-link-on-enter t
-  "Follow a wiki link (if the cursor is on such a link) when
-the enter key is pressed"
+  "Follow wiki link at point (if any) when the enter key is pressed."
   :group 'markdown
   :type 'boolean)
 
@@ -1051,9 +1050,10 @@ Arguments BEG and END specify the beginning and end of the region."
       (funcall indent-line-function)))
 
 (defun markdown-enter-key ()
-  "If wiki link following is on and the word under the cursor is wiki
-link then open the linked document in the new buffer. Otherwise
-process the return in a normal way"
+  "Handle RET according to context.
+If there is a wiki link at the point, follow it unless
+`markdown-follow-wiki-link-on-enter' is nil.  Otherwise, process
+it in the usual way."
   (interactive)
   (if (and markdown-follow-wiki-link-on-enter (markdown-wiki-link-p))
       (markdown-follow-wiki-link-at-point)
@@ -1462,15 +1462,16 @@ potential wiki link name must be available via `match-string'."
 		(save-excursion))))))
 
 (defun markdown-convert-wiki-link-to-filename (name)
-  "Converts a wiki link that may or may not contain spaces into a file
-name in the same manner as the Python-Markdown WikiLinks extension."
+  "Generate a filename from the wiki link NAME.
+Spaces are converted to underscores, following the convention
+used by the Python Markdown WikiLinks extension."
   (let ((new-ext (file-name-extension (buffer-file-name)))
 	(new-basename (replace-regexp-in-string "[[:space:]\n]" "_" name)))
     (concat new-basename "." new-ext)))
 
 (defun markdown-follow-wiki-link (name)
-  "Follow the wiki link NAME by converting the name to a file name and
-calling `find-file` on that name."
+  "Follow the wiki link NAME.
+Convert the name to a file name and call `find-file'."
   (let ((filename (markdown-convert-wiki-link-to-filename name)))
     (find-file filename)))
 
@@ -1501,20 +1502,20 @@ See `markdown-wiki-link-p'."
   (re-search-backward markdown-regex-wiki-link nil t))
 
 (defun markdown-highlight-wiki-link (from to face)
-  "Highlight the wiki link under point"
+  "Highlight the wiki link in the region between FROM and TO using FACE."
   (let ((ov (make-overlay from to)))
     (overlay-put ov 'face face)))
 
 (defun markdown-unfontify-region-wiki-links (from to)
-  "Remove the face overlights used by `markdown-highlight-wiki-link'
-from the specified region"
+  "Remove wiki link faces from the region specified by FROM and TO."
   (interactive "nfrom: \nnto: ")
   (remove-overlays from to 'face markdown-link-face)
   (remove-overlays from to 'face markdown-missing-link-face))
 
 (defun markdown-fontify-region-wiki-links (from to)
-  "Search a region for all wiki links. If a wiki link is found check
-to see if the backing file exists and highlight accordingly"
+  "Search region given by FROM and TO for wiki links and fontify them.
+If a wiki link is found check to see if the backing file exists
+and highlight accordingly."
   (goto-char from)
   (while (re-search-forward markdown-regex-wiki-link to t)
     (let ((highlight-beginning (match-beginning 0))
@@ -1528,8 +1529,9 @@ to see if the backing file exists and highlight accordingly"
 	 highlight-beginning highlight-end markdown-missing-link-face)))))
 
 (defun markdown-extend-changed-region (from to)
-  "Extend the from/to region to the first newline before and the first
-newline after so we can correctly fontify all links"
+  "Extend region given by FROM and TO so that we can fontify all links.
+The region is extended to the first newline before and the first
+newline after."
   ;; start looking for the first new line before 'from
   (goto-char from)
   (re-search-backward "\n" nil t)
@@ -1545,9 +1547,10 @@ newline after so we can correctly fontify all links"
     (list new-from new-to)))
 
 (defun markdown-check-change-for-wiki-link (from to change)
-  "Designed to be used with the `after-change-functions' hook, checks
-the changed region for wiki links correctly rehighlighting any that
-occur"
+  "Check region between FROM and TO for wiki links and re-fontfy as needed.
+Designed to be used with the `after-change-functions' hook.
+CHANGE is the number of bytes of pre-change text replaced by the
+given range."
   (interactive "nfrom: \nnto: \nnchange: ")
   (let* ((inhibit-point-motion-hooks t)
 	 (inhibit-quit t)
@@ -1573,7 +1576,7 @@ occur"
     (goto-char current-point)))
 
 (defun markdown-fontify-buffer-wiki-links ()
-  "Refontify all wiki links in the buffer"
+  "Refontify all wiki links in the buffer."
   (interactive)
   (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
 
