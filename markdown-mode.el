@@ -241,7 +241,8 @@
 ;;
 ;;   * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
 ;;   * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
-;;   * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix.
+;;   * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix and
+;;     GitHub Flavored Markdown mode (`gfm-mode').
 ;;   * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and a patch.
 ;;   * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
 ;;   * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
