@@ -83,35 +83,35 @@
 ;; that can be customized.  The `M-x customize-mode` command
 ;; provides an interface to all of the possible customizations:
 ;;
-;;   * `markdown-command` - the command used to run Markdown
-;;     (default: `markdown`).
+;;   * `markdown-command' - the command used to run Markdown
+;;     (default: `markdown').
 ;;
-;;   * `markdown-hr-length` - the length of horizontal rules
-;;     (default: `5`).
+;;   * `markdown-hr-length' - the length of horizontal rules
+;;     (default: `5').
 ;;
-;;   * `markdown-bold-underscore` - set to a non-nil value to use two
-;;     underscores for bold instead of two asterisks (default: `nil`).
+;;   * `markdown-bold-underscore' - set to a non-nil value to use two
+;;     underscores for bold instead of two asterisks (default: `nil').
 ;;
-;;   * `markdown-italic-underscore` - set to a non-nil value to use
-;;     underscores for italic instead of asterisks (default: `nil`).
+;;   * `markdown-italic-underscore' - set to a non-nil value to use
+;;     underscores for italic instead of asterisks (default: `nil').
 ;;
-;;   * `markdown-indent-function` - the function to use for automatic
-;;     indentation (default: `markdown-indent-line`).
+;;   * `markdown-indent-function' - the function to use for automatic
+;;     indentation (default: `markdown-indent-line').
 ;;
-;;   * `markdown-indent-on-enter` - set to a non-nil value to
+;;   * `markdown-indent-on-enter' - set to a non-nil value to
 ;;     automatically indent new lines when the enter key is pressed
-;;     (default: `t`)
+;;     (default: `t')
 ;;
-;;   * `markdown-follow-wiki-link-on-enter` - set to a non-nil value
+;;   * `markdown-follow-wiki-link-on-enter' - set to a non-nil value
 ;;     to automatically open a linked document in a new buffer if the
 ;;     cursor is an wiki link
-;;     (default: `t`)
+;;     (default: `t')
 ;;
-;;   * `markdown-uri-types` - a list of protocols for URIs that
+;;   * `markdown-uri-types' - a list of protocols for URIs that
 ;;     `markdown-mode' should highlight.
 ;;
-;;   * `markdown-enable-math` - syntax highlighting for
-;;     LaTeX fragments (default: `nil`).
+;;   * `markdown-enable-math' - syntax highlighting for
+;;     LaTeX fragments (default: `nil').
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
@@ -189,8 +189,8 @@
 ;; When applicable, commands that specifically act on the region even
 ;; outside of Transient Mark mode have the same keybinding as the with
 ;; the exception of an additional `C-` prefix.  For example,
-;; `markdown-insert-blockquote` is bound to `C-c C-s b` and only acts on
-;; the region in Transient Mark mode while `markdown-blockquote-region`
+;; `markdown-insert-blockquote' is bound to `C-c C-s b` and only acts on
+;; the region in Transient Mark mode while `markdown-blockquote-region'
 ;; is bound to `C-c C-s C-b` and always applies to the region (when
 ;; nonempty).
 ;;
@@ -211,13 +211,13 @@
 ;; links may be followed automatically by hitting the enter key when
 ;; your curser is on a wiki link or by hitting `C-c C-f`. The
 ;; autofollowing on enter key may be controlled with the
-;; `markdown-follow-wiki-link-on-enter` customization.  Use `M-p` and
+;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
 ;; `M-n` to quickly jump to the previous and next wiki links,
 ;  respectively.
 ;;
-;; [SmartyPants][] support is possible by customizing `markdown-command`.
+;; [SmartyPants][] support is possible by customizing `markdown-command'.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
-;; then you can set `markdown-command` to `"markdown | smartypants"`.
+;; then you can set `markdown-command' to `"markdown | smartypants"`.
 ;; You can do this either by using `M-x customize-group markdown`
 ;; or by placing the following in your `.emacs` file:
 ;;
@@ -230,7 +230,7 @@
 ;;
 ;; Experimental syntax highlighting for mathematical expressions written
 ;; in LaTeX (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`)
-;; can be enabled by setting `markdown-enable-math` to a non-nil value,
+;; can be enabled by setting `markdown-enable-math' to a non-nil value,
 ;; either via customize or by placing `(setq markdown-enable-itex t)`
 ;; in `.emacs`, and restarting Emacs.
 
@@ -1401,7 +1401,7 @@ Calls `markdown-cycle' with argument t."
 ;;; Commands ==================================================================
 
 (defun markdown ()
-  "Run markdown on the current buffer and preview the output in another buffer."
+  "Run `markdown' on the current buffer and preview the output in another buffer."
   (interactive)
   (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
       (shell-command-on-region (region-beginning) (region-end) markdown-command
@@ -1432,7 +1432,7 @@ Calls `markdown-cycle' with argument t."
               "</html>\n"))))
 
 (defun markdown-preview ()
-  "Run markdown on the current buffer and preview the output in a browser."
+  "Run `markdown' on the current buffer and preview the output in a browser."
   (interactive)
   (markdown)
   (browse-url-of-buffer "*markdown-output*"))
@@ -1470,7 +1470,7 @@ used by the Python Markdown WikiLinks extension."
 (defun markdown-follow-wiki-link (name)
   "Follow the wiki link NAME.
 Convert the name to a file name and call `find-file'.  Ensure that
-the new buffer remains in markdown-mode."
+the new buffer remains in `markdown-mode'."
   (let ((filename (markdown-convert-wiki-link-to-filename name)))
     (find-file filename))
   (markdown-mode))

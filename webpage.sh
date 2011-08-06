@@ -23,6 +23,8 @@ cat markdown-mode.el |\
     sed -e 's/^;;[ ]\{0,1\}//' |\
     # Escape wiki links
     #sed -e 's/\(\[\[[^]\n]*\]\]\)/\\\1/g' |\
+    # Use Markdown-style backticks for single-quoted lisp code
+    sed -e 's/`\([^'\'']*\)'\''/`\1`/g' |\
     # Use <kbd> tags for keybindings
     sed -e 's/`\([CM]-[^`]*\)`/<kbd>\1<\/kbd>/g' |\
     # Remove email addresses
