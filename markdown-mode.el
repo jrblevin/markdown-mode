@@ -1,6 +1,17 @@
 ;;; markdown-mode.el --- Major mode to edit Markdown files in Emacs
 
-;; Copyright (C) 2007-2011 Jason R. Blevins
+;; Copyright (C) 2007, 2008, 2009, 2010, 2011 Jason R. Blevins
+;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
+;; Copyright (C) 2007 Conal Elliott <conal@conal.net>
+;; Copyright (C) 2008 Greg Bognar <greg_bognar@hms.harvard.edu>
+;; Copyright (C) 2008 Dmitry Dzhus <mail@sphinx.net.ru>
+;; Copyright (C) 2008 Bryan Kyle <bryan.kyle@gmail.com>
+;; Copyright (C) 2008 Ben Voui <intrigeri@boum.org>
+;; Copyright (C) 2009 Ankit Solanki <ankit.solanki@gmail.com>
+;; Copyright (C) 2009 Hilko Bengen <bengen@debian.org>
+;; Copyright (C) 2009 Peter Williams <pezra@barelyenough.org>
+;; Copyright (C) 2010 George Ogata <george.ogata@gmail.com>
+;; Copyright (C) 2011 Eric Merritt <ericbmerritt@gmail.com>
 
 ;; Version: 1.8-dev
 ;; Keywords: Markdown major mode
