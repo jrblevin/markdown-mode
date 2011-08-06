@@ -510,10 +510,8 @@ This will not take effect until Emacs is restarted."
   :group 'markdown-faces)
 
 (defface markdown-missing-link-face
-  '((t :inherit font-lock-keyword-face
-       :italic t :underline t :weight bold
-       :foreground "red3"))
-  "Face for links."
+  '((t :inherit font-lock-warning-face))
+  "Face for missing links."
   :group 'markdown-faces)
 
 (defface markdown-reference-face
