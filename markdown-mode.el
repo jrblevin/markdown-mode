@@ -1469,9 +1469,11 @@ used by the Python Markdown WikiLinks extension."
 
 (defun markdown-follow-wiki-link (name)
   "Follow the wiki link NAME.
-Convert the name to a file name and call `find-file'."
+Convert the name to a file name and call `find-file'.  Ensure that
+the new buffer remains in markdown-mode."
   (let ((filename (markdown-convert-wiki-link-to-filename name)))
-    (find-file filename)))
+    (find-file filename))
+  (markdown-mode))
 
 (defun markdown-follow-wiki-link-at-point ()
   "Find Wiki Link at point.
