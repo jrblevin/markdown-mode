@@ -113,6 +113,8 @@
 ;;   * `markdown-enable-math' - syntax highlighting for
 ;;     LaTeX fragments (default: `nil').
 ;;
+;;   * `markdown-css-path' - CSS file to link to in XHTML output.
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
