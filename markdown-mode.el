@@ -1433,13 +1433,16 @@ Calls `markdown-cycle' with argument t."
 (defun markdown ()
   "Run `markdown' on the current buffer and preview the output in another buffer."
   (interactive)
-  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-      (shell-command-on-region (region-beginning) (region-end) markdown-command
-                               markdown-output-buffer-name nil)
-    (shell-command-on-region (point-min) (point-max) markdown-command
-                             markdown-output-buffer-name nil))
-  (let (title)
-    (setq title (buffer-name))
+  (let ((title (buffer-name))
+        (begin-region)
+        (end-region))
+    (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+        (setq begin-region (region-beginning)
+              end-region (region-end))
+      (setq begin-region (point-min)
+            end-region (point-max)))
+    (shell-command-on-region begin-region end-region markdown-command
+                             markdown-output-buffer-name)
     (save-current-buffer
       (set-buffer markdown-output-buffer-name)
       (goto-char (point-min))
