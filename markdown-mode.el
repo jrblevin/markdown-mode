@@ -1486,7 +1486,7 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   "Jump to next wiki link.
 See `markdown-wiki-link-p'."
   (interactive)
-  (if (markdown-wiki-name-p)
+  (if (markdown-wiki-link-p)
       ; At a wiki link already, move past it.
       (goto-char (+ 1 (match-end 0))))
   (save-match-data
