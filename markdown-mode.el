@@ -371,8 +371,8 @@ This will not take effect until Emacs is restarted."
   :group 'markdown
   :type 'boolean)
 
-(defcustom markdown-css-path nil
-  "CSS file to link to in the output XHTML."
+(defcustom markdown-css-path ""
+  "URL of CSS file to link to in the output XHTML."
   :group 'markdown
   :type 'string)
 
@@ -1427,7 +1427,7 @@ Calls `markdown-cycle' with argument t."
               "<head>\n<title>")
       (insert title)
       (insert "</title>\n")
-      (if markdown-css-path
+      (if (> (length markdown-css-path) 0)
           (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
                   markdown-css-path
                   "\"  />\n"))
