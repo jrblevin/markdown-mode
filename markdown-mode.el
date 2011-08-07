@@ -235,7 +235,7 @@
 ;; autofollowing on enter key may be controlled with the
 ;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
 ;; `M-n` to quickly jump to the previous and next wiki links,
-;  respectively.
+;; respectively.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command'.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
