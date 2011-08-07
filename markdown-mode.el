@@ -1477,7 +1477,8 @@ Calls `markdown-cycle' with argument t."
       (goto-char (point-max))
       (insert "\n"
               "</body>\n"
-              "</html>\n"))))
+              "</html>\n")
+      (html-mode))))
 
 (defun markdown-preview ()
   "Run `markdown' on the current buffer and preview the output in a browser."
