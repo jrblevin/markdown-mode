@@ -299,6 +299,8 @@
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
+;;   * Joost Kremers <j.kremers@em.uni-frankfurt.de> for bug reports
+;;     regarding indentation.
 ;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph
 ;;     enhancements.
 ;;   * George Ogata <george.ogata@gmail.com> for fixing several
@@ -1046,7 +1048,7 @@ Arguments BEG and END specify the beginning and end of the region."
     (forward-line -1)
     (markdown-cur-line-indent)))
 
-(defun markdown-prev-list-indent ()
+(defun markdown-prev-non-list-indent ()
   "Return position of the first non-list-marker on the previous line."
   (save-excursion
     (forward-line -1)
@@ -1076,7 +1078,9 @@ Arguments BEG and END specify the beginning and end of the region."
     (setq positions (cons prev-line-pos positions))
 
     ;; Previous non-list-marker indent
-    (setq positions (cons (markdown-prev-list-indent) positions))
+    (setq pos (markdown-prev-non-list-indent))
+    (if pos
+        (setq positions (cons pos positions)))
 
     ;; Indentation of the previous line + tab-width
     (cond
@@ -1101,7 +1105,7 @@ Arguments BEG and END specify the beginning and end of the region."
                 (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
                   (throw 'break (length (match-string 1)))))
               nil)))
-    (if pos
+    (if (and pos (not (eq pos prev-line-pos)))
         (setq positions (cons pos positions)))
 
     ;; First column
