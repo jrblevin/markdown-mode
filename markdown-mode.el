@@ -154,6 +154,11 @@
 ;;     `C-c C-c m` will run Markdown on the current buffer and preview
 ;;     the output in another buffer while `C-c C-c p` runs Markdown on
 ;;     the current buffer and previews the output in a browser.
+;;     `C-c C-c e` will run Markdown on the current buffer and save
+;;     the result in the file `basename.html`, where `basename` is the
+;;     name of the Markdown file with the extension removed.  **This
+;;     file will be overwritten without notice.**  Press `C-c C-c v`
+;;     to view the exported file in a browser.
 ;;
 ;;     `C-c C-c c` will check for undefined references.  If there are
 ;;     any, a small buffer will open with a list of undefined
@@ -277,8 +282,8 @@
 ;;   * George Ogata <george.ogata@gmail.com> for fixing several
 ;;     byte-compilation warnings.
 ;;   * Eric Merritt <ericbmerritt@gmail.com> for wiki link features.
-;;   * Philippe Ivaldi <pivaldi@sfr.fr> for XHTML output
-;;     customizations.
+;;   * Philippe Ivaldi <pivaldi@sfr.fr> for XHTML preview
+;;     customizations and XHTML export.
 
 ;;; Bugs:
 
@@ -1128,6 +1133,8 @@ it in the usual way."
     ;; Markdown functions
     (define-key map "\C-c\C-cm" 'markdown)
     (define-key map "\C-c\C-cp" 'markdown-preview)
+    (define-key map "\C-c\C-ce" 'markdown-export)
+    (define-key map "\C-c\C-cv" 'markdown-export-and-view)
     ;; References
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
     map)
@@ -1144,6 +1151,8 @@ it in the usual way."
     "---"
     ["Compile" markdown]
     ["Preview" markdown-preview]
+    ["Export" markdown-export]
+    ["Export & View" markdown-export-and-view]
     "---"
     ("Headers (setext)"
      ["Insert Title" markdown-insert-title]
@@ -1430,8 +1439,8 @@ Calls `markdown-cycle' with argument t."
 
 ;;; Commands ==================================================================
 
-(defun markdown ()
-  "Run `markdown' on the current buffer and preview the output in another buffer."
+(defun markdown (&optional output-buffer-name)
+  "Run `markdown' on current buffer and insert output in buffer BUFFER-OUTPUT."
   (interactive)
   (let ((title (buffer-name))
         (begin-region)
@@ -1441,10 +1450,14 @@ Calls `markdown-cycle' with argument t."
               end-region (region-end))
       (setq begin-region (point-min)
             end-region (point-max)))
+
+    (unless output-buffer-name
+      (setq output-buffer-name markdown-output-buffer-name))
+
     (shell-command-on-region begin-region end-region markdown-command
-                             markdown-output-buffer-name)
+                             output-buffer-name)
     (save-current-buffer
-      (set-buffer markdown-output-buffer-name)
+      (set-buffer output-buffer-name)
       (goto-char (point-min))
       (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
               "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
@@ -1469,8 +1482,35 @@ Calls `markdown-cycle' with argument t."
 (defun markdown-preview ()
   "Run `markdown' on the current buffer and preview the output in a browser."
   (interactive)
-  (markdown)
+  (markdown markdown-output-buffer-name)
   (browse-url-of-buffer markdown-output-buffer-name))
+
+(defun markdown-export-file-name ()
+  "Attempt to generate a filename for Markdown output.
+If the current buffer is visiting a file, we construct a new
+output filename based on that filename.  Otherwise, return nil."
+  (when (buffer-file-name)
+    (concat (file-name-sans-extension (buffer-file-name)) ".html")))
+
+(defun markdown-export ()
+  "Run Markdown on the current buffer, save to a file, and return the filename.
+The resulting filename will be constructed using the current filename, but
+with the extension removed and replaced with .html."
+  (interactive)
+  (let ((output-file (markdown-export-file-name))
+        (output-buffer-name))
+    (when output-file
+      (setq output-buffer-name (buffer-name (find-file-noselect output-file)))
+      (markdown output-buffer-name)
+      (with-current-buffer output-buffer-name
+        (save-buffer)
+        (kill-buffer-and-window))
+      output-file)))
+
+(defun markdown-export-and-view ()
+  "Export to XHTML using `markdown-export' and browse the resulting file."
+  (interactive)
+  (browse-url (markdown-export)))
 
 ;;; WikiLink Following/Markup ========================================================
 
