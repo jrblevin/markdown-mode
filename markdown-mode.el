@@ -1027,7 +1027,7 @@ Arguments BEG and END specify the beginning and end of the region."
   (or (cadr positions) 0))
 
 (defun markdown-prev-line-indent-p ()
-  "Return t if the previous line is indented."
+  "Return t if the previous line is indented and nil otherwise."
   (save-excursion
     (forward-line -1)
     (goto-char (point-at-bol))
