@@ -1033,13 +1033,18 @@ Arguments BEG and END specify the beginning and end of the region."
     (goto-char (point-at-bol))
     (if (re-search-forward "^\\s " (point-at-eol) t) t)))
 
+(defun markdown-cur-line-indent ()
+  "Return the number of leading whitespace characters in the current line."
+  (save-excursion
+    (goto-char (point-at-bol))
+    (re-search-forward "^\\s +" (point-at-eol) t)
+    (current-column)))
+
 (defun markdown-prev-line-indent ()
   "Return the number of leading whitespace characters in the previous line."
   (save-excursion
     (forward-line -1)
-    (goto-char (point-at-bol))
-    (when (re-search-forward "^\\s +" (point-at-eol) t)
-        (current-column))))
+    (markdown-cur-line-indent)))
 
 (defun markdown-prev-list-indent ()
   "Return position of the first non-list-marker on the previous line."
