@@ -95,8 +95,18 @@
 ;; that can be customized.  The `M-x customize-mode` command
 ;; provides an interface to all of the possible customizations:
 ;;
-;;   * `markdown-command' - the command used to run Markdown
-;;     (default: `markdown').
+;;   * `markdown-command' - the command used to run Markdown (default:
+;;     `markdown').  This variable may be customized to pass
+;;     command-line options to your Markdown processor of choice, but
+;;     this command must accept input from `stdin`.  If it does not, a
+;;     simple wrapper script can be used to write `stdin` to a file
+;;     and then pass that file to your Markdown interpreter.  Ideally,
+;;     this command will produce an XHTML fragment around which
+;;     markdown-mode will wrap a header and footer (which can be
+;;     further customized).  However, it attempts to detect whether
+;;     the command produces standalone XHTML output (via
+;;     `markdown-xhtml-standalone-regexp'), in which case no header
+;;     and footer content will be added.
 ;;
 ;;   * `markdown-hr-length' - the length of horizontal rules
 ;;     (default: `5').
@@ -129,6 +139,12 @@
 ;;
 ;;   * `markdown-xhtml-header-content' - additional content to include
 ;;     in the XHTML <head> block.
+;;
+;;  * `markdown-xhtml-standalone-regexp' - a regular expression which
+;;    indicates whether the output of `markdown-command' is standalone
+;;    XHTML (default: `^\\(\<\?xml\\|\<!DOCTYPE\\|\<html\\)`).  If
+;;    this is not matched, we assume this output is a fragment and add
+;;    our own header and footer.
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
@@ -410,6 +426,12 @@ This will not take effect until Emacs is restarted."
   "Additional content to include in the XHTML <head> block."
   :group 'markdown
   :type 'string)
+
+(defcustom markdown-xhtml-standalone-regexp
+  "^\\(\<\?xml\\|\<!DOCTYPE\\|\<html\\)"
+  "Regexp indicating whether `markdown-command' output is standalone XHTML."
+  :group 'markdown
+  :type 'regexp)
 
 ;;; Font lock =================================================================
 
@@ -1465,26 +1487,39 @@ Calls `markdown-cycle' with argument t."
     (save-current-buffer
       (set-buffer output-buffer-name)
       (goto-char (point-min))
-      (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-              "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
-              "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\n"
-              "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\n"
-              "<head>\n<title>")
-      (insert title)
-      (insert "</title>\n")
-      (if (> (length markdown-css-path) 0)
-          (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
-                  markdown-css-path
-                  "\"  />\n"))
-      (when (> (length markdown-xhtml-header-content) 0)
-        (insert markdown-xhtml-header-content))
-      (insert "\n</head>\n\n"
-              "<body>\n\n")
-      (goto-char (point-max))
-      (insert "\n"
-              "</body>\n"
-              "</html>\n")
+      (unless (markdown-output-standalone-p)
+        (markdown-add-xhtml-header-and-footer title))
       (html-mode))))
+
+(defun markdown-output-standalone-p ()
+  "Determine whether `markdown-command' output is standalone XHTML.
+Standalone XHTML output is identified by an occurrence of
+`markdown-xhtml-standalone-regexp' in the first five lines of output."
+  (re-search-forward
+   markdown-xhtml-standalone-regexp
+   (save-excursion (goto-line 5) (point)) t))
+
+(defun markdown-add-xhtml-header-and-footer (title)
+  "Wrap XHTML header and footer with given TITLE around current buffer."
+  (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+          "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
+          "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\n"
+          "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\n"
+          "<head>\n<title>")
+  (insert title)
+  (insert "</title>\n")
+  (if (> (length markdown-css-path) 0)
+      (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
+              markdown-css-path
+              "\"  />\n"))
+  (when (> (length markdown-xhtml-header-content) 0)
+    (insert markdown-xhtml-header-content))
+  (insert "\n</head>\n\n"
+          "<body>\n\n")
+  (goto-char (point-max))
+  (insert "\n"
+          "</body>\n"
+          "</html>\n"))
 
 (defun markdown-preview ()
   "Run `markdown' on the current buffer and preview the output in a browser."
