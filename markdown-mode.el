@@ -1464,7 +1464,6 @@ subtree.  Otherwise, insert a tab using `indent-relative'."
           (setq markdown-cycle-subtree-status 'folded)))))
 
      (t
-      (message "TAB")
       (funcall indent-line-function))))
 
 ;; Based on org-shifttab from org.el.
