@@ -255,6 +255,12 @@
 ;; can be enabled by setting `markdown-enable-math' to a non-nil value,
 ;; either via customize or by placing `(setq markdown-enable-itex t)`
 ;; in `.emacs`, and restarting Emacs.
+;;
+;; A [GitHub Flavored Markdown](http://github.github.com/github-flavored-markdown/)
+;; mode, `gfm-mode', is also available.  The GitHub implementation of
+;; differs slightly from standard Markdown.  Most importantly, newlines are
+;; significant and trigger hard line breaks.  As such, `gfm-mode' turns off
+;; `auto-fill-mode' and turns on `longlines-mode'.
 
 ;;; Acknowledgments:
 
@@ -1733,6 +1739,8 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (markdown-fontify-buffer-wiki-links))
 
 ;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
+
+;;; GitHub Flavored Markdown Mode  ============================================
 
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
