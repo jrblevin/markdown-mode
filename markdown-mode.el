@@ -1745,6 +1745,8 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 ;;;###autoload
 (define-derived-mode markdown-mode text-mode "Markdown"
   "Major mode for editing Markdown files."
+  ;; Natural Markdown tab width
+  (setq tab-width 4)
   ;; Comments
   (make-local-variable 'comment-start)
   (setq comment-start "<!-- ")
