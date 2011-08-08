@@ -933,6 +933,17 @@ indentation."
         (setq cur-end (point))))
     match))
 
+(defun markdown-font-lock-extend-region ()
+  (save-excursion
+    (goto-char font-lock-beg)
+    (let ((found (re-search-backward "\n" nil t)))
+      (when found
+        (goto-char font-lock-end)
+        (when (re-search-forward "\n" nil t)
+          (beginning-of-line)
+          (setq font-lock-end (point)))
+        (setq font-lock-beg found)))))
+
 
 
 ;;; Syntax Table ==============================================================
@@ -1894,7 +1905,12 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; Prepare hooks for XEmacs compatibility
   (when (featurep 'xemacs)
       (make-local-hook 'after-change-functions)
+      (make-local-hook 'font-lock-extend-region-functions)
       (make-local-hook 'window-configuration-change-hook))
+
+  ;; Multiline font lock
+  (add-hook 'font-lock-extend-region-functions
+            'markdown-font-lock-extend-region)
 
   ;; Anytime text changes make sure it gets fontified correctly
   (add-hook 'after-change-functions 'markdown-check-change-for-wiki-link t t)
