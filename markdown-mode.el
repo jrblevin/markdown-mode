@@ -732,10 +732,10 @@ This will not take effect until Emacs is restarted."
 
 (defvar markdown-mode-font-lock-keywords-basic
   (list
-   '(markdown-match-comments 0 markdown-comment-face t t)
    '(markdown-match-pre-blocks 0 markdown-pre-face t t)
-   (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
+   '(markdown-match-comments 0 markdown-comment-face t t)
+   (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-header-1-setext 'markdown-header-face-1)
    (cons markdown-regex-header-2-setext 'markdown-header-face-2)
    (cons markdown-regex-header-1-atx 'markdown-header-face-1)
