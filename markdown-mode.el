@@ -771,11 +771,13 @@ This will not take effect until Emacs is restarted."
 ;;; Markdown parsing functions ================================================
 
 (defun markdown-prev-line-blank-p ()
-  "Return t if the previous line is blank and nil otherwise."
+  "Return t if the previous line is blank and nil otherwise.
+If we are at the first line, then consider the previous line to be blank."
   (save-excursion
-    (forward-line -1)
-    (goto-char (point-at-bol))
-    (if (re-search-forward "^\\s *$" (point-at-eol) t) t)))
+    (if (= (point-at-bol) (point-min))
+        t
+      (forward-line -1)
+      (markdown-cur-line-blank-p))))
 
 (defun markdown-prev-line-indent-p ()
   "Return t if the previous line is indented and nil otherwise."
