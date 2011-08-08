@@ -1154,7 +1154,7 @@ the blockquote text."
 (defun markdown-block-region (beg end prefix)
   "Format the region using a block prefix.
 Arguments BEG and END specify the beginning and end of the
-region.The characters PREFIX will appear at the beginning
+region.  The characters PREFIX will appear at the beginning
 of each line."
   (if mark-active
       (save-excursion
