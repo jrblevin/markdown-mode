@@ -716,8 +716,8 @@ This will not take effect until Emacs is restarted."
 (defvar markdown-mode-font-lock-keywords-basic
   (list
    '(markdown-match-comments 0 markdown-comment-face t t)
+   '(markdown-match-pre-blocks 0 markdown-pre-face t t)
    (cons markdown-regex-code '(2 markdown-inline-code-face))
-   (cons markdown-regex-pre 'markdown-pre-face)
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext 'markdown-header-face-1)
    (cons markdown-regex-header-2-setext 'markdown-header-face-2)
@@ -770,6 +770,12 @@ This will not take effect until Emacs is restarted."
 
 ;;; Markdown parsing functions ================================================
 
+(defun markdown-cur-line-blank-p ()
+  "Return t if the current line is blank and nil otherwise."
+  (save-excursion
+    (beginning-of-line)
+    (re-search-forward "^\\s *$" (point-at-eol) t)))
+
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
 If we are at the first line, then consider the previous line to be blank."
@@ -799,13 +805,55 @@ If we are at the first line, then consider the previous line to be blank."
     (forward-line -1)
     (markdown-cur-line-indent)))
 
+(defun markdown-cur-non-list-indent ()
+  "Return the number of leading whitespace characters in the current line."
+  (save-excursion
+    (beginning-of-line)
+    (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
+      (current-column))))
+
 (defun markdown-prev-non-list-indent ()
   "Return position of the first non-list-marker on the previous line."
   (save-excursion
     (forward-line -1)
-    (goto-char (point-at-bol))
-    (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
-        (current-column))))
+    (markdown-cur-non-list-indent)))
+
+(defun markdown-beginning-of-block-p ()
+  "Return non-nil if the point is at the beginning of a block."
+  (and (eq (point) (point-at-bol))
+       (markdown-prev-line-blank-p)
+       (not (markdown-cur-line-blank-p))))
+
+(defun markdown-next-block ()
+  "Move the point to the start of the next block."
+  (interactive)
+  (forward-line)
+  (while (and (not (markdown-prev-line-blank-p))
+              (not (eq (point) (point-max))))
+    (forward-line)))
+
+(defun markdown-previous-block ()
+  "Move the point to the start of the previous block."
+  (interactive)
+  (forward-line -1)
+  (while (and (not (markdown-prev-line-blank-p))
+              (not (eq (point) (point-min))))
+    (forward-line -1)))
+
+(defun markdown-end-of-block ()
+  "Move the point to the end of the current block."
+  (interactive)
+  (if (markdown-cur-line-blank-p)
+      (end-of-line)
+    (when (and (not (equal (point) (point-max))))
+      (markdown-next-block)
+      (while (and (markdown-prev-line-blank-p)
+                  (not (equal (point) (point-min)))
+                  (not (equal (point) (point-max))))
+        (forward-line -1))
+      (if (not (equal (point-at-eol) (point-max)))
+          (forward-line -1))
+      (end-of-line))))
 
 ; From html-helper-mode
 (defun markdown-match-comments (last)
@@ -818,6 +866,72 @@ If we are at the first line, then consider the previous line to be blank."
                   t)
                  (t nil))))
         (t nil)))
+
+(defun markdown-match-pre-blocks (last)
+  "Match Markdown pre blocks from point to LAST.
+A region matches as if it is indented at least four spaces
+relative to the nearest previous block of lesser non-list-marker
+indentation."
+
+  (let (cur-begin cur-end cur-indent prev-indent prev-begin prev-end
+                  prev-list stop match)
+
+    ;; Move to the first full block in the region
+    (unless (markdown-beginning-of-block-p)
+      (markdown-next-block))
+    (setq cur-begin (point))
+    (setq cur-indent (markdown-cur-line-indent))
+    (markdown-end-of-block)
+    (setq cur-end (point))
+    (setq match nil)
+
+    (while (and (<= cur-end last) (not stop) (not match))
+      ;; Move to the nearest preceding block of lesser (non-marker) indentation
+      (setq prev-indent (+ cur-indent 1))
+      (setq prev-begin nil)
+      (goto-char cur-begin)
+      (while (and (>= prev-indent cur-indent)
+                  (not (and prev-list
+                            (eq prev-indent cur-indent)))
+                  (not (equal (point) (point-min))))
+        (markdown-previous-block)
+        (setq prev-begin (point))
+        (setq prev-list (markdown-cur-non-list-indent))
+        (if prev-list
+            (setq prev-indent prev-list)
+          (setq prev-indent (markdown-cur-line-indent)))
+        (markdown-end-of-block)
+        (setq prev-end (point))
+        (goto-char prev-begin))
+
+      ;; If the loop didn't execute
+      (if (not prev-begin)
+          (setq prev-indent 0))
+
+      ;; Compare with prev-indent minus its remainder mod 4
+      (setq prev-indent (- prev-indent (mod prev-indent 4)))
+
+      ;; Set match data and return t if we have a match
+      (if (>= cur-indent (+ prev-indent 4))
+          ;; Match
+          (progn
+            (setq match t)
+            (set-match-data (list cur-begin cur-end))
+            ;; Leave point at end of block
+            (goto-char cur-end)
+            (forward-line))
+
+        ;; Move to the next block
+        (goto-char cur-end)
+        (markdown-next-block)
+        (setq cur-begin (point))
+        (setq cur-indent (markdown-cur-line-indent))
+        (markdown-end-of-block)
+
+        (if (equal (point) cur-end)
+            (setq stop t))
+        (setq cur-end (point))))
+    match))
 
 
 
