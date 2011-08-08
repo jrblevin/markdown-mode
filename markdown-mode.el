@@ -1633,7 +1633,10 @@ Calls `markdown-cycle' with argument t."
       (goto-char (point-min))
       (unless (markdown-output-standalone-p)
         (markdown-add-xhtml-header-and-footer title))
-      (html-mode))))
+      (html-mode))
+
+    ;; Ensure buffer gets raised, even with short command output
+    (switch-to-buffer-other-window output-buffer-name)))
 
 (defun markdown-output-standalone-p ()
   "Determine whether `markdown-command' output is standalone XHTML.
