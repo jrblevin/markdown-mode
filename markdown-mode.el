@@ -713,18 +713,6 @@ This will not take effect until Emacs is restarted."
   "^\\(\\s *\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\(\\s +\\)"
   "Regular expression for matching indentation of list items.")
 
-; From html-helper-mode
-(defun markdown-match-comments (last)
-  "Match HTML comments from the point to LAST."
-  (cond ((search-forward "<!--" last t)
-         (backward-char 4)
-         (let ((beg (point)))
-           (cond ((search-forward-regexp "--[ \t]*>" last t)
-                  (set-match-data (list beg (point)))
-                  t)
-                 (t nil))))
-        (t nil)))
-
 (defvar markdown-mode-font-lock-keywords-basic
   (list
    '(markdown-match-comments 0 markdown-comment-face t t)
@@ -777,6 +765,57 @@ This will not take effect until Emacs is restarted."
        markdown-mode-font-lock-keywords-latex)
    markdown-mode-font-lock-keywords-basic)
   "Default highlighting expressions for Markdown mode.")
+
+
+
+;;; Markdown parsing functions ================================================
+
+(defun markdown-prev-line-blank-p ()
+  "Return t if the previous line is blank and nil otherwise."
+  (save-excursion
+    (forward-line -1)
+    (goto-char (point-at-bol))
+    (if (re-search-forward "^\\s *$" (point-at-eol) t) t)))
+
+(defun markdown-prev-line-indent-p ()
+  "Return t if the previous line is indented and nil otherwise."
+  (save-excursion
+    (forward-line -1)
+    (goto-char (point-at-bol))
+    (if (re-search-forward "^\\s " (point-at-eol) t) t)))
+
+(defun markdown-cur-line-indent ()
+  "Return the number of leading whitespace characters in the current line."
+  (save-excursion
+    (goto-char (point-at-bol))
+    (re-search-forward "^\\s +" (point-at-eol) t)
+    (current-column)))
+
+(defun markdown-prev-line-indent ()
+  "Return the number of leading whitespace characters in the previous line."
+  (save-excursion
+    (forward-line -1)
+    (markdown-cur-line-indent)))
+
+(defun markdown-prev-non-list-indent ()
+  "Return position of the first non-list-marker on the previous line."
+  (save-excursion
+    (forward-line -1)
+    (goto-char (point-at-bol))
+    (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
+        (current-column))))
+
+; From html-helper-mode
+(defun markdown-match-comments (last)
+  "Match HTML comments from the point to LAST."
+  (cond ((search-forward "<!--" last t)
+         (backward-char 4)
+         (let ((beg (point)))
+           (cond ((search-forward-regexp "--[ \t]*>" last t)
+                  (set-match-data (list beg (point)))
+                  t)
+                 (t nil))))
+        (t nil)))
 
 
 
@@ -1019,42 +1058,12 @@ Arguments BEG and END specify the beginning and end of the region."
 
 ;;; Indentation ====================================================================
 
-;;; Indentation functions contributed by Bryan Kyle <bryan.kyle@gmail.com>..
-
 (defun markdown-indent-find-next-position (cur-pos positions)
   "Return the position after the index of CUR-POS in POSITIONS."
   (while (and positions
               (not (equal cur-pos (car positions))))
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
-
-(defun markdown-prev-line-indent-p ()
-  "Return t if the previous line is indented and nil otherwise."
-  (save-excursion
-    (forward-line -1)
-    (goto-char (point-at-bol))
-    (if (re-search-forward "^\\s " (point-at-eol) t) t)))
-
-(defun markdown-cur-line-indent ()
-  "Return the number of leading whitespace characters in the current line."
-  (save-excursion
-    (goto-char (point-at-bol))
-    (re-search-forward "^\\s +" (point-at-eol) t)
-    (current-column)))
-
-(defun markdown-prev-line-indent ()
-  "Return the number of leading whitespace characters in the previous line."
-  (save-excursion
-    (forward-line -1)
-    (markdown-cur-line-indent)))
-
-(defun markdown-prev-non-list-indent ()
-  "Return position of the first non-list-marker on the previous line."
-  (save-excursion
-    (forward-line -1)
-    (goto-char (point-at-bol))
-    (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
-        (current-column))))
 
 (defun markdown-indent-line ()
   "Indent the current line using some heuristics."
