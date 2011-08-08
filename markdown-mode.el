@@ -13,6 +13,7 @@
 ;; Copyright (C) 2010 George Ogata <george.ogata@gmail.com>
 ;; Copyright (C) 2011 Eric Merritt <ericbmerritt@gmail.com>
 ;; Copyright (C) 2011 Philippe Ivaldi <pivaldi@sfr.fr>
+;; Copyright (C) 2011 Jeremiah Dodds <jeremiah.dodds@gmail.com>
 
 ;; Version: 1.8-dev
 ;; Keywords: Markdown major mode
@@ -107,6 +108,12 @@
 ;;     the command produces standalone XHTML output (via
 ;;     `markdown-xhtml-standalone-regexp'), in which case no header
 ;;     and footer content will be added.
+;;
+;;   * `markdown-command-needs-filename' - set to non-nil if
+;;     `markdown-command' does not accept input from stdin (default: nil).
+;;      Instead, it will be passed a filename as the final command-line
+;;      option.  As a result, you will only be able to run Markdown
+;;      from buffers which are visiting a file.
 ;;
 ;;   * `markdown-hr-length' - the length of horizontal rules
 ;;     (default: `5').
@@ -308,6 +315,8 @@
 ;;   * Eric Merritt <ericbmerritt@gmail.com> for wiki link features.
 ;;   * Philippe Ivaldi <pivaldi@sfr.fr> for XHTML preview
 ;;     customizations and XHTML export.
+;;   * Jeremiah Dodds <jeremiah.dodds@gmail.com> for supporting
+;;     Markdown processors which do not accept input from stdin.
 
 ;;; Bugs:
 
@@ -374,6 +383,14 @@
   "Command to run markdown."
   :group 'markdown
   :type 'string)
+
+(defcustom markdown-command-needs-filename nil
+  "Set to non-nil if `markdown-command' does not accept input from stdin.
+Instead, it will be passed a filename as the final command-line
+option.  As a result, you will only be able to run Markdown from
+buffers which are visiting a file."
+  :group 'markdown
+  :type 'boolean)
 
 (defcustom markdown-hr-length 5
   "Length of horizonal rules."
@@ -1626,8 +1643,17 @@ Calls `markdown-cycle' with argument t."
     (unless output-buffer-name
       (setq output-buffer-name markdown-output-buffer-name))
 
-    (shell-command-on-region begin-region end-region markdown-command
-                             output-buffer-name)
+    (if markdown-command-needs-filename
+        ;; Handle case when `markdown-command' does not read from stdin
+        (if (not buffer-file-name)
+            (error "Must be visiting a file")
+          (shell-command (concat markdown-command " " buffer-file-name)
+                         output-buffer-name))
+      ;; Pass region to `markdown-command' via stdin
+      (shell-command-on-region begin-region end-region markdown-command
+                               output-buffer-name))
+
+    ;; Add header and footer and switch to html-mode.
     (save-current-buffer
       (set-buffer output-buffer-name)
       (goto-char (point-min))
