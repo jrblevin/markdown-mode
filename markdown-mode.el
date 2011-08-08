@@ -1158,26 +1158,31 @@ region.  The characters PREFIX will appear at the beginning
 of each line."
   (if mark-active
       (save-excursion
-        (let ((endpos end))
-          ; Ensure that there is a leading blank line
-          (goto-char beg)
-          (while (not (looking-back "\n\n" 2))
-            (insert "\n")
-            (setq endpos (+ 1 endpos)))
-          ; Insert blockquote characters
-          (move-to-left-margin)
-          (while (< (point-at-bol) endpos)
-            (insert prefix)
-            (setq endpos (+ (length prefix) endpos))
-            (forward-line))
-          ; Move back before any blank lines at the end
-          (goto-char endpos)
-          (while (looking-back "\n" 1)
-            (backward-char))
-          ; Ensure one blank line at the end
-          (while (not (looking-at "\n\n"))
-            (insert "\n")
-            (backward-char))))))
+        ;; Ensure that there is a leading blank line
+        (goto-char beg)
+        (when (and (>= (point) (+ (point-min) 2))
+                   (not (looking-back "\n\n" 2)))
+          (insert "\n")
+          (setq beg (1+ beg))
+          (setq end (1+ end)))
+        ;; Move back before any blank lines at the end
+        (goto-char end)
+        (while (and (looking-back "\n" 1)
+                    (not (equal (point) (point-min))))
+          (backward-char)
+          (setq end (1- end)))
+        ;; Ensure that there is a trailing blank line
+        (goto-char end)
+        (if (not (or (looking-at "\n\n")
+                     (and (equal (1+ end) (point-max)) (looking-at "\n"))))
+          (insert "\n"))
+        ;; Insert PREFIX
+        (goto-char beg)
+        (beginning-of-line)
+        (while (< (point-at-bol) end)
+          (insert prefix)
+          (setq end (+ (length prefix) end))
+          (forward-line)))))
 
 (defun markdown-blockquote-region (beg end)
   "Blockquote the region.
