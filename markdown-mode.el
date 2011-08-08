@@ -147,11 +147,11 @@
 ;;   * `markdown-xhtml-header-content' - additional content to include
 ;;     in the XHTML <head> block.
 ;;
-;;  * `markdown-xhtml-standalone-regexp' - a regular expression which
-;;    indicates whether the output of `markdown-command' is standalone
-;;    XHTML (default: `^\\(\<\?xml\\|\<!DOCTYPE\\|\<html\\)`).  If
-;;    this is not matched, we assume this output is a fragment and add
-;;    our own header and footer.
+;;   * `markdown-xhtml-standalone-regexp' - a regular expression which
+;;     indicates whether the output of `markdown-command' is standalone
+;;     XHTML (default: `^\\(\<\?xml\\|\<!DOCTYPE\\|\<html\\)`).  If
+;;     this is not matched, we assume this output is a fragment and add
+;;     our own header and footer.
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
