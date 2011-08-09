@@ -1732,7 +1732,7 @@ with the extension removed and replaced with .html."
   (interactive)
   (browse-url (markdown-export)))
 
-;;; WikiLink Following/Markup ========================================================
+;;; WikiLink Following/Markup =================================================
 
 (require 'thingatpt)
 
