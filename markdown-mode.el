@@ -945,12 +945,14 @@ indentation."
     match))
 
 (defun markdown-font-lock-extend-region ()
+  "Extend the search region to include an entire block of text.
+This helps improve font locking for block constructs such as pre blocks."
   (save-excursion
     (goto-char font-lock-beg)
-    (let ((found (re-search-backward "\n" nil t)))
+    (let ((found (re-search-backward "\n\n" nil t)))
       (when found
         (goto-char font-lock-end)
-        (when (re-search-forward "\n" nil t)
+        (when (re-search-forward "\n\n" nil t)
           (beginning-of-line)
           (setq font-lock-end (point)))
         (setq font-lock-beg found)))))
