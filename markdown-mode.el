@@ -751,8 +751,8 @@ This will not take effect until Emacs is restarted."
   (list
    '(markdown-match-pre-blocks 0 markdown-pre-face t t)
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
-   '(markdown-match-comments 0 markdown-comment-face t t)
-   (cons markdown-regex-code '(2 markdown-inline-code-face))
+   (cons markdown-regex-pre 'markdown-pre-face)
+   (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext 'markdown-header-face-1)
    (cons markdown-regex-header-2-setext 'markdown-header-face-2)
    (cons markdown-regex-header-1-atx 'markdown-header-face-1)
@@ -762,6 +762,8 @@ This will not take effect until Emacs is restarted."
    (cons markdown-regex-header-5-atx 'markdown-header-face-5)
    (cons markdown-regex-header-6-atx 'markdown-header-face-6)
    (cons markdown-regex-hr 'markdown-header-face)
+   '(markdown-match-comments 0 markdown-comment-face t t)
+   (cons markdown-regex-code '(2 markdown-inline-code-face))
    (cons markdown-regex-list 'markdown-list-face)
    (cons markdown-regex-link-inline
          '((1 markdown-link-face t)
