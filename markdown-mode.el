@@ -227,6 +227,11 @@
 ;;
 ;;     `C-c -` inserts a horizontal rule.
 ;;
+;;   * Wiki-Link Navigation:
+;;
+;;     Use `M-p` and `M-n` to quickly jump to the previous and next
+;;     wiki links, respectively.
+;;
 ;;   * Outline Navigation:
 ;;
 ;;     Navigation between headings is possible using `outline-mode'.
