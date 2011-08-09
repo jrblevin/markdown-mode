@@ -947,6 +947,9 @@ indentation."
 (defun markdown-font-lock-extend-region ()
   "Extend the search region to include an entire block of text.
 This helps improve font locking for block constructs such as pre blocks."
+  ;; Avoid compiler warnings about these global variables from font-lock.el.
+  ;; See the documentation for variable `font-lock-extend-region-functions'.
+  (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
   (save-excursion
     (goto-char font-lock-beg)
     (let ((found (re-search-backward "\n\n" nil t)))
