@@ -1,6 +1,6 @@
-;;; markdown-mode.el --- Major mode to edit Markdown files in Emacs
+;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files
 
-;; Copyright (C) 2007, 2008, 2009, 2010, 2011 Jason R. Blevins
+;; Copyright (C) 2007-2011 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
 ;; Copyright (C) 2007 Conal Elliott <conal@conal.net>
 ;; Copyright (C) 2008 Greg Bognar <greg_bognar@hms.harvard.edu>
@@ -15,9 +15,11 @@
 ;; Copyright (C) 2011 Philippe Ivaldi <pivaldi@sfr.fr>
 ;; Copyright (C) 2011 Jeremiah Dodds <jeremiah.dodds@gmail.com>
 
-;; Version: 1.8-dev
-;; Keywords: Markdown major mode
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
+;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
+;; Created: May 24, 2007
+;; Version: 1.8-dev
+;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
 ;; This file is not part of GNU Emacs.
@@ -34,7 +36,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;; Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
