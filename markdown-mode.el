@@ -1739,12 +1739,9 @@ with the extension removed and replaced with .html."
 (defun markdown-wiki-link-p ()
   "Return non-nil when `point' is at a true wiki link.
 A true wiki link name matches `markdown-regex-wiki-link' but does not
-match the current file name after conversion This modifies the data
-returned by `match-data'.
-
-If optional argument SHORTCUT is non-nil, we assume that
-`markdown-regex-wiki-link' has just been searched for.  Note that the
-potential wiki link name must be available via `match-string'."
+match the current file name after conversion.  This modifies the data
+returned by `match-data'.  Note that the potential wiki link name must
+be available via `match-string'."
   (let ((case-fold-search nil))
     (and (thing-at-point-looking-at markdown-regex-wiki-link)
 	 (or (not buffer-file-name)
