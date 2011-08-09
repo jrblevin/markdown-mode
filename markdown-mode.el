@@ -223,9 +223,18 @@
 ;;     (mnemonic: title) and for a second-level underline-style header
 ;;     press `C-c C-t s` (mnemonic: section).
 ;;
-;;   * Other commands
+;;   * Other elements:
 ;;
 ;;     `C-c -` inserts a horizontal rule.
+;;
+;;   * Outline Navigation:
+;;
+;;     Navigation between headings is possible using `outline-mode'.
+;;     Use `C-M-n` and `C-M-p` to move between the next and previous
+;;     visible headings.  Similarly, `C-M-f` and `C-M-b` move to the
+;;     next and previous visible headings at the same level as the one
+;;     at the point.  Finally, `C-M-u` will move up to a lower-level
+;;     (more inclusive) visible heading.
 ;;
 ;; Many of the commands described above behave differently depending on
 ;; whether Transient Mark mode is enabled or not.  When it makes sense,
@@ -1327,6 +1336,12 @@ it in the usual way."
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
+    ;; Header navigation
+    (define-key map (kbd "C-M-n") 'outline-next-visible-heading)
+    (define-key map (kbd "C-M-p") 'outline-previous-visible-heading)
+    (define-key map (kbd "C-M-f") 'outline-forward-same-level)
+    (define-key map (kbd "C-M-b") 'outline-backward-same-level)
+    (define-key map (kbd "C-M-u") 'outline-up-heading)
     ;; Markdown functions
     (define-key map "\C-c\C-cm" 'markdown)
     (define-key map "\C-c\C-cp" 'markdown-preview)
