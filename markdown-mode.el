@@ -699,11 +699,11 @@ This will not take effect until Emacs is restarted."
   "Regular expression for matching list markers.")
 
 (defconst markdown-regex-bold
-  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\(.\\|\n\\)*?[^\\ ]\\3\\)"
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)"
   "Regular expression for matching bold text.")
 
 (defconst markdown-regex-italic
-  "\\(^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n\\)*?[^\\ ]\\3\\)\\)"
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)\\)"
   "Regular expression for matching italic text.")
 
 (defconst markdown-regex-blockquote
