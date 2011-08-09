@@ -118,8 +118,8 @@
 ;;      option.  As a result, you will only be able to run Markdown
 ;;      from buffers which are visiting a file.
 ;;
-;;   * `markdown-hr-length' - the length of horizontal rules
-;;     (default: `5').
+;;   * `markdown-hr-string' - string to use when inserting horizontal
+;;     rules (default: `* * * * *').
 ;;
 ;;   * `markdown-bold-underscore' - set to a non-nil value to use two
 ;;     underscores for bold instead of two asterisks (default: `nil').
@@ -409,10 +409,10 @@ buffers which are visiting a file."
   :group 'markdown
   :type 'boolean)
 
-(defcustom markdown-hr-length 5
-  "Length of horizonal rules."
+(defcustom markdown-hr-string "* * * * *"
+  "String to use for horizonal rules."
   :group 'markdown
-  :type 'integer)
+  :type 'string)
 
 (defcustom markdown-bold-underscore nil
   "Use two underscores for bold instead of two asterisks."
@@ -1004,13 +1004,18 @@ and S2 around the region."
    (insert s1 s2)))
 
 (defun markdown-insert-hr ()
-  "Insert a horizonal rule."
+  "Insert a horizonal rule using `markdown-hr-string'."
   (interactive)
-  (let (hr)
-    (dotimes (count (- markdown-hr-length 1) hr)        ; Count to n - 1
-      (setq hr (concat "* " hr)))                       ; Build HR string
-    (setq hr (concat hr "*\n"))                         ; Add the n-th *
-    (insert hr)))
+  ;; Leading blank line
+  (when (and (>= (point) (+ (point-min) 2))
+             (not (looking-back "\n\n" 2)))
+    (insert "\n"))
+  ;; Insert custom HR string
+  (insert (concat markdown-hr-string "\n"))
+  ;; Following blank line
+  (backward-char)
+  (unless (looking-at "\n\n")
+          (insert "\n")))
 
 (defun markdown-insert-bold ()
   "Insert markup for a bold word or phrase.
