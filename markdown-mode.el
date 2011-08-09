@@ -1669,7 +1669,8 @@ Standalone XHTML output is identified by an occurrence of
 `markdown-xhtml-standalone-regexp' in the first five lines of output."
   (re-search-forward
    markdown-xhtml-standalone-regexp
-   (save-excursion (goto-line 5) (point)) t))
+   (save-excursion (goto-char (point-min)) (forward-line 4) (point))
+   t))
 
 (defun markdown-add-xhtml-header-and-footer (title)
   "Wrap XHTML header and footer with given TITLE around current buffer."
