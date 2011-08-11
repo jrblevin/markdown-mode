@@ -887,7 +887,7 @@ indentation."
          (not (markdown-cur-line-blank-p))))
 
   (defun next-block ()
-    "Move the point to the start of the next block of at least LEVEL."
+    "Move the point to the start of the next block."
     (forward-line)
     (while (and (or (not (markdown-prev-line-blank-p))
                     (markdown-cur-line-blank-p))
@@ -928,6 +928,7 @@ indentation."
     (end-of-level cur-indent)
     (setq cur-end (point))
     (setq match nil)
+    (setq stop (> cur-begin cur-end))
 
     (while (and (<= cur-end last) (not stop) (not match))
       ;; Move to the nearest preceding block of lesser (non-marker) indentation
