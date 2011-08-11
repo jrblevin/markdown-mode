@@ -1246,18 +1246,26 @@ Arguments BEG and END specify the beginning and end of the region."
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
-(defun markdown-indent-line ()
+(defun markdown-indent-line (&optional enter)
   "Indent the current line using some heuristics."
   (interactive)
-  (if (markdown-prev-line-indent-p)
-      ;; If the current column is any of the positions, remove all
-      ;; of the positions up-to and including the current column
+  (let ((positions (markdown-calc-indents))
+        (cur-pos (current-column)))
+    (cond
+     ;; When the enter key was pressed, indent to the default level.
+     (enter
+      (message "ENTER")
+      (indent-line-to (car positions)))
+     ;; Otherwise, cycle through the positions in sorted order.
+     (t
+      (setq positions (sort (delete-dups positions) '<))
       (indent-line-to
-       (markdown-indent-find-next-position
-        (current-column) (markdown-calc-indents)))))
+       (markdown-indent-find-next-position cur-pos positions))))))
 
 (defun markdown-calc-indents ()
-  "Return a list of indentation columns to cycle through."
+  "Return a list of indentation columns to cycle through.
+The first element in the returned list should be considered the
+default indentation level."
   (let (pos prev-line-pos positions)
 
     ;; Previous line indent
@@ -1296,15 +1304,15 @@ Arguments BEG and END specify the beginning and end of the region."
         (setq positions (cons pos positions)))
 
     ;; First column
-    (setq positions (cons 0 (reverse positions)))
+    (setq positions (cons 0 positions))
 
-    positions))
+    (reverse positions)))
 
 (defun markdown-do-normal-return ()
   "Insert a newline and optionally indent the next line."
   (newline)
   (if markdown-indent-on-enter
-      (funcall indent-line-function)))
+      (funcall indent-line-function 't)))
 
 (defun markdown-enter-key ()
   "Handle RET according to context.
