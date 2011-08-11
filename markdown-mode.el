@@ -1257,10 +1257,7 @@ Arguments BEG and END specify the beginning and end of the region."
 
 (defun markdown-calc-indents ()
   "Return a list of indentation columns to cycle through."
-  (let (pos
-        prev-line-pos
-        positions
-        computed-pos)
+  (let (pos prev-line-pos positions)
 
     ;; Previous line indent
     (setq prev-line-pos (markdown-prev-line-indent))
