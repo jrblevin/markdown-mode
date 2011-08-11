@@ -695,7 +695,7 @@ This will not take effect until Emacs is restarted."
   "Regular expression for matching Markdown horizontal rules.")
 
 (defconst markdown-regex-code
-  "\\(^\\|[^\\]\\)\\(\\(`\\{1,2\\}\\)\\([^ \\]\\|[^ ].*?[^ \\]\\)\\3\\)"
+  "\\(^\\|[^\\]\\)\\(\\(`\\{1,2\\}\\)\\([^ \\]\\|[^ ]\\(.\\|\n[^\n]\\)*?[^ \\]\\)\\3\\)"
   "Regular expression for matching inline code fragments.")
 
 (defconst markdown-regex-pre
