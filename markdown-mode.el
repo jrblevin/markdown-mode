@@ -349,17 +349,8 @@
 ;; GNU Emacs 24, compatibility with earlier Emacsen is also a
 ;; priority.
 ;;
-;; markdown-mode's syntax highlighting is accomplished using the
-;; search-based fontification features of Emacs through a series of
-;; regular expressions.  Unfortunately, Emacs has trouble highlighting
-;; multi-line constructs using regular expressions and this creates
-;; several syntax-highlighting quirks such as mistaking indented
-;; lists for preformatted text, etc.  Making markdown-mode's syntax
-;; highlighting more robust through the use of matching functions
-;; or syntactic font lock is a high-priority item for future work.
-;;
-;; If you find any bugs not mentioned here, please construct a test
-;; case and/or a patch and email me at <jrblevin@sdf.org>.
+;; If you find any bugs in markdown-mode, please construct a test case
+;; or a patch and email me at <jrblevin@sdf.org>.
 
 ;;; History:
 
