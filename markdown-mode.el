@@ -256,6 +256,14 @@
 ;; is bound to `C-c C-s C-b` and always applies to the region (when
 ;; nonempty).
 ;;
+;; markdown-mode attempts to be flexible in how it handles
+;; indentation.  When you press `TAB` repeatedly, the point will cycle
+;; through several possible indentation levels corresponding to things
+;; you might have in mind when you press `RET` at the end of a line or
+;; `TAB`.  For example, you may want to start a new list item,
+;; continue a list item with hanging indentation, indent for a nested
+;; pre block, and so on.
+;;
 ;; markdown-mode supports outline-minor-mode as well as org-mode-style
 ;; visibility cycling for atx- or hash-style headers.  There are two
 ;; types of visibility cycling: Pressing `S-TAB` cycles globally between
