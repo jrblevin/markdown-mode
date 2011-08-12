@@ -870,6 +870,7 @@ If we are at the first line, then consider the previous line to be blank."
   "Move the point to the end of region with indentation at least LEVEL."
   (let (indent)
     (while (and (not (< (setq indent (markdown-cur-line-indent)) level))
+                (not (>= indent (+ level 4)))
                 (not (eobp)))
       (markdown--next-block))
     ;; Move back before any trailing blank lines
@@ -906,7 +907,7 @@ indentation."
       (markdown--next-block))
 
     ;; Move to the first full block in the region with indent 4 or more
-    (while (and (not (= (setq cur-indent (markdown-cur-line-indent)) 4))
+    (while (and (not (>= (setq cur-indent (markdown-cur-line-indent)) 4))
                 (not (>= (point) last)))
       (markdown--next-block))
     (setq cur-begin (point))
