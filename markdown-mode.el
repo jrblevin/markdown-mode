@@ -18,7 +18,7 @@
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
-;; Version: 1.8
+;; Version: 1.9-dev
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -387,7 +387,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "1.8"
+(defconst markdown-mode-version "1.9-dev"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
