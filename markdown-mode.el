@@ -53,15 +53,22 @@
 ;;    * [Screenshot][]
 ;;    * [Release notes][]
 ;;
-;; markdown-mode is also available in the Debian
-;; [emacs-goodies-el](http://packages.debian.org/emacs-goodies-el)
-;; package (beginning with revision 27.0-1) and the OpenBSD
-;; [textproc/markdown-mode](http://pkgsrc.se/textproc/markdown-mode) package.
-;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20080604-001.png
 ;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-7
-
+;;
+;; markdown-mode is also available in several package managers, including:
+;;
+;;    * Debian and Ubuntu Linux: [emacs-goodies-el][]
+;;    * RedHat and Fedora Linux: [emacs-goodies][]
+;;    * OpenBSD: [textproc/markdown-mode][]
+;;    * Arch Linux (AUR): [emacs-markdown-mode-git][]
+;;
+;;  [emacs-goodies-el]: http://packages.debian.org/emacs-goodies-el
+;;  [emacs-goodies]: https://admin.fedoraproject.org/pkgdb/acls/name/emacs-goodies
+;;  [textproc/markdown-mode]: http://pkgsrc.se/textproc/markdown-mode
+;;  [emacs-markdown-mode-git]: http://aur.archlinux.org/packages.php?ID=30389
+;;
 ;; The latest development version can be downloaded directly
 ;; ([markdown-mode.el][devel.el]) or it can be obtained from the
 ;; (browsable and clonable) Git repository at
