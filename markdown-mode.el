@@ -18,7 +18,7 @@
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
-;; Version: 1.8-dev
+;; Version: 1.8
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -47,15 +47,15 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest stable version is markdown-mode 1.7, released on October 1, 2009:
+;; The latest stable version is markdown-mode 1.8, released on August 12, 2011:
 ;;
 ;;    * [markdown-mode.el][]
 ;;    * [Screenshot][]
 ;;    * [Release notes][]
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
-;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20080604-001.png
-;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-7
+;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20110812-001.png
+;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-8
 ;;
 ;; markdown-mode is also available in several package managers, including:
 ;;
@@ -371,11 +371,13 @@
 ;;   * 2008-05-24: [Version 1.5][]
 ;;   * 2008-06-04: [Version 1.6][]
 ;;   * 2009-10-01: [Version 1.7][]
+;;   * 2011-08-12: [Version 1.8][]
 ;;
 ;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
 ;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
 ;; [Version 1.6]: http://jblevins.org/projects/markdown-mode/rev-1-6
 ;; [Version 1.7]: http://jblevins.org/projects/markdown-mode/rev-1-7
+;; [Version 1.8]: http://jblevins.org/projects/markdown-mode/rev-1-8
 
 
 ;;; Code:
@@ -385,7 +387,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "1.7-dev"
+(defconst markdown-mode-version "1.8"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
