@@ -873,12 +873,13 @@ If we are at the first line, then consider the previous line to be blank."
                 (not (>= indent (+ level 4)))
                 (not (eobp)))
       (markdown--next-block))
-    ;; Move back before any trailing blank lines
-    (while (and (markdown-prev-line-blank-p)
-                (not (bobp)))
-      (forward-line -1))
-    (forward-line -1)
-    (end-of-line)))
+    (unless (eobp)
+      ;; Move back before any trailing blank lines
+      (while (and (markdown-prev-line-blank-p)
+                  (not (bobp)))
+        (forward-line -1))
+      (forward-line -1)
+      (end-of-line))))
 
 ; From html-helper-mode
 (defun markdown-match-comments (last)
@@ -898,8 +899,7 @@ A region matches as if it is indented at least four spaces
 relative to the nearest previous block of lesser non-list-marker
 indentation."
 
-  (let (cur-begin cur-end cur-indent prev-indent
-                  prev-list stop match)
+  (let (cur-begin cur-end cur-indent prev-indent prev-list stop match found)
     ;; Don't start in the middle of a block
     (unless (and (bolp)
                  (markdown-prev-line-blank-p)
@@ -920,6 +920,7 @@ indentation."
       ;; Move to the nearest preceding block of lesser (non-marker) indentation
       (setq prev-indent (+ cur-indent 1))
       (goto-char cur-begin)
+      (setq found nil)
       (while (and (>= prev-indent cur-indent)
                   (not (and prev-list
                             (eq prev-indent cur-indent)))
@@ -936,10 +937,11 @@ indentation."
         ;; start of a list, or the actual indentation.
         (setq prev-list (markdown-cur-non-list-indent))
         (setq prev-indent (or prev-list
-                              (markdown-cur-line-indent))))
+                              (markdown-cur-line-indent)))
+        (setq found t))
 
       ;; If the loop didn't execute
-      (when (not prev-indent)
+      (unless found
         (setq prev-indent 0))
 
       ;; Compare with prev-indent minus its remainder mod 4
@@ -961,9 +963,8 @@ indentation."
         (setq cur-begin (point))
         (setq cur-indent (markdown-cur-line-indent))
         (markdown--end-of-level cur-indent)
-        (if (equal (point) cur-end)
-            (setq stop t))
-        (setq cur-end (point))))
+        (setq cur-end (point))
+        (setq stop (equal cur-begin cur-end))))
     match))
 
 (defun markdown-font-lock-extend-region ()
