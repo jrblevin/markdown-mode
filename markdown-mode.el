@@ -290,7 +290,8 @@
 ;; autofollowing on enter key may be controlled with the
 ;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
 ;; `M-n` to quickly jump to the previous and next wiki links,
-;; respectively.
+;; respectively.  Aliased or piped wiki links of the form
+;; `[[PageName|link text]]` are also supported.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command'.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -723,8 +724,12 @@ This will not take effect until Emacs is restarted."
   "Regular expression for matching line breaks.")
 
 (defconst markdown-regex-wiki-link
-  "\\[\\[\\([^]]+\\)\\]\\]"
-  "Regular expression for matching wiki links.")
+  "\\[\\[\\([^]|]+\\)\\(|\\([^]]+\\)\\)?\\]\\]"
+  "Regular expression for matching wiki links.
+This matches typical bracketed [[WikiLinks]] as well as 'aliased'
+wiki links of the form [[PageName|link text]].  In this regular
+expression, #1 matches the page name and #3 matches the link
+text.")
 
 (defconst markdown-regex-uri
   (concat
