@@ -1256,7 +1256,6 @@ Arguments BEG and END specify the beginning and end of the region."
     (cond
      ;; When the enter key was pressed, indent to the default level.
      (enter
-      (message "ENTER")
       (indent-line-to (car positions)))
      ;; Otherwise, cycle through the positions in sorted order.
      (t
