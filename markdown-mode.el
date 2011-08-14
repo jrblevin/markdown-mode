@@ -350,6 +350,8 @@
 ;;     customizations and XHTML export.
 ;;   * Jeremiah Dodds <jeremiah.dodds@gmail.com> for supporting
 ;;     Markdown processors which do not accept input from stdin.
+;;   * Werner Dittmann <werner.dittmann@t-online.de> for a
+;;     bug report regarding auto-fill-mode and indentation.
 
 ;;; Bugs:
 
@@ -1248,20 +1250,24 @@ Arguments BEG and END specify the beginning and end of the region."
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
-(defun markdown-indent-line (&optional enter)
-  "Indent the current line using some heuristics."
+(defun markdown-indent-line ()
+  "Indent the current line using some heuristics.
+
+If the _previous_ command was either `markdown-enter-key' or
+`indent-for-tab-command', then we should cycle to the next
+reasonable indentation position.  Otherwise, we could have been
+called directly by `markdown-enter-key', by an initial call of
+`indent-for-tab-command', or indirectly by `auto-fill-mode'.  In
+these cases, indent to the default position."
   (interactive)
   (let ((positions (markdown-calc-indents))
         (cur-pos (current-column)))
-    (cond
-     ;; When the enter key was pressed, indent to the default level.
-     (enter
-      (indent-line-to (car positions)))
-     ;; Otherwise, cycle through the positions in sorted order.
-     (t
+    (if (not (or (equal last-command 'indent-for-tab-command)
+                 (equal last-command 'markdown-enter-key)))
+        (indent-line-to (car positions))
       (setq positions (sort (delete-dups positions) '<))
       (indent-line-to
-       (markdown-indent-find-next-position cur-pos positions))))))
+       (markdown-indent-find-next-position cur-pos positions)))))
 
 (defun markdown-calc-indents ()
   "Return a list of indentation columns to cycle through.
@@ -1313,7 +1319,7 @@ default indentation level."
   "Insert a newline and optionally indent the next line."
   (newline)
   (if markdown-indent-on-enter
-      (funcall indent-line-function 't)))
+      (funcall indent-line-function)))
 
 (defun markdown-enter-key ()
   "Handle RET according to context.
@@ -1666,7 +1672,7 @@ subtree.  Otherwise, insert a tab using `indent-relative'."
           (setq markdown-cycle-subtree-status 'folded)))))
 
      (t
-      (funcall indent-line-function))))
+      (indent-for-tab-command))))
 
 ;; Based on org-shifttab from org.el.
 (defun markdown-shifttab ()
