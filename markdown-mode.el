@@ -350,8 +350,8 @@
 ;;     customizations and XHTML export.
 ;;   * Jeremiah Dodds <jeremiah.dodds@gmail.com> for supporting
 ;;     Markdown processors which do not accept input from stdin.
-;;   * Werner Dittmann <werner.dittmann@t-online.de> for a
-;;     bug report regarding auto-fill-mode and indentation.
+;;   * Werner Dittmann <werner.dittmann@t-online.de> for bug reports
+;;     regarding the cl dependency and auto-fill-mode and indentation.
 
 ;;; Bugs:
 
@@ -387,6 +387,7 @@
 
 (require 'easymenu)
 (require 'outline)
+(require 'cl)
 
 ;;; Constants =================================================================
 
