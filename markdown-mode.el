@@ -1253,18 +1253,16 @@ Arguments BEG and END specify the beginning and end of the region."
 
 (defun markdown-indent-line ()
   "Indent the current line using some heuristics.
-
 If the _previous_ command was either `markdown-enter-key' or
-`indent-for-tab-command', then we should cycle to the next
+`markdown-cycle', then we should cycle to the next
 reasonable indentation position.  Otherwise, we could have been
 called directly by `markdown-enter-key', by an initial call of
-`indent-for-tab-command', or indirectly by `auto-fill-mode'.  In
+`markdown-cycle', or indirectly by `auto-fill-mode'.  In
 these cases, indent to the default position."
   (interactive)
   (let ((positions (markdown-calc-indents))
         (cur-pos (current-column)))
-    (if (not (or (equal last-command 'indent-for-tab-command)
-                 (equal last-command 'markdown-enter-key)))
+    (if (not (equal this-command 'markdown-cycle))
         (indent-line-to (car positions))
       (setq positions (sort (delete-dups positions) '<))
       (indent-line-to
