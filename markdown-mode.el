@@ -155,7 +155,7 @@
 ;;   * `markdown-css-path' - CSS file to link to in XHTML output.
 ;;
 ;;   * `markdown-xhtml-header-content' - additional content to include
-;;     in the XHTML <head> block.
+;;     in the XHTML `<head>` block.
 ;;
 ;;   * `markdown-xhtml-standalone-regexp' - a regular expression which
 ;;     indicates whether the output of `markdown-command' is standalone
@@ -218,8 +218,8 @@
 ;;     These commands all act on text in the active region, if any,
 ;;     and insert empty markup fragments otherwise.  Logical styles
 ;;     include blockquote (`C-c C-s b`), preformatted (`C-c C-s p`),
-;;     code (`C-c C-s c`), emphasis (`C-c C-s e`), and strong (`C-c
-;;     C-s s`).
+;;     code (`C-c C-s c`), emphasis (`C-c C-s e`), and strong
+;;     (`C-c C-s s`).
 ;;
 ;;   * Headers: `C-c C-t`
 ;;
