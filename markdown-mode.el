@@ -92,7 +92,7 @@
 ;; the following lines to your `.emacs` file to associate markdown-mode
 ;; with `.text` files:
 ;;
-;;     (autoload 'markdown-mode "markdown-mode.el"
+;;     (autoload 'markdown-mode "markdown-mode"
 ;;        "Major mode for editing Markdown files" t)
 ;;     (setq auto-mode-alist
 ;;        (cons '("\\.text" . markdown-mode) auto-mode-alist))
