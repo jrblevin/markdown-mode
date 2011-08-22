@@ -1807,9 +1807,11 @@ be available via `match-string'."
   "Generate a filename from the wiki link NAME.
 Spaces are converted to underscores, following the convention
 used by the Python Markdown WikiLinks extension."
-  (let ((new-ext (file-name-extension (buffer-file-name)))
-	(new-basename (replace-regexp-in-string "[[:space:]\n]" "_" name)))
-    (concat new-basename "." new-ext)))
+  (let ((basename (replace-regexp-in-string "[[:space:]\n]" "_" name)))
+    (concat basename
+            (if (buffer-file-name)
+                (concat "."
+                        (file-name-extension (buffer-file-name)))))))
 
 (defun markdown-follow-wiki-link (name)
   "Follow the wiki link NAME.
