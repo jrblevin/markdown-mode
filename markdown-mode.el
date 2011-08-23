@@ -163,6 +163,10 @@
 ;;     this is not matched, we assume this output is a fragment and add
 ;;     our own header and footer.
 ;;
+;;   * `markdown-link-space-sub-char' - when generating links from page
+;;     names, substitute spaces with character defined by this 
+;;     (for compatibility with github wiki links, set to: -)
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
@@ -482,6 +486,12 @@ This will not take effect until Emacs is restarted."
   "Regexp indicating whether `markdown-command' output is standalone XHTML."
   :group 'markdown
   :type 'regexp)
+
+(defcustom markdown-link-space-sub-char
+	"_"
+	"Character to use as substitue for <space> in links to other markdown pages."
+	:group 'markdown
+	:type 'string)
 
 ;;; Font lock =================================================================
 
@@ -1805,9 +1815,10 @@ be available via `match-string'."
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
-Spaces are converted to underscores, following the convention
-used by the Python Markdown WikiLinks extension."
-  (let ((basename (replace-regexp-in-string "[[:space:]\n]" "_" name)))
+Spaces are converted to the value of markdown-link-space-sub-char
+\(defaults to underscores, following the convention used by the
+Python Markdown WikiLinks extension\)."
+  (let ((basename (replace-regexp-in-string "[[:space:]\n]" markdown-link-space-sub-char name)))
     (concat basename
             (if (buffer-file-name)
                 (concat "."
