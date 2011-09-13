@@ -1715,7 +1715,8 @@ Calls `markdown-cycle' with argument t."
         ;; Handle case when `markdown-command' does not read from stdin
         (if (not buffer-file-name)
             (error "Must be visiting a file")
-          (shell-command (concat markdown-command " " buffer-file-name)
+          (shell-command (concat markdown-command " "
+                                 (shell-quote-argument buffer-file-name))
                          output-buffer-name))
       ;; Pass region to `markdown-command' via stdin
       (shell-command-on-region begin-region end-region markdown-command
