@@ -569,7 +569,7 @@ This will not take effect until Emacs is restarted."
   :group 'faces)
 
 (defface markdown-italic-face
-  '((t :inherit font-lock-variable-name-face :italic t))
+  '((t :inherit font-lock-variable-name-face :slant italic))
   "Face for italic text."
   :group 'markdown-faces)
 
