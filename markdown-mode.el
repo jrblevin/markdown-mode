@@ -569,102 +569,102 @@ This will not take effect until Emacs is restarted."
   :group 'faces)
 
 (defface markdown-italic-face
-  '((t :inherit font-lock-variable-name-face :slant italic))
+  '((t (:inherit font-lock-variable-name-face :slant italic)))
   "Face for italic text."
   :group 'markdown-faces)
 
 (defface markdown-bold-face
-  '((t :inherit font-lock-variable-name-face :bold t))
+  '((t (:inherit font-lock-variable-name-face :weight bold)))
   "Face for bold text."
   :group 'markdown-faces)
 
 (defface markdown-header-face
-  '((t :inherit font-lock-function-name-face :weight bold))
+  '((t (:inherit font-lock-function-name-face :weight bold)))
   "Base face for headers."
   :group 'markdown-faces)
 
 (defface markdown-header-face-1
-  '((t :inherit markdown-header-face))
+  '((t (:inherit markdown-header-face)))
   "Face for level-1 headers."
   :group 'markdown-faces)
 
 (defface markdown-header-face-2
-  '((t :inherit markdown-header-face))
+  '((t (:inherit markdown-header-face)))
   "Face for level-2 headers."
   :group 'markdown-faces)
 
 (defface markdown-header-face-3
-  '((t :inherit markdown-header-face))
+  '((t (:inherit markdown-header-face)))
   "Face for level-3 headers."
   :group 'markdown-faces)
 
 (defface markdown-header-face-4
-  '((t :inherit markdown-header-face))
+  '((t (:inherit markdown-header-face)))
   "Face for level-4 headers."
   :group 'markdown-faces)
 
 (defface markdown-header-face-5
-  '((t :inherit markdown-header-face))
+  '((t (:inherit markdown-header-face)))
   "Face for level-5 headers."
   :group 'markdown-faces)
 
 (defface markdown-header-face-6
-  '((t :inherit markdown-header-face))
+  '((t (:inherit markdown-header-face)))
   "Face for level-6 headers."
   :group 'markdown-faces)
 
 (defface markdown-inline-code-face
-  '((t :inherit font-lock-constant-face))
+  '((t (:inherit font-lock-constant-face)))
   "Face for inline code."
   :group 'markdown-faces)
 
 (defface markdown-list-face
-  '((t :inherit font-lock-builtin-face))
+  '((t (:inherit font-lock-builtin-face)))
   "Face for list item markers."
   :group 'markdown-faces)
 
 (defface markdown-blockquote-face
-  '((t :inherit font-lock-doc-face))
+  '((t (:inherit font-lock-doc-face)))
   "Face for blockquote sections."
   :group 'markdown-faces)
 
 (defface markdown-pre-face
-  '((t :inherit font-lock-constant-face))
+  '((t (:inherit font-lock-constant-face)))
   "Face for preformatted text."
   :group 'markdown-faces)
 
 (defface markdown-link-face
-  '((t :inherit font-lock-keyword-face))
+  '((t (:inherit font-lock-keyword-face)))
   "Face for links."
   :group 'markdown-faces)
 
 (defface markdown-missing-link-face
-  '((t :inherit font-lock-warning-face))
+  '((t (:inherit font-lock-warning-face)))
   "Face for missing links."
   :group 'markdown-faces)
 
 (defface markdown-reference-face
-  '((t :inherit font-lock-type-face))
+  '((t (:inherit font-lock-type-face)))
   "Face for link references."
   :group 'markdown-faces)
 
 (defface markdown-url-face
-  '((t :inherit font-lock-string-face))
+  '((t (:inherit font-lock-string-face)))
   "Face for URLs."
   :group 'markdown-faces)
 
 (defface markdown-link-title-face
-  '((t :inherit font-lock-comment-face))
+  '((t (:inherit font-lock-comment-face)))
   "Face for reference link titles."
   :group 'markdown-faces)
 
 (defface markdown-comment-face
-  '((t :inherit font-lock-comment-face))
+  '((t (:inherit font-lock-comment-face)))
   "Face for HTML comments."
   :group 'markdown-faces)
 
 (defface markdown-math-face
-  '((t :inherit font-lock-string-face))
+  '((t (:inherit font-lock-string-face)))
   "Face for LaTeX expressions."
   :group 'markdown-faces)
 
