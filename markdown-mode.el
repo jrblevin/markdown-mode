@@ -1945,7 +1945,9 @@ given range."
 	    ;; Now do the fontification.
 	    (markdown-fontify-region-wiki-links new-from new-to)))
       (unless modified
-	(restore-buffer-modified-p nil)))
+	(if (fboundp 'restore-buffer-modified-p)
+            (restore-buffer-modified-p nil)
+          (set-buffer-modified-p nil))))
     (goto-char current-point)))
 
 (defun markdown-fontify-buffer-wiki-links ()
