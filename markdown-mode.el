@@ -358,6 +358,10 @@
 ;;     Markdown processors which do not accept input from stdin.
 ;;   * Werner Dittmann <werner.dittmann@t-online.de> for bug reports
 ;;     regarding the cl dependency and auto-fill-mode and indentation.
+;;   * Scott Pfister <scott.pfister@gmail.com> for generalizing the space
+;;     substitution character for mapping wiki links to filenames.
+;;   * Marcin Kasperski <marcin.kasperski@mekk.waw.pl> for a patch to
+;;     escape shell commands.
 
 ;;; Bugs:
 
