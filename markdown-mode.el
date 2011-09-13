@@ -836,6 +836,17 @@ text.")
 
 
 
+;;; Compatibility =============================================================
+
+;; Handle replace-regexp-in-string in XEmacs 21
+(defun markdown-replace-regexp-in-string (regexp rep string)
+  "Compatibility wrapper to provide `replace-regexp-in-string'."
+  (if (featurep 'xemacs)
+      (replace-in-string string regexp rep)
+    (replace-regexp-in-string regexp rep string)))
+
+
+
 ;;; Markdown parsing functions ================================================
 
 (defun markdown-cur-line-blank-p ()
@@ -1449,9 +1460,9 @@ it in the usual way."
 ;;; Undefined reference checking code by Dmitry Dzhus <mail@sphinx.net.ru>.
 
 (defconst markdown-refcheck-buffer
-  "*Undefined references for %BUFFER%*"
+  "*Undefined references for %buffer%*"
   "Pattern for name of buffer for listing undefined references.
-The string %BUFFER% will be replaced by the corresponding
+The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
 (defun markdown-has-reference-definition (reference)
@@ -1547,9 +1558,9 @@ defined."
     (error "Not available in current mode"))
   (let ((oldbuf (current-buffer))
         (refs (markdown-get-undefined-refs))
-        (refbuf (get-buffer-create (replace-regexp-in-string
-                                 "%BUFFER%" (buffer-name)
-                                 markdown-refcheck-buffer t))))
+        (refbuf (get-buffer-create (markdown-replace-regexp-in-string
+                                 "%buffer%" (buffer-name)
+                                 markdown-refcheck-buffer))))
     (if (null refs)
         (progn
           (when (not silent)
@@ -1823,7 +1834,7 @@ be available via `match-string'."
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
 Spaces in NAME are replaced with `markdown-link-space-sub-char'."
-  (let ((basename (replace-regexp-in-string
+  (let ((basename (markdown-replace-regexp-in-string
                    "[[:space:]\n]" markdown-link-space-sub-char name)))
     (concat basename
             (if (buffer-file-name)
