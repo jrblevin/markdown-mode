@@ -1877,14 +1877,13 @@ See `markdown-wiki-link-p'."
 
 (defun markdown-highlight-wiki-link (from to face)
   "Highlight the wiki link in the region between FROM and TO using FACE."
-  (let ((ov (make-overlay from to)))
-    (overlay-put ov 'face face)))
+  (put-text-property from to 'font-lock-face face))
 
 (defun markdown-unfontify-region-wiki-links (from to)
   "Remove wiki link faces from the region specified by FROM and TO."
   (interactive "nfrom: \nnto: ")
-  (remove-overlays from to 'face markdown-link-face)
-  (remove-overlays from to 'face markdown-missing-link-face))
+  (remove-text-properties from to '(font-lock-face markdown-link-face))
+  (remove-text-properties from to '(font-lock-face markdown-missing-link-face)))
 
 (defun markdown-fontify-region-wiki-links (from to)
   "Search region given by FROM and TO for wiki links and fontify them.
