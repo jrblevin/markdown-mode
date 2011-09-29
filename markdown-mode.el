@@ -363,6 +363,8 @@
 ;;     substitution character for mapping wiki links to filenames.
 ;;   * Marcin Kasperski <marcin.kasperski@mekk.waw.pl> for a patch to
 ;;     escape shell commands.
+;;   * Christopher J. Madsen <cjm@cjmweb.net> for a patch to prefer
+;;     `visual-line-mode' to `longlines-mode' when available.
 
 ;;; Bugs:
 
