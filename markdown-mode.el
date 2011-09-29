@@ -322,7 +322,8 @@
 ;; mode, `gfm-mode', is also available.  The GitHub implementation of
 ;; differs slightly from standard Markdown.  Most importantly, newlines are
 ;; significant and trigger hard line breaks.  As such, `gfm-mode' turns off
-;; `auto-fill-mode' and turns on `longlines-mode'.
+;; `auto-fill-mode' and turns on `visual-line-mode' (or `longlines-mode' if
+;; `visual-line-mode' is not available).
 
 ;;; Acknowledgments:
 
@@ -2045,7 +2046,10 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
   (auto-fill-mode 0)
-  (longlines-mode 1))
+  ;; Use visual-line-mode if available, fall back to longlines-mode:
+  (if (fboundp 'visual-line-mode)
+      (visual-line-mode 1)
+    (longlines-mode 1)))
 
 (provide 'markdown-mode)
 
