@@ -366,6 +366,8 @@
 ;;     escape shell commands.
 ;;   * Christopher J. Madsen <cjm@cjmweb.net> for patches to fix a match
 ;;     data bug and to prefer `visual-line-mode' in `gfm-mode'.
+;;   * Shigeru Fukaya <shigeru.fukaya@gmail.com> for better adherence to
+;;     Emacs Lisp coding conventions.
 
 ;;; Bugs:
 
@@ -403,7 +405,7 @@
 
 (require 'easymenu)
 (require 'outline)
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 ;;; Constants =================================================================
 
