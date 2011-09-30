@@ -1330,8 +1330,9 @@ default indentation level."
 
     ;; Previous non-list-marker indent
     (setq pos (markdown-prev-non-list-indent))
-    (if pos
-        (setq positions (cons pos positions)))
+    (when pos
+        (setq positions (cons pos positions))
+        (setq positions (cons (+ pos tab-width) positions)))
 
     ;; Indentation of the previous line + tab-width
     (cond
