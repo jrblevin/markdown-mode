@@ -185,10 +185,12 @@
 ;;
 ;;   * Anchors: `C-c C-a`
 ;;
-;;     `C-c C-a l` inserts inline links of the form `[text](url)`.  If
-;;     there is an active region, text in the region is used for the
-;;     link text.  `C-c C-a w` acts similarly for wiki links of the
-;;     form `[[WikiLink]]`.
+;;     `C-c C-a l` inserts inline links of the form `[text](url)`.
+;;     `C-c C-a r` inserts reference links of the form `[text][label]`.
+;;     The label definition will be placed at the end of the current
+;;     block. `C-c C-a w` acts similarly for wiki links of the form
+;;     `[[WikiLink]]`. In all cases, if there is an active region, the
+;;     text in the region is used as the link text.
 ;;
 ;;   * Commands: `C-c C-c`
 ;;
@@ -1118,6 +1120,48 @@ as the link text."
   (insert "()")
   (backward-char 1))
 
+(defun markdown-insert-reference-link-dwim ()
+  "Insert a reference link of the form [text][label] at point.
+If Transient Mark mode is on and a region is active, the region
+is used as the link text. Otherwise, the link text will be read
+from the minibuffer. The link URL, label, and title will be read
+from the minibuffer. The link label definition is placed at the
+end of the current paragraph."
+  (interactive)
+  (if (and transient-mark-mode mark-active)
+      (call-interactively 'markdown-insert-reference-link-region)
+    (call-interactively 'markdown-insert-reference-link)))
+
+(defun markdown-insert-reference-link-region (url label title)
+  "Insert a reference link at point using the region as the link text."
+  (interactive "sLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
+  (let ((text (buffer-substring (region-beginning) (region-end))))
+    (delete-region (region-beginning) (region-end))
+    (markdown-insert-reference-link text url label title)))
+
+(defun markdown-insert-reference-link (text url label title)
+  "Insert a reference link at point.
+The link label definition is placed at the end of the current
+paragraph."
+  (interactive "sLink Text: \nsLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
+  (let (end)
+    (insert (concat "[" text "][" label "]"))
+    (setq end (point))
+    (forward-paragraph)
+    (insert "\n[")
+    (if (> (length label) 0)
+        (insert label)
+      (insert text))
+    (insert (concat "]: " url))
+    (unless (> (length url) 0)
+        (setq end (point)))
+    (when (> (length title) 0)
+      (insert (concat " \"" title "\"")))
+    (insert "\n")
+    (unless (looking-at "\n")
+      (insert "\n"))
+    (goto-char end)))
+
 (defun markdown-insert-wiki-link ()
   "Insert a wiki link of the form [[WikiLink]].
 If Transient Mark mode is on and a region is active, it is used
@@ -1389,6 +1433,7 @@ it in the usual way."
   (let ((map (make-keymap)))
     ;; Element insertion
     (define-key map "\C-c\C-al" 'markdown-insert-link)
+    (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-aw" 'markdown-insert-wiki-link)
     (define-key map "\C-c\C-ii" 'markdown-insert-image)
     (define-key map "\C-c\C-t1" 'markdown-insert-header-1)
@@ -1467,6 +1512,7 @@ it in the usual way."
     ["Code" markdown-insert-code]
     "---"
     ["Insert inline link" markdown-insert-link]
+    ["Insert reference link" markdown-insert-reference-link-dwim]
     ["Insert image" markdown-insert-image]
     ["Insert horizontal rule" markdown-insert-hr]
     "---"
