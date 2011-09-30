@@ -418,7 +418,7 @@
 ;;; Customizable variables ====================================================
 
 (defvar markdown-mode-hook nil
-  "Hook runs when Markdown mode is loaded.")
+  "Hook run when entering Markdown mode.")
 
 (defgroup markdown nil
   "Major mode for editing text files in Markdown format."
