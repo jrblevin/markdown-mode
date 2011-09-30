@@ -15,6 +15,7 @@
 ;; Copyright (C) 2011 Philippe Ivaldi <pivaldi@sfr.fr>
 ;; Copyright (C) 2011 Jeremiah Dodds <jeremiah.dodds@gmail.com>
 ;; Copyright (C) 2011 Christopher J. Madsen <cjm@cjmweb.net>
+;; Copyright (C) 2011 Shigeru Fukaya <shigeru.fukaya@gmail.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -1715,6 +1716,13 @@ Calls `markdown-cycle' with argument t."
   (interactive)
   (markdown-cycle t))
 
+(defun markdown-outline-level ()
+  "Return the depth to which a statement is nested in the outline."
+  (cond
+   ((match-end 1) 1)
+   ((match-end 2) 2)
+   ((- (match-end 0) (match-beginning 0)))))
+
 ;;; Commands ==================================================================
 
 (defun markdown (&optional output-buffer-name)
@@ -2014,7 +2022,10 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
        "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t*][0-9]+\\.\\|^[ \t]*: ")
   ;; Outline mode
   (make-local-variable 'outline-regexp)
-  (setq outline-regexp "#+")
+  (setq outline-regexp
+        "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$")
+  (make-local-variable 'outline-level)
+  (setq outline-level 'markdown-outline-level)
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
   ;; Indentation and filling
