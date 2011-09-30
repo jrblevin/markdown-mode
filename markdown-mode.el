@@ -14,6 +14,7 @@
 ;; Copyright (C) 2011 Eric Merritt <ericbmerritt@gmail.com>
 ;; Copyright (C) 2011 Philippe Ivaldi <pivaldi@sfr.fr>
 ;; Copyright (C) 2011 Jeremiah Dodds <jeremiah.dodds@gmail.com>
+;; Copyright (C) 2011 Christopher J. Madsen <cjm@cjmweb.net>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -363,8 +364,8 @@
 ;;     substitution character for mapping wiki links to filenames.
 ;;   * Marcin Kasperski <marcin.kasperski@mekk.waw.pl> for a patch to
 ;;     escape shell commands.
-;;   * Christopher J. Madsen <cjm@cjmweb.net> for a patch to prefer
-;;     `visual-line-mode' to `longlines-mode' when available.
+;;   * Christopher J. Madsen <cjm@cjmweb.net> for patches to fix a match
+;;     data bug and to prefer `visual-line-mode' in `gfm-mode'.
 
 ;;; Bugs:
 
