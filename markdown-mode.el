@@ -791,6 +791,7 @@ text.")
 (defvar markdown-mode-font-lock-keywords-basic
   (list
    '(markdown-match-pre-blocks 0 markdown-pre-face t t)
+   '(markdown-match-fenced-code-blocks 0 markdown-pre-face t t)
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext 'markdown-header-face-1)
    (cons markdown-regex-header-2-setext 'markdown-header-face-2)
@@ -1012,6 +1013,19 @@ indentation."
         (setq cur-end (point))
         (setq stop (equal cur-begin cur-end))))
     match))
+
+(defun markdown-match-fenced-code-blocks (last)
+  "Match fenced code blocks from the point to LAST."
+  (cond ((search-forward-regexp "^\\([~]\\{3,\\}\\)" last t)
+         (beginning-of-line)
+         (let ((beg (point)))
+           (forward-line)
+           (cond ((search-forward-regexp
+                   (concat "^" (match-string 1) "~*") last t)
+                  (set-match-data (list beg (point)))
+                  t)
+                 (t nil))))
+        (t nil)))
 
 (defun markdown-font-lock-extend-region ()
   "Extend the search region to include an entire block of text.
