@@ -371,6 +371,7 @@
 ;;     data bug and to prefer `visual-line-mode' in `gfm-mode'.
 ;;   * Shigeru Fukaya <shigeru.fukaya@gmail.com> for better adherence to
 ;;     Emacs Lisp coding conventions.
+;;   * Donald Curtis <dcurtis@coe.edu> for fixing the `paragraph-fill' regexp.
 
 ;;; Bugs:
 
@@ -2080,7 +2081,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Make filling work with lists (unordered, ordered, and definition)
   (set (make-local-variable 'paragraph-start)
-       "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t*][0-9]+\\.\\|^[ \t]*: ")
+       "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t]*[0-9]+\\.\\|^[ \t]*: ")
   ;; Outline mode
   (make-local-variable 'outline-regexp)
   (setq outline-regexp
