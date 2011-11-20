@@ -526,6 +526,13 @@ This will not take effect until Emacs is restarted."
   :group 'markdown
   :type 'string)
 
+(defcustom markdown-footnote-location 'end
+  "Position where new footnotes are inserted in the document."
+  :group 'markdown
+  :type '(choice (const :tag "At the end of the document" end)
+		 (const :tag "Immediately after the paragraph" immediately)
+		 (const :tag "Before next header" header)))
+
 ;;; Font lock =================================================================
 
 (require 'font-lock)
@@ -577,6 +584,9 @@ This will not take effect until Emacs is restarted."
 
 (defvar markdown-reference-face 'markdown-reference-face
   "Face name to use for reference.")
+
+(defvar markdown-footnote-face 'markdown-footnote-face
+  "Face name to use for footnote identifiers.")
 
 (defvar markdown-url-face 'markdown-url-face
   "Face name to use for URLs.")
@@ -675,6 +685,11 @@ This will not take effect until Emacs is restarted."
   "Face for link references."
   :group 'markdown-faces)
 
+(defface markdown-footnote-face
+  '((t (:inherit font-lock-keyword-face)))
+  "Face for footnote markers."
+  :group 'markdown-faces)
+
 (defface markdown-url-face
   '((t (:inherit font-lock-string-face)))
   "Face for URLs."
@@ -704,8 +719,12 @@ This will not take effect until Emacs is restarted."
   "Regular expression for a reference link [text][id].")
 
 (defconst markdown-regex-reference-definition
-  "^ \\{0,3\\}\\(\\[.+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
+  "^ \\{0,3\\}\\(\\[[^^]+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
   "Regular expression for a link definition [id]: ...")
+
+(defconst markdown-regex-footnote
+  "\\(\\[\\^.+?\\]\\)"
+  "Regular expression for a footnote marker [^fn]")
 
 (defconst markdown-regex-header-1-atx
   "^\\(# \\)\\(.*?\\)\\($\\| #+$\\)"
@@ -838,6 +857,7 @@ text.")
          '((1 markdown-reference-face t)
            (2 markdown-url-face t)
            (3 markdown-link-title-face t)))
+   (cons markdown-regex-footnote 'markdown-footnote-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-italic '(2 markdown-italic-face))
    )
@@ -861,6 +881,19 @@ text.")
        markdown-mode-font-lock-keywords-latex)
    markdown-mode-font-lock-keywords-basic)
   "Default highlighting expressions for Markdown mode.")
+
+;; Footnotes
+(defvar markdown-footnote-counter 0
+  "Counter for footnote numbers.")
+(make-variable-buffer-local 'markdown-footnote-counter)
+
+(defconst markdown-footnote-chars
+  "[[:alnum:]-]"
+  "Regular expression maching any character that is allowed in a footnote identifier.")
+
+(defconst markdown-header-regexp
+  "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$"
+  "Regexp identifying markdown headers.")
 
 
 
@@ -892,6 +925,15 @@ If we are at the first line, then consider the previous line to be blank."
       (forward-line -1)
       (markdown-cur-line-blank-p))))
 
+(defun markdown-next-line-blank-p ()
+  "Return t if the next line is blank and nil otherwise.
+If we are at the last line, then consider the next line to be blank."
+  (save-excursion
+    (if (= (point-at-bol) (point-max))
+        t
+      (forward-line 1)
+      (markdown-cur-line-blank-p))))
+
 (defun markdown-prev-line-indent-p ()
   "Return t if the previous line is indented and nil otherwise."
   (save-excursion
@@ -910,6 +952,12 @@ If we are at the first line, then consider the previous line to be blank."
   "Return the number of leading whitespace characters in the previous line."
   (save-excursion
     (forward-line -1)
+    (markdown-cur-line-indent)))
+
+(defun markdown-next-line-indent ()
+  "Return the number of leading whitespace characters in the next line."
+  (save-excursion
+    (forward-line 1)
     (markdown-cur-line-indent)))
 
 (defun markdown-cur-non-list-indent ()
@@ -1354,6 +1402,97 @@ Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
   (markdown-block-region beg end "    "))
 
+;;; Footnotes ======================================================================
+
+(defun markdown-footnote-counter-inc ()
+  "Increment markdown-footnote-counter and return the new value."
+  (when (= markdown-footnote-counter 0) ; hasn't been updated in this buffer yet.
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward (concat "^\\[\\^\\(" markdown-footnote-chars "*?\\)\\]:")
+				(point-max) t)
+	(let ((fn (string-to-number (match-string 1))))
+	  (when (> fn markdown-footnote-counter)
+	    (setq markdown-footnote-counter fn))))))
+  (incf markdown-footnote-counter))
+
+(defun markdown-footnote-new ()
+  "Insert a footnote with a new number and jump to a position to enter the
+footnote text."
+  (interactive)
+  (let ((fn (markdown-footnote-counter-inc)))
+    (insert (format "[^%d]" fn))
+    (markdown-footnote-text-find-new-location)
+    (insert (format "[^%d]: " fn))))
+
+(defun markdown-footnote-text-find-new-location ()
+  "Position the cursor at the proper location for a new footnote text."
+  (cond
+   ((eq markdown-footnote-location 'end) (goto-char (point-max)))
+   ((eq markdown-footnote-location 'immediately) (forward-paragraph))
+   ((eq markdown-footnote-location 'header)
+    ;; search for a header. if none is found, go to the end of the document.
+    (catch 'eof
+      (while (progn
+	       (forward-paragraph)
+	       (unless (re-search-forward markdown-header-regexp nil t)
+		 (throw 'eof nil))
+	       (backward-paragraph)
+	       (not (looking-at (concat "\n" markdown-header-regexp))))))))
+  ;; make sure we're on an empty line:
+  (unless (markdown-cur-line-blank-p)
+    (insert "\n"))
+  ;; and make sure the previous line is empty:
+  (unless (markdown-prev-line-blank-p)
+    (insert "\n"))
+  ;; then make sure there's an empty line following the footnote:
+  (unless (markdown-next-line-blank-p)
+    (insert "\n")
+    (forward-line -1)))
+
+(defun markdown-footnote-goto-text ()
+  "Jump to the text of the footnote under the cursor."
+  (interactive)
+  ;; first make sure we're at a footnote marker
+  (unless (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (point-at-bol))
+	      (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
+    (error "Not at a footnote"))
+  (let* ((fn nil)
+	 (new-pos (save-excursion
+		    ;; move point between [ and ^:
+		    (if (looking-at "\\[")
+			(forward-char 1)
+		      (skip-chars-backward "^["))
+		    (looking-at (concat "\\(\\^" markdown-footnote-chars "*?\\)\\]"))
+		    (setq fn (match-string 1))
+		    (goto-char (point-min))
+		    (re-search-forward (concat "^\\[" fn "\\]:") nil t))))
+    (unless new-pos
+      (error "No definition found for footnote `%s'" fn))
+    (goto-char new-pos)
+    (skip-chars-forward "[:space:]")))
+
+(defun markdown-footnote-return ()
+  "Return from a footnote to its footnote number in the main text."
+  (interactive)
+  (let ((fn (save-excursion
+	      (backward-paragraph)
+	      ;; if we're in a multiparagraph footnote, we need to back up further
+	      (while (>= (markdown-next-line-indent) 4)
+		(backward-paragraph))
+	      (forward-line)
+	      (if (looking-at (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:"))
+		  (match-string 1)))))
+    (unless fn
+      (error "Not in a footnote"))
+    (let ((new-pos (save-excursion
+		     (goto-char (point-min))
+		     (re-search-forward (concat "\\[" fn "\\]\\([^:]\\|\\'\\)") nil t))))
+      (unless new-pos
+	(error "Footnote `%s' not found" fn))
+      (goto-char new-pos)
+      (skip-chars-backward "^]"))))
+
 ;;; Indentation ====================================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
@@ -1473,8 +1612,12 @@ it in the usual way."
     (define-key map "\C-c-" 'markdown-insert-hr)
     (define-key map "\C-c\C-tt" 'markdown-insert-title)
     (define-key map "\C-c\C-ts" 'markdown-insert-section)
+    ;; Footnotes
+    (define-key map "\C-c\C-fn" 'markdown-footnote-new)
+    (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
+    (define-key map "\C-c\C-fb" 'markdown-footnote-return)
     ;; WikiLink Following
-    (define-key map "\C-c\C-f" 'markdown-follow-wiki-link-at-point)
+    (define-key map "\C-c\C-w" 'markdown-follow-wiki-link-at-point)
     (define-key map "\M-n" 'markdown-next-wiki-link)
     (define-key map "\M-p" 'markdown-previous-wiki-link)
     ;; Indentation
@@ -1533,6 +1676,11 @@ it in the usual way."
     ["Insert reference link" markdown-insert-reference-link-dwim]
     ["Insert image" markdown-insert-image]
     ["Insert horizontal rule" markdown-insert-hr]
+    "---"
+    ("Footnotes"
+     ["Insert footnote" markdown-footnote-new]
+     ["Jump to footnote text" markdown-footnote-goto-text]
+     ["Return from footnote" markdown-footnote-return])
     "---"
     ["Check references" markdown-check-refs]
     "---"
