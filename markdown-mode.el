@@ -726,6 +726,10 @@ This will not take effect until Emacs is restarted."
   "\\(\\[\\^.+?\\]\\)"
   "Regular expression for a footnote marker [^fn]")
 
+(defconst markdown-regex-header
+  "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$"
+  "Regexp identifying Markdown headers.")
+
 (defconst markdown-regex-header-1-atx
   "^\\(# \\)\\(.*?\\)\\($\\| #+$\\)"
   "Regular expression for level 1 atx-style (hash mark) headers.")
@@ -890,10 +894,6 @@ text.")
 (defconst markdown-footnote-chars
   "[[:alnum:]-]"
   "Regular expression maching any character that is allowed in a footnote identifier.")
-
-(defconst markdown-header-regexp
-  "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$"
-  "Regexp identifying markdown headers.")
 
 
 
@@ -1435,10 +1435,10 @@ footnote text."
     (catch 'eof
       (while (progn
 	       (forward-paragraph)
-	       (unless (re-search-forward markdown-header-regexp nil t)
+	       (unless (re-search-forward markdown-regex-header nil t)
 		 (throw 'eof nil))
 	       (backward-paragraph)
-	       (not (looking-at (concat "\n" markdown-header-regexp))))))))
+	       (not (looking-at (concat "\n" markdown-regex-header))))))))
   ;; make sure we're on an empty line:
   (unless (markdown-cur-line-blank-p)
     (insert "\n"))
@@ -2263,8 +2263,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
        "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t]*[0-9]+\\.\\|^[ \t]*: ")
   ;; Outline mode
   (make-local-variable 'outline-regexp)
-  (setq outline-regexp
-        "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$")
+  (setq outline-regexp markdown-regex-header)
   (make-local-variable 'outline-level)
   (setq outline-level 'markdown-outline-level)
   ;; Cause use of ellipses for invisible text.
