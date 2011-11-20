@@ -333,7 +333,11 @@
 ;; differs slightly from standard Markdown.  Most importantly, newlines are
 ;; significant and trigger hard line breaks.  As such, `gfm-mode' turns off
 ;; `auto-fill-mode' and turns on `visual-line-mode' (or `longlines-mode' if
-;; `visual-line-mode' is not available).
+;; `visual-line-mode' is not available).  Wiki links in this mode will be
+;; treated as on GitHub, with hyphens replacing spaces in filenames and
+;; where the first letter of the filename capitalized.  For example,
+;; `[[wiki link]]' will map to a file named `Wiki-link` with the same
+;; extension as the current file.
 
 ;;; Acknowledgments:
 
@@ -378,6 +382,7 @@
 ;;   * Shigeru Fukaya <shigeru.fukaya@gmail.com> for better adherence to
 ;;     Emacs Lisp coding conventions.
 ;;   * Donald Curtis <dcurtis@coe.edu> for fixing the `paragraph-fill' regexp.
+;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
 
 ;;; Bugs:
 
@@ -1929,9 +1934,14 @@ The location of the link component depends on the value of
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
-Spaces in NAME are replaced with `markdown-link-space-sub-char'."
+Spaces in NAME are replaced with `markdown-link-space-sub-char'.
+When in `gfm-mode', follow GitHub's conventions where [[Test Test]]
+and [[test test]] both map to Test-test.ext."
   (let ((basename (markdown-replace-regexp-in-string
                    "[[:space:]\n]" markdown-link-space-sub-char name)))
+    (when (eq major-mode 'gfm-mode)
+      (setq basename (concat (upcase (substring basename 0 1))
+                             (substring basename 1 nil))))
     (concat basename
             (if (buffer-file-name)
                 (concat "."
@@ -2144,6 +2154,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
+  (setq markdown-link-space-sub-char "-")
   (auto-fill-mode 0)
   ;; Use visual-line-mode if available, fall back to longlines-mode:
   (if (fboundp 'visual-line-mode)
