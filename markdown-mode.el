@@ -16,6 +16,7 @@
 ;; Copyright (C) 2011 Jeremiah Dodds <jeremiah.dodds@gmail.com>
 ;; Copyright (C) 2011 Christopher J. Madsen <cjm@cjmweb.net>
 ;; Copyright (C) 2011 Shigeru Fukaya <shigeru.fukaya@gmail.com>
+;; Copyright (C) 2011 Joost Kremers <joostkremers@fastmail.fm>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -244,6 +245,13 @@
 ;;     (mnemonic: title) and for a second-level underline-style header
 ;;     press `C-c C-t s` (mnemonic: section).
 ;;
+;;   * Footnotes: `C-c C-f`
+;;
+;;     To create a new footnote at the point, press `C-c C-f n`.
+;;     Press `C-c C-f g` with the point at a footnote to jump to the
+;;     location where the footnote text is defined.  Then, press
+;;     `C-c C-f b` to return to the footnote marker in the main text.
+;;
 ;;   * Other elements:
 ;;
 ;;     `C-c -` inserts a horizontal rule.
@@ -300,7 +308,7 @@
 ;; Besides supporting the basic Markdown syntax, markdown-mode also
 ;; includes syntax highlighting for `[[Wiki Links]]` by default. Wiki
 ;; links may be followed automatically by hitting the enter key when
-;; your curser is on a wiki link or by hitting `C-c C-f`. The
+;; your curser is on a wiki link or by hitting `C-c C-w`. The
 ;; autofollowing on enter key may be controlled with the
 ;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
 ;; `M-n` to quickly jump to the previous and next wiki links,
@@ -724,7 +732,7 @@ This will not take effect until Emacs is restarted."
 
 (defconst markdown-regex-footnote
   "\\(\\[\\^.+?\\]\\)"
-  "Regular expression for a footnote marker [^fn]")
+  "Regular expression for a footnote marker [^fn].")
 
 (defconst markdown-regex-header
   "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$"
