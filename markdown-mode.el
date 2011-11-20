@@ -148,6 +148,10 @@
 ;;     cursor is an wiki link
 ;;     (default: `t')
 ;;
+;;   * `markdown-wiki-link-alias-first' - set to a non-nil value to
+;;     treat aliased wiki links like `[[link text|PageName]]`.
+;;     When set to nil, they will be treated as `[[PageName|link text]]'.
+;;
 ;;   * `markdown-uri-types' - a list of protocols for URIs that
 ;;     `markdown-mode' should highlight.
 ;;
@@ -301,7 +305,9 @@
 ;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
 ;; `M-n` to quickly jump to the previous and next wiki links,
 ;; respectively.  Aliased or piped wiki links of the form
-;; `[[PageName|link text]]` are also supported.
+;; `[[link text|PageName]]` are also supported.  Since some wikis
+;; reverse these components, set `markdown-wiki-link-alias-first'
+;; to nil to treat them as `[[PageName|link text]]`.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command'.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -470,6 +476,12 @@ buffers which are visiting a file."
 
 (defcustom markdown-follow-wiki-link-on-enter t
   "Follow wiki link at point (if any) when the enter key is pressed."
+  :group 'markdown
+  :type 'boolean)
+
+(defcustom markdown-wiki-link-alias-first t
+  "When non-nil, treat aliased wiki links like [[alias text|PageName]].
+Otherwise, they will be treated as [[PageName|alias text]]."
   :group 'markdown
   :type 'boolean)
 
@@ -1903,9 +1915,17 @@ be available via `match-string'."
 	 (or (not buffer-file-name)
 	     (not (string-equal (buffer-file-name)
 				(markdown-convert-wiki-link-to-filename
-				 (match-string 1)))))
+                                 (markdown-wiki-link-link)))))
 	 (not (save-match-data
 		(save-excursion))))))
+
+(defun markdown-wiki-link-link ()
+  "Return the link part of the wiki link using current match data.
+The location of the link component depends on the value of
+`markdown-wiki-link-alias-first'."
+  (if markdown-wiki-link-alias-first
+      (or (match-string 3) (match-string 1))
+    (match-string 1)))
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
@@ -1930,7 +1950,7 @@ the new buffer remains in `markdown-mode'."
 See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   (interactive)
   (if (markdown-wiki-link-p)
-      (markdown-follow-wiki-link (match-string 1))
+      (markdown-follow-wiki-link (markdown-wiki-link-link))
     (error "Point is not at a Wiki Link")))
 
 (defun markdown-next-wiki-link ()
@@ -1970,7 +1990,8 @@ and highlight accordingly."
     (let ((highlight-beginning (match-beginning 0))
 	  (highlight-end (match-end 0))
 	  (file-name
-	   (markdown-convert-wiki-link-to-filename (match-string 1))))
+	   (markdown-convert-wiki-link-to-filename
+            (markdown-wiki-link-link))))
       (if (file-exists-p file-name)
 	  (markdown-highlight-wiki-link
 	   highlight-beginning highlight-end markdown-link-face)
