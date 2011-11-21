@@ -2314,7 +2314,10 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; Use visual-line-mode if available, fall back to longlines-mode:
   (if (fboundp 'visual-line-mode)
       (visual-line-mode 1)
-    (longlines-mode 1)))
+    (longlines-mode 1))
+  ;; do the initial link fontification
+  (markdown-fontify-buffer-wiki-links))
+
 
 (provide 'markdown-mode)
 
