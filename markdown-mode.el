@@ -2097,7 +2097,7 @@ and [[test test]] both map to Test-test.ext."
                    "[[:space:]\n]" markdown-link-space-sub-char name)))
     (when (eq major-mode 'gfm-mode)
       (setq basename (concat (upcase (substring basename 0 1))
-                             (substring basename 1 nil))))
+                             (downcase (substring basename 1 nil)))))
     (concat basename
             (if (buffer-file-name)
                 (concat "."
