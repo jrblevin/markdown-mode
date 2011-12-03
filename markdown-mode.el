@@ -1731,7 +1731,7 @@ it in the usual way."
     (define-key map (kbd "C-M-b") 'outline-backward-same-level)
     (define-key map (kbd "C-M-u") 'outline-up-heading)
     ;; Markdown functions
-    (define-key map "\C-c\C-cm" 'markdown)
+    (define-key map "\C-c\C-cm" 'markdown-other-window)
     (define-key map "\C-c\C-cp" 'markdown-preview)
     (define-key map "\C-c\C-ce" 'markdown-export)
     (define-key map "\C-c\C-cv" 'markdown-export-and-view)
@@ -1749,7 +1749,7 @@ it in the usual way."
      ["Cycle visibility" markdown-cycle (outline-on-heading-p)]
      ["Cycle global visibility" markdown-shifttab])
     "---"
-    ["Compile" markdown]
+    ["Compile" markdown-other-window]
     ["Preview" markdown-preview]
     ["Export" markdown-export]
     ["Export & View" markdown-export-and-view]
@@ -2052,41 +2052,52 @@ Calls `markdown-cycle' with argument t."
 ;;; Commands ==================================================================
 
 (defun markdown (&optional output-buffer-name)
-  "Run `markdown' on current buffer and insert output in buffer BUFFER-OUTPUT."
+  "Run `markdown' on current buffer and insert output in buffer given by
+`output-buffer-name' (defaults to `markdown-output-buffer-name').  Return the
+OUTPUT-BUFFER used."
   (interactive)
-  (let ((title (buffer-name))
-        (begin-region)
-        (end-region))
-    (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
-        (setq begin-region (region-beginning)
-              end-region (region-end))
-      (setq begin-region (point-min)
-            end-region (point-max)))
+  (save-window-excursion
+    (let ((begin-region)
+          (end-region))
+      (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+          (setq begin-region (region-beginning)
+                end-region (region-end))
+        (setq begin-region (point-min)
+              end-region (point-max)))
 
-    (unless output-buffer-name
-      (setq output-buffer-name markdown-output-buffer-name))
+      (unless output-buffer-name
+        (setq output-buffer-name markdown-output-buffer-name))
 
-    (if markdown-command-needs-filename
-        ;; Handle case when `markdown-command' does not read from stdin
+      (cond
+       ;; Handle case when `markdown-command' does not read from stdin
+       (markdown-command-needs-filename
         (if (not buffer-file-name)
             (error "Must be visiting a file")
           (shell-command (concat markdown-command " "
                                  (shell-quote-argument buffer-file-name))
-                         output-buffer-name))
-      ;; Pass region to `markdown-command' via stdin
-      (shell-command-on-region begin-region end-region markdown-command
-                               output-buffer-name))
+                         output-buffer-name)))
+       ;; Pass region to `markdown-command' via stdin
+       (t
+        (shell-command-on-region begin-region end-region markdown-command
+                                 output-buffer-name))))
+    output-buffer-name))
 
-    ;; Add header and footer and switch to html-mode.
-    (save-current-buffer
-      (set-buffer output-buffer-name)
-      (goto-char (point-min))
-      (unless (markdown-output-standalone-p)
-        (markdown-add-xhtml-header-and-footer title))
-      (html-mode))
+(defun markdown-standalone (&optional output-buffer-name)
+  "special function to provide html standalone output"
+  (interactive)
+  (setq output-buffer-name (markdown output-buffer-name))
+  (with-current-buffer output-buffer-name
+    (set-buffer output-buffer-name)
+    (goto-char (point-min))
+    (unless (markdown-output-standalone-p)
+      (markdown-add-xhtml-header-and-footer output-buffer-name))
+    (html-mode))
+  output-buffer-name)
 
-    ;; Ensure buffer gets raised, even with short command output
-    (switch-to-buffer-other-window output-buffer-name)))
+(defun markdown-other-window (&optional output-buffer-name)
+  " Run `markdown' on current buffer and display in other window"
+  (interactive)
+  (display-buffer (markdown-standalone output-buffer-name)))
 
 (defun markdown-output-standalone-p ()
   "Determine whether `markdown-command' output is standalone XHTML.
@@ -2119,32 +2130,33 @@ Standalone XHTML output is identified by an occurrence of
           "</body>\n"
           "</html>\n"))
 
-(defun markdown-preview ()
+(defun markdown-preview (&optional output-buffer-name)
   "Run `markdown' on the current buffer and preview the output in a browser."
   (interactive)
-  (markdown markdown-output-buffer-name)
-  (browse-url-of-buffer markdown-output-buffer-name))
+  (browse-url-of-buffer (markdown markdown-output-buffer-name)))
 
-(defun markdown-export-file-name ()
+(defun markdown-export-file-name (&optional extension)
   "Attempt to generate a filename for Markdown output.
 If the current buffer is visiting a file, we construct a new
 output filename based on that filename.  Otherwise, return nil."
   (when (buffer-file-name)
-    (concat (file-name-sans-extension (buffer-file-name)) ".html")))
+    (unless extension
+      (setq extension ".html"))
+    (concat (file-name-sans-extension (buffer-file-name)) extension)))
 
-(defun markdown-export ()
+(defun markdown-export (&optional output-file)
   "Run Markdown on the current buffer, save to a file, and return the filename.
 The resulting filename will be constructed using the current filename, but
 with the extension removed and replaced with .html."
   (interactive)
-  (let ((output-file (markdown-export-file-name))
-        (output-buffer-name))
-    (when output-file
+  (unless output-file
+    (setq output-file (markdown-export-file-name ".html")))
+  (when output-file
+    (let ((output-buffer-name))
       (setq output-buffer-name (buffer-name (find-file-noselect output-file)))
       (markdown output-buffer-name)
       (with-current-buffer output-buffer-name
-        (save-buffer)
-        (kill-buffer-and-window))
+        (save-buffer))
       output-file)))
 
 (defun markdown-export-and-view ()
