@@ -2455,6 +2455,15 @@ with the extension removed and replaced with .html."
       (call-process markdown-open-command
                     nil nil nil buffer-file-name))))
 
+(defun markdown-copy-html ()
+  "process file with multimarkdown and save it accordingly"
+  (interactive)
+  (save-window-excursion
+    (markdown)
+    (with-current-buffer markdown-output-buffer-name
+      (kill-ring-save (point-min) (point-max)))))
+
+
 ;;; Links =====================================================================
 
 (require 'thingatpt)
