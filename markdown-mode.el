@@ -2134,6 +2134,42 @@ defined."
         (goto-char (point-min))
         (forward-line 2)))))
 
+
+;;; Lists =====================================================================
+
+
+(defun markdown--cleanup-list-numbers-level (&optional pfx)
+  "Update the numbering for pfx (as a string of spaces).
+
+Assume that the previously found match was for a numbered item in a list."
+  (let ((m pfx)
+        (idx 0)
+        (success t))
+    (while (and success
+                (not (string-prefix-p "#" (match-string-no-properties 1)))
+                (not (string< (setq m (match-string-no-properties 2)) pfx)))
+      (cond
+       ((string< pfx m)
+        (setq success (markdown--cleanup-list-numbers-level m)))
+       (success
+        (replace-match
+         (concat pfx (number-to-string  (setq idx (1+ idx))) ". "))
+        (setq success
+              (re-search-forward
+               (concat "\\(^#+\\|\\(^\\|^[\s-]*\\)[0-9]+\\. \\)") nil t)))))
+    success))
+
+;;;###autoload
+(defun markdown-cleanup-list-numbers ()
+  "Update the numbering of numbered markdown lists"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward (concat "\\(\\(^[\s-]*\\)[0-9]+\\. \\)") nil t)
+      (markdown--cleanup-list-numbers-level (match-string-no-properties 2)))))
+
+
+
 ;;; Outline ===================================================================
 
 ;; The following visibility cycling code was taken from org-mode
