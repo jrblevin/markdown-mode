@@ -1734,7 +1734,7 @@ it in the usual way."
     (define-key map "\C-c\C-cm" 'markdown-other-window)
     (define-key map "\C-c\C-cp" 'markdown-preview)
     (define-key map "\C-c\C-ce" 'markdown-export)
-    (define-key map "\C-c\C-cv" 'markdown-export-and-view)
+    (define-key map "\C-c\C-cv" 'markdown-export-and-preview)
     ;; References
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
     map)
@@ -1752,7 +1752,7 @@ it in the usual way."
     ["Compile" markdown-other-window]
     ["Preview" markdown-preview]
     ["Export" markdown-export]
-    ["Export & View" markdown-export-and-view]
+    ["Export & View" markdown-export-and-preview]
     "---"
     ("Headers (setext)"
      ["Insert Title" markdown-insert-title]
@@ -2159,7 +2159,7 @@ with the extension removed and replaced with .html."
         (save-buffer))
       output-file)))
 
-(defun markdown-export-and-view ()
+(defun markdown-export-and-preview ()
   "Export to XHTML using `markdown-export' and browse the resulting file."
   (interactive)
   (browse-url (markdown-export)))
