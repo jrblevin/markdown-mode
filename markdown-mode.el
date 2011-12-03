@@ -2142,7 +2142,12 @@ output filename based on that filename.  Otherwise, return nil."
   (when (buffer-file-name)
     (unless extension
       (setq extension ".html"))
-    (concat (file-name-sans-extension (buffer-file-name)) extension)))
+    (concat
+     (cond
+      ((buffer-file-name)
+       (file-name-sans-extension (buffer-file-name)))
+      (t (buffer-name)))
+     extension)))
 
 (defun markdown-export (&optional output-file)
   "Run Markdown on the current buffer, save to a file, and return the filename.
