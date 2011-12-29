@@ -2159,7 +2159,7 @@ with the extension removed and replaced with .html."
   (when output-file
     (let ((output-buffer-name))
       (setq output-buffer-name (buffer-name (find-file-noselect output-file)))
-      (markdown output-buffer-name)
+      (markdown-standalone output-buffer-name)
       (with-current-buffer output-buffer-name
         (save-buffer))
       output-file)))
