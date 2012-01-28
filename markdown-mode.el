@@ -402,6 +402,7 @@
 ;;     for an autoload token for `gfm-mode'.
 ;;   * Ian Yang <me@iany.me> for improving the reference definition regex.
 ;;   * Akinori Musha <knu@idaemons.org> for an imenu index function.
+;;   * Michael Sperber <sperber@deinprogramm.de> for XEmacs fixes.
 
 ;;; Bugs:
 
@@ -1178,7 +1179,7 @@ This helps improve font locking for block constructs such as pre blocks."
   "Insert the strings S1 and S2.
 If Transient Mark mode is on and a region is active, wrap the strings S1
 and S2 around the region."
-  (if (and transient-mark-mode mark-active)
+  (if (markdown-transient-mark-mode-active)
       (let ((a (region-beginning)) (b (region-end)))
         (goto-char a)
         (insert s1)
@@ -1243,7 +1244,7 @@ from the minibuffer. The link URL, label, and title will be read
 from the minibuffer. The link label definition is placed at the
 end of the current paragraph."
   (interactive)
-  (if (and transient-mark-mode mark-active)
+  (if (markdown-transient-mark-mode-active)
       (call-interactively 'markdown-insert-reference-link-region)
     (call-interactively 'markdown-insert-reference-link)))
 
@@ -1357,7 +1358,7 @@ region is active, it is used as the header text."
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
-  (if (and transient-mark-mode mark-active)
+  (if (markdown-transient-mark-mode-active)
       (let ((a (region-beginning))
             (b (region-end))
             (len 0)
@@ -1375,7 +1376,7 @@ as the header text."
 If Transient Mark mode is on and a region is active, it is used
 as the header text."
   (interactive)
-  (if (and transient-mark-mode mark-active)
+  (if (markdown-transient-mark-mode-active)
       (let ((a (region-beginning))
             (b (region-end))
             (len 0)
@@ -1393,7 +1394,7 @@ as the header text."
 If Transient Mark mode is on and a region is active, it is used as
 the blockquote text."
   (interactive)
-  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+  (if (markdown-transient-mark-mode-active)
       (markdown-blockquote-region (region-beginning) (region-end))
     (insert "> ")))
 
@@ -1441,7 +1442,7 @@ Arguments BEG and END specify the beginning and end of the region."
 If Transient Mark mode is on and a region is active, it is marked
 as preformatted text."
   (interactive)
-  (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+  (if (markdown-transient-mark-mode-active)
       (markdown-pre-region (region-beginning) (region-end))
     (insert "    ")))
 
@@ -2145,7 +2146,7 @@ OUTPUT-BUFFER used."
   (save-window-excursion
     (let ((begin-region)
           (end-region))
-      (if (and (boundp 'transient-mark-mode) transient-mark-mode mark-active)
+      (if (markdown-transient-mark-mode-active)
           (setq begin-region (region-beginning)
                 end-region (region-end))
         (setq begin-region (point-min)
@@ -2374,7 +2375,7 @@ newline after."
     (re-search-forward "\n" nil t)
     (if (not (= (point) to))
 	(setq new-to (point)))
-    (list new-from new-to)))
+    (values new-from new-to)))
 
 (defun markdown-check-change-for-wiki-link (from to change)
   "Check region between FROM and TO for wiki links and re-fontfy as needed.
@@ -2430,6 +2431,13 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   "Return nil if it is acceptable to break the current line at the point."
   ;; inside in square brackets (e.g., link anchor text)
   (looking-back "\\[[^]]*"))
+
+(defun markdown-transient-mark-mode-active ()
+  (cond
+   ((boundp 'transient-mark-mode)
+    (and transient-mark-mode mark-active))
+   ((boundp 'zmacs-regions)
+    (and zmacs-regions (region-exists-p)))))
 
 
 
