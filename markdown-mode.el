@@ -1490,6 +1490,22 @@ the blockquote text."
       (markdown-blockquote-region (region-beginning) (region-end))
     (insert "> ")))
 
+(defun markdown-beginning-of-defun ()
+  "`beginning-of-defun-function' for Markdown.
+Move to the beginning of the next section."
+  (if (re-search-backward "\\(^#+ \\|^.+[^[:space:]].*\n\\(-+\\|=+\\)$\\)" nil t)
+      (match-beginning 0)
+    (point-min)))
+
+(defun markdown-end-of-defun ()
+  "`end-of-defun-function' for Markdown.
+Move to the end of the current section."
+  (end-of-line)
+  (if (re-search-forward
+       "\\(^#+ \\|^.+[^[:space:]].*\n\\(-+\\|=+\\)$\\)" nil t)
+      (goto-char (match-beginning 0))
+    (goto-char (point-max))))
+
 (defun markdown-block-region (beg end prefix)
   "Format the region using a block prefix.
 Arguments BEG and END specify the beginning and end of the
@@ -2708,6 +2724,9 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
+  (set (make-local-variable 'beginning-of-defun-function)
+       'markdown-beginning-of-defun)
+  (set (make-local-variable 'end-of-defun-function) 'markdown-end-of-defun)
   ;; Make filling work with lists (unordered, ordered, and definition)
   (set (make-local-variable 'paragraph-start)
        "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t]*[0-9]+\\.\\|^[ \t]*: ")
