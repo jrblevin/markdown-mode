@@ -2142,31 +2142,52 @@ defined."
   "Update the numbering for pfx (as a string of spaces).
 
 Assume that the previously found match was for a numbered item in a list."
-  (let ((m pfx)
+  (let ((cpfx pfx)
         (idx 0)
-        (success t))
-    (while (and success
-                (not (string-prefix-p "#" (match-string-no-properties 1)))
-                (not (string< (setq m (match-string-no-properties 2)) pfx)))
+        (continue t)
+        (step t)
+        (sep nil))
+    (while continue
+      (setq step t)
       (cond
-       ((string< pfx m)
-        (setq success (markdown--cleanup-list-numbers-level m)))
-       (success
-        (replace-match
-         (concat pfx (number-to-string  (setq idx (1+ idx))) ". "))
-        (setq success
-              (re-search-forward
-               (concat "\\(^#+\\|\\(^\\|^[\s-]*\\)[0-9]+\\. \\)") nil t)))))
-    success))
+       ((looking-at "^\\([\s-]*\\)[0-9]+\\. ")
+        (setq cpfx (match-string-no-properties 1))
+        (cond
+         ((string= cpfx pfx)
+          (replace-match
+           (concat pfx (number-to-string  (setq idx (1+ idx))) ". "))
+          (setq sep nil))
+         ;; indented a level
+         ((string< pfx cpfx)
+          (setq sep (markdown--cleanup-list-numbers-level cpfx))
+          (setq step nil))
+         ;; exit the loop
+         (t
+          (setq step nil)
+          (setq continue nil))))
+
+       ((looking-at "^\\([\s-]*\\)[^	 \n\r].*$")
+        (setq cpfx (match-string-no-properties 1))
+        (cond
+         ;; reset if separated before
+         ((string= cpfx pfx) (when sep (setq idx 0)))
+         ((string< cpfx pfx)
+          (setq step nil)
+          (setq continue nil))))
+       (t (setq sep t)))
+
+      (when step
+        (beginning-of-line)
+        (setq continue (= (forward-line) 0))))
+    sep))
 
 ;;;###autoload
 (defun markdown-cleanup-list-numbers ()
   "Update the numbering of numbered markdown lists"
   (interactive)
   (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward (concat "\\(\\(^[\s-]*\\)[0-9]+\\. \\)") nil t)
-      (markdown--cleanup-list-numbers-level (match-string-no-properties 2)))))
+    (beginning-of-line)
+    (markdown--cleanup-list-numbers-level "")))
 
 
 
