@@ -2186,7 +2186,7 @@ Assume that the previously found match was for a numbered item in a list."
   "Update the numbering of numbered markdown lists"
   (interactive)
   (save-excursion
-    (beginning-of-line)
+    (goto-char (point-min))
     (markdown--cleanup-list-numbers-level "")))
 
 
