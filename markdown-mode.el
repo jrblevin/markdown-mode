@@ -1818,6 +1818,8 @@ Otherwise, do normal delete."
     (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
     (define-key map "\C-c\C-fb" 'markdown-footnote-return)
     (define-key map "\C-c\C-fk" 'markdown-footnote-kill)
+    ;; Regular Link Following
+    (define-key map "\C-c\C-o" 'markdown-follow-link-at-point)
     ;; WikiLink Following
     (define-key map "\C-c\C-w" 'markdown-follow-wiki-link-at-point)
     (define-key map "\M-n" 'markdown-next-wiki-link)
@@ -1962,7 +1964,7 @@ REFERENCE should include the square brackets, like [this]."
       (catch 'found
         (while (re-search-forward markdown-regex-reference-definition nil t)
           (when (string= reference (downcase (match-string-no-properties 1)))
-            (throw 'found t)))))))
+            (throw 'found (match-string-no-properties 2))))))))
 
 (defun markdown-get-undefined-refs ()
   "Return a list of undefined Markdown references.
@@ -2336,9 +2338,37 @@ with the extension removed and replaced with .html."
   (interactive)
   (browse-url (markdown-export)))
 
-;;; WikiLink Following/Markup =================================================
+
+;;; Links =====================================================================
 
 (require 'thingatpt)
+
+(defun markdown-link-p ()
+  "Return non-nil when `point' is at a non-wiki link.
+See `markdown-wiki-link-p' for more information."
+  (let ((case-fold-search nil))
+    (and (not (markdown-wiki-link-p))
+         (or (thing-at-point-looking-at markdown-regex-link-inline)
+             (thing-at-point-looking-at markdown-regex-link-reference)))))
+
+(defun markdown-link-link ()
+  "Return the link part of the regular (non-wiki) link at point.
+Works with both inline and reference style links.  If point is
+not at a link or the link reference is not defined returns nil."
+  (cond
+   ((thing-at-point-looking-at markdown-regex-link-inline)
+    (substring-no-properties (match-string 2) 1 -1))
+   ((thing-at-point-looking-at markdown-regex-link-reference)
+    (markdown-has-reference-definition (match-string-no-properties 2)))
+   (t (error "Not on a markdown link"))))
+
+(defun markdown-follow-link-at-point ()
+  "Open the current non-wiki link in a browser."
+  (interactive)
+  (if (markdown-link-p) (browse-url (markdown-link-link))))
+
+
+;;; WikiLink Following/Markup =================================================
 
 (defun markdown-wiki-link-p ()
   "Return non-nil when `point' is at a true wiki link.
