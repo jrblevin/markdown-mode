@@ -4351,7 +4351,7 @@ current filename, but with the extension removed and replaced with .html."
 (defun markdown-export-and-preview ()
   "Export to XHTML using `markdown-export' and browse the resulting file."
   (interactive)
-  (browse-url (markdown-export)))
+  (browse-url-of-file (markdown-export)))
 
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
