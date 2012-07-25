@@ -2463,6 +2463,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 ;;; GitHub Flavored Markdown Mode  ============================================
 
+;;;###autoload
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
   (setq markdown-link-space-sub-char "-")
