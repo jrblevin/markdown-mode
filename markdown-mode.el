@@ -936,6 +936,18 @@ text.")
   "[[:alnum:]-]"
   "Regular expression maching any character that is allowed in a footnote identifier.")
 
+;; imenu information
+(setq markdown-imenu-generic-expression
+      `((nil ,markdown-regex-header-1-setext 1)
+        (nil ,markdown-regex-header-2-setext 1)
+        (nil ,markdown-regex-header-1-atx 2)
+        (nil ,markdown-regex-header-2-atx 2)
+        (nil ,markdown-regex-header-3-atx 2)
+        (nil ,markdown-regex-header-4-atx 2)
+        (nil ,markdown-regex-header-5-atx 2)
+        (nil ,markdown-regex-header-6-atx 2)
+        ("fn" "^\\[\\^\\(.*\\)\\]" 1)))
+
 
 
 ;;; Compatibility =============================================================
@@ -2402,6 +2414,9 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (set (make-local-variable 'font-lock-defaults)
        '(markdown-mode-font-lock-keywords))
   (set (make-local-variable 'font-lock-multiline) t)
+  ;; For imenu support
+  (set (make-local-variable 'imenu-generic-expression)
+       markdown-imenu-generic-expression)
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Make filling work with lists (unordered, ordered, and definition)
