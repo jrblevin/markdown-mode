@@ -2147,7 +2147,7 @@ Assume that the previously found match was for a numbered item in a list."
         (continue t)
         (step t)
         (sep nil))
-    (while continue
+    (while (and continue (not (eobp)))
       (setq step t)
       (cond
        ((looking-at "^\\([\s-]*\\)[0-9]+\\. ")
