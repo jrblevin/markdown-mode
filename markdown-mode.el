@@ -2377,20 +2377,26 @@ and [[test test]] both map to Test-test.ext."
                 (concat "."
                         (file-name-extension (buffer-file-name)))))))
 
-(defun markdown-follow-wiki-link (name)
+(defun markdown-follow-wiki-link (name &optional other)
   "Follow the wiki link NAME.
 Convert the name to a file name and call `find-file'.  Ensure that
 the new buffer remains in `markdown-mode'."
-  (let ((filename (markdown-convert-wiki-link-to-filename name)))
-    (find-file filename))
-  (markdown-mode))
+  (let ((filename (markdown-convert-wiki-link-to-filename name))
+        (wp (progn
+              (string-match "\\(.*/\\).*$" buffer-file-name)
+              (match-string 1 buffer-file-name))))
+    (when other (other-window 1))
+    (find-file (concat wp filename)))
+  (when (eq major-mode 'fundamental-mode) (markdown-mode)))
 
-(defun markdown-follow-wiki-link-at-point ()
-  "Find Wiki Link at point.
+(defun markdown-follow-wiki-link-at-point (&optional arg)
+  "Find Wiki Link at point.  With prefix argument C-u open the file in
+other window.
+
 See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
-  (interactive)
+  (interactive "P")
   (if (markdown-wiki-link-p)
-      (markdown-follow-wiki-link (markdown-wiki-link-link))
+      (markdown-follow-wiki-link (markdown-wiki-link-link) arg)
     (error "Point is not at a Wiki Link")))
 
 (defun markdown-next-wiki-link ()
