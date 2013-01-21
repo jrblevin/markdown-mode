@@ -18,6 +18,7 @@
 ;; Copyright (C) 2011 Shigeru Fukaya <shigeru.fukaya@gmail.com>
 ;; Copyright (C) 2011 Joost Kremers <joostkremers@fastmail.fm>
 ;; Copyright (C) 2011-2012 Donald Ephraim Curtis <dcurtis@milkbox.net>
+;; Copyright (C) 2012 Akinori Musha <knu@idaemons.org>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -400,6 +401,7 @@
 ;;   * Max Penet <max.penet@gmail.com> and Peter Eisentraut <peter_e@gmx.net>
 ;;     for an autoload token for `gfm-mode'.
 ;;   * Ian Yang <me@iany.me> for improving the reference definition regex.
+;;   * Akinori Musha <knu@idaemons.org> for an imenu index function.
 
 ;;; Bugs:
 
@@ -941,18 +943,6 @@ text.")
 (defconst markdown-footnote-chars
   "[[:alnum:]-]"
   "Regular expression maching any character that is allowed in a footnote identifier.")
-
-;; imenu information
-(setq markdown-imenu-generic-expression
-      `((nil ,markdown-regex-header-1-setext 1)
-        (nil ,markdown-regex-header-2-setext 1)
-        (nil ,markdown-regex-header-1-atx 2)
-        (nil ,markdown-regex-header-2-atx 2)
-        (nil ,markdown-regex-header-3-atx 2)
-        (nil ,markdown-regex-header-4-atx 2)
-        (nil ,markdown-regex-header-5-atx 2)
-        (nil ,markdown-regex-header-6-atx 2)
-        ("Footnotes" "^ \\{0,3\\}\\[\\^\\(.*\\)\\]:\\s *" 1)))
 
 
 
@@ -1836,6 +1826,54 @@ it in the usual way."
 
 
 
+;;; imenu =====================================================================
+
+(defun markdown-imenu-create-index ()
+  (let* ((root '(nil . nil))
+	 cur-alist
+	 (cur-level 0)
+	 (pattern "^\\(\\(#+\\)[ \t]*\\(.+\\)\\|\\([^# \t\n=-].*\\)\n===+\\|\\([^# \t\n=-].*\\)\n---+\\)$")
+	 (empty-heading "-")
+	 (self-heading ".")
+	 hashes pos level heading)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward pattern (point-max) t)
+	(cond
+	 ((setq hashes (match-string-no-properties 2))
+	  (setq heading (match-string-no-properties 3)
+		pos (match-beginning 1)
+		level (length hashes)))
+	 ((setq heading (match-string-no-properties 4))
+	  (setq pos (match-beginning 4)
+		level 1))
+	 ((setq heading (match-string-no-properties 5))
+	  (setq pos (match-beginning 5)
+		level 2)))
+	(let ((alist (list (cons heading pos))))
+	  (cond
+	   ((= cur-level level)		; new sibling
+	    (setcdr cur-alist alist)
+	    (setq cur-alist alist))
+	   ((< cur-level level)		; first child
+	    (dotimes (i (- level cur-level 1))
+	      (setq alist (list (cons empty-heading alist))))
+	    (if cur-alist
+		(let* ((parent (car cur-alist))
+		       (self-pos (cdr parent)))
+		  (setcdr parent (cons (cons self-heading self-pos) alist)))
+	      (setcdr root alist))	; primogenitor
+	    (setq cur-alist alist)
+	    (setq cur-level level))
+	   (t				; new sibling of an ancestor
+	    (let ((sibling-alist (last (cdr root))))
+	      (dotimes (i (1- level))
+		(setq sibling-alist (last (cdar sibling-alist))))
+	      (setcdr sibling-alist alist)
+	      (setq cur-alist alist))
+	    (setq cur-level level)))))
+      (cdr root))))
+
 ;;; References ================================================================
 
 ;;; Undefined reference checking code by Dmitry Dzhus <mail@sphinx.net.ru>.
@@ -2421,8 +2459,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
        '(markdown-mode-font-lock-keywords))
   (set (make-local-variable 'font-lock-multiline) t)
   ;; For imenu support
-  (set (make-local-variable 'imenu-generic-expression)
-       markdown-imenu-generic-expression)
+  (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Make filling work with lists (unordered, ordered, and definition)
