@@ -949,7 +949,7 @@ text.")
         (nil ,markdown-regex-header-4-atx 2)
         (nil ,markdown-regex-header-5-atx 2)
         (nil ,markdown-regex-header-6-atx 2)
-        ("fn" "^\\[\\^\\(.*\\)\\]" 1)))
+        ("Footnotes" "^ \\{0,3\\}\\[\\^\\(.*\\)\\]:\\s *" 1)))
 
 
 
