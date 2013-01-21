@@ -956,6 +956,19 @@ text.")
       (replace-in-string string regexp rep)
     (replace-regexp-in-string regexp rep string)))
 
+(eval-and-compile
+  (if (boundp 'mark-active)
+      (defun markdown-mark-active ()    ; Emacs
+	mark-active)
+    (defalias 'markdown-mark-active 'region-exists-p))) ; XEmacs
+
+(defun markdown-transient-mark-mode-active ()
+  (cond
+   ((boundp 'transient-mark-mode)
+    (and transient-mark-mode (markdown-mark-active)))
+   ((boundp 'zmacs-regions)
+    (and zmacs-regions (markdown-mark-active)))))
+
 
 
 ;;; Markdown parsing functions ================================================
@@ -2431,13 +2444,6 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   "Return nil if it is acceptable to break the current line at the point."
   ;; inside in square brackets (e.g., link anchor text)
   (looking-back "\\[[^]]*"))
-
-(defun markdown-transient-mark-mode-active ()
-  (cond
-   ((boundp 'transient-mark-mode)
-    (and transient-mark-mode mark-active))
-   ((boundp 'zmacs-regions)
-    (and zmacs-regions (region-exists-p)))))
 
 
 
