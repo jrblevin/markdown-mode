@@ -251,6 +251,9 @@
 ;;     Press `C-c C-f g` with the point at a footnote to jump to the
 ;;     location where the footnote text is defined.  Then, press
 ;;     `C-c C-f b` to return to the footnote marker in the main text.
+;;     When the point is at a footnote marker or in the body of a
+;;     footnote, press `C-c C-f k` to kill the footnote and add the
+;;     text to the kill ring.
 ;;
 ;;   * Other elements:
 ;;
