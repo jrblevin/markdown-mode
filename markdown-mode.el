@@ -19,6 +19,7 @@
 ;; Copyright (C) 2011 Joost Kremers <joostkremers@fastmail.fm>
 ;; Copyright (C) 2011-2012 Donald Ephraim Curtis <dcurtis@milkbox.net>
 ;; Copyright (C) 2012 Akinori Musha <knu@idaemons.org>
+;; Copyright (C) 2012 Zhenlei Jia <zhenlei.jia@gmail.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -417,6 +418,8 @@
 ;;   * Michael Sperber <sperber@deinprogramm.de> for XEmacs fixes.
 ;;   * Francois Gannaz <francois.gannaz@free.fr> for suggestingcharset
 ;;     declaration in XHTML output.
+;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart (dedention)
+;;     un-indentation function.
 
 ;;; Bugs:
 
@@ -1761,6 +1764,24 @@ it in the usual way."
       (markdown-follow-wiki-link-at-point)
     (markdown-do-normal-return)))
 
+(defun markdown-dedent-or-delete ()
+  "Handle BACKSPACE by cycling through indentation points.
+When BACKSPACE is pressed, if there is only whitespace
+before the current point, then dedent the line one level.
+Otherwise, do normal delete."
+  (interactive)
+  (let ((cur-pos (current-column))
+        (start-of-indention (save-excursion
+                              (back-to-indentation)
+                              (current-column))))
+    (if (and (> cur-pos 0) (= cur-pos start-of-indention))
+        (let ((result 0))
+          (dolist (i (markdown-calc-indents))
+            (when (< i cur-pos)
+              (setq result (max result i))))
+          (indent-line-to result))
+      (delete-backward-char 1))))
+
 
 
 ;;; Keymap ====================================================================
@@ -1802,6 +1823,7 @@ it in the usual way."
     (define-key map "\M-p" 'markdown-previous-wiki-link)
     ;; Indentation
     (define-key map "\C-m" 'markdown-enter-key)
+    (define-key map (kbd "<backspace>") 'markdown-dedent-or-delete)
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
