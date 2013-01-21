@@ -163,6 +163,18 @@
 ;;
 ;;   * `markdown-css-path' - CSS file to link to in XHTML output.
 ;;
+;;   * `markdown-content-type' - when set to a nonempty string, an
+;;     `http-equiv` attribute will be included in the XHTML `<head>`
+;;     block.  If needed, the suggested values are
+;;     `application/xhtml+xml` or `text/html`.
+;;
+;;   * `markdown-coding-system' - used for specifying the character
+;;     set identifier in the `http-equiv` attribute (see
+;;     `markdown-content-type').  When set to `nil',
+;;     `buffer-file-coding-system' will be used (and falling back to
+;;     `iso-8859-1' when unavailable).  Common settings are `utf-8'
+;;     and `iso-latin-1'.
+;;
 ;;   * `markdown-xhtml-header-content' - additional content to include
 ;;     in the XHTML `<head>` block.
 ;;
@@ -403,6 +415,8 @@
 ;;   * Ian Yang <me@iany.me> for improving the reference definition regex.
 ;;   * Akinori Musha <knu@idaemons.org> for an imenu index function.
 ;;   * Michael Sperber <sperber@deinprogramm.de> for XEmacs fixes.
+;;   * Francois Gannaz <francois.gannaz@free.fr> for suggestingcharset
+;;     declaration in XHTML output.
 
 ;;; Bugs:
 
@@ -528,6 +542,21 @@ This will not take effect until Emacs is restarted."
   "URL of CSS file to link to in the output XHTML."
   :group 'markdown
   :type 'string)
+
+(defcustom markdown-content-type ""
+  "Content type string for the http-equiv header in XHTML output.
+When set to a non-empty string, insert the http-equiv attribute.
+Otherwise, this attribute is omitted."
+  :group 'markdown
+  :type 'string)
+
+(defcustom markdown-coding-system nil
+  "Character set string for the http-equiv header in XHTML output.
+Defaults to `buffer-file-coding-system' (and falling back to
+`iso-8859-1' when not available).  Common settings are `utf-8'
+and `iso-latin-1'.  Use `list-coding-systems' for more choices."
+  :group 'markdown
+  :type 'coding-system)
 
 (defcustom markdown-xhtml-header-content ""
   "Additional content to include in the XHTML <head> block."
@@ -2217,6 +2246,19 @@ Standalone XHTML output is identified by an occurrence of
           "<head>\n<title>")
   (insert title)
   (insert "</title>\n")
+  (when (> (length markdown-content-type) 0)
+    (insert
+     (format
+      "<meta http-equiv=\"Content-Type\" content=\"%s;charset=%s\"/>\n"
+      markdown-content-type
+      (or (and markdown-coding-system
+               (fboundp 'coding-system-get)
+               (coding-system-get markdown-coding-system
+                                  'mime-charset))
+          (and (fboundp 'coding-system-get)
+               (coding-system-get buffer-file-coding-system
+                                  'mime-charset))
+          "iso-8859-1"))))
   (if (> (length markdown-css-path) 0)
       (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
               markdown-css-path
