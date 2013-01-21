@@ -2366,7 +2366,10 @@ not at a link or the link reference is not defined returns nil."
    ((thing-at-point-looking-at markdown-regex-link-inline)
     (substring-no-properties (match-string 2) 1 -1))
    ((thing-at-point-looking-at markdown-regex-link-reference)
-    (markdown-has-reference-definition (match-string-no-properties 2)))
+    (let* ((label (match-string-no-properties 1))
+           (reference (match-string-no-properties 2))
+           (target (downcase (if (string= reference "[]") label reference))))
+      (markdown-has-reference-definition target)))
    (t (error "Not on a markdown link"))))
 
 (defun markdown-follow-link-at-point ()
