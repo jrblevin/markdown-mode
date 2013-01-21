@@ -368,8 +368,8 @@
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
-;;   * Joost Kremers <j.kremers@em.uni-frankfurt.de> for bug reports
-;;     regarding indentation.
+;;   * Joost Kremers <joostkremers@fastmail.fm> for footnote-handling
+;;     functions and bug reports regarding indentation.
 ;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph
 ;;     enhancements.
 ;;   * George Ogata <george.ogata@gmail.com> for fixing several
@@ -1458,48 +1458,135 @@ footnote text."
     (insert "\n")
     (forward-line -1)))
 
-(defun markdown-footnote-goto-text ()
-  "Jump to the text of the footnote under the cursor."
+(defun markdown-footnote-kill ()
+  "Kill the footnote at point.
+The footnote text is killed (and added to the kill ring), the
+footnote marker is deleted. Point has to be either at the
+footnote marker or in the footnote text."
   (interactive)
-  ;; first make sure we're at a footnote marker
-  (unless (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (point-at-bol))
-	      (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
-    (error "Not at a footnote"))
-  (let* ((fn nil)
-	 (new-pos (save-excursion
-		    ;; move point between [ and ^:
-		    (if (looking-at "\\[")
-			(forward-char 1)
-		      (skip-chars-backward "^["))
-		    (looking-at (concat "\\(\\^" markdown-footnote-chars "*?\\)\\]"))
-		    (setq fn (match-string 1))
-		    (goto-char (point-min))
-		    (re-search-forward (concat "^\\[" fn "\\]:") nil t))))
-    (unless new-pos
-      (error "No definition found for footnote `%s'" fn))
-    (goto-char new-pos)
-    (skip-chars-forward "[:space:]")))
+  (let (return-pos)
+    (when (markdown-footnote-text-positions) ; if we're in a footnote text
+      (markdown-footnote-return) ; we first move to the marker
+      (setq return-pos 'text)) ; and remember our return position
+    (let ((marker (markdown-footnote-delete-marker)))
+      (unless marker
+	(error "Not at a footnote"))
+      (let ((text-pos (markdown-footnote-find-text (car marker))))
+	(unless text-pos
+	  (error "No text for footnote `%s'" (car marker)))
+	(goto-char text-pos)
+	(let ((pos (markdown-footnote-kill-text)))
+	  (setq return-pos
+		(if (and pos (eq return-pos 'text))
+		    pos
+		  (cadr marker))))))
+    (goto-char return-pos)))
+
+(defun markdown-footnote-delete-marker ()
+  "Delete a footnote marker at point.
+Returns a list (ID START) containing the footnote ID and the
+start position of the marker before deletion. If no footnote
+marker was deleted, this function returns NIL."
+  (let ((marker (markdown-footnote-marker-positions)))
+    (when marker
+      (delete-region (second marker) (third marker))
+      (butlast marker))))
+
+(defun markdown-footnote-kill-text ()
+  "Kill footnote text at point.
+Returns the start position of the footnote text before deletion,
+or NIL if point was not inside a footnote text.
+
+The killed text is placed in the kill ring (without the footnote
+number)."
+  (let ((fn (markdown-footnote-text-positions)))
+    (when fn
+      (let ((text (delete-and-extract-region (second fn) (third fn))))
+	(string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
+	(kill-new (match-string 1 text))
+	(second fn)))))
+
+(defun markdown-footnote-goto-text ()
+  "Jump to the text of the footnote at point."
+  (interactive)
+  (let ((fn (car (markdown-footnote-marker-positions))))
+    (unless fn
+      (error "Not at a footnote marker"))
+    (let ((new-pos (markdown-footnote-find-text fn)))
+      (unless new-pos
+	(error "No definition found for footnote `%s'" fn))
+      (goto-char new-pos))))
 
 (defun markdown-footnote-return ()
   "Return from a footnote to its footnote number in the main text."
   (interactive)
   (let ((fn (save-excursion
-	      (backward-paragraph)
-	      ;; if we're in a multiparagraph footnote, we need to back up further
-	      (while (>= (markdown-next-line-indent) 4)
-		(backward-paragraph))
-	      (forward-line)
-	      (if (looking-at (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:"))
-		  (match-string 1)))))
+	      (car (markdown-footnote-text-positions)))))
     (unless fn
       (error "Not in a footnote"))
-    (let ((new-pos (save-excursion
-		     (goto-char (point-min))
-		     (re-search-forward (concat "\\[" fn "\\]\\([^:]\\|\\'\\)") nil t))))
+    (let ((new-pos (markdown-footnote-find-marker fn)))
       (unless new-pos
-	(error "Footnote `%s' not found" fn))
-      (goto-char new-pos)
-      (skip-chars-backward "^]"))))
+	(error "Footnote marker `%s' not found" fn))
+      (goto-char new-pos))))
+
+(defun markdown-footnote-find-marker (id)
+  "Find the location of the footnote marker with ID.
+The actual buffer position returned is the position directly
+following the marker's closing bracket. If no marker is found,
+NIL is returned."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward (concat "\\[" id "\\]\\([^:]\\|\\'\\)") nil t)
+      (skip-chars-backward "^]")
+      (point))))
+
+(defun markdown-footnote-find-text (id)
+  "Find the location of the text of footnote ID.
+The actual buffer position returned is the position of the first
+character of the text, after the footnote's identifier. If no
+footnote text is found, NIL is returned."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward (concat "^\\[" id "\\]:") nil t)
+      (skip-chars-forward "[:space:]")
+      (point))))
+
+(defun markdown-footnote-marker-positions ()
+  "Return the position and ID of the footnote marker point is on.
+The return value is a list (ID START END). If point is not on a
+footnote, NIL is returned."
+  ;; first make sure we're at a footnote marker
+  (if (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (point-at-bol))
+	  (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
+      (save-excursion
+	;; move point between [ and ^:
+	(if (looking-at "\\[")
+	    (forward-char 1)
+	  (skip-chars-backward "^["))
+	(looking-at (concat "\\(\\^" markdown-footnote-chars "*?\\)\\]"))
+	(list (match-string 1) (1- (match-beginning 1)) (1+ (match-end 1))))))
+
+(defun markdown-footnote-text-positions ()
+  "Return the start and end positions of the footnote text point is in.
+The exact return value is a list of three elements: (ID START
+END). The start position is the position of the opening bracket
+of the footnote id. The end position is directly after the
+newline that ends the footnote. If point is not in a footnote,
+NIL is returned instead."
+  (save-excursion
+    (let ((fn (progn
+		(backward-paragraph)
+		;; if we're in a multiparagraph footnote, we need to back up further
+		(while (>= (markdown-next-line-indent) 4)
+		  (backward-paragraph))
+		(forward-line)
+		(if (looking-at (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:"))
+		    (list (match-string 1) (point))))))
+      (when fn
+	(while (progn
+		 (forward-paragraph)
+		 (>= (markdown-next-line-indent) 4)))
+	(append fn (list (point)))))))
 
 ;;; Indentation ====================================================================
 
@@ -1624,6 +1711,7 @@ it in the usual way."
     (define-key map "\C-c\C-fn" 'markdown-footnote-new)
     (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
     (define-key map "\C-c\C-fb" 'markdown-footnote-return)
+    (define-key map "\C-c\C-fk" 'markdown-footnote-kill)
     ;; WikiLink Following
     (define-key map "\C-c\C-w" 'markdown-follow-wiki-link-at-point)
     (define-key map "\M-n" 'markdown-next-wiki-link)
