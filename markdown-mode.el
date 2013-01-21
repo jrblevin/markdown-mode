@@ -399,6 +399,7 @@
 ;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
 ;;   * Max Penet <max.penet@gmail.com> and Peter Eisentraut <peter_e@gmx.net>
 ;;     for an autoload token for `gfm-mode'.
+;;   * Ian Yang <me@iany.me> for improving the reference definition regex.
 
 ;;; Bugs:
 
