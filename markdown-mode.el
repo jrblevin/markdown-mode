@@ -17,6 +17,7 @@
 ;; Copyright (C) 2011 Christopher J. Madsen <cjm@cjmweb.net>
 ;; Copyright (C) 2011 Shigeru Fukaya <shigeru.fukaya@gmail.com>
 ;; Copyright (C) 2011 Joost Kremers <joostkremers@fastmail.fm>
+;; Copyright (C) 2011-2012 Donald Ephraim Curtis <dcurtis@milkbox.net>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -392,7 +393,9 @@
 ;;     data bug and to prefer `visual-line-mode' in `gfm-mode'.
 ;;   * Shigeru Fukaya <shigeru.fukaya@gmail.com> for better adherence to
 ;;     Emacs Lisp coding conventions.
-;;   * Donald Curtis <dcurtis@coe.edu> for fixing the `paragraph-fill' regexp.
+;;   * Donald Ephraim Curtis <dcurtis@milkbox.net> for fixing the `paragraph-fill'
+;;     regexp, refactoring the compilation and preview functions,
+;;     heading font-lock generalizations, and imenu support.
 ;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
 
 ;;; Bugs:
