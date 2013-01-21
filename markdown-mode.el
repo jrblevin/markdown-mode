@@ -1805,6 +1805,8 @@ it in the usual way."
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
+    (define-key map (kbd "<S-tab>")  'markdown-shifttab)
+    (define-key map (kbd "<backtab>") 'markdown-shifttab)
     ;; Header navigation
     (define-key map (kbd "C-M-n") 'outline-next-visible-heading)
     (define-key map (kbd "C-M-p") 'outline-previous-visible-heading)
