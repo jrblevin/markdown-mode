@@ -397,6 +397,8 @@
 ;;     regexp, refactoring the compilation and preview functions,
 ;;     heading font-lock generalizations, and imenu support.
 ;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
+;;   * Max Penet <max.penet@gmail.com> and Peter Eisentraut <peter_e@gmx.net>
+;;     for an autoload token for `gfm-mode'.
 
 ;;; Bugs:
 
