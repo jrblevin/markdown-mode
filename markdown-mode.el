@@ -20,6 +20,7 @@
 ;; Copyright (C) 2011-2012 Donald Ephraim Curtis <dcurtis@milkbox.net>
 ;; Copyright (C) 2012 Akinori Musha <knu@idaemons.org>
 ;; Copyright (C) 2012 Zhenlei Jia <zhenlei.jia@gmail.com>
+;; Copyright (C) 2012 Peter Jones <pjones@pmade.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -274,6 +275,11 @@
 ;;
 ;;     `C-c -` inserts a horizontal rule.
 ;;
+;;   * Links:
+;;
+;;     Press `C-c C-o` when the point is on an inline or reference
+;;     link to open the URL in a browser.
+;;
 ;;   * Wiki-Link Navigation:
 ;;
 ;;     Use `M-p` and `M-n` to quickly jump to the previous and next
@@ -421,6 +427,7 @@
 ;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart (dedention)
 ;;     un-indentation function.
 ;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following.
+;;   * Peter Jones <pjones@pmade.com> for link following functions.
 
 ;;; Bugs:
 
