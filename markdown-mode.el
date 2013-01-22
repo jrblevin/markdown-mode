@@ -420,6 +420,7 @@
 ;;     declaration in XHTML output.
 ;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart (dedention)
 ;;     un-indentation function.
+;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following.
 
 ;;; Bugs:
 
