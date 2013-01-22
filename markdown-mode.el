@@ -428,6 +428,8 @@
 ;;     un-indentation function.
 ;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following.
 ;;   * Peter Jones <pjones@pmade.com> for link following functions.
+;;   * Bryan Fink <bryan.fink@gmail.com> for a bug report regarding
+;;     externally modified files.
 
 ;;; Bugs:
 
@@ -2508,30 +2510,27 @@ Designed to be used with the `after-change-functions' hook.
 CHANGE is the number of bytes of pre-change text replaced by the
 given range."
   (interactive "nfrom: \nnto: \nnchange: ")
-  (let* ((inhibit-quit t)
-	 (modified (buffer-modified-p))
-	 (buffer-undo-list t)
-	 (inhibit-read-only t)
-	 (inhibit-point-motion-hooks t)
-	 (inhibit-modification-hooks t)
-	 (current-point (point))
-	 deactivate-mark)
-    (unwind-protect
-        (save-match-data
-          (save-restriction
-            ;; Extend the region to fontify so that it starts
-            ;; and ends at safe places.
-            (multiple-value-bind (new-from new-to)
-                (markdown-extend-changed-region from to)
-              ;; Unfontify existing fontification (start from scratch)
-              (markdown-unfontify-region-wiki-links new-from new-to)
-              ;; Now do the fontification.
-              (markdown-fontify-region-wiki-links new-from new-to)))
-          (unless modified
-            (if (fboundp 'restore-buffer-modified-p)
-                (restore-buffer-modified-p nil)
-              (set-buffer-modified-p nil))))
-      (goto-char current-point))))
+  (let* ((modified (buffer-modified-p))
+         (buffer-undo-list t)
+         (inhibit-read-only t)
+         (inhibit-point-motion-hooks t)
+         deactivate-mark
+         buffer-file-truename)
+     (unwind-protect
+         (save-excursion
+           (save-match-data
+             (save-restriction
+               ;; Extend the region to fontify so that it starts
+               ;; and ends at safe places.
+               (multiple-value-bind (new-from new-to)
+                   (markdown-extend-changed-region from to)
+                 ;; Unfontify existing fontification (start from scratch)
+                 (markdown-unfontify-region-wiki-links new-from new-to)
+                 ;; Now do the fontification.
+                 (markdown-fontify-region-wiki-links new-from new-to)))))
+       (and (not modified)
+            (buffer-modified-p)
+            (set-buffer-modified-p nil)))))
 
 (defun markdown-fontify-buffer-wiki-links ()
   "Refontify all wiki links in the buffer."
