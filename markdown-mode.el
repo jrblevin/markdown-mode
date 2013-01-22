@@ -1774,12 +1774,13 @@ it in the usual way."
       (markdown-follow-wiki-link-at-point)
     (markdown-do-normal-return)))
 
-(defun markdown-dedent-or-delete ()
+(defun markdown-dedent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
 When BACKSPACE is pressed, if there is only whitespace
 before the current point, then dedent the line one level.
-Otherwise, do normal delete."
-  (interactive)
+Otherwise, do normal delete by repeating
+`backward-delete-char-untabify' ARG times."
+  (interactive "*p")
   (let ((cur-pos (current-column))
         (start-of-indention (save-excursion
                               (back-to-indentation)
@@ -1790,7 +1791,7 @@ Otherwise, do normal delete."
             (when (< i cur-pos)
               (setq result (max result i))))
           (indent-line-to result))
-      (delete-backward-char 1))))
+      (backward-delete-char-untabify arg))))
 
 
 
