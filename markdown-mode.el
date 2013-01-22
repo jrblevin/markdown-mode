@@ -2383,16 +2383,15 @@ and [[test test]] both map to Test-test.ext."
 Convert the name to a file name and call `find-file'.  Ensure that
 the new buffer remains in `markdown-mode'."
   (let ((filename (markdown-convert-wiki-link-to-filename name))
-        (wp (progn
-              (string-match "\\(.*/\\).*$" buffer-file-name)
-              (match-string 1 buffer-file-name))))
+        (wp (file-name-directory buffer-file-name)))
     (when other (other-window 1))
     (find-file (concat wp filename)))
-  (when (eq major-mode 'fundamental-mode) (markdown-mode)))
+  (when (not (eq major-mode 'markdown-mode))
+    (markdown-mode)))
 
 (defun markdown-follow-wiki-link-at-point (&optional arg)
-  "Find Wiki Link at point.  With prefix argument C-u open the file in
-other window.
+  "Find Wiki Link at point.
+With prefix argument C-u open the file in other window.
 
 See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   (interactive "P")
