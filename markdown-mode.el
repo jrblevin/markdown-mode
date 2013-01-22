@@ -430,6 +430,8 @@
 ;;   * Peter Jones <pjones@pmade.com> for link following functions.
 ;;   * Bryan Fink <bryan.fink@gmail.com> for a bug report regarding
 ;;     externally modified files.
+;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> and Carsten Dominik
+;;     for a bug fix related to orgtbl-mode.
 
 ;;; Bugs:
 
@@ -2475,17 +2477,19 @@ See `markdown-wiki-link-p'."
 If a wiki link is found check to see if the backing file exists
 and highlight accordingly."
   (goto-char from)
-  (while (re-search-forward markdown-regex-wiki-link to t)
-    (let ((highlight-beginning (match-beginning 0))
-	  (highlight-end (match-end 0))
-	  (file-name
-	   (markdown-convert-wiki-link-to-filename
-            (markdown-wiki-link-link))))
-      (if (file-exists-p file-name)
+  (save-match-data
+    (while (re-search-forward markdown-regex-wiki-link to t)
+      (let ((highlight-beginning (match-beginning 0))
+	    (highlight-end (match-end 0))
+	    (file-name
+	     (markdown-convert-wiki-link-to-filename (match-string 1))))
+	(if (file-exists-p file-name)
+	    (markdown-highlight-wiki-link
+	     highlight-beginning highlight-end markdown-link-face)
 	  (markdown-highlight-wiki-link
 	   highlight-beginning highlight-end markdown-link-face)
-	(markdown-highlight-wiki-link
-	 highlight-beginning highlight-end markdown-missing-link-face)))))
+          (markdown-highlight-wiki-link
+           highlight-beginning highlight-end markdown-missing-link-face))))))
 
 (defun markdown-extend-changed-region (from to)
   "Extend region given by FROM and TO so that we can fontify all links.
