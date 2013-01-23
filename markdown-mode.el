@@ -101,8 +101,7 @@
 ;;
 ;;     (autoload 'markdown-mode "markdown-mode"
 ;;        "Major mode for editing Markdown files" t)
-;;     (setq auto-mode-alist
-;;        (cons '("\\.text" . markdown-mode) auto-mode-alist))
+;;     (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 ;;
 ;; There is no consensus on an official file extension so change `.text` to
 ;; `.mdwn`, `.md`, `.mdt`, or whatever you call your markdown files.
