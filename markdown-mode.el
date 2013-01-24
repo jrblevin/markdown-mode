@@ -256,6 +256,8 @@
 ;;     end of the buffer.  Similarly, selecting the line number will
 ;;     jump to the corresponding line.
 ;;
+;;     `C-c C-c n` will clean up the numbering of ordered lists.
+
 ;;   * Images: `C-c C-i`
 ;;
 ;;     `C-c C-i i` inserts an image, using the active region (if any)
@@ -439,7 +441,7 @@
 ;;     Emacs Lisp coding conventions.
 ;;   * Donald Ephraim Curtis <dcurtis@milkbox.net> for fixing the `paragraph-fill'
 ;;     regexp, refactoring the compilation and preview functions,
-;;     heading font-lock generalizations, and imenu support.
+;;     heading font-lock generalizations, and list renumbering.
 ;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
 ;;   * Max Penet <max.penet@gmail.com> and Peter Eisentraut <peter_e@gmx.net>
 ;;     for an autoload token for `gfm-mode'.
@@ -1890,6 +1892,8 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-co" 'markdown-open)
     ;; References
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
+    ;; Lists
+    (define-key map "\C-c\C-cn" 'markdown-cleanup-list-numbers)
     map)
   "Keymap for Markdown major mode.")
 
@@ -1936,6 +1940,7 @@ Otherwise, do normal delete by repeating
      ["Return from footnote" markdown-footnote-return])
     "---"
     ["Check references" markdown-check-refs]
+    ["Clean up list numbering" markdown-cleanup-list-numbers]
     "---"
     ["Version" markdown-show-version]
     ))
@@ -2137,11 +2142,11 @@ defined."
 
 ;;; Lists =====================================================================
 
-
 (defun markdown--cleanup-list-numbers-level (&optional pfx)
-  "Update the numbering for pfx (as a string of spaces).
+  "Update the numbering for level PFX (as a string of spaces).
 
-Assume that the previously found match was for a numbered item in a list."
+Assume that the previously found match was for a numbered item in
+a list."
   (let ((cpfx pfx)
         (idx 0)
         (continue t)
@@ -2183,12 +2188,11 @@ Assume that the previously found match was for a numbered item in a list."
 
 ;;;###autoload
 (defun markdown-cleanup-list-numbers ()
-  "Update the numbering of numbered markdown lists"
+  "Update the numbering of ordered lists."
   (interactive)
   (save-excursion
     (goto-char (point-min))
     (markdown--cleanup-list-numbers-level "")))
-
 
 
 ;;; Outline ===================================================================
