@@ -1982,7 +1982,7 @@ Otherwise, do normal delete by repeating
   (let* ((root '(nil . nil))
 	 cur-alist
 	 (cur-level 0)
-	 (pattern "^\\(\\(#+\\)[ \t]*\\(.+\\)\\|\\([^# \t\n=-].*\\)\n===+\\|\\([^# \t\n=-].*\\)\n---+\\)$")
+	 (pattern "^\\(\\(#+\\)\\s *\\(.*?\\)[ \t#]*\\|\\([^# \t\n=-].*\\)\n===+\\|\\([^# \t\n=-].*\\)\n---+\\)$")
 	 (empty-heading "-")
 	 (self-heading ".")
 	 hashes pos level heading)
