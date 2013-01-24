@@ -214,14 +214,23 @@
 ;;
 ;;   * Commands: `C-c C-c`
 ;;
-;;     `C-c C-c m` will run Markdown on the current buffer and preview
-;;     the output in another buffer while `C-c C-c p` runs Markdown on
-;;     the current buffer and previews the output in a browser.
-;;     `C-c C-c e` will run Markdown on the current buffer and save
-;;     the result in the file `basename.html`, where `basename` is the
-;;     name of the Markdown file with the extension removed.  **This
-;;     file will be overwritten without notice.**  Press `C-c C-c v`
-;;     to view the exported file in a browser.
+;;     *Compile:* `C-c C-c m` will run Markdown on the current buffer
+;;     and show the output in another buffer.  *Preview*: `C-c C-c p`
+;;     runs Markdown on the current buffer and previews, stores the
+;;     output in a temporary file, and displays the file in a browser.
+;;     *Export:* `C-c C-c e` will run Markdown on the current buffer
+;;     and save the result in the file `basename.html`, where
+;;     `basename` is the name of the Markdown file with the extension
+;;     removed.  *Export and View:* press `C-c C-c v` to export the
+;;     file and view it in a browser.  **For both export commands, the
+;;     output file will be overwritten without notice.**
+;;
+;;     To summarize:
+;;
+;;       - `C-c C-c m`: markdown -> `*markdown-output*` buffer.
+;;       - `C-c C-c p`: markdown -> temporary file -> browser.
+;;       - `C-c C-c e`: markdown -> `basename.html`.
+;;       - `C-c C-c v`: markdown -> `basename.html` -> browser.
 ;;
 ;;     `C-c C-c c` will check for undefined references.  If there are
 ;;     any, a small buffer will open with a list of undefined
