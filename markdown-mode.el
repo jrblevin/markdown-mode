@@ -441,7 +441,8 @@
 ;;     Emacs Lisp coding conventions.
 ;;   * Donald Ephraim Curtis <dcurtis@milkbox.net> for fixing the `paragraph-fill'
 ;;     regexp, refactoring the compilation and preview functions,
-;;     heading font-lock generalizations, and list renumbering.
+;;     heading font-lock generalizations, list renumbering,
+;;     and kill ring save.
 ;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
 ;;   * Max Penet <max.penet@gmail.com> and Peter Eisentraut <peter_e@gmx.net>
 ;;     for an autoload token for `gfm-mode'.
@@ -1890,6 +1891,7 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-ce" 'markdown-export)
     (define-key map "\C-c\C-cv" 'markdown-export-and-preview)
     (define-key map "\C-c\C-co" 'markdown-open)
+    (define-key map "\C-c\C-cw" 'markdown-kill-ring-save)
     ;; References
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
     ;; Lists
@@ -1911,6 +1913,7 @@ Otherwise, do normal delete by repeating
     ["Export" markdown-export]
     ["Export & View" markdown-export-and-preview]
     ["Open" markdown-open]
+    ["Kill ring save" markdown-kill-ring-save]
     "---"
     ("Headers (setext)"
      ["Insert Title" markdown-insert-title]
@@ -2455,8 +2458,8 @@ with the extension removed and replaced with .html."
       (call-process markdown-open-command
                     nil nil nil buffer-file-name))))
 
-(defun markdown-copy-html ()
-  "process file with multimarkdown and save it accordingly"
+(defun markdown-kill-ring-save ()
+  "Run Markdown on file and store output in the kill ring."
   (interactive)
   (save-window-excursion
     (markdown)
