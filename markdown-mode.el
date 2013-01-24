@@ -320,6 +320,15 @@
 ;;     at the point.  Finally, `C-M-u` will move up to a lower-level
 ;;     (more inclusive) visible heading.
 ;;
+;;   * Defun Navigation:
+;;
+;;     The usual Emacs commands can be used to move by defuns
+;;     (top-level major definitions).  In markdown-mode, a defun
+;;     is a section.  As usual, `C-M-a` will move the point to
+;;     the beginning of the current or preceding defun, `C-M-e`
+;;     will move to the end of the current or following defun,
+;;     and `C-M-h` will put the region around the entire defun.
+;;
 ;; Many of the commands described above behave differently depending on
 ;; whether Transient Mark mode is enabled or not.  When it makes sense,
 ;; if Transient Mark mode is on and a region is active, the command
@@ -1492,14 +1501,15 @@ the blockquote text."
 
 (defun markdown-beginning-of-defun ()
   "`beginning-of-defun-function' for Markdown.
-Move to the beginning of the next section."
+Move backward to the beginning of the current or previous
+section."
   (if (re-search-backward "\\(^#+ \\|^.+[^[:space:]].*\n\\(-+\\|=+\\)$\\)" nil t)
       (match-beginning 0)
     (point-min)))
 
 (defun markdown-end-of-defun ()
   "`end-of-defun-function' for Markdown.
-Move to the end of the current section."
+Move forward to the end of the current or following section."
   (end-of-line)
   (if (re-search-forward
        "\\(^#+ \\|^.+[^[:space:]].*\n\\(-+\\|=+\\)$\\)" nil t)
