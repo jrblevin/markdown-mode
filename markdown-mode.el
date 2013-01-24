@@ -131,6 +131,14 @@
 ;;      option.  As a result, you will only be able to run Markdown
 ;;      from buffers which are visiting a file.
 ;;
+;;   * `markdown-open-command' - the command used for calling a standalone
+;;     Markdown previewer which is capable of opening Markdown source files
+;;     directly (default: `nil').  This command will be called
+;;     with a single argument, the filename of the current buffer.
+;;     A representative program is the Mac app [Marked][], a
+;;     live-updating MultiMarkdown previewer which has a command line
+;;     utility at `/usr/local/bin/mark`.
+;;
 ;;   * `markdown-hr-string' - string to use when inserting horizontal
 ;;     rules (default: `* * * * *').
 ;;
@@ -195,6 +203,8 @@
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
 ;; customization screen.
+;;
+;; [Marked]: https://itunes.apple.com/us/app/marked/id448925439?ls=1&mt=12&partnerId=30&siteID=GpHp3Acs1Yo
 
 ;;; Usage:
 
@@ -224,13 +234,16 @@
 ;;     removed.  *Export and View:* press `C-c C-c v` to export the
 ;;     file and view it in a browser.  **For both export commands, the
 ;;     output file will be overwritten without notice.**
+;;     *Open:* `C-c C-c o` will open the Markdown source file directly
+;;     using `markdown-open-command'.
 ;;
 ;;     To summarize:
 ;;
-;;       - `C-c C-c m`: markdown -> `*markdown-output*` buffer.
-;;       - `C-c C-c p`: markdown -> temporary file -> browser.
-;;       - `C-c C-c e`: markdown -> `basename.html`.
-;;       - `C-c C-c v`: markdown -> `basename.html` -> browser.
+;;       - `C-c C-c m`: `markdown-command' > `*markdown-output*` buffer.
+;;       - `C-c C-c p`: `markdown-command' > temporary file > browser.
+;;       - `C-c C-c e`: `markdown-command' > `basename.html`.
+;;       - `C-c C-c v`: `markdown-command' > `basename.html` > browser.
+;;       - `C-c C-c o`: `markdown-open-command'.
 ;;
 ;;     `C-c C-c c` will check for undefined references.  If there are
 ;;     any, a small buffer will open with a list of undefined
@@ -510,6 +523,14 @@ option.  As a result, you will only be able to run Markdown from
 buffers which are visiting a file."
   :group 'markdown
   :type 'boolean)
+
+(defcustom markdown-open-command nil
+  "Command used for opening Markdown files directly.
+For example, a standalone Markdown previewer.  This command will
+be called with a single argument: the filename of the current
+buffer."
+  :group 'markdown
+  :type 'string)
 
 (defcustom markdown-hr-string "* * * * *"
   "String to use for horizonal rules."
@@ -1863,6 +1884,7 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-cp" 'markdown-preview)
     (define-key map "\C-c\C-ce" 'markdown-export)
     (define-key map "\C-c\C-cv" 'markdown-export-and-preview)
+    (define-key map "\C-c\C-co" 'markdown-open)
     ;; References
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
     map)
@@ -1881,6 +1903,7 @@ Otherwise, do normal delete by repeating
     ["Preview" markdown-preview]
     ["Export" markdown-export]
     ["Export & View" markdown-export-and-preview]
+    ["Open" markdown-open]
     "---"
     ("Headers (setext)"
      ["Insert Title" markdown-insert-title]
@@ -2358,6 +2381,15 @@ with the extension removed and replaced with .html."
   (interactive)
   (browse-url (markdown-export)))
 
+(defun markdown-open ()
+  "Open file for the current buffer with `markdown-open-command'."
+  (interactive)
+  (if (not markdown-open-command)
+      (error "Variable `markdown-open-command' must be set")
+    (if (not buffer-file-name)
+        (error "Must be visiting a file")
+      (call-process markdown-open-command
+                    nil nil nil buffer-file-name))))
 
 ;;; Links =====================================================================
 
