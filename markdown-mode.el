@@ -842,7 +842,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for a footnote marker [^fn].")
 
 (defconst markdown-regex-header
-  "#+\\|\\S-.*\n\\(?:\\(===+\\)\\|\\(---+\\)\\)$"
+  "^\\(?:\\(.+\\)\n\\(===+\\)\\|\\(.+\\)\n\\(---+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
   "Regexp identifying Markdown headers.")
 
 (defconst markdown-regex-header-1-atx
@@ -1956,24 +1956,23 @@ Otherwise, do normal delete by repeating
   (let* ((root '(nil . nil))
 	 cur-alist
 	 (cur-level 0)
-	 (pattern "^\\(\\(#+\\)\\s *\\(.*?\\)[ \t#]*\\|\\([^# \t\n=-].*\\)\n===+\\|\\([^# \t\n=-].*\\)\n---+\\)$")
 	 (empty-heading "-")
 	 (self-heading ".")
 	 hashes pos level heading)
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward pattern (point-max) t)
+      (while (re-search-forward markdown-regex-header (point-max) t)
 	(cond
-	 ((setq hashes (match-string-no-properties 2))
-	  (setq heading (match-string-no-properties 3)
-		pos (match-beginning 1)
-		level (length hashes)))
-	 ((setq heading (match-string-no-properties 4))
-	  (setq pos (match-beginning 4)
+	 ((setq heading (match-string-no-properties 1))
+	  (setq pos (match-beginning 1)
 		level 1))
-	 ((setq heading (match-string-no-properties 5))
-	  (setq pos (match-beginning 5)
-		level 2)))
+	 ((setq heading (match-string-no-properties 3))
+	  (setq pos (match-beginning 3)
+		level 2))
+	 ((setq hashes (match-string-no-properties 5))
+	  (setq heading (match-string-no-properties 6)
+		pos (match-beginning 5)
+		level (length hashes))))
 	(let ((alist (list (cons heading pos))))
 	  (cond
 	   ((= cur-level level)		; new sibling
