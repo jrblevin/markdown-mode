@@ -925,9 +925,9 @@ text.")
 
 (defconst markdown-regex-angle-uri
   (concat
-   "\\(<\\)\\("
+   "\\(<\\)\\(\\(?:"
    (mapconcat 'identity markdown-uri-types "\\|")
-   "\\):[^]\t\n\r<>,;()]+\\(>\\)")
+   "\\):[^]\t\n\r<>,;()]+\\)\\(>\\)")
   "Regular expression for matching inline URIs in angle brackets.")
 
 (defconst markdown-regex-email
@@ -2476,7 +2476,9 @@ See `markdown-wiki-link-p' for more information."
   (let ((case-fold-search nil))
     (and (not (markdown-wiki-link-p))
          (or (thing-at-point-looking-at markdown-regex-link-inline)
-             (thing-at-point-looking-at markdown-regex-link-reference)))))
+             (thing-at-point-looking-at markdown-regex-link-reference)
+             (thing-at-point-looking-at markdown-regex-uri)
+             (thing-at-point-looking-at markdown-regex-angle-uri)))))
 
 (defun markdown-link-link ()
   "Return the link part of the regular (non-wiki) link at point.
@@ -2490,12 +2492,17 @@ not at a link or the link reference is not defined returns nil."
            (reference (match-string-no-properties 2))
            (target (downcase (if (string= reference "[]") label reference))))
       (markdown-has-reference-definition target)))
-   (t (error "Not on a markdown link"))))
+   ((thing-at-point-looking-at markdown-regex-uri)
+    (match-string-no-properties 0))
+   ((thing-at-point-looking-at markdown-regex-angle-uri)
+    (match-string-no-properties 2))
+   (t nil)))
 
 (defun markdown-follow-link-at-point ()
   "Open the current non-wiki link in a browser."
   (interactive)
-  (if (markdown-link-p) (browse-url (markdown-link-link))))
+  (if (markdown-link-p) (browse-url (markdown-link-link))
+    (error "Point is not at a Markdown link or URI")))
 
 
 ;;; WikiLink Following/Markup =================================================
