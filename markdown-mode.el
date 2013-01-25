@@ -1580,7 +1580,9 @@ footnote text."
 	       (unless (re-search-forward markdown-regex-header nil t)
 		 (throw 'eof nil))
 	       (backward-paragraph)
-	       (not (looking-at (concat "\n" markdown-regex-header))))))))
+               (forward-line)
+	       (not (looking-at markdown-regex-header)))))))
+  (forward-line -1)
   ;; make sure we're on an empty line:
   (unless (markdown-cur-line-blank-p)
     (insert "\n"))
