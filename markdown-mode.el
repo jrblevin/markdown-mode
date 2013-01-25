@@ -1,6 +1,6 @@
 ;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files
 
-;; Copyright (C) 2007-2011 Jason R. Blevins <jrblevin@sdf.org>
+;; Copyright (C) 2007-2013 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
 ;; Copyright (C) 2007 Conal Elliott <conal@conal.net>
 ;; Copyright (C) 2008 Greg Bognar <greg_bognar@hms.harvard.edu>
@@ -25,7 +25,7 @@
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
-;; Version: 1.8.1
+;; Version: 1.9
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -54,7 +54,7 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest stable version is markdown-mode 1.8.1, released on August 15, 2011:
+;; The latest stable version is markdown-mode 1.9, released on January 25, 2013:
 ;;
 ;;    * [markdown-mode.el][]
 ;;    * [Screenshot][]
@@ -62,7 +62,7 @@
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20110812-001.png
-;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-8-1
+;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-9
 ;;
 ;; markdown-mode is also available in several package managers, including:
 ;;
@@ -449,7 +449,7 @@
 ;;   * Ian Yang <me@iany.me> for improving the reference definition regex.
 ;;   * Akinori Musha <knu@idaemons.org> for an imenu index function.
 ;;   * Michael Sperber <sperber@deinprogramm.de> for XEmacs fixes.
-;;   * Francois Gannaz <francois.gannaz@free.fr> for suggestingcharset
+;;   * Francois Gannaz <francois.gannaz@free.fr> for suggesting charset
 ;;     declaration in XHTML output.
 ;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart (dedention)
 ;;     un-indentation function.
@@ -483,6 +483,7 @@
 ;;   * 2009-10-01: [Version 1.7][]
 ;;   * 2011-08-12: [Version 1.8][]
 ;;   * 2011-08-15: [Version 1.8.1][]
+;;   * 2013-01-25: [Version 1.9][]
 ;;
 ;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
 ;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
@@ -490,6 +491,7 @@
 ;; [Version 1.7]: http://jblevins.org/projects/markdown-mode/rev-1-7
 ;; [Version 1.8]: http://jblevins.org/projects/markdown-mode/rev-1-8
 ;; [Version 1.8.1]: http://jblevins.org/projects/markdown-mode/rev-1-8-1
+;; [Version 1.9]: http://jblevins.org/projects/markdown-mode/rev-1-9
 
 
 ;;; Code:
@@ -500,7 +502,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "1.8.1"
+(defconst markdown-mode-version "1.9"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
