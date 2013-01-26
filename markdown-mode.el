@@ -246,6 +246,7 @@
 ;;       - `C-c C-c p`: `markdown-command' > temporary file > browser.
 ;;       - `C-c C-c e`: `markdown-command' > `basename.html`.
 ;;       - `C-c C-c v`: `markdown-command' > `basename.html` > browser.
+;;       - `C-c C-c w`: `markdown-command' > kill ring.
 ;;       - `C-c C-c o`: `markdown-open-command'.
 ;;
 ;;     `C-c C-c c` will check for undefined references.  If there are
