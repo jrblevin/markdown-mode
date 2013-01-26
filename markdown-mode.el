@@ -71,6 +71,7 @@
 ;;    * OpenBSD: [textproc/markdown-mode][]
 ;;    * Arch Linux (AUR): [emacs-markdown-mode-git][]
 ;;    * MacPorts: [markdown-mode.el][macports-package] ([pending][macports-ticket])
+;;    * FreeBSD: [textproc/markdown-mode.el][freebsd-port]
 ;;
 ;;  [emacs-goodies-el]: http://packages.debian.org/emacs-goodies-el
 ;;  [emacs-goodies]: https://admin.fedoraproject.org/pkgdb/acls/name/emacs-goodies
@@ -78,6 +79,7 @@
 ;;  [emacs-markdown-mode-git]: http://aur.archlinux.org/packages.php?ID=30389
 ;;  [macports-package]: https://trac.macports.org/browser/trunk/dports/editors/markdown-mode.el/Portfile
 ;;  [macports-ticket]: http://trac.macports.org/ticket/35716
+;;  [freebsd-port]: http://svnweb.freebsd.org/ports/head/textproc/markdown-mode.el
 ;;
 ;; The latest development version can be downloaded directly
 ;; ([markdown-mode.el][devel.el]) or it can be obtained from the
