@@ -2718,9 +2718,6 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
-  (set (make-local-variable 'beginning-of-defun-function)
-       'markdown-beginning-of-defun)
-  (set (make-local-variable 'end-of-defun-function) 'markdown-end-of-defun)
   ;; Make filling work with lists (unordered, ordered, and definition)
   (set (make-local-variable 'paragraph-start)
        "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t]*[0-9]+\\.\\|^[ \t]*: ")
