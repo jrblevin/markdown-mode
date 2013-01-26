@@ -57,12 +57,15 @@
 ;; The latest stable version is markdown-mode 1.9, released on January 25, 2013:
 ;;
 ;;    * [markdown-mode.el][]
-;;    * [Screenshot][]
+;;    * [Screenshot][][^theme]
 ;;    * [Release notes][]
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
 ;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20110812-001.png
 ;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-9
+;;
+;; [^theme]: The theme used in the screenshot is
+;;   [color-theme-twilight](https://github.com/crafterm/twilight-emacs).
 ;;
 ;; markdown-mode is also available in several package managers, including:
 ;;
