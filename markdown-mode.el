@@ -1142,6 +1142,153 @@ If we are at the last line, then consider the next line to be blank."
       (forward-line -1)
       (end-of-line))))
 
+(defun markdown-prev-list-item (level)
+  "Search backward from point for a list item with indentation LEVEL.
+Set point to the beginning of the item, and return point, or nil
+upon failure."
+  (let (bounds indent prev)
+    (setq prev (point))
+    (forward-line -1)
+    (setq indent (markdown-cur-line-indent))
+    (while
+        (cond
+         ;; Stop at beginning of buffer
+         ((bobp) (setq prev nil))
+         ;; Continue if current line is blank
+         ((markdown-cur-line-blank-p) t)
+         ;; List item
+         ((and (looking-at markdown-regex-list)
+               (setq bounds (markdown-cur-list-item-bounds)))
+          (cond
+           ;; Continue at item with greater indentation
+           ((> (nth 3 bounds) level) t)
+           ;; Stop and return point at item of equal indentation
+           ((= (nth 3 bounds) level)
+            (setq prev (point))
+            nil)
+           ;; Stop and return nil at item with lesser indentation
+           ((< (nth 3 bounds) level)
+            (setq prev nil)
+            nil)))
+         ;; Continue while indentation is the same or greater
+         ((>= indent level) t)
+         ;; Stop if current indentation is less than list item
+         ;; and the next is blank
+         ((and (< indent level)
+               (markdown-next-line-blank-p))
+          (setq prev nil))
+         ;; Stop at a header
+         ((looking-at markdown-regex-header) (setq prev nil))
+         ;; Stop at a horizontal rule
+         ((looking-at markdown-regex-hr) (setq prev nil))
+         ;; Otherwise, continue.
+         (t t))
+      (forward-line -1)
+      (setq indent (markdown-cur-line-indent)))
+    prev))
+
+(defun markdown-next-list-item (level)
+  "Search forward from point for the next list item with indentation LEVEL.
+Set point to the beginning of the item, and return point, or nil
+upon failure."
+  (let (bounds indent next)
+    (setq next (point))
+    (forward-line)
+    (setq indent (markdown-cur-line-indent))
+    (while
+        (cond
+         ;; Stop at end of the buffer.
+         ((eobp) (setq prev nil))
+         ;; Continue if the current line is blank
+         ((markdown-cur-line-blank-p) t)
+         ;; List item
+         ((and (looking-at markdown-regex-list)
+               (setq bounds (markdown-cur-list-item-bounds)))
+          (cond
+           ;; Continue at item with greater indentation
+           ((> (nth 3 bounds) level) t)
+           ;; Stop and return point at item of equal indentation
+           ((= (nth 3 bounds) level)
+            (setq next (point))
+            nil)
+           ;; Stop and return nil at item with lesser indentation
+           ((< (nth 3 bounds) level)
+            (setq next nil)
+            nil)))
+         ;; Continue while indentation is the same or greater
+         ((>= indent level) t)
+         ;; Stop if current indentation is less than list item
+         ;; and the previous line was blank.
+         ((and (< indent level)
+               (markdown-prev-line-blank-p))
+          (setq next nil))
+         ;; Stop at a header
+         ((looking-at markdown-regex-header) (setq next nil))
+         ;; Stop at a horizontal rule
+         ((looking-at markdown-regex-hr) (setq next nil))
+         ;; Otherwise, continue.
+         (t t))
+      (forward-line)
+      (setq indent (markdown-cur-line-indent)))
+    next))
+
+(defun markdown-cur-list-item-end (level)
+  "Move to the end of the current list item with nonlist indentation LEVEL.
+If the point is not in a list item, do nothing."
+  (let (indent)
+    (forward-line)
+    (setq indent (markdown-cur-line-indent))
+    (while
+        (cond
+         ;; Stop at end of the buffer.
+         ((eobp) nil)
+         ;; Continue if the current line is blank
+         ((markdown-cur-line-blank-p) t)
+         ;; Continue while indentation is the same or greater
+         ((>= indent level) t)
+         ;; Stop if current indentation is less than list item
+         ;; and the previous line was blank.
+         ((and (< indent level)
+               (markdown-prev-line-blank-p))
+          nil)
+         ;; Stop at a new list item of the same or lesser indentation
+         ((looking-at markdown-regex-list) nil)
+         ;; Stop at a header
+         ((looking-at markdown-regex-header) nil)
+         ;; Stop at a horizontal rule
+         ((looking-at markdown-regex-hr) nil)
+         ;; Otherwise, continue.
+         (t t))
+      (forward-line)
+      (setq indent (markdown-cur-line-indent)))
+    (skip-syntax-backward "-")))
+
+(defun markdown-cur-list-item-bounds ()
+  "Return bounds and indentation of the current list item.
+Return a list of the form (begin end indent nonlist-indent).
+If the point is not inside a list item, return nil.
+Leave match data intact for `markdown-regex-list'."
+  (let (cur prev-begin prev-end indent nonlist-indent)
+    ;; Store current location
+    (setq cur (point))
+    ;; Verify that cur is between beginning and end of item
+    (save-excursion
+      (if (looking-at markdown-regex-list)
+          (beginning-of-line)
+        (end-of-line)
+        (re-search-backward markdown-regex-list nil t))
+      (save-match-data
+        (setq prev-begin (point))
+        (setq indent (markdown-cur-line-indent))
+        (setq nonlist-indent (markdown-cur-non-list-indent))
+        (markdown-cur-list-item-end nonlist-indent)
+        (setq prev-end (point)))
+      (if (and (>= cur prev-begin)
+               (<= cur prev-end)
+               nonlist-indent)
+          (list prev-begin prev-end indent nonlist-indent)
+        nil))))
+
 ;; From html-helper-mode
 (defun markdown-match-comments (last)
   "Match HTML comments from the point to LAST."
@@ -1902,6 +2049,8 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
     ;; Lists
     (define-key map "\C-c\C-cn" 'markdown-cleanup-list-numbers)
+    (define-key map (kbd "M-<up>") 'markdown-metaup)
+    (define-key map (kbd "M-<down>") 'markdown-metadown)
     map)
   "Keymap for Markdown major mode.")
 
@@ -2150,6 +2299,43 @@ defined."
 
 ;;; Lists =====================================================================
 
+(defun markdown-move-list-item-up ()
+  "Move the current list item up in the list when possible."
+  (interactive)
+  (let (cur prev old)
+    (when (setq cur (markdown-cur-list-item-bounds))
+      (setq old (point))
+      (goto-char (nth 0 cur))
+      (if (markdown-prev-list-item (nth 3 cur))
+          (progn
+            (setq prev (markdown-cur-list-item-bounds))
+            (condition-case nil
+                (progn
+                  (transpose-regions (nth 0 prev) (nth 1 prev)
+                                     (nth 0 cur) (nth 1 cur) t)
+                  (goto-char (+ (nth 0 prev) (- old (nth 0 cur)))))
+              ;; Catch error in case regions overlap.
+              (error (goto-char old))))
+        (goto-char old)))))
+
+(defun markdown-move-list-item-down ()
+  "Move the current list item down in the list when possible."
+  (interactive)
+  (let (cur next old)
+    (when (setq cur (markdown-cur-list-item-bounds))
+      (setq old (point))
+      (if (markdown-next-list-item (nth 3 cur))
+          (progn
+            (setq next (markdown-cur-list-item-bounds))
+            (condition-case nil
+                (progn
+                  (transpose-regions (nth 0 cur) (nth 1 cur)
+                                     (nth 0 next) (nth 1 next) nil)
+                  (goto-char (+ old (- (nth 1 next) (nth 1 cur)))))
+              ;; Catch error in case regions overlap.
+              (error (goto-char old))))
+        (goto-char old)))))
+
 (defun markdown--cleanup-list-numbers-level (&optional pfx)
   "Update the numbering for level PFX (as a string of spaces).
 
@@ -2319,6 +2505,20 @@ Calls `markdown-cycle' with argument t."
    ((match-end 1) 1)
    ((match-end 2) 2)
    ((- (match-end 0) (match-beginning 0)))))
+
+;;; Structure Editing =========================================================
+
+(defun markdown-metaup ()
+  "Move list item up.
+Calls `markdown-move-list-item-up'."
+  (interactive)
+  (markdown-move-list-item-up))
+
+(defun markdown-metadown ()
+  "Move list item down.
+Calls `markdown-move-list-item-down'."
+  (interactive)
+  (markdown-move-list-item-down))
 
 ;;; Commands ==================================================================
 
