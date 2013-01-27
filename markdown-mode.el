@@ -898,8 +898,8 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  "^[ \t]*\\([0-9]+\\.\\|[\\*\\+-]\\) "
-  "Regular expression for matching list markers.")
+  "^\\(\\s *\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\(\\s +\\)"
+  "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
   "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)"
@@ -950,10 +950,6 @@ text.")
   "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
-(defconst markdown-regex-list-indent
-  "^\\(\\s *\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\(\\s +\\)"
-  "Regular expression for matching indentation of list items.")
-
 (defvar markdown-mode-font-lock-keywords-basic
   (list
    '(markdown-match-pre-blocks 0 markdown-pre-face t t)
@@ -987,7 +983,7 @@ text.")
    (cons markdown-regex-angle-uri 'markdown-link-face)
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
-   (cons markdown-regex-list 'markdown-list-face)
+   (cons markdown-regex-list '(2 markdown-list-face))
    (cons markdown-regex-link-inline
          '((1 markdown-link-face t)
            (2 markdown-url-face t)))
@@ -1114,7 +1110,7 @@ If we are at the last line, then consider the next line to be blank."
   "Return the number of leading whitespace characters in the current line."
   (save-excursion
     (beginning-of-line)
-    (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
+    (when (re-search-forward markdown-regex-list (point-at-eol) t)
       (current-column))))
 
 (defun markdown-prev-non-list-indent ()
@@ -1794,7 +1790,7 @@ default indentation level."
               (while (not (equal (point) (point-min)))
                 (forward-line -1)
                 (goto-char (point-at-bol))
-                (when (re-search-forward markdown-regex-list-indent (point-at-eol) t)
+                (when (re-search-forward markdown-regex-list (point-at-eol) t)
                   (throw 'break (length (match-string 1)))))
               nil)))
     (if (and pos (not (eq pos prev-line-pos)))
