@@ -2420,6 +2420,52 @@ With two C-u prefixes, increase the indentation by one level."
               (setq del (+ del num))
               (forward-line))))))))
 
+(defun markdown-cycle-list ()
+  "Cycle through the different ordered and unordered list markers.
+This cycles through the set of possible markers in the following order:
+
+   `-'  ->  `+'  ->  `*'  ->  `1.'"
+  (interactive)
+  (let* ((bounds (markdown-cur-list-item-bounds))
+         (level (nth bounds 4))
+         (marker (concat (match-string 2) (match-string 3)))
+         (current (cond
+                   ((string-match "[\\*\\+-]" marker) (match-string 0))
+                   ((string-match "\\." bullet) "1.")
+                   (t nil)))
+         (new (cond
+               ((eq current "-") "+")
+               ((eq current "+") "*")
+               ((eq current "*") "1.")
+               ((eq current "1.") "-")))
+         (beg nil)
+         (end nil))
+    (unless (bounds) (error "Not at a list item"))
+    (save-excursion
+      (while (markdown-prev-list-item level))
+      (setq beg (nth 0 
+       ;; Unordered list
+       ((string-match "[\\*\\+-]" new)
+        (while (re-search-forward markdown-regex-list (nth 1 bounds) t)
+          (replace-match "\\1\\2" nil nil)
+          ;; Replace with new marker, but adjust spacing to account
+          ;; for possibly long ordered list labels.
+
+          ;; ((re-search-forward "\\(^[ \t]*\\)\\*" (point-at-eol) t)
+          ;;  (replace-match "\\1-" nil nil))
+
+          ;; ((re-search-forward "\\(^[ \t]*\\)\\-" (point-at-eol) t)
+          ;;  (replace-match "\\1+" nil nil))
+
+          ;; ((re-search-forward "\\(^[ \t]*\\)\\+" (point-at-eol) t)
+          ;;  (replace-match "\\1*" nil nil))
+
+        ))
+       ;; Ordered list
+       ((string-match "\\." new)
+        )
+)))))
+
 (defun markdown--cleanup-list-numbers-level (&optional pfx)
   "Update the numbering for level PFX (as a string of spaces).
 
