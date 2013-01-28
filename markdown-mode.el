@@ -2053,6 +2053,7 @@ Otherwise, do normal delete by repeating
     (define-key map (kbd "M-<down>") 'markdown-metadown)
     (define-key map (kbd "M-<left>") 'markdown-metaleft)
     (define-key map (kbd "M-<right>") 'markdown-metaright)
+    (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
     map)
   "Keymap for Markdown major mode.")
 
@@ -2300,6 +2301,50 @@ defined."
 
 
 ;;; Lists =====================================================================
+
+(defun markdown-insert-list-item (&optional arg)
+  "Insert a new list item.
+If the point is inside unordered list, insert a bullet mark.  If
+the point is inside ordered list, insert the next number followed
+by a period.  Use the previous list item to determine the amount
+of whitespace to place before and after list markers.
+
+With a C-u prefix, decrease the indentation by one level.
+With two C-u prefixes, increase the indentation by one level."
+  (interactive "p")
+  (let (bounds item-indent marker indent new-indent end)
+    (save-match-data
+      (setq bounds (markdown-cur-list-item-bounds))
+      (if (not bounds)
+          ;; When not in a list, start a new unordered one
+          (insert "* ")
+        ;; Compute indentation for a new list item
+        (setq item-indent (nth 2 bounds))
+        (setq marker (concat (match-string 2) (match-string 3)))
+        (setq indent (cond
+                      ((= arg 4) (max (- item-indent 4) 0))
+                      ((= arg 16) (+ item-indent 4))
+                      (t item-indent)))
+        (setq new-indent (make-string indent 32))
+        (goto-char (nth 1 bounds))
+        (newline)
+        (cond
+         ;; Ordered list
+         ((string-match "[0-9]" marker)
+          (if (= arg 16) ;; starting a new column indented one more level
+              (insert (concat new-indent "1. "))
+            ;; travel up to the last item and pick the correct number.  If
+            ;; the argument was nil, "new-indent = item-indent" is the same,
+            ;; so we don't need special treatment. Neat.
+            (save-excursion
+              (while (not (looking-at (concat new-indent "\\([0-9]+\\)\\.")))
+                (forward-line -1)))
+            (insert (concat new-indent
+                            (int-to-string (1+ (string-to-int (match-string 1))))
+                            ". "))))
+         ;; Unordered list
+         ((string-match "[\\*\\+-]" marker)
+          (insert (concat new-indent marker))))))))
 
 (defun markdown-move-list-item-up ()
   "Move the current list item up in the list when possible."
