@@ -2460,7 +2460,6 @@ a list."
         (setq continue (= (forward-line) 0))))
     sep))
 
-;;;###autoload
 (defun markdown-cleanup-list-numbers ()
   "Update the numbering of ordered lists."
   (interactive)
