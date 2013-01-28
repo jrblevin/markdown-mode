@@ -2051,6 +2051,8 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-cn" 'markdown-cleanup-list-numbers)
     (define-key map (kbd "M-<up>") 'markdown-metaup)
     (define-key map (kbd "M-<down>") 'markdown-metadown)
+    (define-key map (kbd "M-<left>") 'markdown-metaleft)
+    (define-key map (kbd "M-<right>") 'markdown-metaright)
     map)
   "Keymap for Markdown major mode.")
 
@@ -2336,6 +2338,39 @@ defined."
               (error (goto-char old))))
         (goto-char old)))))
 
+(defun markdown-promote-list-item ()
+  "Indent the current list item."
+  (interactive)
+  (let ((bounds (markdown-cur-list-item-bounds))
+        (ins 0))
+    (when bounds
+      (save-excursion
+        (save-match-data
+          (goto-char (nth 0 bounds))
+          (while (< (point) (+ (nth 1 bounds) ins))
+            (unless (markdown-cur-line-blank-p)
+              (insert "    ")
+              (setq ins (+ ins 4)))
+            (forward-line)))))))
+
+(defun markdown-demote-list-item ()
+  "Unindent the current list item."
+  (interactive)
+  (let (bounds num del regexp)
+    (when (setq bounds (markdown-cur-list-item-bounds))
+      (save-excursion
+        (save-match-data
+          (goto-char (nth 0 bounds))
+          (setq del 0)
+          (when (looking-at "^[ ]\\{1,4\\}")
+            (setq num (- (match-end 0) (match-beginning 0)))
+            (setq regexp (format "^[ ]\\{1,%d\\}" num))
+            (while (re-search-forward regexp (- (nth 1 bounds) del) t)
+              (replace-match "" nil nil)
+              (setq num (- (match-end 0) (match-beginning 0)))
+              (setq del (+ del num))
+              (forward-line))))))))
+
 (defun markdown--cleanup-list-numbers-level (&optional pfx)
   "Update the numbering for level PFX (as a string of spaces).
 
@@ -2519,6 +2554,18 @@ Calls `markdown-move-list-item-up'."
 Calls `markdown-move-list-item-down'."
   (interactive)
   (markdown-move-list-item-down))
+
+(defun markdown-metaleft ()
+  "Unindent list item.
+Calls `markdown-demote-list-item'."
+  (interactive)
+  (markdown-demote-list-item))
+
+(defun markdown-metaright ()
+  "Indent list item.
+Calls `markdown-promote-list-item'."
+  (interactive)
+  (markdown-promote-list-item))
 
 ;;; Commands ==================================================================
 
