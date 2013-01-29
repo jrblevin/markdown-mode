@@ -2325,7 +2325,10 @@ With two C-u prefixes, increase the indentation by one level."
       (setq bounds (markdown-cur-list-item-bounds))
       (if (not bounds)
           ;; When not in a list, start a new unordered one
-          (insert "* ")
+          (progn
+            (unless (markdown-cur-line-blank-p)
+              (insert "\n"))
+            (insert "* "))
         ;; Compute indentation for a new list item
         (setq item-indent (nth 2 bounds))
         (setq marker (concat (match-string 2) (match-string 3)))
