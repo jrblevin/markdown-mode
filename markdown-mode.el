@@ -898,7 +898,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  "^\\(\\s *\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\(\\s +\\)"
+  "^\\([ \t]*\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
