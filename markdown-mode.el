@@ -637,8 +637,8 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Position where new footnotes are inserted in the document."
   :group 'markdown
   :type '(choice (const :tag "At the end of the document" end)
-		 (const :tag "Immediately after the paragraph" immediately)
-		 (const :tag "Before next header" header)))
+                 (const :tag "Immediately after the paragraph" immediately)
+                 (const :tag "Before next header" header)))
 
 ;;; Font lock =================================================================
 
@@ -1042,7 +1042,7 @@ text.")
 (eval-and-compile
   (if (boundp 'mark-active)
       (defun markdown-mark-active ()    ; Emacs
-	mark-active)
+        mark-active)
     (defalias 'markdown-mark-active 'region-exists-p))) ; XEmacs
 
 (defun markdown-transient-mark-mode-active ()
@@ -1707,10 +1707,10 @@ Arguments BEG and END specify the beginning and end of the region."
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward (concat "^\\[\\^\\(" markdown-footnote-chars "*?\\)\\]:")
-				(point-max) t)
-	(let ((fn (string-to-number (match-string 1))))
-	  (when (> fn markdown-footnote-counter)
-	    (setq markdown-footnote-counter fn))))))
+                                (point-max) t)
+        (let ((fn (string-to-number (match-string 1))))
+          (when (> fn markdown-footnote-counter)
+            (setq markdown-footnote-counter fn))))))
   (incf markdown-footnote-counter))
 
 (defun markdown-footnote-new ()
@@ -1731,12 +1731,12 @@ footnote text."
     ;; search for a header. if none is found, go to the end of the document.
     (catch 'eof
       (while (progn
-	       (forward-paragraph)
-	       (unless (re-search-forward markdown-regex-header nil t)
-		 (throw 'eof nil))
-	       (backward-paragraph)
+               (forward-paragraph)
+               (unless (re-search-forward markdown-regex-header nil t)
+                 (throw 'eof nil))
+               (backward-paragraph)
                (forward-line)
-	       (not (looking-at markdown-regex-header)))))))
+               (not (looking-at markdown-regex-header)))))))
   (forward-line -1)
   ;; make sure we're on an empty line:
   (unless (markdown-cur-line-blank-p)
@@ -1761,16 +1761,16 @@ footnote marker or in the footnote text."
       (setq return-pos 'text)) ; and remember our return position
     (let ((marker (markdown-footnote-delete-marker)))
       (unless marker
-	(error "Not at a footnote"))
+        (error "Not at a footnote"))
       (let ((text-pos (markdown-footnote-find-text (car marker))))
-	(unless text-pos
-	  (error "No text for footnote `%s'" (car marker)))
-	(goto-char text-pos)
-	(let ((pos (markdown-footnote-kill-text)))
-	  (setq return-pos
-		(if (and pos (eq return-pos 'text))
-		    pos
-		  (cadr marker))))))
+        (unless text-pos
+          (error "No text for footnote `%s'" (car marker)))
+        (goto-char text-pos)
+        (let ((pos (markdown-footnote-kill-text)))
+          (setq return-pos
+                (if (and pos (eq return-pos 'text))
+                    pos
+                  (cadr marker))))))
     (goto-char return-pos)))
 
 (defun markdown-footnote-delete-marker ()
@@ -1793,9 +1793,9 @@ number)."
   (let ((fn (markdown-footnote-text-positions)))
     (when fn
       (let ((text (delete-and-extract-region (second fn) (third fn))))
-	(string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
-	(kill-new (match-string 1 text))
-	(second fn)))))
+        (string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
+        (kill-new (match-string 1 text))
+        (second fn)))))
 
 (defun markdown-footnote-goto-text ()
   "Jump to the text of the footnote at point."
@@ -1805,19 +1805,19 @@ number)."
       (error "Not at a footnote marker"))
     (let ((new-pos (markdown-footnote-find-text fn)))
       (unless new-pos
-	(error "No definition found for footnote `%s'" fn))
+        (error "No definition found for footnote `%s'" fn))
       (goto-char new-pos))))
 
 (defun markdown-footnote-return ()
   "Return from a footnote to its footnote number in the main text."
   (interactive)
   (let ((fn (save-excursion
-	      (car (markdown-footnote-text-positions)))))
+              (car (markdown-footnote-text-positions)))))
     (unless fn
       (error "Not in a footnote"))
     (let ((new-pos (markdown-footnote-find-marker fn)))
       (unless new-pos
-	(error "Footnote marker `%s' not found" fn))
+        (error "Footnote marker `%s' not found" fn))
       (goto-char new-pos))))
 
 (defun markdown-footnote-find-marker (id)
@@ -1848,14 +1848,14 @@ The return value is a list (ID START END). If point is not on a
 footnote, NIL is returned."
   ;; first make sure we're at a footnote marker
   (if (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (point-at-bol))
-	  (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
+          (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
       (save-excursion
-	;; move point between [ and ^:
-	(if (looking-at "\\[")
-	    (forward-char 1)
-	  (skip-chars-backward "^["))
-	(looking-at (concat "\\(\\^" markdown-footnote-chars "*?\\)\\]"))
-	(list (match-string 1) (1- (match-beginning 1)) (1+ (match-end 1))))))
+        ;; move point between [ and ^:
+        (if (looking-at "\\[")
+            (forward-char 1)
+          (skip-chars-backward "^["))
+        (looking-at (concat "\\(\\^" markdown-footnote-chars "*?\\)\\]"))
+        (list (match-string 1) (1- (match-beginning 1)) (1+ (match-end 1))))))
 
 (defun markdown-footnote-text-positions ()
   "Return the start and end positions of the footnote text point is in.
@@ -1866,18 +1866,18 @@ newline that ends the footnote. If point is not in a footnote,
 NIL is returned instead."
   (save-excursion
     (let ((fn (progn
-		(backward-paragraph)
-		;; if we're in a multiparagraph footnote, we need to back up further
-		(while (>= (markdown-next-line-indent) 4)
-		  (backward-paragraph))
-		(forward-line)
-		(if (looking-at (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:"))
-		    (list (match-string 1) (point))))))
+                (backward-paragraph)
+                ;; if we're in a multiparagraph footnote, we need to back up further
+                (while (>= (markdown-next-line-indent) 4)
+                  (backward-paragraph))
+                (forward-line)
+                (if (looking-at (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:"))
+                    (list (match-string 1) (point))))))
       (when fn
-	(while (progn
-		 (forward-paragraph)
-		 (>= (markdown-next-line-indent) 4)))
-	(append fn (list (point)))))))
+        (while (progn
+                 (forward-paragraph)
+                 (>= (markdown-next-line-indent) 4)))
+        (append fn (list (point)))))))
 
 ;;; Indentation ====================================================================
 
@@ -2120,47 +2120,47 @@ Otherwise, do normal delete by repeating
 
 (defun markdown-imenu-create-index ()
   (let* ((root '(nil . nil))
-	 cur-alist
-	 (cur-level 0)
-	 (empty-heading "-")
-	 (self-heading ".")
-	 hashes pos level heading)
+         cur-alist
+         (cur-level 0)
+         (empty-heading "-")
+         (self-heading ".")
+         hashes pos level heading)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-	(cond
-	 ((setq heading (match-string-no-properties 1))
-	  (setq pos (match-beginning 1)
-		level 1))
-	 ((setq heading (match-string-no-properties 3))
-	  (setq pos (match-beginning 3)
-		level 2))
-	 ((setq hashes (match-string-no-properties 5))
-	  (setq heading (match-string-no-properties 6)
-		pos (match-beginning 5)
-		level (length hashes))))
-	(let ((alist (list (cons heading pos))))
-	  (cond
-	   ((= cur-level level)		; new sibling
-	    (setcdr cur-alist alist)
-	    (setq cur-alist alist))
-	   ((< cur-level level)		; first child
-	    (dotimes (i (- level cur-level 1))
-	      (setq alist (list (cons empty-heading alist))))
-	    (if cur-alist
-		(let* ((parent (car cur-alist))
-		       (self-pos (cdr parent)))
-		  (setcdr parent (cons (cons self-heading self-pos) alist)))
-	      (setcdr root alist))	; primogenitor
-	    (setq cur-alist alist)
-	    (setq cur-level level))
-	   (t				; new sibling of an ancestor
-	    (let ((sibling-alist (last (cdr root))))
-	      (dotimes (i (1- level))
-		(setq sibling-alist (last (cdar sibling-alist))))
-	      (setcdr sibling-alist alist)
-	      (setq cur-alist alist))
-	    (setq cur-level level)))))
+        (cond
+         ((setq heading (match-string-no-properties 1))
+          (setq pos (match-beginning 1)
+                level 1))
+         ((setq heading (match-string-no-properties 3))
+          (setq pos (match-beginning 3)
+                level 2))
+         ((setq hashes (match-string-no-properties 5))
+          (setq heading (match-string-no-properties 6)
+                pos (match-beginning 5)
+                level (length hashes))))
+        (let ((alist (list (cons heading pos))))
+          (cond
+           ((= cur-level level)         ; new sibling
+            (setcdr cur-alist alist)
+            (setq cur-alist alist))
+           ((< cur-level level)         ; first child
+            (dotimes (i (- level cur-level 1))
+              (setq alist (list (cons empty-heading alist))))
+            (if cur-alist
+                (let* ((parent (car cur-alist))
+                       (self-pos (cdr parent)))
+                  (setcdr parent (cons (cons self-heading self-pos) alist)))
+              (setcdr root alist))      ; primogenitor
+            (setq cur-alist alist)
+            (setq cur-level level))
+           (t                           ; new sibling of an ancestor
+            (let ((sibling-alist (last (cdr root))))
+              (dotimes (i (1- level))
+                (setq sibling-alist (last (cdar sibling-alist))))
+              (setcdr sibling-alist alist)
+              (setq cur-alist alist))
+            (setq cur-level level)))))
       (cdr root))))
 
 ;;; References ================================================================
@@ -2456,7 +2456,7 @@ a list."
           (setq step nil)
           (setq continue nil))))
 
-       ((looking-at "^\\([\s-]*\\)[^	 \n\r].*$")
+       ((looking-at "^\\([\s-]*\\)[^ \t\n\r].*$")
         (setq cpfx (match-string-no-properties 1))
         (cond
          ;; reset if separated before
@@ -2823,12 +2823,12 @@ returned by `match-data'.  Note that the potential wiki link name must
 be available via `match-string'."
   (let ((case-fold-search nil))
     (and (thing-at-point-looking-at markdown-regex-wiki-link)
-	 (or (not buffer-file-name)
-	     (not (string-equal (buffer-file-name)
-				(markdown-convert-wiki-link-to-filename
+         (or (not buffer-file-name)
+             (not (string-equal (buffer-file-name)
+                                (markdown-convert-wiki-link-to-filename
                                  (markdown-wiki-link-link)))))
-	 (not (save-match-data
-		(save-excursion))))))
+         (not (save-match-data
+                (save-excursion))))))
 
 (defun markdown-wiki-link-link ()
   "Return the link part of the wiki link using current match data.
@@ -2910,14 +2910,14 @@ and highlight accordingly."
   (save-match-data
     (while (re-search-forward markdown-regex-wiki-link to t)
       (let ((highlight-beginning (match-beginning 0))
-	    (highlight-end (match-end 0))
-	    (file-name
-	     (markdown-convert-wiki-link-to-filename (match-string 1))))
-	(if (file-exists-p file-name)
-	    (markdown-highlight-wiki-link
-	     highlight-beginning highlight-end markdown-link-face)
-	  (markdown-highlight-wiki-link
-	   highlight-beginning highlight-end markdown-link-face)
+            (highlight-end (match-end 0))
+            (file-name
+             (markdown-convert-wiki-link-to-filename (match-string 1))))
+        (if (file-exists-p file-name)
+            (markdown-highlight-wiki-link
+             highlight-beginning highlight-end markdown-link-face)
+          (markdown-highlight-wiki-link
+           highlight-beginning highlight-end markdown-link-face)
           (markdown-highlight-wiki-link
            highlight-beginning highlight-end markdown-missing-link-face))))))
 
@@ -2929,14 +2929,14 @@ newline after."
   (goto-char from)
   (re-search-backward "\n" nil t)
   (let ((new-from (point-min))
-	(new-to (point-max)))
+        (new-to (point-max)))
     (if (not (= (point) from))
-	(setq new-from (point)))
+        (setq new-from (point)))
     ;; do the same thing for the first new line after 'to
     (goto-char to)
     (re-search-forward "\n" nil t)
     (if (not (= (point) to))
-	(setq new-to (point)))
+        (setq new-to (point)))
     (values new-from new-to)))
 
 (defun markdown-check-change-for-wiki-link (from to change)
@@ -3054,7 +3054,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; creating one of the wiki link documents. Make sure we get
   ;; refontified when we come back.
   (add-hook 'window-configuration-change-hook
-	    'markdown-fontify-buffer-wiki-links t t)
+            'markdown-fontify-buffer-wiki-links t t)
 
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
