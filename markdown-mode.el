@@ -1261,7 +1261,11 @@ If the point is not in a list item, do nothing."
          (t t))
       (forward-line)
       (setq indent (markdown-cur-line-indent)))
-    (skip-syntax-backward "-")))
+    ;; Don't skip over whitespace for empty list items (marker and
+    ;; whitespace only), just move to end of whitespace.
+    (if (looking-back (concat markdown-regex-list "\\s-*"))
+          (goto-char (match-end 3))
+      (skip-syntax-backward "-"))))
 
 (defun markdown-cur-list-item-bounds ()
   "Return bounds and indentation of the current list item.
