@@ -532,7 +532,7 @@
 
 (defcustom markdown-command-needs-filename nil
   "Set to non-nil if `markdown-command' does not accept input from stdin.
-Instead, it will be passed a filename as the final command-line
+Instead, it will be passed a filename as the final command line
 option.  As a result, you will only be able to run Markdown from
 buffers which are visiting a file."
   :group 'markdown
@@ -1034,7 +1034,8 @@ text.")
 
 ;; Handle replace-regexp-in-string in XEmacs 21
 (defun markdown-replace-regexp-in-string (regexp rep string)
-  "Compatibility wrapper to provide `replace-regexp-in-string'."
+  "Compatibility wrapper to provide `replace-regexp-in-string'.
+Replace all matches for REGEXP with REP in STRING."
   (if (featurep 'xemacs)
       (replace-in-string string regexp rep)
     (replace-regexp-in-string regexp rep string)))
@@ -1046,6 +1047,8 @@ text.")
     (defalias 'markdown-mark-active 'region-exists-p))) ; XEmacs
 
 (defun markdown-transient-mark-mode-active ()
+  "Determine if Transient Mark mode is on and there is an active region.
+Works in both Emacs and XEmacs."
   (cond
    ((boundp 'transient-mark-mode)
     (and transient-mark-mode (markdown-mark-active)))
@@ -1486,9 +1489,9 @@ as the link text."
 (defun markdown-insert-reference-link-dwim ()
   "Insert a reference link of the form [text][label] at point.
 If Transient Mark mode is on and a region is active, the region
-is used as the link text. Otherwise, the link text will be read
-from the minibuffer. The link URL, label, and title will be read
-from the minibuffer. The link label definition is placed at the
+is used as the link text.  Otherwise, the link text will be read
+from the minibuffer.  The link URL, label, and title will be read
+from the minibuffer.  The link label definition is placed at the
 end of the current paragraph."
   (interactive)
   (if (markdown-transient-mark-mode-active)
@@ -1496,7 +1499,9 @@ end of the current paragraph."
     (call-interactively 'markdown-insert-reference-link)))
 
 (defun markdown-insert-reference-link-region (url label title)
-  "Insert a reference link at point using the region as the link text."
+  "Insert a reference link at point using the region as the link text.
+The link will point to URL, will be referenced as LABEL, and will have the
+optional title text given by TITLE."
   (interactive "sLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
   (let ((text (buffer-substring (region-beginning) (region-end))))
     (delete-region (region-beginning) (region-end))
@@ -1504,8 +1509,9 @@ end of the current paragraph."
 
 (defun markdown-insert-reference-link (text url label title)
   "Insert a reference link at point.
-The link label definition is placed at the end of the current
-paragraph."
+The link TEXT will point to the given URL and may be referenced using
+LABEL.  The link TITLE is optional and will be used to populate the
+title attribute when converted to XHTML."
   (interactive "sLink Text: \nsLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
   (let (end)
     (insert (concat "[" text "][" label "]"))
@@ -1702,7 +1708,7 @@ Arguments BEG and END specify the beginning and end of the region."
 ;;; Footnotes ======================================================================
 
 (defun markdown-footnote-counter-inc ()
-  "Increment markdown-footnote-counter and return the new value."
+  "Increment `markdown-footnote-counter' and return the new value."
   (when (= markdown-footnote-counter 0) ; hasn't been updated in this buffer yet.
     (save-excursion
       (goto-char (point-min))
@@ -1714,8 +1720,7 @@ Arguments BEG and END specify the beginning and end of the region."
   (incf markdown-footnote-counter))
 
 (defun markdown-footnote-new ()
-  "Insert a footnote with a new number and jump to a position to enter the
-footnote text."
+  "Insert footnote with a new number and move point to footnote definition."
   (interactive)
   (let ((fn (markdown-footnote-counter-inc)))
     (insert (format "[^%d]" fn))
@@ -1752,7 +1757,7 @@ footnote text."
 (defun markdown-footnote-kill ()
   "Kill the footnote at point.
 The footnote text is killed (and added to the kill ring), the
-footnote marker is deleted. Point has to be either at the
+footnote marker is deleted.  Point has to be either at the
 footnote marker or in the footnote text."
   (interactive)
   (let (return-pos)
@@ -1776,7 +1781,7 @@ footnote marker or in the footnote text."
 (defun markdown-footnote-delete-marker ()
   "Delete a footnote marker at point.
 Returns a list (ID START) containing the footnote ID and the
-start position of the marker before deletion. If no footnote
+start position of the marker before deletion.  If no footnote
 marker was deleted, this function returns NIL."
   (let ((marker (markdown-footnote-marker-positions)))
     (when marker
@@ -1823,7 +1828,7 @@ number)."
 (defun markdown-footnote-find-marker (id)
   "Find the location of the footnote marker with ID.
 The actual buffer position returned is the position directly
-following the marker's closing bracket. If no marker is found,
+following the marker's closing bracket.  If no marker is found,
 NIL is returned."
   (save-excursion
     (goto-char (point-min))
@@ -1834,7 +1839,7 @@ NIL is returned."
 (defun markdown-footnote-find-text (id)
   "Find the location of the text of footnote ID.
 The actual buffer position returned is the position of the first
-character of the text, after the footnote's identifier. If no
+character of the text, after the footnote's identifier.  If no
 footnote text is found, NIL is returned."
   (save-excursion
     (goto-char (point-min))
@@ -1844,7 +1849,7 @@ footnote text is found, NIL is returned."
 
 (defun markdown-footnote-marker-positions ()
   "Return the position and ID of the footnote marker point is on.
-The return value is a list (ID START END). If point is not on a
+The return value is a list (ID START END).  If point is not on a
 footnote, NIL is returned."
   ;; first make sure we're at a footnote marker
   (if (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (point-at-bol))
@@ -1859,10 +1864,10 @@ footnote, NIL is returned."
 
 (defun markdown-footnote-text-positions ()
   "Return the start and end positions of the footnote text point is in.
-The exact return value is a list of three elements: (ID START
-END). The start position is the position of the opening bracket
-of the footnote id. The end position is directly after the
-newline that ends the footnote. If point is not in a footnote,
+The exact return value is a list of three elements: (ID START END).
+The start position is the position of the opening bracket
+of the footnote id.  The end position is directly after the
+newline that ends the footnote.  If point is not in a footnote,
 NIL is returned instead."
   (save-excursion
     (let ((fn (progn
@@ -2119,6 +2124,9 @@ Otherwise, do normal delete by repeating
 ;;; imenu =====================================================================
 
 (defun markdown-imenu-create-index ()
+  "Create and return an imenu index alist for the current buffer.
+
+See `imenu-create-index-function' and `imenu--index-alist' for details."
   (let* ((root '(nil . nil))
          cur-alist
          (cur-level 0)
@@ -2317,8 +2325,11 @@ the point is inside ordered list, insert the next number followed
 by a period.  Use the previous list item to determine the amount
 of whitespace to place before and after list markers.
 
-With a C-u prefix, decrease the indentation by one level.
-With two C-u prefixes, increase the indentation by one level."
+With a \\[universal-argument] prefix (i.e., when ARG is 4),
+decrease the indentation by one level.
+
+With two \\[universal-argument] prefixes (i.e., when ARG is 16),
+increase the indentation by one level."
   (interactive "p")
   (let (bounds item-indent marker indent new-indent end)
     (save-match-data
@@ -2625,9 +2636,9 @@ Calls `markdown-promote-list-item'."
 ;;; Commands ==================================================================
 
 (defun markdown (&optional output-buffer-name)
-  "Run `markdown' on current buffer and insert output in buffer given by
-`output-buffer-name' (defaults to `markdown-output-buffer-name').  Return the
-OUTPUT-BUFFER used."
+  "Run `markdown-command' on buffer, sending output to OUTPUT-BUFFER-NAME.
+The output buffer name defaults to `markdown-output-buffer-name'.
+Return the name of the output buffer used."
   (interactive)
   (save-window-excursion
     (let ((begin-region)
@@ -2656,7 +2667,8 @@ OUTPUT-BUFFER used."
     output-buffer-name))
 
 (defun markdown-standalone (&optional output-buffer-name)
-  "special function to provide html standalone output"
+  "Special function to provide standalone HTML output.
+Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (interactive)
   (setq output-buffer-name (markdown output-buffer-name))
   (with-current-buffer output-buffer-name
@@ -2668,7 +2680,9 @@ OUTPUT-BUFFER used."
   output-buffer-name)
 
 (defun markdown-other-window (&optional output-buffer-name)
-  " Run `markdown' on current buffer and display in other window"
+  "Run `markdown-command' on current buffer and display in other window.
+When OUTPUT-BUFFER-NAME is given, insert the output in the buffer with
+that name."
   (interactive)
   (display-buffer (markdown-standalone output-buffer-name)))
 
@@ -2717,12 +2731,15 @@ Standalone XHTML output is identified by an occurrence of
           "</html>\n"))
 
 (defun markdown-preview (&optional output-buffer-name)
-  "Run `markdown' on the current buffer and preview the output in a browser."
+  "Run `markdown-command' on the current buffer and view output in browser.
+When OUTPUT-BUFFER-NAME is given, insert the output in the buffer with
+that name."
   (interactive)
   (browse-url-of-buffer (markdown markdown-output-buffer-name)))
 
 (defun markdown-export-file-name (&optional extension)
   "Attempt to generate a filename for Markdown output.
+The file extension will be EXTENSION if given, or .html by default.
 If the current buffer is visiting a file, we construct a new
 output filename based on that filename.  Otherwise, return nil."
   (when (buffer-file-name)
@@ -2736,9 +2753,10 @@ output filename based on that filename.  Otherwise, return nil."
      extension)))
 
 (defun markdown-export (&optional output-file)
-  "Run Markdown on the current buffer, save to a file, and return the filename.
-The resulting filename will be constructed using the current filename, but
-with the extension removed and replaced with .html."
+  "Run Markdown on the current buffer, save to file, and return the filename.
+If OUTPUT-FILE is given, use that as the filename.  Otherwise, use the filename
+generated by `markdown-export-file-name', which will be constructed using the
+current filename, but with the extension removed and replaced with .html."
   (interactive)
   (unless output-file
     (setq output-file (markdown-export-file-name ".html")))
@@ -2856,7 +2874,8 @@ and [[test test]] both map to Test-test.ext."
 (defun markdown-follow-wiki-link (name &optional other)
   "Follow the wiki link NAME.
 Convert the name to a file name and call `find-file'.  Ensure that
-the new buffer remains in `markdown-mode'."
+the new buffer remains in `markdown-mode'.  Open the link in another
+window when OTHER is non-nil."
   (let ((filename (markdown-convert-wiki-link-to-filename name))
         (wp (file-name-directory buffer-file-name)))
     (when other (other-window 1))
@@ -2866,7 +2885,7 @@ the new buffer remains in `markdown-mode'."
 
 (defun markdown-follow-wiki-link-at-point (&optional arg)
   "Find Wiki Link at point.
-With prefix argument C-u open the file in other window.
+With prefix argument ARG, open the file in other window.
 
 See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   (interactive "P")
