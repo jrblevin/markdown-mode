@@ -926,7 +926,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for matching line breaks.")
 
 (defconst markdown-regex-wiki-link
-  "\\[\\[\\([^]|]+\\)\\(|\\([^]]+\\)\\)?\\]\\]"
+  "\\(?:^\\|[^\\]\\)\\(\\[\\[\\([^]|]+\\)\\(|\\([^]]+\\)\\)?\\]\\]\\)"
   "Regular expression for matching wiki links.
 This matches typical bracketed [[WikiLinks]] as well as 'aliased'
 wiki links of the form [[PageName|link text]].  In this regular
@@ -2858,8 +2858,8 @@ be available via `match-string'."
 The location of the link component depends on the value of
 `markdown-wiki-link-alias-first'."
   (if markdown-wiki-link-alias-first
-      (or (match-string 3) (match-string 1))
-    (match-string 1)))
+      (or (match-string 4) (match-string 2))
+    (match-string 2)))
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
@@ -2908,7 +2908,7 @@ See `markdown-wiki-link-p'."
   (save-match-data
     ;; Search for the next wiki link and move to the beginning.
     (re-search-forward markdown-regex-wiki-link nil t)
-    (goto-char (match-beginning 0))))
+    (goto-char (match-beginning 1))))
 
 (defun markdown-previous-wiki-link ()
   "Jump to previous wiki link.
@@ -2933,10 +2933,10 @@ and highlight accordingly."
   (goto-char from)
   (save-match-data
     (while (re-search-forward markdown-regex-wiki-link to t)
-      (let ((highlight-beginning (match-beginning 0))
-            (highlight-end (match-end 0))
+      (let ((highlight-beginning (match-beginning 1))
+            (highlight-end (match-end 1))
             (file-name
-             (markdown-convert-wiki-link-to-filename (match-string 1))))
+             (markdown-convert-wiki-link-to-filename (match-string 2))))
         (if (file-exists-p file-name)
             (markdown-highlight-wiki-link
              highlight-beginning highlight-end markdown-link-face)
