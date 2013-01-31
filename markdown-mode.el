@@ -918,7 +918,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for matching italic text.")
 
 (defconst markdown-regex-blockquote
-  "^>.*$"
+  "^[ \t]*\\(>\\).*$"
   "Regular expression for matching blockquote lines.")
 
 (defconst markdown-regex-line-break
