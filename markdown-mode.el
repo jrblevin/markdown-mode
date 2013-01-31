@@ -472,6 +472,14 @@
 ;; GNU Emacs 24, compatibility with earlier Emacsen is also a
 ;; priority.
 ;;
+;; One area where markdown-mode is lacking is in parsing complex
+;; nested preformatted blocks (e.g., a nested list containing a
+;; preformatted text block).  The syntax highlighting engine in
+;; markdown-mode currently has both false positives and false
+;; negatives in such situations (or Type I and Type II errors,
+;; if you prefer).  Patches for improvements in this area, with
+;; thorough test cases, are most welcome.
+;;
 ;; If you find any bugs in markdown-mode, please construct a test case
 ;; or a patch and email me at <jrblevin@sdf.org>.
 
