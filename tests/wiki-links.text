@@ -1,0 +1,7 @@
+Line 1
+[[Wiki Link]] at point 8.
+
+Here's a second link, an aliased link [[first|second]], at point 73.
+The first two links are invalid.  This third link, [[inline]], is a
+valid link since the file `inline.text` exists.  The last link is at
+point 155.
