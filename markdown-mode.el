@@ -2900,21 +2900,27 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
 
 (defun markdown-next-wiki-link ()
   "Jump to next wiki link.
-See `markdown-wiki-link-p'."
+If successful, return point.  Otherwise, return nil.
+See `markdown-wiki-link-p' and `markdown-previous-wiki-link'."
   (interactive)
-  (if (markdown-wiki-link-p)
+  (let ((opoint (point)))
+    (when (markdown-wiki-link-p)
       ;; At a wiki link already, move past it.
-      (goto-char (+ 1 (match-end 0))))
-  (save-match-data
-    ;; Search for the next wiki link and move to the beginning.
-    (re-search-forward markdown-regex-wiki-link nil t)
-    (goto-char (match-beginning 1))))
+      (goto-char (+ (match-end 0) 1)))
+      ;; Search for the next wiki link and move to the beginning.
+    (if (re-search-forward markdown-regex-wiki-link nil t)
+        (goto-char (match-beginning 1))
+      (goto-char opoint)
+      nil)))
 
 (defun markdown-previous-wiki-link ()
   "Jump to previous wiki link.
-See `markdown-wiki-link-p'."
+If successful, return point.  Otherwise, return nil.
+See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
   (interactive)
-  (re-search-backward markdown-regex-wiki-link nil t))
+  (if (re-search-backward markdown-regex-wiki-link nil t)
+      (goto-char (match-beginning 1))
+    nil))
 
 (defun markdown-highlight-wiki-link (from to face)
   "Highlight the wiki link in the region between FROM and TO using FACE."
