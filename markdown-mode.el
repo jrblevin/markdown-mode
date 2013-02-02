@@ -2858,8 +2858,8 @@ be available via `match-string'."
 The location of the link component depends on the value of
 `markdown-wiki-link-alias-first'."
   (if markdown-wiki-link-alias-first
-      (or (match-string 4) (match-string 2))
-    (match-string 2)))
+      (or (match-string-no-properties 4) (match-string-no-properties 2))
+    (match-string-no-properties 2)))
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
