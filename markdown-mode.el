@@ -1421,9 +1421,9 @@ This helps improve font locking for block constructs such as pre blocks."
 ;;; Syntax Table ==============================================================
 
 (defvar markdown-mode-syntax-table
-  (let ((markdown-mode-syntax-table (make-syntax-table)))
-    (modify-syntax-entry ?\" "w" markdown-mode-syntax-table)
-    markdown-mode-syntax-table)
+  (let ((tab (make-syntax-table text-mode-syntax-table)))
+    (modify-syntax-entry ?\" "." tab)
+    tab)
   "Syntax table for `markdown-mode'.")
 
 
