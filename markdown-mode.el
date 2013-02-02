@@ -21,6 +21,7 @@
 ;; Copyright (C) 2012 Akinori Musha <knu@idaemons.org>
 ;; Copyright (C) 2012 Zhenlei Jia <zhenlei.jia@gmail.com>
 ;; Copyright (C) 2012 Peter Jones <pjones@pmade.com>
+;; Copyright (C) 2013 Matus Goljer <dota.keys@gmail.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -401,7 +402,11 @@
 ;; treated as on GitHub, with hyphens replacing spaces in filenames and
 ;; where the first letter of the filename capitalized.  For example,
 ;; `[[wiki link]]' will map to a file named `Wiki-link` with the same
-;; extension as the current file.
+;; extension as the current file.  GFM code blocks, with optional
+;; programming language keywords, will be highlighted.  They can be inserted
+;;  with `C-c C-s l`.  If there is an active region, the text in the region
+;; will be placed inside the code block.  You will be prompted for the name
+;; of the language, but may press enter to continue without naming a language.
 
 ;;; Acknowledgments:
 
@@ -460,7 +465,8 @@
 ;;     declaration in XHTML output.
 ;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart (dedention)
 ;;     un-indentation function.
-;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following.
+;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following
+;;     and GFM code block insertion.
 ;;   * Peter Jones <pjones@pmade.com> for link following functions.
 ;;   * Bryan Fink <bryan.fink@gmail.com> for a bug report regarding
 ;;     externally modified files.
@@ -690,6 +696,9 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defvar markdown-pre-face 'markdown-pre-face
   "Face name to use for preformatted text.")
 
+(defvar markdown-language-keyword-face 'markdown-language-keyword-face
+  "Face name to use for programming language identifiers.")
+
 (defvar markdown-link-face 'markdown-link-face
   "Face name to use for links.")
 
@@ -792,6 +801,11 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defface markdown-pre-face
   '((t (:inherit font-lock-constant-face)))
   "Face for preformatted text."
+  :group 'markdown-faces)
+
+(defface markdown-language-keyword-face
+  '((t (:inherit font-lock-type-face)))
+  "Face for programming language identifiers."
   :group 'markdown-faces)
 
 (defface markdown-link-face
@@ -959,6 +973,10 @@ text.")
   (list
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
+   (cons 'markdown-match-gfm-code-blocks '((1 markdown-pre-face)
+                                           (2 markdown-language-keyword-face nil t)
+                                           (3 markdown-pre-face)
+                                           (4 markdown-pre-face)))
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext '((1 markdown-header-face-1)
                                           (2 markdown-header-rule-face)))
@@ -1428,6 +1446,25 @@ Leave match data intact for `markdown-regex-list'."
                  (t nil))))
         (t nil)))
 
+(defun markdown-match-gfm-code-blocks (last)
+  "Match GFM quoted code blocks from point to LAST."
+  (let (open lang body close all)
+    (cond ((and (eq major-mode 'gfm-mode)
+                (search-forward-regexp "^\\(```\\)\\(\\w+\\)?$" last t))
+           (beginning-of-line)
+           (setq open (list (match-beginning 1) (match-end 1))
+                 lang (list (match-beginning 2) (match-end 2)))
+           (forward-line)
+           (setq body (list (point)))
+           (cond ((search-forward-regexp "^```$" last t)
+                  (setq body (reverse (cons (1- (match-beginning 0)) body))
+                        close (list (match-beginning 0) (match-end 0))
+                        all (list (car open) (match-end 0)))
+                  (set-match-data (append all open lang body close))
+                  t)
+                 (t nil)))
+          (t nil))))
+
 (defun markdown-font-lock-extend-region ()
   "Extend the search region to include an entire block of text.
 This helps improve font locking for block constructs such as pre blocks."
@@ -1737,6 +1774,34 @@ as preformatted text."
 Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
   (markdown-block-region beg end "    "))
+
+(defun markdown-insert-gfm-code-block (&optional lang)
+  "Insert GFM code block for language LANG.
+If LANG is nil, the language will be queried from user.  If a
+region is active, wrap this region with the markup instead.  If
+the region boundaries are not on empty lines, these are added
+automatically in order to have the correct markup."
+  (interactive "sProgramming language: ")
+  (if (markdown-transient-mark-mode-active)
+      (let ((b (region-beginning)) (e (region-end)))
+        (goto-char b)
+        ;; if we're on a blank line, insert the quotes here, otherwise
+        ;; add a new line first
+        (unless (looking-at "\n")
+          (newline)
+          (forward-line -1)
+          (setq e (1+ e)))
+        (insert "```" lang)
+        (goto-char (+ e 3 (length lang)))
+        ;; if we're on a blank line, don't newline, otherwise the ```
+        ;; should go on its own line
+        (unless (looking-back "\n")
+          (newline))
+        (insert "```"))
+    (insert "```" lang)
+    (newline 2)
+    (insert "```")
+    (forward-line -1)))
 
 ;;; Footnotes ======================================================================
 
@@ -2102,6 +2167,14 @@ Otherwise, do normal delete by repeating
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
     map)
   "Keymap for Markdown major mode.")
+
+(defvar gfm-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map markdown-mode-map)
+    (define-key map "\C-c\C-sl" 'markdown-insert-gfm-code-block)
+    map)
+  "Keymap for `gfm-mode'.
+See also `markdown-mode-map'.")
 
 ;;; Menu ==================================================================
 

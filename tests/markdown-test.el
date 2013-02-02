@@ -56,6 +56,18 @@
          ,@body))))
 (def-edebug-spec markdown-test-file (form body))
 
+(defmacro markdown-test-file-gfm (file &rest body)
+  "Open FILE from `markdown-test-dir' and execute body."
+  `(let ((fn (concat markdown-test-dir ,file)))
+     (save-window-excursion
+       (with-temp-buffer
+         (insert-file-contents fn)
+         (gfm-mode)
+         (goto-char (point-min))
+         (font-lock-fontify-buffer)
+         ,@body))))
+(def-edebug-spec markdown-test-file-gfm (form body))
+
 (defmacro markdown-test-temp-file (file &rest body)
   "Open FILE from `markdown-test-dir' visiting temp file and execute body.
 This file is not saved."
@@ -326,6 +338,17 @@ This file is not saved."
      ;; Remove temporary files
      (delete-file fn)
      )))
+
+;;; gfm-mode tests:
+
+(ert-deftest test-markdown-gfm/pre-1 ()
+  "GFM pre block font lock test."
+  (markdown-test-file-gfm "gfm.text"
+    (markdown-test-range-has-face 2626 2637 nil)
+    (markdown-test-range-has-face 2639 2641 markdown-pre-face)
+    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face)
+    (markdown-test-range-has-face 2647 2728 markdown-pre-face)
+    (markdown-test-range-has-face 2730 2732 markdown-pre-face)))
 
 (provide 'markdown-test)
 
