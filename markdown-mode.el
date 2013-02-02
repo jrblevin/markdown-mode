@@ -2936,7 +2936,8 @@ and highlight accordingly."
       (let ((highlight-beginning (match-beginning 1))
             (highlight-end (match-end 1))
             (file-name
-             (markdown-convert-wiki-link-to-filename (match-string 2))))
+             (markdown-convert-wiki-link-to-filename
+              (markdown-wiki-link-link))))
         (if (file-exists-p file-name)
             (markdown-highlight-wiki-link
              highlight-beginning highlight-end markdown-link-face)
