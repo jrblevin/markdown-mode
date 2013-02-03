@@ -74,6 +74,11 @@ This file is not saved."
        (kill-buffer buf))))
 (def-edebug-spec markdown-test-temp-file (form body))
 
+(defun markdown-test-range-has-face (begin end face)
+  (let (loc)
+    (dolist (loc (number-sequence begin end))
+      (should (eq (get-text-property loc 'face) face)))))
+
 (defun markdown-test ()
   "Run all defined tests for `markdown-mode'."
   (interactive)
@@ -132,6 +137,18 @@ This file is not saved."
    (should (eq (get-text-property 35 'face) markdown-bold-face))
    ;; Check face of point past leading asterisk
    (should (eq (get-text-property 36 'face) nil))))
+
+(ert-deftest test-markdown-font-lock/code-1 ()
+  "A simple inline code test."
+  (markdown-test-file "inline.text"
+   (goto-char 45)
+   (should (looking-at "`"))
+   (markdown-test-range-has-face 45 50 markdown-inline-code-face)
+   (markdown-test-range-has-face 61 89 markdown-inline-code-face)
+   ;; These tests are known to fail:
+   ;; (markdown-test-range-has-face 122 128 markdown-inline-code-face)
+   ;; (markdown-test-range-has-face 288 296 markdown-inline-code-face)
+   ))
 
 ;;; Wiki link tests:
 

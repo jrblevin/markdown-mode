@@ -2,3 +2,11 @@ This is *italic.*
 This is **bold.**
 This is `code`.
 This is ``code`containing`backticks``.
+
+Seven backquotes in a string ``````` results in three backquotes
+in an inline code span.
+
+A backslash as the final character in an inline code fragment does
+*not* escape the backquote.  That is, `C-h C-\` will render as
+
+    <code>C-h C-\</code>
