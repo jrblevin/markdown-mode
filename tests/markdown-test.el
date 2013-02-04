@@ -77,6 +77,12 @@ This file is not saved."
     (dolist (loc (number-sequence begin end))
       (should (eq (get-text-property loc 'face) face)))))
 
+(defun markdown-test-goto-heading (title)
+  "Move the point to section with TITLE."
+  (let ((regexp (format "\\(^#+ %s\\( #+\\)?\\|^%s\n[=-]+\n\\)" title title)))
+    (if (re-search-forward regexp nil t)
+        (goto-char (match-end 0)))))
+
 (defun markdown-test ()
   "Run all defined tests for `markdown-mode'."
   (interactive)
@@ -153,6 +159,32 @@ This file is not saved."
    (markdown-test-range-has-face 652 656 nil)
    (markdown-test-range-has-face 657 666 markdown-inline-code-face)
    ))
+
+(ert-deftest test-markdown-font-lock/lists-1 ()
+  "A simple list marker font lock test."
+  (markdown-test-file "lists.text"
+   (dolist (loc (list 1063 1283 1659 1830 1919 2150 2393 2484
+                      2762 2853 3097 3188 3700 3903 4009))
+     (goto-char loc)
+     (should (looking-at "[*+-]"))
+     (markdown-test-range-has-face loc loc markdown-list-face))))
+
+;;; Lists:
+
+(ert-deftest test-markdown-lists/bounds-1 ()
+  "Test list item bounds function `markdown-cur-list-item-bounds'."
+  (markdown-test-file "lists.text"
+    (markdown-test-goto-heading "Case 9")
+    (forward-line)
+    (should (eq (point) 3699))
+    (markdown-next-list-item 4)
+    (should (eq (point) 3700))
+    (should (equal (markdown-cur-list-item-bounds)
+                   (list 3700 3901 0 4)))
+    (markdown-next-list-item 4)
+    (should (eq (point) 3903))
+    (should (equal (markdown-cur-list-item-bounds)
+                   (list 3903 3937 0 4)))))
 
 ;;; Wiki link tests:
 
