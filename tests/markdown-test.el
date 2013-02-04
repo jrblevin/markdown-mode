@@ -125,13 +125,11 @@ This file is not saved."
    (goto-char 9)
    (should (looking-at "\*"))
    ;; Check face of char before leading asterisk
-   (should (eq (get-text-property 8 'face) nil))
-   ;; Check face of leading asterisk
-   (should (eq (get-text-property 9 'face) markdown-italic-face))
-   ;; Check face of trailing asterisk
-   (should (eq (get-text-property 17 'face) markdown-italic-face))
+   (markdown-test-range-has-face 8 8 nil)
+   ;; Check face of italic range
+   (markdown-test-range-has-face 9 17 markdown-italic-face)
    ;; Check face of point past leading asterisk
-   (should (eq (get-text-property 18 'face) nil))))
+   (markdown-test-range-has-face 18 18 nil)))
 
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
@@ -139,13 +137,11 @@ This file is not saved."
    (goto-char 27)
    (should (looking-at "\*\*"))
    ;; Check face of char before leading asterisk
-   (should (eq (get-text-property 26 'face) nil))
-   ;; Check face of leading asterisk
-   (should (eq (get-text-property 27 'face) markdown-bold-face))
-   ;; Check face of trailing asterisk
-   (should (eq (get-text-property 35 'face) markdown-bold-face))
+   (markdown-test-range-has-face 26 26 nil)
+   ;; Check face of bold range
+   (markdown-test-range-has-face 27 35 markdown-bold-face)
    ;; Check face of point past leading asterisk
-   (should (eq (get-text-property 36 'face) nil))))
+   (markdown-test-range-has-face 36 36 nil)))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
@@ -286,14 +282,14 @@ This file is not saved."
      ;; Confirm location of first wiki link
      (should (eq (markdown-next-wiki-link) 8))
      ;; First wiki link doesn't have a corresponding file
-     (should (eq (get-char-property 8 'font-lock-face) markdown-missing-link-face))
+     (markdown-test-range-has-property 8 20 'font-lock-face markdown-missing-link-face)
      ;; Second wiki link doesn't have a corresponding file
      (should (eq (markdown-next-wiki-link) 73))
-     (should (eq (get-char-property 8 'font-lock-face) markdown-missing-link-face))
+     (markdown-test-range-has-property 73 88 'font-lock-face markdown-missing-link-face)
      ;; Move to third wiki link, and create the missing file
      (should (eq (markdown-next-wiki-link) 155))
      (should (string-equal (markdown-wiki-link-link) "inline"))
-     (should (eq (get-char-property 155 'font-lock-face) markdown-link-face))
+     (markdown-test-range-has-property 155 164 'font-lock-face markdown-link-face)
      ;; Remove temporary files
      (delete-file fn)
      )))
