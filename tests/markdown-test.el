@@ -72,10 +72,15 @@ This file is not saved."
        (kill-buffer buf))))
 (def-edebug-spec markdown-test-temp-file (form body))
 
-(defun markdown-test-range-has-face (begin end face)
+(defun markdown-test-range-has-property (begin end prop value)
+  "Verify that the range from BEGIN to END has property PROP equal to VALUE."
   (let (loc)
     (dolist (loc (number-sequence begin end))
-      (should (eq (get-text-property loc 'face) face)))))
+      (should (eq (get-char-property loc prop) value)))))
+
+(defun markdown-test-range-has-face (begin end face)
+  "Verify that the range from BEGIN to END has face equal to FACE."
+  (markdown-test-range-has-property begin end 'face face))
 
 (defun markdown-test-goto-heading (title)
   "Move the point to section with TITLE."
@@ -185,6 +190,52 @@ This file is not saved."
     (should (eq (point) 3903))
     (should (equal (markdown-cur-list-item-bounds)
                    (list 3903 3937 0 4)))))
+
+;;; Outline minor mode tests:
+
+(ert-deftest test-markdown-outline/navigation ()
+  "Test outline navigation functions."
+  (markdown-test-file "outline.text"
+   ;; Navigate to the first visible heading
+   (outline-next-visible-heading 1)
+   (should (eq (point) 19))
+   (should (looking-at "^# A top-level header"))
+   ;; Navigate forward at the same level
+   (outline-forward-same-level 1)
+   (should (eq (point) 377))
+   (should (looking-at "^=+$"))
+   ;; Navigate backward by four visible headings
+   (outline-previous-visible-heading 4)
+   (should (eq (point) 69))
+   (should (looking-at "^## A second-level header$"))))
+
+(ert-deftest test-markdown-outline/visibility ()
+  "Test outline visibility cycling."
+  (markdown-test-file "outline.text"
+   ;; Navigate to the second visible heading
+   (outline-next-visible-heading 2)
+   (should (eq (point) 69))
+   (should (looking-at "^## A second-level header$"))
+   ;; Cycle visibility of this subtree
+   (markdown-cycle)
+   (should (eq (point) 69))
+   (should (looking-at "^## A second-level header$"))
+   ;; Test that the entire subtree is invisible
+   (markdown-test-range-has-property 93 349 'invisible 'outline)
+   ;; Cycle visibility of this subtree again
+   (markdown-cycle)
+   (should (eq (point) 69))
+   (should (looking-at "^## A second-level header$"))
+   ;; Test that text is visible
+   (markdown-test-range-has-property 95 121 'invisible nil)
+   ;; Test that subheadings are visible
+   (markdown-test-range-has-property 123 141 'invisible nil)
+   ;; Cycle visibility of this subtree again
+   (markdown-cycle)
+   (should (eq (point) 69))
+   (should (looking-at "^## A second-level header$"))
+   ;; Verify that entire subtree is visible
+   (markdown-test-range-has-property 93 349 'invisible nil)))
 
 ;;; Wiki link tests:
 
