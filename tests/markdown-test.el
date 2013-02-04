@@ -205,8 +205,8 @@ This file is not saved."
    (should (eq (point) 69))
    (should (looking-at "^## A second-level header$"))))
 
-(ert-deftest test-markdown-outline/visibility ()
-  "Test outline visibility cycling."
+(ert-deftest test-markdown-outline/visibility-atx ()
+  "Test outline visibility cycling for ATX-style headers."
   (markdown-test-file "outline.text"
    ;; Navigate to the second visible heading
    (outline-next-visible-heading 2)
@@ -232,6 +232,23 @@ This file is not saved."
    (should (looking-at "^## A second-level header$"))
    ;; Verify that entire subtree is visible
    (markdown-test-range-has-property 93 349 'invisible nil)))
+
+(ert-deftest test-markdown-outline/visibility-setext ()
+  "Test outline visibility cycling for setext-style headers."
+  (markdown-test-file "outline.text"
+   ;; Navigate to the sixth visible heading
+   (outline-next-visible-heading 7)
+   (outline-previous-visible-heading 1)
+   (should (looking-at markdown-regex-header))
+   (should (string-equal (match-string-no-properties 1) "An underline-style header"))
+   (should (string-equal (match-string-no-properties 2) "========================="))
+   ;; Cycle visibility subtree, test that it's invisible
+   (markdown-cycle)
+   (markdown-test-range-has-property 404 515 'invisible 'outline)
+   ;; Cycle visibility subtree, test that text and headers are visible
+   (markdown-cycle)
+   (markdown-test-range-has-property 404 417 'invisible nil)
+   (markdown-test-range-has-property 420 451 'invisible nil)))
 
 ;;; Wiki link tests:
 
