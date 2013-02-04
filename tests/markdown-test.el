@@ -23,8 +23,8 @@
 
 ;; This file contains the `markdown-mode' test suite.  To run the tests:
 ;;
-;;     M-x load-file markdown-test.el
-;;     M-x markdown-test
+;;     M-x load-file RET markdown-test.el RET
+;;     M-x markdown-test RET
 
 ;;; Code:
 
