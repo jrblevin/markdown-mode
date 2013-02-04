@@ -144,14 +144,14 @@ This file is not saved."
    (markdown-test-range-has-face 45 50 markdown-inline-code-face)
    (markdown-test-range-has-face 61 89 markdown-inline-code-face)
    ;; These tests are known to fail:
-   ;; (markdown-test-range-has-face 119 125 nil)
-   ;; (markdown-test-range-has-face 228 239 markdown-inline-code-face)
-   ;; (markdown-test-range-has-face 341 351 markdown-inline-code-face)
-   ;; (markdown-test-range-has-face 460 468 markdown-inline-code-face)
+   (markdown-test-range-has-face 119 125 nil)
+   (markdown-test-range-has-face 228 239 markdown-inline-code-face)
+   (markdown-test-range-has-face 341 351 markdown-inline-code-face)
+   (markdown-test-range-has-face 460 468 markdown-inline-code-face)
    (markdown-test-range-has-face 586 592 nil)
    (markdown-test-range-has-face 597 603 nil)
    (markdown-test-range-has-face 652 656 nil)
-   ;; (markdown-test-range-has-face 657 666 markdown-inline-code-face)
+   (markdown-test-range-has-face 657 666 markdown-inline-code-face)
    ))
 
 ;;; Wiki link tests:
