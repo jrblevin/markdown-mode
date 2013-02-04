@@ -208,3 +208,7 @@ This file is not saved."
      ;; Remove temporary files
      (delete-file fn)
      )))
+
+(provide 'markdown-test)
+
+;;; markdown-test.el ends here
