@@ -2613,8 +2613,8 @@ Calls `markdown-cycle' with argument t."
   "Return the depth to which a statement is nested in the outline."
   (cond
    ((match-end 1) 1)
-   ((match-end 2) 2)
-   ((- (match-end 0) (match-beginning 0)))))
+   ((match-end 3) 2)
+   ((- (match-end 5) (match-beginning 5)))))
 
 ;;; Structure Editing =========================================================
 
