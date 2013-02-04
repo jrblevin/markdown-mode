@@ -32,10 +32,8 @@
   (require 'markdown-mode))
 
 (defconst markdown-test-dir
-  (concat
    (expand-file-name (file-name-directory
-                      (or load-file-name buffer-file-name)))
-   "tests/"))
+                      (or load-file-name buffer-file-name))))
 
 (defmacro markdown-test-string (string &rest body)
   "Run body in a temporary buffer containing STRING."
