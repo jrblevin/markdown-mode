@@ -1203,7 +1203,7 @@ upon failure."
   "Search forward from point for the next list item with indentation LEVEL.
 Set point to the beginning of the item, and return point, or nil
 upon failure."
-  (let (bounds indent next)
+  (let (bounds indent prev next)
     (setq next (point))
     (forward-line)
     (setq indent (markdown-cur-line-indent))
