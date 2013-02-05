@@ -425,7 +425,8 @@
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
 ;;   * Joost Kremers <joostkremers@fastmail.fm> for footnote-handling
-;;     functions and bug reports regarding indentation.
+;;     functions, bug reports regarding indentation, and
+;;     fixes for byte-compilation warnings.
 ;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph
 ;;     enhancements.
 ;;   * George Ogata <george.ogata@gmail.com> for fixing several
