@@ -2371,7 +2371,7 @@ increase the indentation by one level."
               (while (not (looking-at (concat new-indent "\\([0-9]+\\)\\.")))
                 (forward-line -1)))
             (insert (concat new-indent
-                            (int-to-string (1+ (string-to-int (match-string 1))))
+                            (int-to-string (1+ (string-to-number (match-string 1))))
                             ". "))))
          ;; Unordered list
          ((string-match "[\\*\\+-]" marker)
