@@ -1102,10 +1102,11 @@ If we are at the last line, then consider the next line to be blank."
 
 (defun markdown-cur-line-indent ()
   "Return the number of leading whitespace characters in the current line."
-  (save-excursion
-    (goto-char (point-at-bol))
-    (re-search-forward "^\\s +" (point-at-eol) t)
-    (current-column)))
+  (save-match-data
+    (save-excursion
+      (goto-char (point-at-bol))
+      (re-search-forward "^[ \t]+" (point-at-eol) t)
+      (current-column))))
 
 (defun markdown-prev-line-indent ()
   "Return the number of leading whitespace characters in the previous line."
@@ -1121,10 +1122,11 @@ If we are at the last line, then consider the next line to be blank."
 
 (defun markdown-cur-non-list-indent ()
   "Return the number of leading whitespace characters in the current line."
-  (save-excursion
-    (beginning-of-line)
-    (when (re-search-forward markdown-regex-list (point-at-eol) t)
-      (current-column))))
+  (save-match-data
+    (save-excursion
+      (beginning-of-line)
+      (when (re-search-forward markdown-regex-list (point-at-eol) t)
+        (current-column)))))
 
 (defun markdown-prev-non-list-indent ()
   "Return position of the first non-list-marker on the previous line."
