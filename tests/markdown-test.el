@@ -170,6 +170,22 @@ This file is not saved."
      (should (looking-at "[*+-]"))
      (markdown-test-range-has-face loc loc markdown-list-face))))
 
+(ert-deftest test-markdown-font-lock/pre-1 ()
+  "Nested list and pre block font lock test."
+  (markdown-test-file "nested-list.text"
+    (dolist (loc (list 4 29 194 224 491 525))
+      (markdown-test-range-has-face loc loc markdown-list-face))
+    (markdown-test-range-has-face 6 25 nil)
+    (markdown-test-range-has-face 31 83 nil)
+    (markdown-test-range-has-face 85 155 markdown-pre-face)
+    (markdown-test-range-has-face 157 189 nil)
+    (markdown-test-range-has-face 196 215 nil)
+    (markdown-test-range-has-face 226 403 nil)
+    (markdown-test-range-has-face 405 482 markdown-pre-face)
+    (markdown-test-range-has-face 493 512 nil)
+    (markdown-test-range-has-face 527 546 nil)
+    (markdown-test-range-has-face 548 581 markdown-pre-face)))
+
 ;;; Lists:
 
 (ert-deftest test-markdown-lists/bounds-1 ()

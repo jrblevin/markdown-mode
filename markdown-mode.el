@@ -473,14 +473,6 @@
 ;; GNU Emacs 24, compatibility with earlier Emacsen is also a
 ;; priority.
 ;;
-;; One area where markdown-mode is lacking is in parsing complex
-;; nested preformatted blocks (e.g., a nested list containing a
-;; preformatted text block).  The syntax highlighting engine in
-;; markdown-mode currently has both false positives and false
-;; negatives in such situations (or Type I and Type II errors,
-;; if you prefer).  Patches for improvements in this area, with
-;; thorough test cases, are most welcome.
-;;
 ;; If you find any bugs in markdown-mode, please construct a test case
 ;; or a patch and email me at <jrblevin@sdf.org>.
 
@@ -1139,23 +1131,64 @@ If we are at the last line, then consider the next line to be blank."
   (forward-line)
   (while (and (or (not (markdown-prev-line-blank-p))
                   (markdown-cur-line-blank-p))
+              (not (or (looking-at markdown-regex-list)
+                       (looking-at markdown-regex-header)
+                       (looking-at markdown-regex-hr)))
               (not (eobp)))
     (forward-line)))
 
-(defun markdown--end-of-level (level)
-  "Move the point to the end of region with indentation at least LEVEL."
-  (let (indent)
-    (while (and (not (< (setq indent (markdown-cur-line-indent)) level))
-                (not (>= indent (+ level 4)))
-                (not (eobp)))
-      (markdown--next-block))
-    (unless (eobp)
-      ;; Move back before any trailing blank lines
-      (while (and (markdown-prev-line-blank-p)
-                  (not (bobp)))
-        (forward-line -1))
-      (forward-line -1)
-      (end-of-line))))
+(defun markdown-new-baseline-p ()
+  "Determine if the current line begins a new baseline level."
+  (save-excursion
+    (beginning-of-line)
+    (save-match-data
+      (or (looking-at markdown-regex-header)
+          (looking-at markdown-regex-hr)))))
+
+(defun markdown-search-backward-baseline ()
+  "Search backward baseline point with no indentation and not a list item."
+  (end-of-line)
+  (let (stop)
+    (while (not (or stop (bobp)))
+      (re-search-backward "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)" nil t)
+      (when (match-end 2)
+        (goto-char (match-end 2))
+        (cond
+         ((markdown-new-baseline-p)
+          (setq stop t))
+         ((looking-at markdown-regex-list)
+          (setq stop nil))
+         (t (setq stop t)))))))
+
+(defun markdown-update-list-levels (marker indent levels)
+  "Update list levels given list MARKER, block INDENT, and current LEVELS.
+Here, MARKER is a string representing the type of list, INDENT is an integer
+giving the indentation, in spaces, of the current block, and LEVELS is a
+list of the indentation levels of parent list items.  When LEVELS is nil,
+it means we are at baseline (not inside of a nested list)."
+  (cond
+   ;; New list item at baseline.
+   ((and marker (null levels))
+    (setq levels (list indent)))
+   ;; List item with greater indentation (four or more spaces).
+   ;; Increase list level.
+   ((and marker (>= indent (+ (car levels) 4)))
+    (setq levels (cons indent levels)))
+   ;; List item with greater or equal indentation (less than four spaces).
+   ;; Do not increase list level.
+   ((and marker (>= indent (car levels)))
+    levels)
+   ;; Lesser indentation level.
+   ;; Pop appropriate number of elements off LEVELS list (e.g., lesser
+   ;; indentation could move back more than one list level).  Note
+   ;; that this block need not be the beginning of list item.
+   ((< indent (car levels))
+    (while (and (> (length levels) 1)
+                (< indent (+ (car (cdr levels)) 4)))
+      (setq levels (cdr levels)))
+    levels)
+   ;; Otherwise, do nothing.
+   (t levels)))
 
 (defun markdown-prev-list-item (level)
   "Search backward from point for a list item with indentation LEVEL.
@@ -1308,6 +1341,8 @@ Leave match data intact for `markdown-regex-list'."
           (list prev-begin prev-end indent nonlist-indent)
         nil))))
 
+;;; Markdown font lock matching functions =====================================
+
 ;; From html-helper-mode
 (defun markdown-match-comments (last)
   "Match HTML comments from the point to LAST."
@@ -1321,78 +1356,64 @@ Leave match data intact for `markdown-regex-list'."
         (t nil)))
 
 (defun markdown-match-pre-blocks (last)
-  "Match Markdown pre blocks from point to LAST.
-A region matches as if it is indented at least four spaces
-relative to the nearest previous block of lesser non-list-marker
-indentation."
+  "Match Markdown pre blocks from point to LAST."
+  (let ((first (point)) levels indent pre-regexp end-regexp begin end stop)
+    ;; Find a baseline point with zero list indentation
+    (markdown-search-backward-baseline)
 
-  (let (cur-begin cur-end cur-indent prev-indent prev-list stop match found)
-    ;; Don't start in the middle of a block
-    (unless (and (bolp)
-                 (markdown-prev-line-blank-p)
-                 (not (markdown-cur-line-blank-p)))
-      (markdown--next-block))
+    ;; Search for all list items between baseline and FIRST
+    (while (re-search-forward markdown-regex-list first t)
+      (cond
+       ;; Make sure this is not a header or hr
+       ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+       ;; If not, then update levels
+       (t
+        (setq indent (markdown-cur-line-indent))
+        (setq levels (markdown-update-list-levels (match-string 2) indent levels)))))
 
-    ;; Move to the first full block in the region with indent 4 or more
-    (while (and (not (>= (setq cur-indent (markdown-cur-line-indent)) 4))
-                (not (>= (point) last)))
-      (markdown--next-block))
-    (setq cur-begin (point))
-    (markdown--end-of-level cur-indent)
-    (setq cur-end (point))
-    (setq match nil)
-    (setq stop (> cur-begin cur-end))
+    ;; Search for pre blocks from FIRST to LAST
+    (goto-char first)
+    (while (and (< (point) last) (not end))
+      ;; Search for a region with sufficient indentation
+      (if (null levels)
+          (setq indent 1)
+        (setq indent (1+ (length levels))))
+      (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" indent))
+      (setq end-regexp (format "^\\(    \\|\t\\)\\{0,%d\\}\\([^ \t]\\)" (1- indent)))
 
-    (while (and (<= cur-end last) (not stop) (not match))
-      ;; Move to the nearest preceding block of lesser (non-marker) indentation
-      (setq prev-indent (+ cur-indent 1))
-      (goto-char cur-begin)
-      (setq found nil)
-      (while (and (>= prev-indent cur-indent)
-                  (not (and prev-list
-                            (eq prev-indent cur-indent)))
-                  (not (bobp)))
+      (cond
+       ;; If not at the beginning of a line, move forward
+       ((not (bolp)) (forward-line))
+       ;; Move past blank lines
+       ((markdown-cur-line-blank-p) (forward-line))
+       ;; At headers and horizontal rules, reset levels
+       ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+       ;; If the current line has sufficient indentation, mark out pre block
+       ((looking-at pre-regexp)
+        (setq begin (match-beginning 0))
+        (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
+                    (not (eobp)))
+          (forward-line))
+        (setq end (point)))
+       ;; If current line has a list marker, update levels, move to end of block
+       ((looking-at markdown-regex-list)
+        (setq levels (markdown-update-list-levels
+                      (match-string 2) (markdown-cur-line-indent) levels))
+        (markdown--next-block))
+       ;; If this is the end of the indentation level, adjust levels accordingly.
+       ;; Only match end of indentation level if levels is not the empty list.
+       ((and (car levels) (looking-at end-regexp))
+        (setq levels (markdown-update-list-levels
+                      nil (markdown-cur-line-indent) levels))
+        (markdown--next-block))
+       (t (markdown--next-block))))
 
-        ;; Move point to the last line of the previous block.
-        (forward-line -1)
-        (while (and (markdown-cur-line-blank-p)
-                    (not (bobp)))
-          (forward-line -1))
-
-        ;; Update the indentation level using either the
-        ;; non-list-marker indentation, if the previous line is the
-        ;; start of a list, or the actual indentation.
-        (setq prev-list (markdown-cur-non-list-indent))
-        (setq prev-indent (or prev-list
-                              (markdown-cur-line-indent)))
-        (setq found t))
-
-      ;; If the loop didn't execute
-      (unless found
-        (setq prev-indent 0))
-
-      ;; Compare with prev-indent minus its remainder mod 4
-      (setq prev-indent (- prev-indent (mod prev-indent 4)))
-
-      ;; Set match data and return t if we have a match
-      (if (>= cur-indent (+ prev-indent 4))
-          ;; Match
-          (progn
-            (setq match t)
-            (set-match-data (list cur-begin cur-end))
-            ;; Leave point at end of block
-            (goto-char cur-end)
-            (forward-line))
-
-        ;; Move to the next block (if possible)
-        (goto-char cur-end)
-        (markdown--next-block)
-        (setq cur-begin (point))
-        (setq cur-indent (markdown-cur-line-indent))
-        (markdown--end-of-level cur-indent)
-        (setq cur-end (point))
-        (setq stop (equal cur-begin cur-end))))
-    match))
+    (if (not (and begin end))
+        ;; Return nil if no pre block was found
+        nil
+      ;; Set match data and return t upon success
+      (set-match-data (list begin end))
+      t)))
 
 (defun markdown-match-fenced-code-blocks (last)
   "Match fenced code blocks from the point to LAST."
