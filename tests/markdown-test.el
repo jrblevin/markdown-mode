@@ -1531,6 +1531,12 @@ This file is not saved."
     (markdown-test-range-has-face 2647 2728 markdown-pre-face)
     (markdown-test-range-has-face 2730 2732 markdown-pre-face)))
 
+(ert-deftest test-markdown-gfm/italic-1 ()
+  "GFM italic font lock test."
+  (markdown-test-file-gfm "gfm.text"
+    (markdown-test-range-has-face 1483 1488 markdown-italic-face)
+    (markdown-test-range-has-face 1729 1790 nil)))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here

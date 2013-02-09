@@ -1002,6 +1002,11 @@ Group 2 matches the entire expression, including delimiters.
 Groups 3 and 5 matches the opening and closing delimiters.
 Group 4 matches the text inside the delimiters.")
 
+(defconst markdown-regex-gfm-italic
+  "\\(^\\|\\s-\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)\\)"
+  "Regular expression for matching italic text in GitHub-flavored Markdown.
+Underscores in words are not treated as special.")
+
 (defconst markdown-regex-blockquote
   "^[ \t]*\\(>\\).*$"
   "Regular expression for matching blockquote lines.")
@@ -1051,10 +1056,6 @@ text.")
   (list
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
-   (cons 'markdown-match-gfm-code-blocks '((1 markdown-pre-face)
-                                           (2 markdown-language-keyword-face nil t)
-                                           (3 markdown-pre-face)
-                                           (4 markdown-pre-face)))
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext '((1 markdown-header-face-1)
                                           (2 markdown-header-rule-face)))
@@ -1094,9 +1095,15 @@ text.")
                                                (3 markdown-link-title-face t)))
    (cons markdown-regex-footnote 'markdown-footnote-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
-   (cons markdown-regex-italic '(2 markdown-italic-face))
    )
   "Syntax highlighting for Markdown files.")
+
+(defvar markdown-mode-font-lock-keywords-core
+  (list
+   (cons markdown-regex-italic '(2 markdown-italic-face))
+   )
+  "Additional syntax highlighting for Markdown files.
+Includes features which are overridden by some variants.")
 
 (defconst markdown-mode-font-lock-keywords-latex
   (list
@@ -1114,7 +1121,8 @@ text.")
   (append
    (if markdown-enable-math
        markdown-mode-font-lock-keywords-latex)
-   markdown-mode-font-lock-keywords-basic)
+   markdown-mode-font-lock-keywords-basic
+   markdown-mode-font-lock-keywords-core)
   "Default highlighting expressions for Markdown mode.")
 
 ;; Footnotes
@@ -3793,10 +3801,27 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 ;;; GitHub Flavored Markdown Mode  ============================================
 
+(defvar gfm-font-lock-keywords
+  (append
+   ;; GFM features to match first
+   (list
+    (cons 'markdown-match-gfm-code-blocks '((1 markdown-pre-face)
+                                            (2 markdown-language-keyword-face)
+                                            (3 markdown-pre-face)
+                                            (4 markdown-pre-face))))
+   ;; Basic Markdown features (excluding possibly overridden ones)
+   markdown-mode-font-lock-keywords-basic
+   ;; GFM features to match last
+   (list
+    (cons markdown-regex-gfm-italic '(2 markdown-italic-face))))
+  "Default highlighting expressions for GitHub-flavored Markdown mode.")
+
 ;;;###autoload
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
   (setq markdown-link-space-sub-char "-")
+  (set (make-local-variable 'font-lock-defaults)
+       '(gfm-font-lock-keywords))
   (auto-fill-mode 0)
   ;; Use visual-line-mode if available, fall back to longlines-mode:
   (if (fboundp 'visual-line-mode)
