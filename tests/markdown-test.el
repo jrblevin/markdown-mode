@@ -339,6 +339,42 @@ This file is not saved."
      (delete-file fn)
      )))
 
+;;; Hook tests:
+
+(ert-deftest test-markdown-hook/before-export ()
+  "Test hook run before export XHTML."
+  (markdown-test-temp-file "lists.text"
+   (let* ((before-hook-run nil)
+          (ofile (concat buffer-file-name ".html"))
+          (func (lambda (fname)
+                  (setq before-hook-run t)
+                  (should (string-equal fname ofile)))))
+     ;; Register function
+     (add-hook 'markdown-before-export-hooks func)
+     ;; Export XHTML
+     (markdown-export ofile)
+     (should (eq before-hook-run t))
+     ;; Clean
+     (remove-hook 'markdown-before-export-hooks func)
+     (delete-file ofile))))
+
+(ert-deftest test-markdown-hook/after-export ()
+  "Test hook run after export XHTML."
+  (markdown-test-temp-file "lists.text"
+   (let* ((after-hook-run nil)
+          (ofile (concat buffer-file-name ".html"))
+          (func (lambda (fname)
+                  (setq after-hook-run t)
+                  (should (string-equal fname ofile)))))
+     ;; Register function
+     (add-hook 'markdown-after-export-hooks func)
+     ;; Export XHTML
+     (markdown-export ofile)
+     (should (eq after-hook-run t))
+     ;; Clean
+     (remove-hook 'markdown-after-export-hooks func)
+     (delete-file ofile))))
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()
