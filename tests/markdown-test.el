@@ -1,6 +1,7 @@
 ;;;; markdown-test.el --- Tests for markdown-mode
 
 ;; Copyright (C) 2013 Jason R. Blevins <jrblevin@sdf.org>
+;; Copyright (C) 2013 Makoto Motohashi <mkt.motohashi@gmail.com>
 
 ;; This file is not part of GNU Emacs.
 

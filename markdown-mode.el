@@ -472,6 +472,8 @@
 ;;     externally modified files.
 ;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> and Carsten Dominik
 ;;     for a bug fix related to orgtbl-mode.
+;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
+;;     export hooks and unit test improvements.
 
 ;;; Bugs:
 
@@ -527,10 +529,12 @@
   "Hook run when entering Markdown mode.")
 
 (defvar markdown-before-export-hooks nil
-  "Hook run before output XHTML. This hook is abnormal and registered functions are given an argument that is output filename.")
+  "Hook run before output XHTML.
+This hook is abnormal and registered functions are given an argument that is output filename.")
 
 (defvar markdown-after-export-hooks nil
-  "Hook run after output XHTML. This hook is abnormal and registered functions are given an argument that is output filename.")
+  "Hook run after output XHTML.
+This hook is abnormal and registered functions are given an argument that is output filename.")
 
 (defgroup markdown nil
   "Major mode for editing text files in Markdown format."
