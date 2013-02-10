@@ -73,12 +73,10 @@
   "Open FILE from `markdown-test-dir' visiting temp file and execute body.
 This file is not saved."
   `(let ((fn (concat markdown-test-dir ,file))
-         (tmp (make-temp-file "markdown-test"))
-         tmp-text
+         (tmp (make-temp-file "markdown-test" nil ".text"))
          buf)
      (save-window-excursion
-       (setq tmp-text (concat tmp ".text"))
-       (setq buf (find-file tmp-text))
+       (setq buf (find-file tmp))
        (insert-file-contents fn)
        (markdown-mode)
        (goto-char (point-min))
