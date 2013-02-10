@@ -20,3 +20,9 @@ as in \`foo\` or \`bar\`.
 
 But this will be a code span crossing lines: \`foo` or
 bar ` containing only "or bar".
+
+This should result in three backquotes in a code span `` ``` `` and
+they should even match across across lines `` ```
+``, like so.  However, backquotes should not `` ``` match
+
+across two blocks``.

@@ -164,17 +164,29 @@ This file is not saved."
   (markdown-test-file "inline.text"
    (goto-char 45)
    (should (looking-at "`"))
+   ;; Regular code span
    (markdown-test-range-has-face 45 50 markdown-inline-code-face)
+   ;; Code containing backticks
    (markdown-test-range-has-face 61 89 markdown-inline-code-face)
-   ;; These tests are known to fail:
+   ;; Seven backquotes in a row
    (markdown-test-range-has-face 119 125 nil)
+   ;; Backquotes at beginning or end
    (markdown-test-range-has-face 228 239 markdown-inline-code-face)
    (markdown-test-range-has-face 341 351 markdown-inline-code-face)
+   ;; Backslash as final character
    (markdown-test-range-has-face 460 468 markdown-inline-code-face)
+   ;; Escaping of leading backquotes
    (markdown-test-range-has-face 586 592 nil)
    (markdown-test-range-has-face 597 603 nil)
+   ;; A code span crossing lines
    (markdown-test-range-has-face 652 656 nil)
    (markdown-test-range-has-face 657 666 markdown-inline-code-face)
+   ;; Three backquotes: same line, across lines, not across blocks
+   (markdown-test-range-has-face 695 748 nil)
+   (markdown-test-range-has-face 749 757 markdown-inline-code-face)
+   (markdown-test-range-has-face 758 805 nil)
+   (markdown-test-range-has-face 806 814 markdown-inline-code-face)
+   (markdown-test-range-has-face 815 891 nil)
    ))
 
 (ert-deftest test-markdown-font-lock/lists-1 ()

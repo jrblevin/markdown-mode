@@ -915,12 +915,14 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for matching Markdown horizontal rules.")
 
 (defconst markdown-regex-code
-  "\\(^\\|[^\\]\\)\\(\\(`+\\)\\(\\(.\\|\n[^\n]\\)*?[^`]\\)\\3\\)"
+  "\\(\\`\\|[^\\]\\)\\(\\(`+\\)\\(\\(.\\|\n[^\n]\\)*?[^`]\\)\\3\\)\\([^`]\\|\\'\\)"
   "Regular expression for matching inline code fragments.
 
 The first group ensures that the leading backquote character
 is not escaped.  The group \\(.\\|\n[^\n]\\) matches any
-character, including newlines, but not two newlines in a row.")
+character, including newlines, but not two newlines in a row.
+The final group requires that the character following the code
+fragment is not a backquote.")
 
 (defconst markdown-regex-pre
   "^\\(    \\|\t\\).*$"
