@@ -1523,15 +1523,13 @@ and S2 around the region."
   "Insert a horizonal rule using `markdown-hr-string'."
   (interactive)
   ;; Leading blank line
-  (when (and (>= (point) (+ (point-min) 2))
-             (not (looking-back "\n\n" 2)))
-    (insert "\n"))
+  (unless (bolp) (insert "\n"))
+  (unless (looking-back "\n\n") (insert "\n"))
   ;; Insert custom HR string
-  (insert (concat markdown-hr-string "\n"))
+  (insert markdown-hr-string)
   ;; Following blank line
-  (backward-char)
-  (unless (looking-at "\n\n")
-    (insert "\n")))
+  (unless (eolp) (insert "\n"))
+  (unless (looking-at "\n\n") (insert "\n")))
 
 (defun markdown-insert-bold ()
   "Insert markup for a bold word or phrase.
