@@ -1072,20 +1072,21 @@ Replace all matches for REGEXP with REP in STRING."
       (replace-in-string string regexp rep)
     (replace-regexp-in-string regexp rep string)))
 
+;; `markdown-use-region-p' is a compatibility function which checks
+;; for an active region, with fallbacks for older Emacsen and XEmacs.
 (eval-and-compile
-  (if (boundp 'mark-active)
-      (defun markdown-mark-active ()    ; Emacs
-        mark-active)
-    (defalias 'markdown-mark-active 'region-exists-p))) ; XEmacs
-
-(defun markdown-transient-mark-mode-active ()
-  "Determine if Transient Mark mode is on and there is an active region.
-Works in both Emacs and XEmacs."
   (cond
-   ((boundp 'transient-mark-mode)
-    (and transient-mark-mode (markdown-mark-active)))
-   ((boundp 'zmacs-regions)
-    (and zmacs-regions (markdown-mark-active)))))
+   ;; Emacs 23 and newer
+   ((fboundp 'use-region-p)
+    (defalias 'markdown-use-region-p 'use-region-p))
+   ;; Older Emacsen
+   ((and (boundp 'transient-mark-mode) (boundp 'mark-active))
+    (defun markdown-use-region-p ()
+      "Compatibility wrapper to provide `use-region-p'."
+      (and transient-mark-mode mark-active)))
+   ;; XEmacs
+   ((fboundp 'region-active-p)
+    (defalias 'markdown-use-region-p 'region-active-p))))
 
 
 
@@ -1521,7 +1522,7 @@ This helps improve font locking for block constructs such as pre blocks."
   "Insert the strings S1 and S2.
 If Transient Mark mode is on and a region is active, wrap the strings S1
 and S2 around the region."
-  (if (markdown-transient-mark-mode-active)
+  (if (markdown-use-region-p)
       (let ((a (region-beginning)) (b (region-end)))
         (goto-char a)
         (insert s1)
@@ -1579,7 +1580,7 @@ from the minibuffer.  The link URL, label, and title will be read
 from the minibuffer.  The link label definition is placed at the
 end of the current paragraph."
   (interactive)
-  (if (markdown-transient-mark-mode-active)
+  (if (markdown-use-region-p)
       (call-interactively 'markdown-insert-reference-link-region)
     (call-interactively 'markdown-insert-reference-link)))
 
@@ -1698,7 +1699,7 @@ region is active, it is used as the header text."
   "Insert a setext-style (underlined) header with CHAR repeated underneath.
 CHAR should be either a hyphen (-) or an equals sign (=)."
   (cond
-   ((markdown-transient-mark-mode-active)
+   ((markdown-use-region-p)
     (let ((a (region-beginning)) (b (region-end)))
       (goto-char b)
       ;; If the region spans multiple lines, only use the last one.
@@ -1733,7 +1734,7 @@ CHAR should be either a hyphen (-) or an equals sign (=)."
 If Transient Mark mode is on and a region is active, it is used as
 the blockquote text."
   (interactive)
-  (if (markdown-transient-mark-mode-active)
+  (if (markdown-use-region-p)
       (markdown-blockquote-region (region-beginning) (region-end))
     (insert "> ")))
 
@@ -1781,7 +1782,7 @@ Arguments BEG and END specify the beginning and end of the region."
 If Transient Mark mode is on and a region is active, it is marked
 as preformatted text."
   (interactive)
-  (if (markdown-transient-mark-mode-active)
+  (if (markdown-use-region-p)
       (markdown-pre-region (region-beginning) (region-end))
     (insert "    ")))
 
@@ -1798,7 +1799,7 @@ region is active, wrap this region with the markup instead.  If
 the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
   (interactive "sProgramming language: ")
-  (if (markdown-transient-mark-mode-active)
+  (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
         (goto-char b)
         ;; if we're on a blank line, insert the quotes here, otherwise
@@ -2765,7 +2766,7 @@ Return the name of the output buffer used."
   (save-window-excursion
     (let ((begin-region)
           (end-region))
-      (if (markdown-transient-mark-mode-active)
+      (if (markdown-use-region-p)
           (setq begin-region (region-beginning)
                 end-region (region-end))
         (setq begin-region (point-min)
