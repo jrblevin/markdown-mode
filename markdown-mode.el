@@ -1514,9 +1514,11 @@ This helps improve font locking for block constructs such as pre blocks."
   (unless (looking-back "\n\\s-*\n") (insert "\n")))
 
 (defun markdown-ensure-blank-line-after ()
-  "If following line is not already blank, insert a blank line after point."
-  (unless (eolp) (insert "\n"))
-  (unless (looking-at "\n\\s-*\n") (insert "\n")))
+  "If following line is not already blank, insert a blank line after point.
+Return the point where it was originally."
+  (save-excursion
+    (unless (eolp) (insert "\n"))
+    (unless (looking-at "\n\\s-*\n") (insert "\n"))))
 
 (defun markdown-wrap-or-insert (s1 s2)
   "Insert the strings S1 and S2.

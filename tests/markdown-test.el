@@ -131,6 +131,81 @@ This file is not saved."
    (should (eq font-lock-multiline t))
    (should (eq major-mode 'markdown-mode))))
 
+;;; Element insertion tests:
+
+(ert-deftest test-markdown-insertion/blank-line-before-1 ()
+  "Test function `markdown-ensure-blank-line-before' at beginning of line."
+  (markdown-test-file "syntax.text"
+   (search-forward "as plain text")
+   (should (= (point) 1556))
+   (beginning-of-line)
+   (should (= (point) 1505))
+   (should (looking-back "A Markdown-formatted\n"))
+   (should (not (markdown-prev-line-blank-p)))
+   (markdown-ensure-blank-line-before)
+   (should (looking-back "A Markdown-formatted\n\n"))
+   (should (markdown-prev-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/blank-line-before-2 ()
+  "Test function `markdown-ensure-blank-line-before' in middle of line."
+  (markdown-test-file "syntax.text"
+   (search-forward "as plain text")
+   (should (= (point) 1556))
+   (should (looking-back "as plain text"))
+   (should (not (markdown-prev-line-blank-p)))
+   (markdown-ensure-blank-line-before)
+   (should (looking-back "as plain text\n\n"))
+   (should (markdown-prev-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/blank-line-before-3 ()
+  "Test function `markdown-ensure-blank-line-before' with blank line before."
+  (markdown-test-file "syntax.text"
+   (search-forward "web.\n\nMarkdown is not a replacement for HTML")
+   (beginning-of-line)
+   (should (= (point) 2704))
+   (should (looking-back "web.\n\n"))
+   (should (markdown-prev-line-blank-p))
+   (markdown-ensure-blank-line-before)
+   (should (= (point) 2704))
+   (should (looking-back "web.\n\n"))
+   (should (markdown-prev-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/blank-line-after-1 ()
+  "Test function `markdown-ensure-blank-line-after' at end of line."
+  (markdown-test-file "syntax.text"
+   (search-forward "as plain text")
+   (should (= (point) 1556))
+   (end-of-line)
+   (should (= (point) 1573))
+   (should (looking-at "\nlike it's been"))
+   (should (not (markdown-next-line-blank-p)))
+   (markdown-ensure-blank-line-after)
+   (should (looking-at "\n\nlike it's been"))
+   (should (markdown-next-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/blank-line-after-2 ()
+  "Test function `markdown-ensure-blank-line-after' in middle of line."
+  (markdown-test-file "syntax.text"
+   (search-forward "as plain text")
+   (should (= (point) 1556))
+   (should (looking-at ", without looking"))
+   (should (not (markdown-next-line-blank-p)))
+   (markdown-ensure-blank-line-after)
+   (should (looking-at "\n\n, without looking"))
+   (should (markdown-next-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/blank-line-after-3 ()
+  "Test function `markdown-ensure-blank-line-after' with blank line after."
+  (markdown-test-file "syntax.text"
+   (search-forward "*writing* for the web.")
+   (should (= (point) 2702))
+   (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
+   (should (markdown-next-line-blank-p))
+   (markdown-ensure-blank-line-after)
+   (should (= (point) 2702))
+   (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
+   (should (markdown-next-line-blank-p))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
