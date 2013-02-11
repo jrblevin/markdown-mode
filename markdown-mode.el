@@ -1688,44 +1688,45 @@ region is active, it is used as the header text."
       (setq hdr (concat "#" hdr)))      ; Build a hash mark header string
     (setq hdrl (concat hdr " "))
     (setq hdrr (concat " " hdr))
-    (markdown-wrap-or-insert hdrl hdrr))
-  (backward-char (+ 1 n)))
+    (markdown-ensure-blank-line-before)
+    (markdown-wrap-or-insert hdrl hdrr)
+    (save-excursion
+      (markdown-ensure-blank-line-after))
+    (backward-char (1+ n))))
+
+(defun markdown-insert-setext-header (char)
+  "Insert a setext-style (underlined) header with CHAR repeated underneath.
+CHAR should be either a hyphen (-) or an equals sign (=)."
+  (cond
+   ((markdown-transient-mark-mode-active)
+    (let ((a (region-beginning)) (b (region-end)))
+      (goto-char b)
+      ;; If the region spans multiple lines, only use the last one.
+      (setq a (max a (point-at-bol)))
+      (insert "\n")
+      (dotimes (count (- b a))
+        (insert char))
+      (markdown-ensure-blank-line-after)
+      (goto-char a)
+      (markdown-ensure-blank-line-before)))
+   (t
+    (let ((text (read-string "Header text: ")))
+      (when (> (length text) 0)
+        (markdown-ensure-blank-line-before)
+        (insert text "\n")
+        (dotimes (count (length text))
+          (insert char))
+        (markdown-ensure-blank-line-after))))))
 
 (defun markdown-insert-title ()
-  "Insert a setext-style (underline) first level header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
+  "Insert a setext-style (underlined) first-level header."
   (interactive)
-  (if (markdown-transient-mark-mode-active)
-      (let ((a (region-beginning))
-            (b (region-end))
-            (len 0)
-            (hdr))
-        (setq len (- b a))
-        (dotimes (count len hdr)
-          (setq hdr (concat "=" hdr)))  ; Build a === title underline
-        (end-of-line)
-        (insert "\n" hdr "\n"))
-    (insert "\n==========\n")
-    (backward-char 12)))
+  (markdown-insert-setext-header "="))
 
 (defun markdown-insert-section ()
-  "Insert a setext-style (underline) second level header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
+  "Insert a setext-style (underlined) second-level header."
   (interactive)
-  (if (markdown-transient-mark-mode-active)
-      (let ((a (region-beginning))
-            (b (region-end))
-            (len 0)
-            (hdr))
-        (setq len (- b a))
-        (dotimes (count len hdr)
-          (setq hdr (concat "-" hdr)))  ; Build a --- section underline
-        (end-of-line)
-        (insert "\n" hdr "\n"))
-    (insert "\n----------\n")
-    (backward-char 12)))
+  (markdown-insert-setext-header "-"))
 
 (defun markdown-insert-blockquote ()
   "Start a blockquote section (or blockquote the region).
