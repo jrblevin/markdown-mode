@@ -1507,6 +1507,16 @@ This helps improve font locking for block constructs such as pre blocks."
 
 ;;; Element Insertion =========================================================
 
+(defun markdown-ensure-blank-line-before ()
+  "If previous line is not already blank, insert a blank line before point."
+  (unless (bolp) (insert "\n"))
+  (unless (looking-back "\n\\s-*\n") (insert "\n")))
+
+(defun markdown-ensure-blank-line-after ()
+  "If following line is not already blank, insert a blank line after point."
+  (unless (eolp) (insert "\n"))
+  (unless (looking-at "\n\\s-*\n") (insert "\n")))
+
 (defun markdown-wrap-or-insert (s1 s2)
   "Insert the strings S1 and S2.
 If Transient Mark mode is on and a region is active, wrap the strings S1
@@ -1522,14 +1532,9 @@ and S2 around the region."
 (defun markdown-insert-hr ()
   "Insert a horizonal rule using `markdown-hr-string'."
   (interactive)
-  ;; Leading blank line
-  (unless (bolp) (insert "\n"))
-  (unless (looking-back "\n\n") (insert "\n"))
-  ;; Insert custom HR string
+  (markdown-ensure-blank-line-before)
   (insert markdown-hr-string)
-  ;; Following blank line
-  (unless (eolp) (insert "\n"))
-  (unless (looking-at "\n\n") (insert "\n")))
+  (markdown-ensure-blank-line-after))
 
 (defun markdown-insert-bold ()
   "Insert markup for a bold word or phrase.
