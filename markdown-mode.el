@@ -1530,17 +1530,38 @@ Return the point where it was originally."
     (unless (eolp) (insert "\n"))
     (unless (looking-at "\n\\s-*\n") (insert "\n"))))
 
-(defun markdown-wrap-or-insert (s1 s2)
-  "Insert the strings S1 and S2.
-If Transient Mark mode is on and a region is active, wrap the strings S1
-and S2 around the region."
-  (if (markdown-use-region-p)
-      (let ((a (region-beginning)) (b (region-end)))
-        (goto-char a)
-        (insert s1)
-        (goto-char (+ b (length s1)))
-        (insert s2))
-    (insert s1 s2)))
+(defun markdown-wrap-or-insert (s1 s2 &optional thing)
+  "Insert the strings S1 and S2, wrapping around region or THING.
+If there is an active region, wrap the strings S1 and S2 around
+the region.  If there is not an active region but the point is at
+THING, wrap that thing (which defaults to word).  Otherwise, just
+insert S1 and S2 and place the cursor in between.  Return the
+bounds of the string wrapped, or nil if nothing was wrapped
+and S1 and S2 were only inserted."
+  (let (a b bounds new-point)
+    (cond
+     ;; Active region
+     ((markdown-use-region-p)
+      (setq a (region-beginning)
+            b (region-end)
+            new-point (+ (point) (length s1))))
+     ;; Thing (word) at point
+     ((setq bounds (bounds-of-thing-at-point (or thing 'word)))
+      (setq a (car bounds)
+            b (cdr bounds)
+            new-point (+ (point) (length s1))))
+     ;; No active region and no word
+     (t
+      (setq a (point)
+            b (point))))
+    (goto-char b)
+    (insert s2)
+    (goto-char a)
+    (insert s1)
+    (when new-point (goto-char new-point))
+    (if (= a b)
+        nil
+      (cons a b))))
 
 (defun markdown-insert-hr ()
   "Insert a horizonal rule using `markdown-hr-string'."
@@ -1550,39 +1571,63 @@ and S2 around the region."
   (markdown-ensure-blank-line-after))
 
 (defun markdown-insert-bold ()
-  "Insert markup for a bold word or phrase.
-If Transient Mark mode is on and a region is active, it is made bold."
+  "Insert markup to make a region or word bold.
+If there is an active region, make the region bold.  If the point
+is at a non-bold word, make the word bold.  If the point is at a
+bold word or phrase, remove the bold markup.  Otherwise, simply
+insert bold delimiters and place the cursor in between them."
   (interactive)
-  (if markdown-bold-underscore
-      (markdown-wrap-or-insert "__" "__")
-    (markdown-wrap-or-insert "**" "**"))
-  (backward-char 2))
+  (if (thing-at-point-looking-at markdown-regex-bold)
+      (let* ((old (point))
+             (new (cond ((< old (match-end 3)) old)
+                        ((< old (match-end 4)) (- old 2))
+                        ((< old (match-end 2)) (- old 4))
+                        (t old))))
+        (replace-match (match-string 4) t t nil 2)
+        (goto-char new))
+    (if markdown-bold-underscore
+        (markdown-wrap-or-insert "__" "__")
+      (markdown-wrap-or-insert "**" "**"))))
 
 (defun markdown-insert-italic ()
-  "Insert markup for an italic word or phrase.
-If Transient Mark mode is on and a region is active, it is made italic."
+  "Insert markup to make a region or word italic.
+If there is an active region, make the region italic.  If the point
+is at a non-italic word, make the word italic.  If the point is at an
+italic word or phrase, remove the italic markup.  Otherwise, simply
+insert italic delimiters and place the cursor in between them."
   (interactive)
-  (if markdown-italic-underscore
-      (markdown-wrap-or-insert "_" "_")
-    (markdown-wrap-or-insert "*" "*"))
-  (backward-char 1))
+  (if (thing-at-point-looking-at markdown-regex-italic)
+      (let* ((old (point))
+             (new (cond ((< old (match-end 3)) old)
+                        ((< old (match-end 4)) (- old 1))
+                        ((< old (match-end 2)) (- old 2))
+                        (t old))))
+        (replace-match (match-string 4) t t nil 2)
+        (goto-char new))
+    (if markdown-italic-underscore
+        (markdown-wrap-or-insert "_" "_")
+      (markdown-wrap-or-insert "*" "*"))))
 
 (defun markdown-insert-code ()
-  "Insert markup for an inline code fragment.
-If Transient Mark mode is on and a region is active, it is marked
-as inline code."
+  "Insert markup to make a region or word an inline code fragment.
+If there is an active region, make the region an inline code
+fragment.  If the point is at a word, make the word an inline
+code fragment.  Otherwise, simply insert code delimiters and
+place the cursor in between them."
   (interactive)
-  (markdown-wrap-or-insert "`" "`")
-  (backward-char 1))
+  (markdown-wrap-or-insert "`" "`"))
 
 (defun markdown-insert-link ()
-  "Insert an inline link of the form []().
-If Transient Mark mode is on and a region is active, it is used
-as the link text."
+  "Insert an inline link, using region or word as link text if possible.
+If there is an active region, use the region as the link text.  If the
+point is at a word, use the word as the link text.  In these cases, the
+point will be left at the position for inserting a URL.  If there is no
+active region and the point is not at word, simply insert link markup and
+place the point in the position to enter link text."
   (interactive)
-  (markdown-wrap-or-insert "[" "]")
-  (insert "()")
-  (backward-char 1))
+  (let ((bounds (markdown-wrap-or-insert "[" "]()")))
+    (when bounds
+      (goto-char (+ (cdr bounds) 3)))))
 
 (defun markdown-insert-reference-link-dwim ()
   "Insert a reference link of the form [text][label] at point.
@@ -1638,13 +1683,16 @@ as the link text."
   (backward-char 2))
 
 (defun markdown-insert-image ()
-  "Insert an inline image tag of the form ![]().
-If Transient Mark mode is on and a region is active, it is used
-as the alt text of the image."
+  "Insert inline image markup using region or word as alt text if possible.
+If there is an active region, use the region as the alt text.  If the
+point is at a word, use the word as the alt text.  In these cases, the
+point will be left at the position for inserting a URL.  If there is no
+active region and the point is not at word, simply insert image markup and
+place the point in the position to enter alt text."
   (interactive)
-  (markdown-wrap-or-insert "![" "]")
-  (insert "()")
-  (backward-char 1))
+  (let ((bounds (markdown-wrap-or-insert "![" "]()")))
+    (when bounds
+      (goto-char (+ (cdr bounds) 4)))))
 
 (defun markdown-insert-header-1 ()
   "Insert a first level atx-style (hash mark) header.
