@@ -42,6 +42,7 @@
     (markdown-mode)
     (insert ,string)
     (goto-char (point-min))
+    (font-lock-fontify-buffer)
     (prog1 ,@body (kill-buffer))))
 (def-edebug-spec markdown-test-string (form body))
 
