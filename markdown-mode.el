@@ -933,12 +933,22 @@ fragment is not a backquote.")
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
-  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)"
-  "Regular expression for matching bold text.")
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\([^ \\]\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\3\\)\\)"
+  "Regular expression for matching bold text.
+Group 1 matches the character before the opening asterisk or
+underscore, if any, ensuring that it is not a backslash escape.
+Group 2 matches the entire expression, including delimiters.
+Groups 3 and 5 matches the opening and closing delimiters.
+Group 4 matches the text inside the delimiters.")
 
 (defconst markdown-regex-italic
-  "\\(^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)\\)"
-  "Regular expression for matching italic text.")
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \\]\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\3\\)\\)"
+  "Regular expression for matching italic text.
+Group 1 matches the character before the opening asterisk or
+underscore, if any, ensuring that it is not a backslash escape.
+Group 2 matches the entire expression, including delimiters.
+Groups 3 and 5 matches the opening and closing delimiters.
+Group 4 matches the text inside the delimiters.")
 
 (defconst markdown-regex-blockquote
   "^[ \t]*\\(>\\).*$"

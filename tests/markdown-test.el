@@ -221,6 +221,31 @@ This file is not saved."
    ;; Check face of point past leading asterisk
    (markdown-test-range-has-face 18 18 nil)))
 
+(ert-deftest test-markdown-font-lock/italics-2 ()
+  "Test space after leading asterisk or underscore."
+  (markdown-test-string
+   "This is * not italic*, nor _ is this_."
+   (markdown-test-range-has-face (point-min) (point-max) nil)))
+
+(ert-deftest test-markdown-font-lock/italics-3 ()
+  "Test that slash inside asterisks is not italic."
+  (markdown-test-string
+   "not italic *\\*"
+   (markdown-test-range-has-face (point-min) (point-max) nil)))
+
+(ert-deftest test-markdown-font-lock/italics-4 ()
+  "Test that escaped asterisk inside italics is not bold."
+  (markdown-test-string
+   "italic **\\**"
+   (markdown-test-range-has-face 1 7 nil)
+   (markdown-test-range-has-face 8 12 markdown-italic-face)))
+
+(ert-deftest test-markdown-font-lock/italics-5 ()
+  "Test italic single letter."
+  (markdown-test-string
+   "*a*"
+   (markdown-test-range-has-face 1 3 markdown-italic-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
@@ -232,6 +257,28 @@ This file is not saved."
    (markdown-test-range-has-face 27 35 markdown-bold-face)
    ;; Check face of point past leading asterisk
    (markdown-test-range-has-face 36 36 nil)))
+
+(ert-deftest test-markdown-font-lock/bold-2 ()
+  "Test space after leading asterisks or underscores."
+  (markdown-test-string
+   "This is ** not bold**, nor __ is this__ (but they match italics)."
+   (markdown-test-range-has-face 1 8 nil)
+   (markdown-test-range-has-face 9 20 markdown-italic-face)
+   (markdown-test-range-has-face 21 27 nil)
+   (markdown-test-range-has-face 28 38 markdown-italic-face)
+   (markdown-test-range-has-face 39 (point-max) nil)))
+
+(ert-deftest test-markdown-font-lock/bold-3 ()
+  "Test escaped asterisk inside bold."
+  (markdown-test-string
+   "bold **\\***"
+   (markdown-test-range-has-face 6 11 markdown-bold-face)))
+
+(ert-deftest test-markdown-font-lock/bold-4 ()
+  "Test bold single letter."
+  (markdown-test-string
+   "**a**"
+   (markdown-test-range-has-face 1 5 markdown-bold-face)))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
