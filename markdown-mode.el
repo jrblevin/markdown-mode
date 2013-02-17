@@ -1549,7 +1549,13 @@ and S1 and S2 were only inserted."
      ((setq bounds (bounds-of-thing-at-point (or thing 'word)))
       (setq a (car bounds)
             b (cdr bounds)
-            new-point (+ (point) (length s1))))
+            new-point (+ (point) (length s1)))
+      (when (eq thing 'line)
+        ;; Handle end of buffer and newlines included by thing-at-point
+        (cond ((and (eobp) (markdown-cur-line-blank-p))
+               (setq a b))
+              ((char-equal (char-before b) ?\^J)
+               (setq b (1- b))))))
      ;; No active region and no word
      (t
       (setq a (point)
@@ -1745,15 +1751,19 @@ region is active, it is used as the header text."
   (interactive "p")
   (unless n                             ; Test to see if n is defined
     (setq n 1))                         ; Default to level 1 header
-  (let (hdr hdrl hdrr)
+  (let (hdr hdrl hdrr bounds)
     (dotimes (count n hdr)
       (setq hdr (concat "#" hdr)))      ; Build a hash mark header string
     (setq hdrl (concat hdr " "))
     (setq hdrr (concat " " hdr))
-    (markdown-ensure-blank-line-before)
-    (markdown-wrap-or-insert hdrl hdrr)
-    (markdown-ensure-blank-line-after)
-    (backward-char (1+ n))))
+    (setq bounds (markdown-wrap-or-insert hdrl hdrr 'line))
+    (unless bounds
+      (setq bounds (cons (- (point) (length hdrl)) (+ (point) (length hdrr)))))
+    (save-excursion
+      (goto-char (cdr bounds))
+      (markdown-ensure-blank-line-after)
+      (goto-char (car bounds))
+      (markdown-ensure-blank-line-before))))
 
 (defun markdown-insert-setext-header (char)
   "Insert a setext-style (underlined) header with CHAR repeated underneath.
