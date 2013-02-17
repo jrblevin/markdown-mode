@@ -1751,8 +1751,7 @@ region is active, it is used as the header text."
     (setq hdrr (concat " " hdr))
     (markdown-ensure-blank-line-before)
     (markdown-wrap-or-insert hdrl hdrr)
-    (save-excursion
-      (markdown-ensure-blank-line-after))
+    (markdown-ensure-blank-line-after)
     (backward-char (1+ n))))
 
 (defun markdown-insert-setext-header (char)
