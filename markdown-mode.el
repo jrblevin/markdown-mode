@@ -1536,7 +1536,7 @@ If there is an active region, wrap the strings S1 and S2 around
 the region.  If there is not an active region but the point is at
 THING, wrap that thing (which defaults to word).  Otherwise, just
 insert S1 and S2 and place the cursor in between.  Return the
-bounds of the string wrapped, or nil if nothing was wrapped
+bounds of the entire wrapped string, or nil if nothing was wrapped
 and S1 and S2 were only inserted."
   (let (a b bounds new-point)
     (cond
@@ -1561,6 +1561,7 @@ and S1 and S2 were only inserted."
     (when new-point (goto-char new-point))
     (if (= a b)
         nil
+      (setq b (+ b (length s1) (length s2)))
       (cons a b))))
 
 (defun markdown-insert-hr ()
@@ -1627,7 +1628,7 @@ place the point in the position to enter link text."
   (interactive)
   (let ((bounds (markdown-wrap-or-insert "[" "]()")))
     (when bounds
-      (goto-char (+ (cdr bounds) 3)))))
+      (goto-char (- (cdr bounds) 1)))))
 
 (defun markdown-insert-reference-link-dwim ()
   "Insert a reference link of the form [text][label] at point.
@@ -1692,7 +1693,7 @@ place the point in the position to enter alt text."
   (interactive)
   (let ((bounds (markdown-wrap-or-insert "![" "]()")))
     (when bounds
-      (goto-char (+ (cdr bounds) 4)))))
+      (goto-char (- (cdr bounds) 1)))))
 
 (defun markdown-insert-header-1 ()
   "Insert a first level atx-style (hash mark) header.
