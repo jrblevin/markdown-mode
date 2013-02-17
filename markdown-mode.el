@@ -1521,14 +1521,14 @@ This helps improve font locking for block constructs such as pre blocks."
 (defun markdown-ensure-blank-line-before ()
   "If previous line is not already blank, insert a blank line before point."
   (unless (bolp) (insert "\n"))
-  (unless (looking-back "\n\\s-*\n") (insert "\n")))
+  (unless (or (bobp) (looking-back "\n\\s-*\n")) (insert "\n")))
 
 (defun markdown-ensure-blank-line-after ()
   "If following line is not already blank, insert a blank line after point.
 Return the point where it was originally."
   (save-excursion
     (unless (eolp) (insert "\n"))
-    (unless (looking-at "\n\\s-*\n") (insert "\n"))))
+    (unless (or (eobp) (looking-at "\n\\s-*\n")) (insert "\n"))))
 
 (defun markdown-wrap-or-insert (s1 s2 &optional thing)
   "Insert the strings S1 and S2, wrapping around region or THING.

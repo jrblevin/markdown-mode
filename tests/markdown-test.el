@@ -171,6 +171,21 @@ This file is not saved."
    (should (looking-back "web.\n\n"))
    (should (markdown-prev-line-blank-p))))
 
+(ert-deftest test-markdown-insertion/blank-line-before-4 ()
+  "Test function `markdown-ensure-blank-line-before' at beginning of buffer."
+  (markdown-test-string "first line"
+   (beginning-of-line)
+   (should (bobp))
+   (should (= (point-max) 11))
+   (markdown-ensure-blank-line-before)
+   (should (= (point-max) 11))
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "first line"))
+   (forward-word)
+   (markdown-ensure-blank-line-before)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "first\n\n line"))))
+
 (ert-deftest test-markdown-insertion/blank-line-after-1 ()
   "Test function `markdown-ensure-blank-line-after' at end of line."
   (markdown-test-file "syntax.text"
@@ -206,6 +221,21 @@ This file is not saved."
    (should (= (point) 2702))
    (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
    (should (markdown-next-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/blank-line-after-4 ()
+  "Test function `markdown-ensure-blank-line-after' at end of buffer."
+  (markdown-test-string "last line"
+   (end-of-line)
+   (should (eobp))
+   (should (= (point-max) 10))
+   (markdown-ensure-blank-line-after)
+   (should (= (point-max) 10))
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "last line"))
+   (backward-word)
+   (markdown-ensure-blank-line-after)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "last \n\nline"))))
 
 ;;; Font lock tests:
 
