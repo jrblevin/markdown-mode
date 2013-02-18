@@ -237,6 +237,41 @@ This file is not saved."
    (should (string-equal (buffer-substring (point-min) (point-max))
                          "last \n\nline"))))
 
+(ert-deftest test-markdown-insertion/atx-line ()
+  "Test ATX header insertion without region."
+  (markdown-test-string "line one\nline two\n"
+   (forward-word)
+   (markdown-insert-header-1)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "# line one #\n\nline two\n"))
+   (forward-line 2)
+   (markdown-insert-header-2)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "# line one #\n\n## line two ##\n\n"))))
+
+(ert-deftest test-markdown-insertion/atx-region ()
+  "Test ATX header insertion with region."
+  (markdown-test-string "line one\nline two\n"
+   (transient-mark-mode)
+   (forward-char 5)
+   (push-mark (point) t t)
+   (forward-word)
+   (should (string-equal (buffer-substring (region-beginning) (region-end))
+                         "one"))
+   (markdown-insert-header-4)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line \n\n#### one ####\n\nline two\n"))))
+
+(ert-deftest test-markdown-insertion/atx-blank ()
+  "Test ATX header insertion on blank line."
+  (markdown-test-string "line one\n\nline two\n"
+   (forward-line)
+   (markdown-insert-header-3)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line one\n\n###  ###\n\nline two\n"))
+   (should (= (point) 15))
+   (should (looking-at " ###\n"))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
