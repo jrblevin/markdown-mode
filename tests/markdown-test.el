@@ -424,6 +424,18 @@ This file is not saved."
     (markdown-test-range-has-face 527 546 nil)
     (markdown-test-range-has-face 548 581 markdown-pre-face)))
 
+(ert-deftest test-markdown-font-lock/setext-1-letter ()
+  "An edge case for level-one Setext headers."
+  (markdown-test-string "a\n=\n"
+   (markdown-test-range-has-face 1 1 markdown-header-face-1)
+   (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
+
+(ert-deftest test-markdown-font-lock/setext-2-letter ()
+  "An edge case for level-two Setext headers."
+  (markdown-test-string "b\n-\n"
+   (markdown-test-range-has-face 1 1 markdown-header-face-2)
+   (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
+
 ;;; Lists:
 
 (ert-deftest test-markdown-lists/bounds-1 ()

@@ -875,7 +875,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for a footnote marker [^fn].")
 
 (defconst markdown-regex-header
-  "^\\(?:\\(.+\\)\n\\(===+\\)\\|\\(.+\\)\n\\(---+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
+  "^\\(?:\\(.+\\)\n\\(=+\\)\\|\\(.+\\)\n\\(-+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
   "Regexp identifying Markdown headers.")
 
 (defconst markdown-regex-header-1-atx
@@ -903,11 +903,11 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Regular expression for level 6 atx-style (hash mark) headers.")
 
 (defconst markdown-regex-header-1-setext
-  "^\\(.*\\)\n\\(===+\\)$"
+  "^\\(.*\\)\n\\(=+\\)$"
   "Regular expression for level 1 setext-style (underline) headers.")
 
 (defconst markdown-regex-header-2-setext
-  "^\\(.*\\)\n\\(---+\\)$"
+  "^\\(.*\\)\n\\(-+\\)$"
   "Regular expression for level 2 setext-style (underline) headers.")
 
 (defconst markdown-regex-hr
