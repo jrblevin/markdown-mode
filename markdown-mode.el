@@ -1529,6 +1529,18 @@ Return the point where it was originally."
     (unless (eolp) (insert "\n"))
     (unless (or (eobp) (looking-at "\n\\s-*\n")) (insert "\n"))))
 
+(defun markdown-point-after-unwrap (prefix suffix)
+  "Return desired position of point after an unwrapping operation.
+Two cons cells must be provided.  PREFIX gives the bounds of the
+prefix string and SUFFIX gives the bounds of the suffix string."
+  (let ((cur (point)))
+    (cond ((< cur (cdr prefix)) cur)
+          ((< cur (car suffix)) (- cur (- (cdr prefix) (car prefix))))
+          ((< cur (cdr suffix))
+           (- cur (+ (- (cdr prefix) (car prefix))
+                     (- (cdr suffix) (car suffix)))))
+          (t cur))))
+
 (defun markdown-wrap-or-insert (s1 s2 &optional thing)
   "Insert the strings S1 and S2, wrapping around region or THING.
 If there is an active region, wrap the strings S1 and S2 around
@@ -1585,10 +1597,9 @@ insert bold delimiters and place the cursor in between them."
   (interactive)
   (if (thing-at-point-looking-at markdown-regex-bold)
       (let* ((old (point))
-             (new (cond ((< old (match-end 3)) old)
-                        ((< old (match-end 4)) (- old 2))
-                        ((< old (match-end 2)) (- old 4))
-                        (t old))))
+             (new (markdown-point-after-unwrap
+                   (cons (match-beginning 3) (match-end 3))
+                   (cons (match-beginning 5) (match-end 5)))))
         (replace-match (match-string 4) t t nil 2)
         (goto-char new))
     (if markdown-bold-underscore
@@ -1603,11 +1614,9 @@ italic word or phrase, remove the italic markup.  Otherwise, simply
 insert italic delimiters and place the cursor in between them."
   (interactive)
   (if (thing-at-point-looking-at markdown-regex-italic)
-      (let* ((old (point))
-             (new (cond ((< old (match-end 3)) old)
-                        ((< old (match-end 4)) (- old 1))
-                        ((< old (match-end 2)) (- old 2))
-                        (t old))))
+      (let* ((new (markdown-point-after-unwrap
+                   (cons (match-beginning 3) (match-end 3))
+                   (cons (match-beginning 5) (match-end 5)))))
         (replace-match (match-string 4) t t nil 2)
         (goto-char new))
     (if markdown-italic-underscore

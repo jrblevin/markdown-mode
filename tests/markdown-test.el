@@ -238,6 +238,31 @@ This file is not saved."
    (should (string-equal (buffer-substring (point-min) (point-max))
                          "last \n\nline"))))
 
+(ert-deftest test-markdown-insertion/point-after-unwrap ()
+  "Test new point position calculations after unwrap operations."
+  (markdown-test-string "line **one**\nline _two_\n"
+   (let (prefix suffix)
+     (setq prefix (cons 6 8))
+     (setq suffix (cons 11 13))
+     (goto-char 6)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 6))
+     (goto-char 8)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 6))
+     (goto-char 9)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 7))
+     (goto-char 12)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 8))
+     (setq prefix (cons 19 20))
+     (setq suffix (cons 23 24))
+     (goto-char 19)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 19))
+     (goto-char 20)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 19))
+     (goto-char 21)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 20))
+     (goto-char 23)
+     (should (eq (markdown-point-after-unwrap prefix suffix) 21)))))
+
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."
   (markdown-test-string "line one\nline two\n"
