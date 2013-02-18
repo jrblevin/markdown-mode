@@ -244,24 +244,58 @@ This file is not saved."
    (let (prefix suffix)
      (setq prefix (cons 6 8))
      (setq suffix (cons 11 13))
-     (goto-char 6)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 6))
-     (goto-char 8)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 6))
-     (goto-char 9)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 7))
-     (goto-char 12)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 8))
+     (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
+     (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
+     (should (eq (markdown-point-after-unwrap 8 prefix suffix) 6))
+     (should (eq (markdown-point-after-unwrap 9 prefix suffix) 7))
+     (should (eq (markdown-point-after-unwrap 12 prefix suffix) 8))
      (setq prefix (cons 19 20))
      (setq suffix (cons 23 24))
-     (goto-char 19)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 19))
-     (goto-char 20)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 19))
-     (goto-char 21)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 20))
-     (goto-char 23)
-     (should (eq (markdown-point-after-unwrap prefix suffix) 21)))))
+     (should (eq (markdown-point-after-unwrap 19 prefix suffix) 19))
+     (should (eq (markdown-point-after-unwrap 20 prefix suffix) 19))
+     (should (eq (markdown-point-after-unwrap 21 prefix suffix) 20))
+     (should (eq (markdown-point-after-unwrap 22 prefix suffix) 21))
+     (should (eq (markdown-point-after-unwrap 23 prefix suffix) 21)))))
+
+(ert-deftest test-markdown-insertion/unwrap-thing-at-point-italic ()
+  "Test function `markdown-unwrap-thing-at-point' on italics."
+  (markdown-test-file "syntax.text"
+   ;; Unwrap *not*
+   (goto-char 2859)
+   (should (thing-at-point-looking-at markdown-regex-italic))
+   (should (equal (markdown-unwrap-thing-at-point
+                   markdown-regex-italic 2 4)
+                  (cons 2859 2862)))
+   (should (= (point) 2859))
+   ;; Unwrap *publishing*
+   (goto-char 3064)
+   (should (thing-at-point-looking-at markdown-regex-italic))
+   (should (equal (markdown-unwrap-thing-at-point
+                   markdown-regex-italic 2 4)
+                  (cons 3060 3070)))
+   (should (= (point) 3063))
+   ;; Unwrap *writing*
+   (goto-char 3101)
+   (should (thing-at-point-looking-at markdown-regex-italic))
+   (should (equal (markdown-unwrap-thing-at-point
+                   markdown-regex-italic 2 4)
+                  (cons 3093 3100)))
+   (should (= (point) 3099))))
+
+(ert-deftest test-markdown-insertion/unwrap-things-in-region-italic ()
+  "Test function `markdown-unwrap-things-in-region' on italics."
+  (markdown-test-file "syntax.text"
+   (should (equal (markdown-unwrap-things-in-region
+                   2704 3207 markdown-regex-italic 2 4)
+                  (cons 2704 3201)))))
+
+(ert-deftest test-markdown-insertion/unwrap-things-in-region-links ()
+  "Test function `markdown-unwrap-things-in-region' on inline links."
+  (markdown-test-string "a [link](http://jblevins.org/) or [two](/).\n"
+   (should (equal (markdown-unwrap-things-in-region
+                   (point-min) (point-max) markdown-regex-link-inline 0 3)
+                  (cons 1 16)))
+   (should (string-equal (buffer-string) "a link or two.\n"))))
 
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."
@@ -297,6 +331,33 @@ This file is not saved."
                          "line one\n\n###  ###\n\nline two\n"))
    (should (= (point) 15))
    (should (looking-at " ###\n"))))
+
+(ert-deftest test-markdown-insertion/italic-unwrap-region ()
+  "A test of inserting italics with italic text in the region."
+  (markdown-test-string "*foo* bar *baz*"
+   (transient-mark-mode)
+   (push-mark (point) t t)
+   (end-of-line)
+   (markdown-insert-italic)
+   (should (string-equal (buffer-string) "*foo bar baz*"))))
+
+(ert-deftest test-markdown-insertion/bold-unwrap-region ()
+  "A test of inserting bold with italic text in the region."
+  (markdown-test-string "*foo* **bar** *baz*"
+   (transient-mark-mode)
+   (push-mark (point) t t)
+   (end-of-line)
+   (markdown-insert-bold)
+   (should (string-equal (buffer-string) "***foo* bar *baz***"))))
+
+(ert-deftest test-markdown-insertion/code-unwrap-region ()
+  "A test of inserting code with code already in the region."
+  (markdown-test-string "`foo` *bar* `baz`"
+   (transient-mark-mode)
+   (push-mark (point) t t)
+   (end-of-line)
+   (markdown-insert-code)
+   (should (string-equal (buffer-string) "`foo *bar* baz`"))))
 
 (ert-deftest test-markdown-insertion/hr-bob ()
   "Test inserting horizontal rule at beginning of buffer."

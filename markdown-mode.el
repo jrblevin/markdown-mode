@@ -1529,20 +1529,10 @@ Return the point where it was originally."
     (unless (eolp) (insert "\n"))
     (unless (or (eobp) (looking-at "\n\\s-*\n")) (insert "\n"))))
 
-(defun markdown-point-after-unwrap (prefix suffix)
-  "Return desired position of point after an unwrapping operation.
-Two cons cells must be provided.  PREFIX gives the bounds of the
-prefix string and SUFFIX gives the bounds of the suffix string."
-  (let ((cur (point)))
-    (cond ((< cur (cdr prefix)) cur)
-          ((< cur (car suffix)) (- cur (- (cdr prefix) (car prefix))))
-          ((< cur (cdr suffix))
-           (- cur (+ (- (cdr prefix) (car prefix))
-                     (- (cdr suffix) (car suffix)))))
-          (t cur))))
-
-(defun markdown-wrap-or-insert (s1 s2 &optional thing)
+(defun markdown-wrap-or-insert (s1 s2 &optional thing beg end)
   "Insert the strings S1 and S2, wrapping around region or THING.
+If a region is specified by the optional BEG and END arguments,
+wrap the strings S1 and S2 around that region.
 If there is an active region, wrap the strings S1 and S2 around
 the region.  If there is not an active region but the point is at
 THING, wrap that thing (which defaults to word).  Otherwise, just
@@ -1551,6 +1541,11 @@ bounds of the entire wrapped string, or nil if nothing was wrapped
 and S1 and S2 were only inserted."
   (let (a b bounds new-point)
     (cond
+     ;; Given region
+     ((and beg end)
+      (setq a beg
+            b end
+            new-point (+ (point) (length s1))))
      ;; Active region
      ((markdown-use-region-p)
       (setq a (region-beginning)
@@ -1581,6 +1576,51 @@ and S1 and S2 were only inserted."
       (setq b (+ b (length s1) (length s2)))
       (cons a b))))
 
+(defun markdown-point-after-unwrap (cur prefix suffix)
+  "Return desired position of point after an unwrapping operation.
+Two cons cells must be provided.  PREFIX gives the bounds of the
+prefix string and SUFFIX gives the bounds of the suffix string."
+  (cond ((< cur (cdr prefix)) (car prefix))
+        ((< cur (car suffix)) (- cur (- (cdr prefix) (car prefix))))
+        ((< cur (cdr suffix))
+         (- cur (+ (- (cdr prefix) (car prefix))
+                   (- (cdr suffix) (car suffix)))))
+        (t cur)))
+
+(defun markdown-unwrap-thing-at-point (regexp all text)
+  "Remove prefix and suffix of thing at point and reposition the point.
+When the thing at point matches REGEXP, replace the subexpression
+ALL with the string in subexpression TEXT.  Reposition the point
+in an appropriate location accounting for the removal of prefix
+and suffix strings.  Return new bounds of string from group TEXT."
+  (when (thing-at-point-looking-at regexp)
+    (let ((cur (point))
+          (prefix (cons (match-beginning all) (match-beginning text)))
+          (suffix (cons (match-end text) (match-end all)))
+          (bounds (cons (match-beginning text) (match-end text))))
+      ;; Replace the thing at point
+      (replace-match (match-string text) t t nil all)
+      ;; Reposition the point
+      (goto-char (markdown-point-after-unwrap cur prefix suffix))
+      ;; Adjust bounds
+      (setq bounds (cons (car prefix)
+                         (- (cdr bounds) (- (cdr prefix) (car prefix))))))))
+
+(defun markdown-unwrap-things-in-region (beg end regexp all text)
+  "Remove prefix and suffix of all things in region.
+When a thing in the region matches REGEXP, replace the
+subexpression ALL with the string in subexpression TEXT.
+Return a cons cell containing updated bounds for the region."
+  (save-excursion
+    (goto-char beg)
+    (let ((removed 0) len-all len-text)
+      (while (re-search-forward regexp end t)
+        (setq len-all (length (match-string-no-properties all)))
+        (setq len-text (length (match-string-no-properties text)))
+        (setq removed (+ removed (- len-all len-text)))
+        (replace-match (match-string text) t t nil all))
+      (cons beg (- end removed)))))
+
 (defun markdown-insert-hr ()
   "Insert a horizonal rule using `markdown-hr-string'."
   (interactive)
@@ -1595,16 +1635,16 @@ is at a non-bold word, make the word bold.  If the point is at a
 bold word or phrase, remove the bold markup.  Otherwise, simply
 insert bold delimiters and place the cursor in between them."
   (interactive)
-  (if (thing-at-point-looking-at markdown-regex-bold)
-      (let* ((old (point))
-             (new (markdown-point-after-unwrap
-                   (cons (match-beginning 3) (match-end 3))
-                   (cons (match-beginning 5) (match-end 5)))))
-        (replace-match (match-string 4) t t nil 2)
-        (goto-char new))
-    (if markdown-bold-underscore
-        (markdown-wrap-or-insert "__" "__")
-      (markdown-wrap-or-insert "**" "**"))))
+  (let ((delim (if markdown-bold-underscore "__" "**")))
+    (if (markdown-use-region-p)
+        ;; Active region
+        (let ((bounds (markdown-unwrap-things-in-region
+                       (region-beginning) (region-end)
+                       markdown-regex-bold 2 4)))
+          (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
+      ;; Word at point or markup insert
+      (unless (markdown-unwrap-thing-at-point markdown-regex-bold 2 4)
+        (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
 (defun markdown-insert-italic ()
   "Insert markup to make a region or word italic.
@@ -1613,15 +1653,16 @@ is at a non-italic word, make the word italic.  If the point is at an
 italic word or phrase, remove the italic markup.  Otherwise, simply
 insert italic delimiters and place the cursor in between them."
   (interactive)
-  (if (thing-at-point-looking-at markdown-regex-italic)
-      (let* ((new (markdown-point-after-unwrap
-                   (cons (match-beginning 3) (match-end 3))
-                   (cons (match-beginning 5) (match-end 5)))))
-        (replace-match (match-string 4) t t nil 2)
-        (goto-char new))
-    (if markdown-italic-underscore
-        (markdown-wrap-or-insert "_" "_")
-      (markdown-wrap-or-insert "*" "*"))))
+  (let ((delim (if markdown-italic-underscore "_" "*")))
+    (if (markdown-use-region-p)
+        ;; Active region
+        (let ((bounds (markdown-unwrap-things-in-region
+                       (region-beginning) (region-end)
+                       markdown-regex-italic 2 4)))
+          (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
+      ;; Word at point or markup insert
+      (unless (markdown-unwrap-thing-at-point markdown-regex-italic 2 4)
+        (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
 (defun markdown-insert-code ()
   "Insert markup to make a region or word an inline code fragment.
@@ -1630,7 +1671,15 @@ fragment.  If the point is at a word, make the word an inline
 code fragment.  Otherwise, simply insert code delimiters and
 place the cursor in between them."
   (interactive)
-  (markdown-wrap-or-insert "`" "`"))
+  (if (markdown-use-region-p)
+      ;; Active region
+      (let ((bounds (markdown-unwrap-things-in-region
+                     (region-beginning) (region-end)
+                     markdown-regex-code 2 4)))
+        (markdown-wrap-or-insert "`" "`" nil (car bounds) (cdr bounds)))
+    ;; Word at point or markup insert
+    (unless (markdown-unwrap-thing-at-point markdown-regex-code 2 4)
+      (markdown-wrap-or-insert "`" "`" 'word nil nil))))
 
 (defun markdown-insert-link ()
   "Insert an inline link, using region or word as link text if possible.
