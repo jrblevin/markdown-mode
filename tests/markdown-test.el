@@ -272,6 +272,30 @@ This file is not saved."
    (should (= (point) 15))
    (should (looking-at " ###\n"))))
 
+(ert-deftest test-markdown-insertion/hr-bob ()
+  "Test inserting horizontal rule at beginning of buffer."
+  (markdown-test-string "one line\n"
+   (markdown-insert-hr)
+   (should (string-equal (buffer-string)
+                         (concat markdown-hr-string "\n\none line\n")))))
+
+(ert-deftest test-markdown-insertion/hr-eob ()
+  "Test inserting horizontal rule at end of buffer."
+  (markdown-test-string "one line\n"
+   (forward-line)
+   (markdown-insert-hr)
+   (should (string-equal (buffer-string)
+                         (concat "one line\n\n" markdown-hr-string)))))
+
+(ert-deftest test-markdown-insertion/hr-mob ()
+  "Test inserting horizontal rule in middle of buffer."
+  (markdown-test-string "one line\n"
+   (forward-word)
+   (setq markdown-hr-string "----------")
+   (markdown-insert-hr)
+   (should (string-equal (buffer-string)
+                         (concat "one\n\n" markdown-hr-string "\n\n line\n")))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
