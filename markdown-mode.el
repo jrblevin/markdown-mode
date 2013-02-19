@@ -1382,6 +1382,21 @@ Leave match data intact for `markdown-regex-list'."
           (list prev-begin prev-end indent nonlist-indent)
         nil))))
 
+(defun markdown-bounds-of-thing-at-point (thing)
+  "Calls `bounds-of-thing-at-point' for THING with slight modifications.
+Does not include trailing newlines when THING is 'line.  Handles the
+end of buffer case by setting both endpoints equal to the value of
+`point-max', since an empty region will trigger empty markup insertion."
+  (let* ((bounds (bounds-of-thing-at-point thing))
+         (a (car bounds))
+         (b (cdr bounds)))
+    (when (eq thing 'line)
+      (cond ((and (eobp) (markdown-cur-line-blank-p))
+             (setq a b))
+            ((char-equal (char-before b) ?\^J)
+             (setq b (1- b)))))
+  (cons a b)))
+
 ;;; Markdown font lock matching functions =====================================
 
 ;; From html-helper-mode
@@ -1552,16 +1567,10 @@ and S1 and S2 were only inserted."
             b (region-end)
             new-point (+ (point) (length s1))))
      ;; Thing (word) at point
-     ((setq bounds (bounds-of-thing-at-point (or thing 'word)))
+     ((setq bounds (markdown-bounds-of-thing-at-point (or thing 'word)))
       (setq a (car bounds)
             b (cdr bounds)
-            new-point (+ (point) (length s1)))
-      (when (eq thing 'line)
-        ;; Handle end of buffer and newlines included by thing-at-point
-        (cond ((and (eobp) (markdown-cur-line-blank-p))
-               (setq a b))
-              ((char-equal (char-before b) ?\^J)
-               (setq b (1- b))))))
+            new-point (+ (point) (length s1))))
      ;; No active region and no word
      (t
       (setq a (point)
