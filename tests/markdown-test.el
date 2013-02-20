@@ -240,22 +240,32 @@ This file is not saved."
 
 (ert-deftest test-markdown-insertion/point-after-unwrap ()
   "Test new point position calculations after unwrap operations."
-  (markdown-test-string "line **one**\nline _two_\n"
-   (let (prefix suffix)
-     (setq prefix (cons 6 8))
-     (setq suffix (cons 11 13))
+  (markdown-test-string "line **one**\n"
+   (let ((prefix (cons 6 8)) (suffix (cons 11 13)))
+     ;; Prefix
      (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
      (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
+     ;; Word
      (should (eq (markdown-point-after-unwrap 8 prefix suffix) 6))
      (should (eq (markdown-point-after-unwrap 9 prefix suffix) 7))
-     (should (eq (markdown-point-after-unwrap 12 prefix suffix) 8))
-     (setq prefix (cons 19 20))
-     (setq suffix (cons 23 24))
-     (should (eq (markdown-point-after-unwrap 19 prefix suffix) 19))
-     (should (eq (markdown-point-after-unwrap 20 prefix suffix) 19))
-     (should (eq (markdown-point-after-unwrap 21 prefix suffix) 20))
-     (should (eq (markdown-point-after-unwrap 22 prefix suffix) 21))
-     (should (eq (markdown-point-after-unwrap 23 prefix suffix) 21)))))
+     (should (eq (markdown-point-after-unwrap 10 prefix suffix) 8))
+     ;; Suffix
+     (should (eq (markdown-point-after-unwrap 11 prefix suffix) 9))
+     (should (eq (markdown-point-after-unwrap 12 prefix suffix) 9))
+     ;; Immediately after
+     (should (eq (markdown-point-after-unwrap 13 prefix suffix) 9))))
+  (markdown-test-string "line _one_\n"
+   (let ((prefix (cons 6 7)) (suffix (cons 10 11)))
+     ;; Prefix
+     (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
+     ;; Word
+     (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
+     (should (eq (markdown-point-after-unwrap 8 prefix suffix) 7))
+     (should (eq (markdown-point-after-unwrap 9 prefix suffix) 8))
+     ;; Suffix
+     (should (eq (markdown-point-after-unwrap 10 prefix suffix) 9))
+     ;; Immediately after
+     (should (eq (markdown-point-after-unwrap 10 prefix suffix) 9)))))
 
 (ert-deftest test-markdown-insertion/unwrap-thing-at-point-italic ()
   "Test function `markdown-unwrap-thing-at-point' on italics."
@@ -280,7 +290,7 @@ This file is not saved."
    (should (equal (markdown-unwrap-thing-at-point
                    markdown-regex-italic 2 4)
                   (cons 3093 3100)))
-   (should (= (point) 3099))))
+   (should (= (point) 3100))))
 
 (ert-deftest test-markdown-insertion/unwrap-things-in-region-italic ()
   "Test function `markdown-unwrap-things-in-region' on italics."

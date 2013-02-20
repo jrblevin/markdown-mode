@@ -1591,9 +1591,9 @@ Two cons cells must be provided.  PREFIX gives the bounds of the
 prefix string and SUFFIX gives the bounds of the suffix string."
   (cond ((< cur (cdr prefix)) (car prefix))
         ((< cur (car suffix)) (- cur (- (cdr prefix) (car prefix))))
-        ((< cur (cdr suffix))
+        ((<= cur (cdr suffix))
          (- cur (+ (- (cdr prefix) (car prefix))
-                   (- (cdr suffix) (car suffix)))))
+                   (- cur (car suffix)))))
         (t cur)))
 
 (defun markdown-unwrap-thing-at-point (regexp all text)
