@@ -83,6 +83,7 @@ This file is not saved."
        (goto-char (point-min))
        (font-lock-fontify-buffer)
        ,@body
+       (set-buffer-modified-p nil)
        (kill-buffer buf)
        (delete-file tmp))))
 (def-edebug-spec markdown-test-temp-file (form body))
