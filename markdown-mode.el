@@ -1601,8 +1601,10 @@ prefix string and SUFFIX gives the bounds of the suffix string."
 When the thing at point matches REGEXP, replace the subexpression
 ALL with the string in subexpression TEXT.  Reposition the point
 in an appropriate location accounting for the removal of prefix
-and suffix strings.  Return new bounds of string from group TEXT."
-  (when (thing-at-point-looking-at regexp)
+and suffix strings.  Return new bounds of string from group TEXT.
+When REGEXP is nil, assumes match data is already set."
+  (when (or (null regexp)
+            (thing-at-point-looking-at regexp))
     (let ((cur (point))
           (prefix (cons (match-beginning all) (match-beginning text)))
           (suffix (cons (match-end text) (match-end all)))
