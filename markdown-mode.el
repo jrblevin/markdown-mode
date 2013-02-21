@@ -1251,6 +1251,30 @@ it means we are at baseline (not inside of a nested list)."
    ;; Otherwise, do nothing.
    (t levels)))
 
+(defun markdown-calculate-list-levels ()
+  "Calculate list levels at point.
+Return a list of the form (n1 n2 n3 ...) where n1 is the
+indentation of the deepest nested list item in the branch of
+the list at the point, n2 is the indentation of the parent
+list item, and so on.  The depth of the list item is therefore
+the length of the returned list.  If the point is not at or
+immediately  after a list item, return nil."
+  (save-excursion
+    (let ((first (point)) levels indent)
+      ;; Find a baseline point with zero list indentation
+      (markdown-search-backward-baseline)
+      ;; Search for all list items between baseline and LOC
+      (while (re-search-forward markdown-regex-list first t)
+        (cond
+         ;; Make sure this is not a header or hr
+         ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+         ;; If not, then update levels
+         (t
+          (setq indent (markdown-cur-line-indent))
+          (setq levels (markdown-update-list-levels (match-string 2)
+                                                    indent levels)))))
+      levels)))
+
 (defun markdown-prev-list-item (level)
   "Search backward from point for a list item with indentation LEVEL.
 Set point to the beginning of the item, and return point, or nil
@@ -1430,22 +1454,8 @@ end of buffer case by setting both endpoints equal to the value of
 
 (defun markdown-match-pre-blocks (last)
   "Match Markdown pre blocks from point to LAST."
-  (let ((first (point)) levels indent pre-regexp end-regexp begin end stop)
-    ;; Find a baseline point with zero list indentation
-    (markdown-search-backward-baseline)
-
-    ;; Search for all list items between baseline and FIRST
-    (while (re-search-forward markdown-regex-list first t)
-      (cond
-       ;; Make sure this is not a header or hr
-       ((markdown-new-baseline-p) (forward-line) (setq levels nil))
-       ;; If not, then update levels
-       (t
-        (setq indent (markdown-cur-line-indent))
-        (setq levels (markdown-update-list-levels (match-string 2) indent levels)))))
-
-    ;; Search for pre blocks from FIRST to LAST
-    (goto-char first)
+  (let ((levels (markdown-calculate-list-levels))
+        indent pre-regexp end-regexp begin end stop)
     (while (and (< (point) last) (not end))
       ;; Search for a region with sufficient indentation
       (if (null levels)
