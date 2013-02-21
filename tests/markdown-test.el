@@ -735,6 +735,15 @@ This file is not saved."
     (should (equal (markdown-cur-list-item-bounds)
                    (list 3903 3937 0 4)))))
 
+(ert-deftest test-markdown-lists/bounds-2 ()
+  "Function `markdown-cur-list-item-bounds' should return nil outside of list items."
+  (markdown-test-string "line one\n\n* item\n"
+    (should (null (markdown-cur-list-item-bounds)))
+    (forward-line)
+    (should (null (markdown-cur-list-item-bounds)))
+    (forward-line)
+    (should (markdown-cur-list-item-bounds))))
+
 ;;; Outline minor mode tests:
 
 (ert-deftest test-markdown-outline/navigation ()

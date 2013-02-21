@@ -1170,7 +1170,8 @@ If we are at the last line, then consider the next line to be blank."
     (markdown-cur-line-indent)))
 
 (defun markdown-cur-non-list-indent ()
-  "Return the number of leading whitespace characters in the current line."
+  "Return beginning position of list item text (not including the list marker).
+Return nil if the current line is not the beginning of a list item."
   (save-match-data
     (save-excursion
       (beginning-of-line)
@@ -1385,21 +1386,18 @@ Leave match data intact for `markdown-regex-list'."
     (setq cur (point))
     ;; Verify that cur is between beginning and end of item
     (save-excursion
-      (if (looking-at markdown-regex-list)
-          (beginning-of-line)
-        (end-of-line)
-        (re-search-backward markdown-regex-list nil t))
-      (save-match-data
-        (setq prev-begin (point))
-        (setq indent (markdown-cur-line-indent))
-        (setq nonlist-indent (markdown-cur-non-list-indent))
-        (markdown-cur-list-item-end nonlist-indent)
-        (setq prev-end (point)))
-      (if (and (>= cur prev-begin)
-               (<= cur prev-end)
-               nonlist-indent)
-          (list prev-begin prev-end indent nonlist-indent)
-        nil))))
+      (end-of-line)
+      (when (re-search-backward markdown-regex-list nil t)
+        (setq prev-begin (match-beginning 0))
+        (setq indent (length (match-string 1)))
+        (setq nonlist-indent (length (match-string 0)))
+        (save-match-data
+          (markdown-cur-list-item-end nonlist-indent)
+          (setq prev-end (point)))
+        (when (and (>= cur prev-begin)
+                   (<= cur prev-end)
+                   nonlist-indent)
+          (list prev-begin prev-end indent nonlist-indent))))))
 
 (defun markdown-bounds-of-thing-at-point (thing)
   "Calls `bounds-of-thing-at-point' for THING with slight modifications.
