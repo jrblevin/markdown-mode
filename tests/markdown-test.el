@@ -595,6 +595,7 @@ This file is not saved."
      (should (eq before-hook-run t))
      ;; Clean
      (remove-hook 'markdown-before-export-hooks func)
+     (kill-buffer (get-file-buffer ofile))
      (delete-file ofile))))
 
 (ert-deftest test-markdown-hook/after-export ()
@@ -612,6 +613,7 @@ This file is not saved."
      (should (eq after-hook-run t))
      ;; Clean
      (remove-hook 'markdown-after-export-hooks func)
+     (kill-buffer (get-file-buffer ofile))
      (delete-file ofile))))
 
 ;;; gfm-mode tests:
