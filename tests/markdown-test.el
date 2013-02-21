@@ -307,6 +307,36 @@ This file is not saved."
                   (cons 1 16)))
    (should (string-equal (buffer-string) "a link or two.\n"))))
 
+(ert-deftest test-markdown-insertion/toggle-bold ()
+  "Test toggling functionality of `markdown-insert-bold'."
+  (markdown-test-string "one **two** three"
+   (forward-word 2)
+   (markdown-insert-bold)
+   (should (string-equal (buffer-string) "one two three"))
+   (forward-word)
+   (markdown-insert-bold)
+   (should (string-equal (buffer-string) "one two **three**"))))
+
+(ert-deftest test-markdown-insertion/toggle-italic ()
+  "Test toggling functionality of `markdown-insert-italic'."
+  (markdown-test-string "one *two* three"
+   (forward-word 2)
+   (markdown-insert-italic)
+   (should (string-equal (buffer-string) "one two three"))
+   (forward-word)
+   (markdown-insert-italic)
+   (should (string-equal (buffer-string) "one two *three*"))))
+
+(ert-deftest test-markdown-insertion/toggle-code ()
+  "Test toggling functionality of `markdown-insert-code'."
+  (markdown-test-string "one `two` three"
+   (forward-word 2)
+   (markdown-insert-code)
+   (should (string-equal (buffer-string) "one two three"))
+   (forward-word)
+   (markdown-insert-code)
+   (should (string-equal (buffer-string) "one two `three`"))))
+
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."
   (markdown-test-string "line one\nline two\n"
