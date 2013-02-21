@@ -692,6 +692,20 @@ This file is not saved."
     (markdown-test-range-has-face 527 546 nil)
     (markdown-test-range-has-face 548 581 markdown-pre-face)))
 
+(ert-deftest test-markdown-font-lock/pre-2 ()
+  (markdown-test-string "* item\n\nreset baseline\n\n    pre block\n"
+   (markdown-test-range-has-face 2 24 nil)
+   (markdown-test-range-has-face 29 37 markdown-pre-face)))
+
+(ert-deftest test-markdown-font-lock/pre-3 ()
+  (markdown-test-string "It is interesting to see what happens when one queries
+`social upheaval` and `protopalatial era`.
+
+* `social upheaval`: the follwing queries have been tried:
+
+    social upheaval subClassOf"
+   (markdown-test-range-has-face 160 190 nil)))
+
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
   "An edge case for level-one setext headers."
   (markdown-test-string "a\n=\n"

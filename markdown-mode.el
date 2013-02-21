@@ -1200,7 +1200,10 @@ If we are at the last line, then consider the next line to be blank."
     (beginning-of-line)
     (save-match-data
       (or (looking-at markdown-regex-header)
-          (looking-at markdown-regex-hr)))))
+          (looking-at markdown-regex-hr)
+          (and (null (markdown-cur-non-list-indent))
+               (= (markdown-cur-line-indent) 0)
+               (markdown-prev-line-blank-p))))))
 
 (defun markdown-search-backward-baseline ()
   "Search backward baseline point with no indentation and not a list item."
