@@ -341,11 +341,11 @@ This file is not saved."
   "Test ATX header insertion without region."
   (markdown-test-string "line one\nline two\n"
    (forward-word)
-   (markdown-insert-header-1)
+   (markdown-insert-header-atx-1)
    (should (string-equal (buffer-substring (point-min) (point-max))
                          "# line one #\n\nline two\n"))
    (forward-line 2)
-   (markdown-insert-header-2)
+   (markdown-insert-header-atx-2)
    (should (string-equal (buffer-substring (point-min) (point-max))
                          "# line one #\n\n## line two ##\n\n"))))
 
@@ -358,7 +358,7 @@ This file is not saved."
    (forward-word)
    (should (string-equal (buffer-substring (region-beginning) (region-end))
                          "one"))
-   (markdown-insert-header-4)
+   (markdown-insert-header-atx-4)
    (should (string-equal (buffer-substring (point-min) (point-max))
                          "line \n\n#### one ####\n\nline two\n"))))
 
@@ -366,11 +366,152 @@ This file is not saved."
   "Test ATX header insertion on blank line."
   (markdown-test-string "line one\n\nline two\n"
    (forward-line)
-   (markdown-insert-header-3)
+   (markdown-insert-header-atx-3)
    (should (string-equal (buffer-substring (point-min) (point-max))
                          "line one\n\n###  ###\n\nline two\n"))
    (should (= (point) 15))
    (should (looking-at " ###\n"))))
+
+(ert-deftest test-markdown-insertion/atx-region-whitespace ()
+  "Test ATX header insertion using a region with whitespace."
+  (markdown-test-string "  line one\n\nline two\n  \n"
+   (transient-mark-mode)
+   (push-mark (point) t t)
+   (goto-char (point-max))
+   (markdown-insert-header-atx-2)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "## line one line two ##"))
+   (should (= (point) 21))
+   (should (looking-at " ##"))))
+
+(ert-deftest test-markdown-insertion/atx-line-whitespace ()
+  "Test ATX header insertion using current line with whitespace."
+  (markdown-test-string "  line one  \n\nline two\n"
+   (goto-char (line-end-position))
+   (markdown-insert-header-atx-3)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "### line one ###\n\nline two\n"))
+   (should (= (point) 13))
+   (should (looking-at " ###\n"))))
+
+(ert-deftest test-markdown-insertion/atx-replace-atx ()
+  "Test ATX header insertion when replacing an existing ATX header."
+  (markdown-test-string "## replace ##\n"
+   (markdown-insert-header-atx-4)
+   (should (string-equal (buffer-string) "#### replace ####\n\n"))
+   (should (looking-at " ####\n"))))
+
+(ert-deftest test-markdown-insertion/atx-replace-setext-1 ()
+  "Test ATX header insertion when replacing an existing setext header."
+  (markdown-test-string "replace\n=======\n"
+   (markdown-insert-header-atx-2)
+   (should (string-equal (buffer-string) "## replace ##\n\n"))
+   (should (looking-at " ##\n"))))
+
+(ert-deftest test-markdown-insertion/atx-replace-setext-2 ()
+  "Test ATX header insertion when replacing an existing setext header."
+  (markdown-test-string "replace\n-------\n"
+   (markdown-insert-header-atx-5)
+   (should (string-equal (buffer-string) "##### replace #####\n\n"))
+   (should (looking-at " #####\n"))))
+
+(ert-deftest test-markdown-insertion/setext-line ()
+  "Test setext header insertion without region."
+  (markdown-test-string "line one\nline two\n"
+   (forward-word)
+   (markdown-insert-header-setext-1)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line one\n========\n\nline two\n"))
+   (forward-line 3)
+   (markdown-insert-header-setext-2)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line one\n========\n\nline two\n--------\n\n"))))
+
+(ert-deftest test-markdown-insertion/setext-region ()
+  "Test setext header insertion with region."
+  (markdown-test-string "line one\nline two\n"
+   (transient-mark-mode)
+   (forward-char 5)
+   (push-mark (point) t t)
+   (forward-word)
+   (should (string-equal (buffer-substring (region-beginning) (region-end))
+                         "one"))
+   (markdown-insert-header-setext-1)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line \n\none\n===\n\nline two\n"))))
+
+(ert-deftest test-markdown-insertion/setext-blank ()
+  "Test setext header insertion on blank line."
+  (markdown-test-string "line one\n\nline two\n"
+   (forward-line)
+   (markdown-insert-header 2 "foo" t)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line one\n\nfoo\n---\n\nline two\n"))
+   (should (= (point) 14))
+   (should (looking-at "\n---"))))
+
+(ert-deftest test-markdown-insertion/setext-region-whitespace ()
+  "Test setext header insertion using a region with whitespace."
+  (markdown-test-string "  line one\n\nline two\n  \n"
+   (transient-mark-mode)
+   (push-mark (point) t t)
+   (goto-char (point-max))
+   (markdown-insert-header-setext-1)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line one line two\n================="))
+   (should (= (point) 18))
+   (should (looking-at "\n===="))))
+
+(ert-deftest test-markdown-insertion/setext-line-whitespace ()
+  "Test setext header insertion using current line with whitespace."
+  (markdown-test-string "  line one  \n\nline two\n"
+   (goto-char (line-end-position))
+   (markdown-insert-header-setext-2)
+   (should (string-equal (buffer-substring (point-min) (point-max))
+                         "line one\n--------\n\nline two\n"))
+   (should (= (point) 9))
+   (should (looking-at "\n---"))))
+
+(ert-deftest test-markdown-insertion/setext-replace-atx ()
+  "Test setext header insertion when replacing an existing ATX header."
+  (markdown-test-string "## replace ##\n"
+   (markdown-insert-header-setext-1)
+   (should (string-equal (buffer-string) "replace\n=======\n\n"))
+   (should (looking-at "\n==="))))
+
+(ert-deftest test-markdown-insertion/setext-replace-setext-1 ()
+  "Test setext header insertion when replacing an existing setext title."
+  (markdown-test-string "replace\n=======\n"
+   (markdown-insert-header-setext-2)
+   (should (string-equal (buffer-string) "replace\n-------\n\n"))
+   (should (looking-at "\n---"))))
+
+(ert-deftest test-markdown-insertion/setext-replace-setext-2 ()
+  "Test setext header insertion when replacing an existing setext section."
+  (markdown-test-string "replace\n-------\n"
+   (markdown-insert-header-setext-1)
+   (should (string-equal (buffer-string) "replace\n=======\n\n"))
+   (should (looking-at "\n==="))))
+
+(ert-deftest test-markdown-insertion/remove-header ()
+  "Test ATX and setext header."
+  (markdown-test-string
+   "# atx1\n\n## atx2 ##\n\nsetext1\n=======\n\nsetext2\n-------\n"
+   (should (equal (markdown-remove-header) (cons 1 5)))
+   (forward-line)
+   (should (not (markdown-remove-header)))
+   (forward-line)
+   (should (equal (markdown-remove-header) (cons 7 11)))
+   (forward-line)
+   (should (not (markdown-remove-header)))
+   (forward-line)
+   (should (equal (markdown-remove-header) (cons 13 20)))
+   (forward-line)
+   (should (not (markdown-remove-header)))
+   (forward-line)
+   (should (equal (markdown-remove-header) (cons 22 29)))
+   (should (string-equal (buffer-string)
+                         "atx1\n\natx2\n\nsetext1\n\nsetext2\n"))))
 
 (ert-deftest test-markdown-insertion/italic-unwrap-region ()
   "A test of inserting italics with italic text in the region."
@@ -552,13 +693,13 @@ This file is not saved."
     (markdown-test-range-has-face 548 581 markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
-  "An edge case for level-one Setext headers."
+  "An edge case for level-one setext headers."
   (markdown-test-string "a\n=\n"
    (markdown-test-range-has-face 1 1 markdown-header-face-1)
    (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
 
 (ert-deftest test-markdown-font-lock/setext-2-letter ()
-  "An edge case for level-two Setext headers."
+  "An edge case for level-two setext headers."
   (markdown-test-string "b\n-\n"
    (markdown-test-range-has-face 1 1 markdown-header-face-2)
    (markdown-test-range-has-face 3 3 markdown-header-rule-face)))

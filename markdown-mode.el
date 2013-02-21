@@ -288,11 +288,19 @@
 ;;   * Headers: `C-c C-t`
 ;;
 ;;     All header commands use text in the active region, if any, as
-;;     the header text.  To insert an atx or hash style level-n
+;;     the header text.  Otherwise, if the current line is not blank,
+;;     use the text on the current line.  Finally, prompt for header
+;;     text if there is no active region and the current line is
+;;     blank.  To insert an atx or hash style level-n
 ;;     header, press `C-c C-t n` where n is between 1 and 6.  For a
 ;;     top-level setext or underline style header press `C-c C-t t`
 ;;     (mnemonic: title) and for a second-level underline-style header
 ;;     press `C-c C-t s` (mnemonic: section).
+;;
+;;     If the point is at a header, these commands will replace the
+;;     existing markup in order to update the level and/or type of the
+;;     header.  To remove the markup of the header at the point, press
+;;     `C-c C-t 0`.
 ;;
 ;;   * Footnotes: `C-c C-f`
 ;;
@@ -909,6 +917,14 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defconst markdown-regex-header-2-setext
   "^\\(.*\\)\n\\(-+\\)$"
   "Regular expression for level 2 setext-style (underline) headers.")
+
+(defconst markdown-regex-header-setext
+  "^\\(.+\\)\n\\(\\(?:=\\|-\\)+\\)$"
+  "Regular expression for generic setext-style (underline) headers.")
+
+(defconst markdown-regex-header-atx
+  "^\\(#+\\)[ \t]*\\(.*?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for generic atx-style (hash mark) headers.")
 
 (defconst markdown-regex-hr
   "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
@@ -1769,103 +1785,110 @@ place the point in the position to enter alt text."
     (when bounds
       (goto-char (- (cdr bounds) 1)))))
 
-(defun markdown-insert-header-1 ()
-  "Insert a first level atx-style (hash mark) header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
-  (interactive)
-  (markdown-insert-header 1))
+(defun markdown-remove-header ()
+  "Remove header markup if point is at a header.
+Return bounds of remaining header text if a header was removed
+and nil otherwise."
+  (interactive "*")
+  (or (markdown-unwrap-thing-at-point markdown-regex-header-atx 0 2)
+      (markdown-unwrap-thing-at-point markdown-regex-header-setext 0 1)))
 
-(defun markdown-insert-header-2 ()
-  "Insert a second level atx-style (hash mark) header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
-  (interactive)
-  (markdown-insert-header 2))
-
-(defun markdown-insert-header-3 ()
-  "Insert a third level atx-style (hash mark) header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
-  (interactive)
-  (markdown-insert-header 3))
-
-(defun markdown-insert-header-4 ()
-  "Insert a fourth level atx-style (hash mark) header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
-  (interactive)
-  (markdown-insert-header 4))
-
-(defun markdown-insert-header-5 ()
-  "Insert a fifth level atx-style (hash mark) header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
-  (interactive)
-  (markdown-insert-header 5))
-
-(defun markdown-insert-header-6 ()
-  "Insert a sixth level atx-style (hash mark) header.
-If Transient Mark mode is on and a region is active, it is used
-as the header text."
-  (interactive)
-  (markdown-insert-header 6))
-
-(defun markdown-insert-header (n)
-  "Insert an atx-style (hash mark) header.
-With no prefix argument, insert a level-1 header.  With prefix N,
-insert a level-N header.  If Transient Mark mode is on and the
-region is active, it is used as the header text."
-  (interactive "p")
-  (unless n                             ; Test to see if n is defined
-    (setq n 1))                         ; Default to level 1 header
-  (let (hdr hdrl hdrr bounds)
-    (dotimes (count n hdr)
-      (setq hdr (concat "#" hdr)))      ; Build a hash mark header string
-    (setq hdrl (concat hdr " "))
-    (setq hdrr (concat " " hdr))
-    (setq bounds (markdown-wrap-or-insert hdrl hdrr 'line))
-    (unless bounds
-      (setq bounds (cons (- (point) (length hdrl)) (+ (point) (length hdrr)))))
-    (save-excursion
-      (goto-char (cdr bounds))
-      (markdown-ensure-blank-line-after)
-      (goto-char (car bounds))
-      (markdown-ensure-blank-line-before))))
-
-(defun markdown-insert-setext-header (char)
-  "Insert a setext-style (underlined) header with CHAR repeated underneath.
-CHAR should be either a hyphen (-) or an equals sign (=)."
-  (cond
-   ((markdown-use-region-p)
-    (let ((a (region-beginning)) (b (region-end)))
-      (goto-char b)
-      ;; If the region spans multiple lines, only use the last one.
-      (setq a (max a (point-at-bol)))
-      (insert "\n")
-      (dotimes (count (- b a))
-        (insert char))
-      (markdown-ensure-blank-line-after)
-      (goto-char a)
-      (markdown-ensure-blank-line-before)))
-   (t
-    (let ((text (read-string "Header text: ")))
-      (when (> (length text) 0)
-        (markdown-ensure-blank-line-before)
+(defun markdown-insert-header (&optional level text setext)
+  "Insert or replace header markup.
+The level of the header is specified by LEVEL and header text is
+given by TEXT.  LEVEL must be an integer from 1 and 6, and the
+default value is 1.
+When TEXT is nil, the header text is obtained as follows.
+If there is an active region, it is used as the header text.
+Otherwise, the current line will be used as the header text.
+If there is not an active region and the point is at a header,
+remove the header markup and replace with level N header.
+Otherwise, insert empty header markup and place the cursor in
+between.
+The style of the header will be atx (hash marks) unless
+SETEXT is non-nil, in which case a setext-style (underlined)
+header will be inserted."
+  (interactive "p\nsHeader text: ")
+  (setq level (min (max (or level 1) 1) (if setext 2 6)))
+  ;; Determine header text if not given
+  (when (null text)
+    (if (markdown-use-region-p)
+        ;; Active region
+        (progn
+          (setq text (buffer-substring (region-beginning) (region-end)))
+          (delete-region (region-beginning) (region-end)))
+      ;; No active region
+      (markdown-remove-header)
+      (setq text (buffer-substring (line-beginning-position) (line-end-position)))
+      (delete-region (line-beginning-position) (line-end-position))
+      (when (and setext (string-match "^[ \t]*$" text))
+        (setq text (read-string "Header text: "))))
+    (setq text (markdown-compress-whitespace-string text)))
+  ;; Insertion with given text
+  (markdown-ensure-blank-line-before)
+  (if setext
+      ;; setext
+      (progn
         (insert text "\n")
-        (dotimes (count (length text))
-          (insert char))
-        (markdown-ensure-blank-line-after))))))
+        (dotimes (n (length text))
+          (insert (if (= level 2) "-" "="))))
+    ;; atx
+    (dotimes (count level) (insert "#"))
+    (insert " " text " ")
+    (dotimes (count level) (insert "#")))
+  (markdown-ensure-blank-line-after)
+  ;; Leave point at end of text
+  (if setext
+      (backward-char (1+ (length text)))
+    (backward-char (1+ level))))
 
-(defun markdown-insert-title ()
-  "Insert a setext-style (underlined) first-level header."
-  (interactive)
-  (markdown-insert-setext-header "="))
+(defun markdown-insert-header-atx-1 ()
+  "Insert a first level atx-style (hash mark) header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 1 nil nil))
 
-(defun markdown-insert-section ()
-  "Insert a setext-style (underlined) second-level header."
-  (interactive)
-  (markdown-insert-setext-header "-"))
+(defun markdown-insert-header-atx-2 ()
+  "Insert a level two atx-style (hash mark) header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 2 nil nil))
+
+(defun markdown-insert-header-atx-3 ()
+  "Insert a level three atx-style (hash mark) header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 3 nil nil))
+
+(defun markdown-insert-header-atx-4 ()
+  "Insert a level four atx-style (hash mark) header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 4 nil nil))
+
+(defun markdown-insert-header-atx-5 ()
+  "Insert a level five atx-style (hash mark) header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 5 nil nil))
+
+(defun markdown-insert-header-atx-6 ()
+  "Insert a sixth level atx-style (hash mark) header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 6 nil nil))
+
+(defun markdown-insert-header-setext-1 ()
+  "Insert a setext-style (underlined) first-level header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 1 nil t))
+
+(defun markdown-insert-header-setext-2 ()
+  "Insert a setext-style (underlined) second-level header.
+See `markdown-insert-header'."
+  (interactive "*")
+  (markdown-insert-header 2 nil t))
 
 (defun markdown-insert-blockquote ()
   "Start a blockquote section (or blockquote the region).
@@ -2256,12 +2279,13 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-aw" 'markdown-insert-wiki-link)
     (define-key map "\C-c\C-ii" 'markdown-insert-image)
-    (define-key map "\C-c\C-t1" 'markdown-insert-header-1)
-    (define-key map "\C-c\C-t2" 'markdown-insert-header-2)
-    (define-key map "\C-c\C-t3" 'markdown-insert-header-3)
-    (define-key map "\C-c\C-t4" 'markdown-insert-header-4)
-    (define-key map "\C-c\C-t5" 'markdown-insert-header-5)
-    (define-key map "\C-c\C-t6" 'markdown-insert-header-6)
+    (define-key map "\C-c\C-t0" 'markdown-remove-header)
+    (define-key map "\C-c\C-t1" 'markdown-insert-header-atx-1)
+    (define-key map "\C-c\C-t2" 'markdown-insert-header-atx-2)
+    (define-key map "\C-c\C-t3" 'markdown-insert-header-atx-3)
+    (define-key map "\C-c\C-t4" 'markdown-insert-header-atx-4)
+    (define-key map "\C-c\C-t5" 'markdown-insert-header-atx-5)
+    (define-key map "\C-c\C-t6" 'markdown-insert-header-atx-6)
     (define-key map "\C-c\C-pb" 'markdown-insert-bold)
     (define-key map "\C-c\C-ss" 'markdown-insert-bold)
     (define-key map "\C-c\C-pi" 'markdown-insert-italic)
@@ -2273,8 +2297,8 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-sp" 'markdown-insert-pre)
     (define-key map "\C-c\C-s\C-p" 'markdown-pre-region)
     (define-key map "\C-c-" 'markdown-insert-hr)
-    (define-key map "\C-c\C-tt" 'markdown-insert-title)
-    (define-key map "\C-c\C-ts" 'markdown-insert-section)
+    (define-key map "\C-c\C-tt" 'markdown-insert-header-setext-1)
+    (define-key map "\C-c\C-ts" 'markdown-insert-header-setext-2)
     ;; Footnotes
     (define-key map "\C-c\C-fn" 'markdown-footnote-new)
     (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
@@ -2348,15 +2372,15 @@ See also `markdown-mode-map'.")
     ["Kill ring save" markdown-kill-ring-save]
     "---"
     ("Headers (setext)"
-     ["Insert Title" markdown-insert-title]
-     ["Insert Section" markdown-insert-section])
+     ["First level" markdown-insert-setext-header-1]
+     ["Second level" markdown-insert-setext-header-2])
     ("Headers (atx)"
-     ["First level" markdown-insert-header-1]
-     ["Second level" markdown-insert-header-2]
-     ["Third level" markdown-insert-header-3]
-     ["Fourth level" markdown-insert-header-4]
-     ["Fifth level" markdown-insert-header-5]
-     ["Sixth level" markdown-insert-header-6])
+     ["First level" markdown-insert-header-atx-1]
+     ["Second level" markdown-insert-header-atx-2]
+     ["Third level" markdown-insert-header-atx-3]
+     ["Fourth level" markdown-insert-header-atx-4]
+     ["Fifth level" markdown-insert-header-atx-5]
+     ["Sixth level" markdown-insert-header-atx-6])
     "---"
     ["Bold" markdown-insert-bold]
     ["Italic" markdown-insert-italic]
@@ -3262,6 +3286,13 @@ given range."
   (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
 
 ;;; Miscellaneous =============================================================
+
+(defun markdown-compress-whitespace-string (str)
+  "Compress whitespace in STR and return result.
+Leading and trailing whitespace is removed.  Sequences of multiple
+spaces, tabs, and newlines are replaced with single spaces."
+  (replace-regexp-in-string "\\(^[ \t\n]+\\|[ \t\n]+$\\)" ""
+                            (replace-regexp-in-string "[ \t\n]+" " " str)))
 
 (defun markdown-line-number-at-pos (&optional pos)
   "Return (narrowed) buffer line number at position POS.
