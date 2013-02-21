@@ -564,6 +564,32 @@ This file is not saved."
    (should (string-equal (buffer-string)
                          (concat "one\n\n" markdown-hr-string "\n\n line\n")))))
 
+(ert-deftest test-markdown-insertion/pre-region-1 ()
+  "Test `markdown-pre-region'."
+  ;; Simple test as non-interactive command
+  (markdown-test-string "line one\nline two\n"
+   (markdown-pre-region (line-beginning-position) (line-end-position))
+   (should (string-equal (buffer-string) "    line one\n\nline two\n")))
+  ;; Simple test as interactive command
+  (markdown-test-string "line one\nline two\n"
+   (push-mark (point) t t)
+   (forward-line 2)
+   (call-interactively 'markdown-pre-region)
+   (should (string-equal (buffer-string) "    line one\n    line two\n"))))
+
+(ert-deftest test-markdown-insertion/blockquote-region-1 ()
+  "Test `markdown-blockquote-region'."
+  ;; Simple test as non-interactive command
+  (markdown-test-string "line one\nline two\n"
+   (markdown-blockquote-region (line-beginning-position) (line-end-position))
+   (should (string-equal (buffer-string) "> line one\n\nline two\n")))
+  ;; Simple test as interactive command
+  (markdown-test-string "line one\nline two\n"
+   (push-mark (point) t t)
+   (forward-line 2)
+   (call-interactively 'markdown-blockquote-region)
+   (should (string-equal (buffer-string) "> line one\n> line two\n"))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()

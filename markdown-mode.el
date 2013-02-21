@@ -1905,33 +1905,32 @@ the blockquote text."
 Arguments BEG and END specify the beginning and end of the
 region.  The characters PREFIX will appear at the beginning
 of each line."
-  (if mark-active
-      (save-excursion
-        ;; Ensure that there is a leading blank line
-        (goto-char beg)
-        (when (and (>= (point) (+ (point-min) 2))
-                   (not (looking-back "\n\n" 2)))
-          (insert "\n")
-          (setq beg (1+ beg))
-          (setq end (1+ end)))
-        ;; Move back before any blank lines at the end
-        (goto-char end)
-        (while (and (looking-back "\n" 1)
-                    (not (equal (point) (point-min))))
-          (backward-char)
-          (setq end (1- end)))
-        ;; Ensure that there is a trailing blank line
-        (goto-char end)
-        (if (not (or (looking-at "\n\n")
-                     (and (equal (1+ end) (point-max)) (looking-at "\n"))))
-            (insert "\n"))
-        ;; Insert PREFIX
-        (goto-char beg)
-        (beginning-of-line)
-        (while (< (point-at-bol) end)
-          (insert prefix)
-          (setq end (+ (length prefix) end))
-          (forward-line)))))
+  (save-excursion
+    ;; Ensure that there is a leading blank line
+    (goto-char beg)
+    (when (and (>= (point) (+ (point-min) 2))
+               (not (looking-back "\n\n" 2)))
+      (insert "\n")
+      (setq beg (1+ beg))
+      (setq end (1+ end)))
+    ;; Move back before any blank lines at the end
+    (goto-char end)
+    (while (and (looking-back "\n" 1)
+                (not (equal (point) (point-min))))
+      (backward-char)
+      (setq end (1- end)))
+    ;; Ensure that there is a trailing blank line
+    (goto-char end)
+    (if (not (or (looking-at "\n\n")
+                 (and (equal (1+ end) (point-max)) (looking-at "\n"))))
+        (insert "\n"))
+    ;; Insert PREFIX
+    (goto-char beg)
+    (beginning-of-line)
+    (while (< (point-at-bol) end)
+      (insert prefix)
+      (setq end (+ (length prefix) end))
+      (forward-line))))
 
 (defun markdown-blockquote-region (beg end)
   "Blockquote the region.
