@@ -1710,8 +1710,9 @@ insert bold delimiters and place the cursor in between them."
                        (region-beginning) (region-end)
                        markdown-regex-bold 2 4)))
           (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
-      ;; Word at point or markup insert
-      (unless (markdown-unwrap-thing-at-point markdown-regex-bold 2 4)
+      ;; Bold markup removal, bold word at point, or empty markup insertion
+      (if (thing-at-point-looking-at markdown-regex-bold)
+          (markdown-unwrap-thing-at-point nil 2 4)
         (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
 (defun markdown-insert-italic ()
@@ -1728,8 +1729,9 @@ insert italic delimiters and place the cursor in between them."
                        (region-beginning) (region-end)
                        markdown-regex-italic 2 4)))
           (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
-      ;; Word at point or markup insert
-      (unless (markdown-unwrap-thing-at-point markdown-regex-italic 2 4)
+      ;; Italic markup removal, bold word at point, or empty markup insertion
+      (if (thing-at-point-looking-at markdown-regex-italic)
+          (markdown-unwrap-thing-at-point nil 2 4)
         (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
 (defun markdown-insert-code ()
