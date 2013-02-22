@@ -622,6 +622,26 @@ This file is not saved."
   (markdown-test-string "    * pre block, not a list item\n"
    (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
 
+;;; Indentation tests:
+
+(ert-deftest test-markdown-indentation/calc-indents ()
+  "Test `markdown-calc-indents' a nested list context."
+  (markdown-test-file "nested-list.text"
+   (goto-char (point-max))
+   (let ((indents (markdown-calc-indents)))
+     (should (= (car indents) 17)) ; indentation of previous line first
+     (should (equal (sort indents '<)
+                    (list
+                     0 ; beginning of line
+                     3 ; first-level list marker
+                     7 ; second-level list marker
+                     11 ; third-level list marker
+                     13 ; previous list item text
+                     16 ; pre-block indentation
+                     17 ; indentation of previous line
+                     21 ; previous line plus tab-width
+                     ))))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()

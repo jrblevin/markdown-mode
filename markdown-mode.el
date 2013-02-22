@@ -2196,7 +2196,8 @@ NIL is returned instead."
 ;;; Indentation ====================================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
-  "Return the position after the index of CUR-POS in POSITIONS."
+  "Return the position after the index of CUR-POS in POSITIONS.
+Positions are calculated by `markdown-calc-indents'."
   (while (and positions
               (not (equal cur-pos (car positions))))
     (setq positions (cdr positions)))
@@ -2209,7 +2210,8 @@ If the _previous_ command was either `markdown-enter-key' or
 reasonable indentation position.  Otherwise, we could have been
 called directly by `markdown-enter-key', by an initial call of
 `markdown-cycle', or indirectly by `auto-fill-mode'.  In
-these cases, indent to the default position."
+these cases, indent to the default position.
+Positions are calculated by `markdown-calc-indents'."
   (interactive)
   (let ((positions (markdown-calc-indents))
         (cur-pos (current-column)))
@@ -2222,48 +2224,39 @@ these cases, indent to the default position."
 (defun markdown-calc-indents ()
   "Return a list of indentation columns to cycle through.
 The first element in the returned list should be considered the
-default indentation level."
+default indentation level.  This function does not worry about
+duplicate positions, which are handled up by calling functions."
   (let (pos prev-line-pos positions)
 
-    ;; Previous line indent
+    ;; Indentation of previous line
     (setq prev-line-pos (markdown-prev-line-indent))
     (setq positions (cons prev-line-pos positions))
 
-    ;; Previous non-list-marker indent
-    (setq pos (markdown-prev-non-list-indent))
-    (when pos
-      (setq positions (cons pos positions))
-      (setq positions (cons (+ pos tab-width) positions)))
+    ;; Indentation of previous non-list-marker text
+    (when (setq pos (markdown-prev-non-list-indent))
+      (setq positions (cons pos positions)))
+
+    ;; Indentation required for a pre block in current context
+    (setq pos (length (markdown-pre-indentation (point))))
+    (setq positions (cons pos positions))
 
     ;; Indentation of the previous line + tab-width
-    (cond
-     (prev-line-pos
-      (setq positions (cons (+ prev-line-pos tab-width) positions)))
-     (t
-      (setq positions (cons tab-width positions))))
+    (if prev-line-pos
+        (setq positions (cons (+ prev-line-pos tab-width) positions))
+      (setq positions (cons tab-width positions)))
 
     ;; Indentation of the previous line - tab-width
-    (if (and prev-line-pos
-             (> prev-line-pos tab-width))
+    (if (and prev-line-pos (> prev-line-pos tab-width))
         (setq positions (cons (- prev-line-pos tab-width) positions)))
 
-    ;; Indentation of preceeding list item
-    (setq pos
-          (save-excursion
-            (forward-line -1)
-            (catch 'break
-              (while (not (equal (point) (point-min)))
-                (forward-line -1)
-                (goto-char (point-at-bol))
-                (when (re-search-forward markdown-regex-list (point-at-eol) t)
-                  (throw 'break (length (match-string 1)))))
-              nil)))
-    (if (and pos (not (eq pos prev-line-pos)))
-        (setq positions (cons pos positions)))
+    ;; Indentation of all preceeding list markers (when in a list)
+    (when (setq pos (markdown-calculate-list-levels))
+      (setq positions (append pos positions)))
 
     ;; First column
     (setq positions (cons 0 positions))
 
+    ;; Return reversed list
     (reverse positions)))
 
 (defun markdown-do-normal-return ()
