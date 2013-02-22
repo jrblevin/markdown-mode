@@ -746,6 +746,33 @@ This file is not saved."
 
 ;;; Lists:
 
+(ert-deftest test-markdown-lists/levels-1 ()
+  "Test list levels function `markdown-calculate-list-levels'."
+  (markdown-test-file "nested-list.text"
+   (let ((values '(((1 . 1) . nil) ((2 . 13) . (3)) ((14 . 23) . (7 3))
+                   ((24 . 26) . (11 7 3)))))
+     (loop for (range . value) in values
+           do (goto-char (point-min))
+              (forward-line (1- (car range)))
+              (dotimes (n (- (cdr range) (car range)))
+                (should (equal (markdown-calculate-list-levels) value))
+                (forward-line))))))
+
+(ert-deftest test-markdown-lists/levels-2 ()
+  "Test list levels function `markdown-calculate-list-levels'."
+  (markdown-test-file "syntax.text"
+   (let ((values '(((1 . 13) . nil) ((14 . 14) . (0)) ((15 . 17) . (4 0))
+                   ((18 . 18) . (0)) ((19 . 24) . (4 0)) ((25 . 25) . (0))
+                   ((26 . 29) . (4 0)) ((30 . 30) . (0)) ((31 . 33) . (4 0))
+                   ((34 . 588) . nil) ((589 . 595) . (0)) ((596 . 814) . nil)
+                   ((815 . 820) . (0)) ((821 . 898) . nil))))
+     (loop for (range . value) in values
+           do (goto-char (point-min))
+              (forward-line (1- (car range)))
+              (dotimes (n (- (cdr range) (car range)))
+                (should (equal (markdown-calculate-list-levels) value))
+                (forward-line))))))
+
 (ert-deftest test-markdown-lists/bounds-1 ()
   "Test list item bounds function `markdown-cur-list-item-bounds'."
   (markdown-test-file "lists.text"

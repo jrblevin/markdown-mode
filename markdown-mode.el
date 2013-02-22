@@ -1260,19 +1260,24 @@ list item, and so on.  The depth of the list item is therefore
 the length of the returned list.  If the point is not at or
 immediately  after a list item, return nil."
   (save-excursion
-    (let ((first (point)) levels indent)
+    (let ((first (point)) levels indent pre-regexp)
       ;; Find a baseline point with zero list indentation
       (markdown-search-backward-baseline)
       ;; Search for all list items between baseline and LOC
       (while (re-search-forward markdown-regex-list first t)
+        (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" (1+ (length levels))))
+        (beginning-of-line)
         (cond
          ;; Make sure this is not a header or hr
-         ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+         ((markdown-new-baseline-p) (setq levels nil))
+         ;; Make sure this is not a line from a pre block
+         ((looking-at pre-regexp))
          ;; If not, then update levels
          (t
           (setq indent (markdown-cur-line-indent))
           (setq levels (markdown-update-list-levels (match-string 2)
-                                                    indent levels)))))
+                                                    indent levels))))
+        (end-of-line))
       levels)))
 
 (defun markdown-prev-list-item (level)
