@@ -264,7 +264,7 @@
 ;;     jump to the corresponding line.
 ;;
 ;;     `C-c C-c n` will clean up the numbering of ordered lists.
-
+;;
 ;;   * Images: `C-c C-i`
 ;;
 ;;     `C-c C-i i` inserts an image, using the active region (if any)
@@ -429,13 +429,18 @@
 ;;     `markdown' with an active region.
 ;;   * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
 ;;   * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
-;;   * Dmitry Dzhus <mail@sphinx.net.ru> for reference checking functions.
+;;   * Dmitry Dzhus <mail@sphinx.net.ru> for undefined reference checking.
+;;   * Carsten Dominik <carsten@orgmode.org> for org-mode, from which the
+;;     visibility cycling functionality was derived, and for a bug fix
+;;     related to orgtbl-mode.
 ;;   * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
 ;;   * Ben Voui <intrigeri@boum.org> for font-lock face customizations.
 ;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el
 ;;     compatibility and custom CSS.
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
+;;   * Nelson Minar <nelson@santafe.edu> for html-helper-mode, from which
+;;     comment matching functions were derived.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
 ;;   * Joost Kremers <joostkremers@fastmail.fm> for footnote-handling
 ;;     functions, bug reports regarding indentation, and
@@ -478,8 +483,8 @@
 ;;   * Peter Jones <pjones@pmade.com> for link following functions.
 ;;   * Bryan Fink <bryan.fink@gmail.com> for a bug report regarding
 ;;     externally modified files.
-;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> and Carsten Dominik
-;;     for a bug fix related to orgtbl-mode.
+;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> for a bug fix
+;;     related to orgtbl-mode.
 ;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
 ;;     export hooks and unit test improvements.
 
@@ -523,6 +528,7 @@
 (require 'outline)
 (eval-when-compile (require 'cl))
 
+
 ;;; Constants =================================================================
 
 (defconst markdown-mode-version "1.9"
@@ -531,7 +537,8 @@
 (defconst markdown-output-buffer-name "*markdown-output*"
   "Name of temporary buffer for markdown command output.")
 
-;;; Customizable variables ====================================================
+
+;;; Customizable Variables ====================================================
 
 (defvar markdown-mode-hook nil
   "Hook run when entering Markdown mode.")
@@ -665,7 +672,8 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
                  (const :tag "Immediately after the paragraph" immediately)
                  (const :tag "Before next header" header)))
 
-;;; Font lock =================================================================
+
+;;; Font Lock =================================================================
 
 (require 'font-lock)
 
@@ -1087,13 +1095,12 @@ text.")
   "Regular expression maching any character that is allowed in a footnote identifier.")
 
 
-
 ;;; Compatibility =============================================================
 
-;; Handle replace-regexp-in-string in XEmacs 21
 (defun markdown-replace-regexp-in-string (regexp rep string)
-  "Compatibility wrapper to provide `replace-regexp-in-string'.
-Replace all matches for REGEXP with REP in STRING."
+  "Replace all matches for REGEXP with REP in STRING.
+This is a compatibility wrapper to provide `replace-regexp-in-string'
+in XEmacs 21."
   (if (featurep 'xemacs)
       (replace-in-string string regexp rep)
     (replace-regexp-in-string regexp rep string)))
@@ -1115,8 +1122,7 @@ Replace all matches for REGEXP with REP in STRING."
     (defalias 'markdown-use-region-p 'region-active-p))))
 
 
-
-;;; Markdown parsing functions ================================================
+;;; Markdown Parsing Functions ================================================
 
 (defun markdown-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
@@ -1443,9 +1449,9 @@ end of buffer case by setting both endpoints equal to the value of
              (setq b (1- b)))))
   (cons a b)))
 
-;;; Markdown font lock matching functions =====================================
+
+;;; Markdown Font Lock Matching Functions =====================================
 
-;; From html-helper-mode
 (defun markdown-match-comments (last)
   "Match HTML comments from the point to LAST."
   (cond ((search-forward "<!--" last t)
@@ -1551,7 +1557,6 @@ This helps improve font locking for block constructs such as pre blocks."
       (setq font-lock-beg found))))
 
 
-
 ;;; Syntax Table ==============================================================
 
 (defvar markdown-mode-syntax-table
@@ -1561,7 +1566,6 @@ This helps improve font locking for block constructs such as pre blocks."
   "Syntax table for `markdown-mode'.")
 
 
-
 ;;; Element Insertion =========================================================
 
 (defun markdown-ensure-blank-line-before ()
@@ -2008,6 +2012,7 @@ automatically in order to have the correct markup."
     (insert "```")
     (forward-line -1)))
 
+
 ;;; Footnotes ======================================================================
 
 (defun markdown-footnote-counter-inc ()
@@ -2187,6 +2192,7 @@ NIL is returned instead."
                  (>= (markdown-next-line-indent) 4)))
         (append fn (list (point)))))))
 
+
 ;;; Indentation ====================================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
@@ -2382,6 +2388,7 @@ Otherwise, do normal delete by repeating
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
 
+
 ;;; Menu ==================================================================
 
 (easy-menu-define markdown-mode-menu markdown-mode-map
@@ -2432,12 +2439,10 @@ See also `markdown-mode-map'.")
     ))
 
 
-
 ;;; imenu =====================================================================
 
 (defun markdown-imenu-create-index ()
   "Create and return an imenu index alist for the current buffer.
-
 See `imenu-create-index-function' and `imenu--index-alist' for details."
   (let* ((root '(nil . nil))
          cur-alist
@@ -2483,9 +2488,8 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
             (setq cur-level level)))))
       (cdr root))))
 
-;;; References ================================================================
-
-;;; Undefined reference checking code by Dmitry Dzhus <mail@sphinx.net.ru>.
+
+;;; Reference Checking ========================================================
 
 (defconst markdown-refcheck-buffer
   "*Undefined references for %buffer%*"
@@ -2495,7 +2499,6 @@ The string %buffer% will be replaced by the corresponding
 
 (defun markdown-has-reference-definition (reference)
   "Find out whether Markdown REFERENCE is defined.
-
 REFERENCE should include the square brackets, like [this]."
   (let ((reference (downcase reference)))
     (save-excursion
@@ -2507,11 +2510,8 @@ REFERENCE should include the square brackets, like [this]."
 
 (defun markdown-get-undefined-refs ()
   "Return a list of undefined Markdown references.
-
-Result is an alist of pairs (reference . occurencies), where
-occurencies is itself another alist of pairs (label .
-line-number).
-
+Result is an alist of pairs (reference . occurrences), where
+occurrences is itself another alist of pairs (label . line-number).
 For example, an alist corresponding to [Nice editor][Emacs] at line 12,
 \[GNU Emacs][Emacs] at line 45 and [manual][elisp] at line 127 is
 \((\"[emacs]\" (\"[Nice editor]\" . 12) (\"[GNU Emacs]\" . 45)) (\"[elisp]\" (\"[manual]\" . 127)))."
@@ -2534,9 +2534,7 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
 
 (defun markdown-add-missing-ref-definition (ref buffer &optional recheck)
   "Add blank REF definition to the end of BUFFER.
-
 REF is a Markdown reference in square brackets, like \"[lisp-history]\".
-
 When RECHECK is non-nil, BUFFER gets rechecked for undefined
 references so that REF disappears from the list of those links."
   (with-current-buffer buffer
@@ -2575,10 +2573,8 @@ references so that REF disappears from the list of those links."
 
 (defun markdown-check-refs (&optional silent)
   "Show all undefined Markdown references in current `markdown-mode' buffer.
-
 If SILENT is non-nil, do not message anything when no undefined
 references found.
-
 Links which have empty reference definitions are considered to be
 defined."
   (interactive "P")
@@ -2610,8 +2606,8 @@ defined."
               ;; Insert reference as text in Emacs < 22
               (insert button-label)))
           (insert " (")
-          (dolist (occurency (cdr ref))
-            (let ((line (cdr occurency)))
+          (dolist (occurrence (cdr ref))
+            (let ((line (cdr occurrence)))
               (if (>= emacs-major-version 22)
                   ;; Create a line number button in Emacs 22
                   (insert-button (number-to-string line)
@@ -2627,7 +2623,7 @@ defined."
         (goto-char (point-min))
         (forward-line 2)))))
 
-
+
 ;;; Lists =====================================================================
 
 (defun markdown-insert-list-item (&optional arg)
@@ -2801,20 +2797,17 @@ a list."
     (goto-char (point-min))
     (markdown--cleanup-list-numbers-level "")))
 
-
+
 ;;; Outline ===================================================================
-
-;; The following visibility cycling code was taken from org-mode
-;; by Carsten Dominik and adapted for markdown-mode.
 
 (defvar markdown-cycle-global-status 1)
 (defvar markdown-cycle-subtree-status nil)
 
-;; Based on org-end-of-subtree from org.el
 (defun markdown-end-of-subtree (&optional invisible-OK)
   "Move to the end of the current subtree.
 Only visible heading lines are considered, unless INVISIBLE-OK is
-non-nil."
+non-nil.
+Derived from `org-end-of-subtree'."
   (outline-back-to-heading invisible-OK)
   (let ((first t)
         (level (funcall outline-level)))
@@ -2831,12 +2824,12 @@ non-nil."
               (forward-char -1)))))
   (point))
 
-;; Based on org-cycle from org.el.
 (defun markdown-cycle (&optional arg)
   "Visibility cycling for Markdown mode.
 If ARG is t, perform global visibility cycling.  If the point is
 at an atx-style header, cycle visibility of the corresponding
-subtree.  Otherwise, insert a tab using `indent-relative'."
+subtree.  Otherwise, insert a tab using `indent-relative'.
+Derived from `org-cycle'."
   (interactive "P")
   (cond
    ((eq arg t) ;; Global cycling
@@ -2905,7 +2898,6 @@ subtree.  Otherwise, insert a tab using `indent-relative'."
    (t
     (indent-for-tab-command))))
 
-;; Based on org-shifttab from org.el.
 (defun markdown-shifttab ()
   "Global visibility cycling.
 Calls `markdown-cycle' with argument t."
@@ -2919,6 +2911,7 @@ Calls `markdown-cycle' with argument t."
    ((match-end 3) 2)
    ((- (match-end 5) (match-beginning 5)))))
 
+
 ;;; Structure Editing =========================================================
 
 (defun markdown-metaup ()
@@ -2945,6 +2938,7 @@ Calls `markdown-promote-list-item'."
   (interactive)
   (markdown-promote-list-item))
 
+
 ;;; Commands ==================================================================
 
 (defun markdown (&optional output-buffer-name)
@@ -3105,7 +3099,7 @@ current filename, but with the extension removed and replaced with .html."
     (with-current-buffer markdown-output-buffer-name
       (kill-ring-save (point-min) (point-max)))))
 
-
+
 ;;; Links =====================================================================
 
 (require 'thingatpt)
@@ -3144,7 +3138,7 @@ not at a link or the link reference is not defined returns nil."
   (if (markdown-link-p) (browse-url (markdown-link-link))
     (error "Point is not at a Markdown link or URI")))
 
-
+
 ;;; WikiLink Following/Markup =================================================
 
 (defun markdown-wiki-link-p ()
@@ -3200,7 +3194,6 @@ window when OTHER is non-nil."
 (defun markdown-follow-wiki-link-at-point (&optional arg)
   "Find Wiki Link at point.
 With prefix argument ARG, open the file in other window.
-
 See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   (interactive "P")
   (if (markdown-wiki-link-p)
@@ -3312,6 +3305,7 @@ given range."
   (interactive)
   (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
 
+
 ;;; Miscellaneous =============================================================
 
 (defun markdown-compress-whitespace-string (str)
@@ -3339,8 +3333,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (looking-back "\\[[^]]*"))
 
 
-
-;;; Mode definition  ==========================================================
+;;; Mode Definition  ==========================================================
 
 (defun markdown-show-version ()
   "Show the version number in the minibuffer."
@@ -3408,6 +3401,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 ;;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
+
 ;;; GitHub Flavored Markdown Mode  ============================================
 
 ;;;###autoload
@@ -3422,7 +3416,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
 
-
+
 (provide 'markdown-mode)
 
 ;;; markdown-mode.el ends here
