@@ -1953,6 +1953,15 @@ Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
   (markdown-block-region beg end "> "))
 
+(defun markdown-pre-indentation (loc)
+  "Return string containing necessary whitespace for a pre block at LOC."
+  (save-excursion
+    (goto-char loc)
+    (let* ((list-level (length (markdown-calculate-list-levels)))
+           indent)
+      (dotimes (count (1+ list-level) indent)
+        (setq indent (concat indent "    "))))))
+
 (defun markdown-insert-pre ()
   "Start a preformatted section (or apply to the region).
 If Transient Mark mode is on and a region is active, it is marked
@@ -1960,13 +1969,16 @@ as preformatted text."
   (interactive)
   (if (markdown-use-region-p)
       (markdown-pre-region (region-beginning) (region-end))
-    (insert "    ")))
+    (markdown-ensure-blank-line-before)
+    (insert (markdown-pre-indentation (point)))
+    (markdown-ensure-blank-line-after)))
 
 (defun markdown-pre-region (beg end)
   "Format the region as preformatted text.
 Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
-  (markdown-block-region beg end "    "))
+  (let ((indent (markdown-pre-indentation (max (point-min) (1- beg)))))
+    (markdown-block-region beg end indent)))
 
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.

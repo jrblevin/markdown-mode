@@ -590,6 +590,38 @@ This file is not saved."
    (call-interactively 'markdown-blockquote-region)
    (should (string-equal (buffer-string) "> line one\n> line two\n"))))
 
+(ert-deftest test-markdown-insertion/pre-nested-lists ()
+  "Test `markdown-pre-indentation' and `markdown-insert-pre' with nested list."
+  (markdown-test-string "* item\n    * item\n"
+   ;; before the first item
+   (should (string-equal (markdown-pre-indentation (point)) "    "))
+   (markdown-insert-pre)
+   (beginning-of-line)
+   (should (markdown-prev-line-blank-p))
+   (should (looking-at "^    $"))
+   (should (markdown-next-line-blank-p))
+   ;; before the second item
+   (forward-line 3)
+   (should (string-equal (markdown-pre-indentation (point)) "        "))
+   (markdown-insert-pre)
+   (beginning-of-line)
+   (should (markdown-prev-line-blank-p))
+   (should (looking-at "^        $"))
+   (should (markdown-next-line-blank-p))
+   ;; after the second item
+   (forward-line 3)
+   (should (string-equal (markdown-pre-indentation (point)) "            "))
+   (markdown-insert-pre)
+   (beginning-of-line)
+   (should (markdown-prev-line-blank-p))
+   (should (looking-at "^            $"))
+   (should (markdown-next-line-blank-p))))
+
+(ert-deftest test-markdown-insertion/pre-faux-list ()
+  "Test `markdown-pre-indentation' following a list-marker in a pre block."
+  (markdown-test-string "    * pre block, not a list item\n"
+   (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
