@@ -543,26 +543,28 @@ This file is not saved."
 (ert-deftest test-markdown-insertion/hr-bob ()
   "Test inserting horizontal rule at beginning of buffer."
   (markdown-test-string "one line\n"
-   (markdown-insert-hr)
+   (call-interactively 'markdown-insert-hr)
    (should (string-equal (buffer-string)
-                         (concat markdown-hr-string "\n\none line\n")))))
+                         (concat (car markdown-hr-strings)
+                                 "\n\none line\n")))))
 
 (ert-deftest test-markdown-insertion/hr-eob ()
   "Test inserting horizontal rule at end of buffer."
   (markdown-test-string "one line\n"
    (forward-line)
-   (markdown-insert-hr)
+   (call-interactively 'markdown-insert-hr)
    (should (string-equal (buffer-string)
-                         (concat "one line\n\n" markdown-hr-string)))))
+                         (concat "one line\n\n" (car markdown-hr-strings))))))
 
 (ert-deftest test-markdown-insertion/hr-mob ()
   "Test inserting horizontal rule in middle of buffer."
   (markdown-test-string "one line\n"
    (forward-word)
-   (setq markdown-hr-string "----------")
-   (markdown-insert-hr)
-   (should (string-equal (buffer-string)
-                         (concat "one\n\n" markdown-hr-string "\n\n line\n")))))
+   (let ((markdown-hr-strings '("----------")))
+     (call-interactively 'markdown-insert-hr)
+     (should (string-equal (buffer-string)
+                           (concat "one\n\n" (car markdown-hr-strings)
+                                   "\n\n line\n"))))))
 
 (ert-deftest test-markdown-insertion/pre-region-1 ()
   "Test `markdown-pre-region'."
@@ -621,6 +623,127 @@ This file is not saved."
   "Test `markdown-pre-indentation' following a list-marker in a pre block."
   (markdown-test-string "    * pre block, not a list item\n"
    (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
+
+;;; Promotion and demotion tests:
+
+(ert-deftest test-markdown-promote/atx-header ()
+  "Test `markdown-promote' for atx headers."
+  (markdown-test-string "###### test ######"
+   (markdown-promote)
+   (should (string-equal (buffer-string) "##### test #####"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "#### test ####"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "### test ###"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "## test ##"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "# test #"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "test"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "test"))))
+
+(ert-deftest test-markdown-demote/atx-header ()
+  "Test `markdown-demote' for atx headers."
+  (markdown-test-string "test"
+   (markdown-demote)
+   (should (string-equal (buffer-string) "# test #"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "## test ##"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "### test ###"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "#### test ####"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "##### test #####"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "###### test ######"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "###### test ######"))))
+
+(ert-deftest test-markdown-promote/setext-header ()
+  "Test `markdown-promote' for setext headers."
+  (markdown-test-string "test\n----"
+   (markdown-promote)
+   (should (string-equal (buffer-string) "test\n===="))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "test"))
+   (markdown-promote)
+   (should (string-equal (buffer-string) "test"))))
+
+(ert-deftest test-markdown-demote/setext-header ()
+  "Test `markdown-demote' for setext headers."
+  (markdown-test-string "test\n===="
+   (markdown-demote)
+   (should (string-equal (buffer-string) "test\n----"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "### test ###"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "#### test ####"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "##### test #####"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "###### test ######"))
+   (markdown-demote)
+   (should (string-equal (buffer-string) "###### test ######"))))
+
+(ert-deftest test-markdown-promote/hr ()
+  "Test `markdown-promote' for horizontal rules."
+  (markdown-test-string (car markdown-hr-strings)
+    (dolist (n (number-sequence 1 5))
+      (markdown-promote)
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+    (markdown-promote)
+    (should (string-equal (buffer-string) (nth 5 markdown-hr-strings)))))
+
+(ert-deftest test-markdown-demote/hr ()
+  "Test `markdown-demote' for horizontal rules."
+  (markdown-test-string (nth 5 markdown-hr-strings)
+    (dolist (n (number-sequence 4 0 -1))
+      (markdown-demote)
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+    (markdown-demote)
+    (should (string-equal (buffer-string) ""))))
+
+;;; Completion and cycling:
+
+(ert-deftest test-markdown-complete-or-cycle/atx-header ()
+  "Test `markdown-complete-or-cycle' for atx headers."
+  (markdown-test-string "##### test"
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "##### test #####"))
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "###### test ######"))
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "# test #"))
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "## test ##"))))
+
+(ert-deftest test-markdown-complete-or-cycle/setext-header ()
+  "Test `markdown-complete-or-cycle' for setext headers."
+  (markdown-test-string " test  \n=="
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "test\n===="))
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "test\n----"))
+   (call-interactively 'markdown-complete-or-cycle)
+   (should (string-equal (buffer-string) "### test ###"))))
+
+(ert-deftest test-markdown-complete/hr ()
+  "Test completion via `markdown-complete-or-cycle' for horizontal rules."
+  (markdown-test-string "- - - - -"
+  (call-interactively 'markdown-complete-or-cycle)
+  (should (string-equal (buffer-string) (car markdown-hr-strings)))))
+
+(ert-deftest test-markdown-cycle/hr ()
+  "Test cycling via `markdown-complete-or-cycle' for horizontal rules."
+  (markdown-test-string (nth 5 markdown-hr-strings)
+    (dolist (n (number-sequence 4 0 -1))
+      (call-interactively 'markdown-complete-or-cycle)
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+    (call-interactively 'markdown-complete-or-cycle)
+    (should (string-equal (buffer-string) (nth 5 markdown-hr-strings)))))
 
 ;;; Indentation tests:
 
@@ -861,7 +984,7 @@ This file is not saved."
         Four spaces past the marker
 
      Another paragraph of item 2"))
-    (markdown-promote-list-item)
+    (markdown-demote-list-item)
     (should (looking-at "       - List level 1 item 2
 
          Second paragraph of item 2
@@ -870,7 +993,7 @@ This file is not saved."
             Four spaces past the marker
 
          Another paragraph of item 2"))
-    (markdown-demote-list-item)
+    (markdown-promote-list-item)
     (should (looking-at "   - List level 1 item 2
 
      Second paragraph of item 2
@@ -883,11 +1006,11 @@ This file is not saved."
     (should (looking-at "           - List level 3 item 1
 
                  Nested pre block"))
-    (markdown-promote-list-item)
+    (markdown-demote-list-item)
     (should (looking-at "               - List level 3 item 1
 
                      Nested pre block"))
-    (markdown-demote-list-item)
+    (markdown-promote-list-item)
     (should (looking-at "           - List level 3 item 1
 
                  Nested pre block"))))

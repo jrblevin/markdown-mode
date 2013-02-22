@@ -148,8 +148,8 @@
 ;;     live-updating MultiMarkdown previewer which has a command line
 ;;     utility at `/usr/local/bin/mark`.
 ;;
-;;   * `markdown-hr-string' - string to use when inserting horizontal
-;;     rules (default: `* * * * *').
+;;   * `markdown-hr-strings' - list of strings to use when inserting
+;;     horizontal rules, in decreasing order of priority.
 ;;
 ;;   * `markdown-bold-underscore' - set to a non-nil value to use two
 ;;     underscores for bold instead of two asterisks (default: `nil').
@@ -578,10 +578,19 @@ buffer."
   :group 'markdown
   :type 'string)
 
-(defcustom markdown-hr-string "* * * * *"
-  "String to use for horizonal rules."
+(defcustom markdown-hr-strings
+  '("* * * * *"
+    "---------"
+    "* * * * * * * * * * * * * * * * * * * *"
+    "---------------------------------------"
+    "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
+    "-------------------------------------------------------------------------------")
+  "Strings to use when inserting horizontal rules.
+The first string in the list will be the default when inserting a
+horizontal rule.  Strings should be listed in increasing order of
+prominence for use with promotion and demotion functions."
   :group 'markdown
-  :type 'string)
+  :type 'list)
 
 (defcustom markdown-bold-underscore nil
   "Use two underscores for bold instead of two asterisks."
@@ -1668,11 +1677,23 @@ Return a cons cell containing updated bounds for the region."
         (replace-match (match-string text) t t nil all))
       (cons beg (- end removed)))))
 
-(defun markdown-insert-hr ()
-  "Insert a horizonal rule using `markdown-hr-string'."
-  (interactive)
+(defun markdown-insert-hr (arg)
+  "Insert or replace a horizonal rule.
+By default, use the first element of `markdown-hr-strings'.  When
+prefixed with C-u, use the last element of `markdown-hr-strings'
+instead.  When prefixed with an integer from 1 to the length of
+`markdown-hr-strings', use the element in that position instead."
+  (interactive "*P")
+  (when (thing-at-point-looking-at markdown-regex-hr)
+    (delete-region (match-beginning 0) (match-end 0)))
   (markdown-ensure-blank-line-before)
-  (insert markdown-hr-string)
+  (cond ((equal arg '(4))
+         (insert (car (reverse markdown-hr-strings))))
+        ((and (integerp arg) (> arg 0)
+              (<= arg (length markdown-hr-strings)))
+         (insert (nth (1- arg) markdown-hr-strings)))
+        (t
+         (insert (car markdown-hr-strings))))
   (markdown-ensure-blank-line-after))
 
 (defun markdown-insert-bold ()
@@ -2295,7 +2316,188 @@ Otherwise, do normal delete by repeating
       (backward-delete-char-untabify arg))))
 
 
+;;; Markup Completion =========================================================
 
+(defconst markdown-complete-alist
+  '((markdown-regex-header-atx . markdown-complete-atx)
+    (markdown-regex-header-setext . markdown-complete-setext)
+    (markdown-regex-hr . markdown-complete-hr))
+  "Association list of form (regexp . function) for markup completion.")
+
+(defun markdown-incomplete-atx-p ()
+  "Return t if ATX header markup is incomplete and nil otherwise.
+Assumes match data is available for `markdown-regex-header-atx'.
+Checks that the number of trailing hash marks equals the number of leading
+hash marks, that there is only a single space before and after the text,
+and that there is no extraneous whitespace in the text."
+  (save-match-data
+    (or (not (= (length (match-string 1)) (length (match-string 3))))
+        (not (= (match-beginning 2) (1+ (match-end 1))))
+        (not (= (match-beginning 3) (1+ (match-end 2))))
+        (string-match "[ \t\n]\\{2\\}" (match-string 2)))))
+
+(defun markdown-complete-atx ()
+  "Complete and normalize ATX headers.
+Add or remove hash marks to the end of the header to match the
+beginning.  Ensure that there is only a single space between hash
+marks and header text.  Removes extraneous whitespace from header text.
+Assumes match data is available for `markdown-regex-header-atx'."
+  (when (markdown-incomplete-atx-p)
+    (let* ((new-marker (make-marker))
+           (new-marker (set-marker new-marker (match-end 2))))
+      ;; Hash marks and spacing at end
+      (goto-char (match-end 2))
+      (delete-region (match-end 2) (match-end 3))
+      (insert " " (match-string 1))
+      ;; Remove extraneous whitespace from title
+      (replace-match (markdown-compress-whitespace-string (match-string 2))
+                     t t nil 2)
+      ;; Spacing at beginning
+      (goto-char (match-end 1))
+      (delete-region (match-end 1) (match-beginning 2))
+      (insert " ")
+      ;; Leave point at end of text
+      (goto-char new-marker))))
+
+(defun markdown-incomplete-setext-p ()
+  "Return t if setext header markup is incomplete and nil otherwise.
+Assumes match data is available for `markdown-regex-header-setext'.
+Checks that length of underline matches text and that there is no
+extraneous whitespace in the text."
+  (save-match-data
+    (or (not (= (length (match-string 1)) (length (match-string 2))))
+        (string-match "[ \t\n]\\{2\\}" (match-string 1)))))
+
+(defun markdown-complete-setext ()
+  "Complete and normalize setext headers.
+Add or remove underline characters to match length of header
+text.  Removes extraneous whitespace from header text.  Assumes
+match data is available for `markdown-regex-header-setext'."
+  (when (markdown-incomplete-setext-p)
+    (let* ((text (markdown-compress-whitespace-string (match-string 1)))
+           (char (char-after (match-beginning 2)))
+           (level (if (char-equal char ?-) 2 1)))
+      (goto-char (match-beginning 0))
+      (delete-region (match-beginning 0) (match-end 0))
+      (markdown-insert-header level text t))))
+
+(defun markdown-incomplete-hr-p ()
+  "Return non-nil if hr is not in `markdown-hr-strings' and nil otherwise.
+Assumes match data is available for `markdown-regex-hr'."
+  (not (member (match-string 0) markdown-hr-strings)))
+
+(defun markdown-complete-hr ()
+  "Complete horizontal rules.
+If horizontal rule string is a member of `markdown-hr-strings',
+do nothing.  Otherwise, replace with the car of
+`markdown-hr-strings'.
+Assumes match data is available for `markdown-regex-hr'."
+  (replace-match (car markdown-hr-strings)))
+
+(defun markdown-complete ()
+  "Complete markup of object near point or in region when active.
+Handle all objects in `markdown-complete-alist', in order.
+See `markdown-complete-at-point' and `markdown-complete-region'."
+  (interactive "*")
+  (if (markdown-use-region-p)
+      (markdown-complete-region (region-beginning) (region-end))
+    (markdown-complete-at-point)))
+
+(defun markdown-complete-at-point ()
+  "Complete markup of object near point.
+Handle all objects in `markdown-complete-alist', in
+order."
+  (interactive "*")
+  (loop for (regexp . function) in markdown-complete-alist
+        until (thing-at-point-looking-at (eval regexp))
+        finally (funcall function)))
+
+(defun markdown-complete-region (beg end)
+  "Complete markup of object near point.
+Handle all objects in `markdown-complete-alist', in
+order."
+  (interactive "*r")
+  (let* ((end-marker (make-marker))
+         (end-marker (set-marker end-marker end)))
+    (loop for (regexp . function) in markdown-complete-alist
+          do (save-excursion
+               (goto-char beg)
+               (while (re-search-forward (eval regexp) end-marker t)
+                 (funcall function))))))
+
+(defun markdown-complete-buffer ()
+  "Complete markup for all objects in the current buffer."
+  (interactive "*")
+  (markdown-complete-region (point-min) (point-max)))
+
+
+;;; Markup Cycling ============================================================
+
+(defun markdown-cycle-atx (arg &optional remove)
+  "Cycle ATX header markup.
+Promote header (decrease level) when ARG is 1 and demote
+header (increase level) if arg is -1.  When REMOVE is non-nil,
+remove the header when the level reaches zero and stop cycling
+when it reaches six.  Otherwise, perform a proper cycling through
+levels one through six.  Assumes match data is available for
+`markdown-regex-header-atx'."
+  (let* ((old-level (length (match-string 1)))
+         (new-level (+ old-level arg))
+         (text (match-string 2)))
+    (when (not remove)
+      (setq new-level (% new-level 6))
+      (setq new-level (cond ((= new-level 0) 6)
+                            ((< new-level 0) (+ new-level 6))
+                            (t new-level))))
+    (cond
+     ((= new-level 0)
+      (markdown-unwrap-thing-at-point nil 0 2))
+     ((<= new-level 6)
+      (goto-char (match-beginning 0))
+      (delete-region (match-beginning 0) (match-end 0))
+      (markdown-insert-header new-level text nil)))))
+
+(defun markdown-cycle-setext (arg &optional remove)
+  "Cycle setext header markup.
+Promote header (increase level) when ARG is 1 and demote
+header (decrease level or remove) if arg is -1.  When demoting a
+level-two setext header, replace with a level-three atx header.
+When REMOVE is non-nil, remove the header when the level reaches
+zero.  Otherwise, cycle back to a level six atx header.  Assumes
+match data is available for `markdown-regex-header-setext'."
+  (let* ((char (char-after (match-beginning 2)))
+         (old-level (if (char-equal char ?=) 1 2))
+         (new-level (+ old-level arg))
+         (text (match-string 1)))
+    (when (and (not remove) (= new-level 0))
+      (setq new-level 6))
+    (cond
+     ((= new-level 0)
+      (markdown-unwrap-thing-at-point nil 0 1))
+     ((<= new-level 2)
+      (markdown-insert-header new-level nil t))
+     ((<= new-level 6)
+      (markdown-insert-header new-level nil nil)))))
+
+(defun markdown-cycle-hr (arg &optional remove)
+  "Cycle string used for horizontal rule from `markdown-hr-strings'.
+When ARG is 1, cycle forward (promote), and when ARG is -1, cycle
+backwards (demote).  When REMOVE is non-nil, remove the hr instead
+of cycling when the end of the list is reached.
+Assumes match data is available for `markdown-regex-hr'."
+  (let* ((strings (if (= arg 1)
+                      (reverse markdown-hr-strings)
+                    markdown-hr-strings))
+         (tail (member (match-string 0) strings))
+         (new (or (car (cdr tail))
+                  (if remove
+                      (if (= arg 1)
+                          ""
+                        (car tail))
+                    (car strings)))))
+    (replace-match new)))
+
+
 ;;; Keymap ====================================================================
 
 (defvar markdown-mode-map
@@ -2330,6 +2532,13 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
     (define-key map "\C-c\C-fb" 'markdown-footnote-return)
     (define-key map "\C-c\C-fk" 'markdown-footnote-kill)
+    ;; Promotion, Demotion, Completion, and Cycling
+    (define-key map (kbd "M-<left>") 'markdown-promote)
+    (define-key map (kbd "M-<right>") 'markdown-demote)
+    (define-key map (kbd "C-c C-l") 'markdown-promote)
+    (define-key map (kbd "C-c C-r") 'markdown-demote)
+    (define-key map (kbd "C-c C-=") 'markdown-complete-or-cycle)
+    (define-key map (kbd "C-c C-c =") 'markdown-complete-buffer)
     ;; Regular Link Following
     (define-key map "\C-c\C-o" 'markdown-follow-link-at-point)
     ;; WikiLink Following
@@ -2361,14 +2570,8 @@ Otherwise, do normal delete by repeating
     (define-key map "\C-c\C-cc" 'markdown-check-refs)
     ;; Lists
     (define-key map "\C-c\C-cn" 'markdown-cleanup-list-numbers)
-    (define-key map (kbd "M-<up>") 'markdown-metaup)
-    (define-key map (kbd "M-<down>") 'markdown-metadown)
-    (define-key map (kbd "M-<left>") 'markdown-metaleft)
-    (define-key map (kbd "M-<right>") 'markdown-metaright)
-    (define-key map (kbd "C-c C-u") 'markdown-metaup)
-    (define-key map (kbd "C-c C-d") 'markdown-metadown)
-    (define-key map (kbd "C-c C-l") 'markdown-metaleft)
-    (define-key map (kbd "C-c C-r") 'markdown-metaright)
+    (define-key map (kbd "M-<up>") 'markdown-move-up)
+    (define-key map (kbd "M-<down>") 'markdown-move-down)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
     map)
   "Keymap for Markdown major mode.")
@@ -2706,8 +2909,8 @@ increase the indentation by one level."
               (error (goto-char old))))
         (goto-char old)))))
 
-(defun markdown-promote-list-item (&optional bounds)
-  "Indent the current list item.
+(defun markdown-demote-list-item (&optional bounds)
+  "Indent (or demote) the current list item.
 Optionally, BOUNDS of the current list item may be provided if available."
   (interactive)
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
@@ -2721,8 +2924,8 @@ Optionally, BOUNDS of the current list item may be provided if available."
               (insert "    "))
             (forward-line)))))))
 
-(defun markdown-demote-list-item (&optional bounds)
-  "Unindent the current list item.
+(defun markdown-promote-list-item (&optional bounds)
+  "Unindent (or promote) the current list item.
 Optionally, BOUNDS of the current list item may be provided if available."
   (interactive)
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
@@ -2906,31 +3109,96 @@ Calls `markdown-cycle' with argument t."
    ((- (match-end 5) (match-beginning 5)))))
 
 
-;;; Structure Editing =========================================================
+;;; Generic Structure Editing, Completion, and Cycling Commands ===============
 
-(defun markdown-metaup ()
+(defun markdown-move-up ()
   "Move list item up.
 Calls `markdown-move-list-item-up'."
   (interactive)
   (markdown-move-list-item-up))
 
-(defun markdown-metadown ()
+(defun markdown-move-down ()
   "Move list item down.
 Calls `markdown-move-list-item-down'."
   (interactive)
   (markdown-move-list-item-down))
 
-(defun markdown-metaleft ()
-  "Unindent list item.
-Calls `markdown-demote-list-item'."
+(defun markdown-promote ()
+  "Either promote header or list item at point or cycle markup.
+See `markdown-cycle-atx', `markdown-cycle-setext', and
+`markdown-demote-list-item'."
   (interactive)
-  (markdown-demote-list-item))
+  (let (bounds)
+    (cond
+     ;; Promote atx header
+     ((thing-at-point-looking-at markdown-regex-header-atx)
+      (markdown-cycle-atx -1 t))
+     ;; Promote setext header
+     ((thing-at-point-looking-at markdown-regex-header-setext)
+      (markdown-cycle-setext -1 t))
+     ;; Promote horizonal rule
+     ((thing-at-point-looking-at markdown-regex-hr)
+      (markdown-cycle-hr -1 t))
+     ;; Promote list item
+     ((setq bounds (markdown-cur-list-item-bounds))
+      (markdown-promote-list-item)))))
 
-(defun markdown-metaright ()
-  "Indent list item.
-Calls `markdown-promote-list-item'."
+(defun markdown-demote ()
+  "Either demote header or list item at point or cycle or remove markup.
+See `markdown-cycle-atx', `markdown-cycle-setext', and
+`markdown-demote-list-item'."
   (interactive)
-  (markdown-promote-list-item))
+  (let (bounds)
+    (cond
+     ;; Demote atx header
+     ((thing-at-point-looking-at markdown-regex-header-atx)
+      (markdown-cycle-atx 1 t))
+     ;; Demote setext header
+     ((thing-at-point-looking-at markdown-regex-header-setext)
+      (markdown-cycle-setext 1 t))
+     ;; Demote horizonal rule
+     ((thing-at-point-looking-at markdown-regex-hr)
+      (markdown-cycle-hr 1 t))
+     ;; Promote list item
+     ((setq bounds (markdown-cur-list-item-bounds))
+      (markdown-demote-list-item))
+     ;; Create a new level one ATX header
+     (t
+      (markdown-insert-header-atx-1)))))
+
+(defun markdown-complete-or-cycle (arg)
+  "Complete or cycle markup of object at point or complete objects in region.
+If there is an active region, complete markup in region.
+Otherwise, complete or cycle markup of object near point.
+When ARG is non-nil, cycle backwards when cycling."
+  (interactive "*P")
+  (if (markdown-use-region-p)
+      ;; Complete markup in region
+      (markdown-complete-region (region-beginning) (region-end))
+    ;; Complete or cycle markup at point
+    (let ((dir (if arg -1 1))
+          bounds)
+      (cond
+       ;; atx header
+       ((thing-at-point-looking-at markdown-regex-header-atx)
+        (if (markdown-incomplete-atx-p)
+            (markdown-complete-atx)
+          (markdown-cycle-atx dir)))
+       ;; setext header
+       ((thing-at-point-looking-at markdown-regex-header-setext)
+        (if (markdown-incomplete-setext-p)
+            (markdown-complete-setext)
+          (markdown-cycle-setext dir)))
+       ;; horizonal rule
+       ((thing-at-point-looking-at markdown-regex-hr)
+        (if (markdown-incomplete-hr-p)
+            (markdown-complete-hr)
+          (markdown-cycle-hr dir)))
+       ;; list item
+       ((setq bounds (markdown-cur-list-item-bounds))
+        (if (> dir 0)
+            (markdown-demote-list-item)
+          (markdown-promote-list-item)))))))
 
 
 ;;; Commands ==================================================================
