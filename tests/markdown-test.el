@@ -624,6 +624,20 @@ This file is not saved."
   (markdown-test-string "    * pre block, not a list item\n"
    (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
 
+(ert-deftest test-markdown-insertion/empty-italic ()
+  "Test `markdown-insert-italic' with no word at point and no region."
+  (markdown-test-string ""
+   (call-interactively 'markdown-insert-italic)
+   (should (string-equal (buffer-string) "**"))
+   (should (= (point) 2))))
+
+(ert-deftest test-markdown-insertion/empty-bold ()
+  "Test `markdown-insert-bold' with no word at point and no region."
+  (markdown-test-string ""
+   (call-interactively 'markdown-insert-bold)
+   (should (string-equal (buffer-string) "****"))
+   (should (= (point) 3))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()

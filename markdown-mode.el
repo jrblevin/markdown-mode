@@ -1447,16 +1447,18 @@ Leave match data intact for `markdown-regex-list'."
   "Calls `bounds-of-thing-at-point' for THING with slight modifications.
 Does not include trailing newlines when THING is 'line.  Handles the
 end of buffer case by setting both endpoints equal to the value of
-`point-max', since an empty region will trigger empty markup insertion."
+`point-max', since an empty region will trigger empty markup insertion.
+Return bounds of form (beg . end) if THING is found, or nil otherwise."
   (let* ((bounds (bounds-of-thing-at-point thing))
          (a (car bounds))
          (b (cdr bounds)))
-    (when (eq thing 'line)
-      (cond ((and (eobp) (markdown-cur-line-blank-p))
-             (setq a b))
-            ((char-equal (char-before b) ?\^J)
-             (setq b (1- b)))))
-  (cons a b)))
+    (when bounds
+      (when (eq thing 'line)
+        (cond ((and (eobp) (markdown-cur-line-blank-p))
+               (setq a b))
+              ((char-equal (char-before b) ?\^J)
+               (setq b (1- b)))))
+      (cons a b))))
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
