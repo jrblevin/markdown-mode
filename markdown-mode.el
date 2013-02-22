@@ -2706,37 +2706,38 @@ increase the indentation by one level."
               (error (goto-char old))))
         (goto-char old)))))
 
-(defun markdown-promote-list-item ()
-  "Indent the current list item."
+(defun markdown-promote-list-item (&optional bounds)
+  "Indent the current list item.
+Optionally, BOUNDS of the current list item may be provided if available."
   (interactive)
-  (let ((bounds (markdown-cur-list-item-bounds))
-        (ins 0))
-    (when bounds
-      (save-excursion
-        (save-match-data
+  (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
+    (save-excursion
+      (save-match-data
+        (let* ((end-marker (make-marker))
+               (end-marker (set-marker end-marker (nth 1 bounds))))
           (goto-char (nth 0 bounds))
-          (while (< (point) (+ (nth 1 bounds) ins))
+          (while (< (point) end-marker)
             (unless (markdown-cur-line-blank-p)
-              (insert "    ")
-              (setq ins (+ ins 4)))
+              (insert "    "))
             (forward-line)))))))
 
-(defun markdown-demote-list-item ()
-  "Unindent the current list item."
+(defun markdown-demote-list-item (&optional bounds)
+  "Unindent the current list item.
+Optionally, BOUNDS of the current list item may be provided if available."
   (interactive)
-  (let (bounds num del regexp)
-    (when (setq bounds (markdown-cur-list-item-bounds))
-      (save-excursion
-        (save-match-data
+  (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
+    (save-excursion
+      (save-match-data
+        (let* ((end-marker (make-marker))
+               (end-marker (set-marker end-marker (nth 1 bounds)))
+               num regexp)
           (goto-char (nth 0 bounds))
-          (setq del 0)
           (when (looking-at "^[ ]\\{1,4\\}")
             (setq num (- (match-end 0) (match-beginning 0)))
             (setq regexp (format "^[ ]\\{1,%d\\}" num))
-            (while (re-search-forward regexp (- (nth 1 bounds) del) t)
+            (while (and (< (point) end-marker)
+                        (re-search-forward regexp end-marker t))
               (replace-match "" nil nil)
-              (setq num (- (match-end 0) (match-beginning 0)))
-              (setq del (+ del num))
               (forward-line))))))))
 
 (defun markdown--cleanup-list-numbers-level (&optional pfx)

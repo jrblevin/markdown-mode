@@ -849,6 +849,49 @@ This file is not saved."
     (forward-line)
     (should (markdown-cur-list-item-bounds))))
 
+(ert-deftest test-markdown-lists/promotion-and-demotion ()
+  "Test function `markdown-promote-list-item'."
+  (markdown-test-file "nested-list.text"
+    (forward-line)
+    (should (looking-at "   - List level 1 item 2
+
+     Second paragraph of item 2
+
+        Nested pre block in item 2
+        Four spaces past the marker
+
+     Another paragraph of item 2"))
+    (markdown-promote-list-item)
+    (should (looking-at "       - List level 1 item 2
+
+         Second paragraph of item 2
+
+            Nested pre block in item 2
+            Four spaces past the marker
+
+         Another paragraph of item 2"))
+    (markdown-demote-list-item)
+    (should (looking-at "   - List level 1 item 2
+
+     Second paragraph of item 2
+
+        Nested pre block in item 2
+        Four spaces past the marker
+
+     Another paragraph of item 2"))
+    (goto-line 23)
+    (should (looking-at "           - List level 3 item 1
+
+                 Nested pre block"))
+    (markdown-promote-list-item)
+    (should (looking-at "               - List level 3 item 1
+
+                     Nested pre block"))
+    (markdown-demote-list-item)
+    (should (looking-at "           - List level 3 item 1
+
+                 Nested pre block"))))
+
 ;;; Outline minor mode tests:
 
 (ert-deftest test-markdown-outline/navigation ()
