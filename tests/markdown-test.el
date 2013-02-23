@@ -1135,6 +1135,36 @@ This file is not saved."
    (markdown-test-range-has-property 404 417 'invisible nil)
    (markdown-test-range-has-property 420 451 'invisible nil)))
 
+;;; Movement tests:
+
+(ert-deftest test-markdown-movement/defun ()
+  "Test defun navigation."
+  (markdown-test-file "outline.text"
+   ;; end-of-defun should go to point-max
+   (end-of-defun 10)
+   (should (= (point) (point-max)))
+   ;; end-of-defun should stop just before the next header
+   (goto-char (point-min))
+   (end-of-defun)
+   (should (looking-at "\n# A top-level header"))
+   (end-of-defun)
+   (should (looking-at "\n## A second-level header"))
+   (end-of-defun)
+   (should (looking-at "\n### Third level ###"))
+   (end-of-defun)
+   (should (looking-at "\n### Third level number two ###"))
+   ;; beginning-of-defun should move to the start of the previous header
+   (beginning-of-defun)
+   (should (looking-at "### Third level ###"))
+   (beginning-of-defun)
+   (should (looking-at "## A second-level header"))
+   (beginning-of-defun)
+   (should (looking-at "# A top-level header"))
+   (beginning-of-defun)
+   ;; beginning-of-defun should move up to point-min
+   (should (= (point) (point-min)))))
+
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/aliasing ()

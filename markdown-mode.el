@@ -335,6 +335,15 @@
 ;;     at the point.  Finally, `C-M-u` will move up to a lower-level
 ;;     (more inclusive) visible heading.
 ;;
+;;   * Movement by Defun:
+;;
+;;     The usual Emacs commands can be used to move by defuns
+;;     (top-level major definitions).  In markdown-mode, a defun
+;;     is a section.  As usual, `C-M-a` will move the point to
+;;     the beginning of the current or preceding defun, `C-M-e`
+;;     will move to the end of the current or following defun,
+;;     and `C-M-h` will put the region around the entire defun.
+;;
 ;; Many of the commands described above behave differently depending on
 ;; whether Transient Mark mode is enabled or not.  When it makes sense,
 ;; if Transient Mark mode is on and a region is active, the command
@@ -3132,6 +3141,30 @@ Calls `markdown-cycle' with argument t."
    ((- (match-end 5) (match-beginning 5)))))
 
 
+;;; Movement ==================================================================
+
+(defun markdown-beginning-of-defun (&optional arg)
+  "`beginning-of-defun-function' for Markdown.
+Move backward to the beginning of the current or previous section."
+  (interactive "P")
+  (or arg (setq arg 1))
+  (or (re-search-backward markdown-regex-header nil t arg)
+      (goto-char (point-min))))
+
+(defun markdown-end-of-defun (&optional arg)
+  "`end-of-defun-function' for Markdown.
+Move forward to the end of the current or following section."
+  (interactive "P")
+  (or arg (setq arg 1))
+  (when (looking-at markdown-regex-header)
+    (goto-char (match-beginning 0))
+    (forward-char 1))
+  (if (re-search-forward markdown-regex-header nil t arg)
+      (goto-char (match-beginning 0))
+    (goto-char (point-max)))
+  (skip-syntax-backward "-"))
+
+
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
 
 (defun markdown-move-up ()
@@ -3648,6 +3681,11 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
+  ;; Defun movement
+  (set (make-local-variable 'beginning-of-defun-function)
+       'markdown-beginning-of-defun)
+  (set (make-local-variable 'end-of-defun-function)
+       'markdown-end-of-defun)
   ;; Make filling work with lists (unordered, ordered, and definition)
   (set (make-local-variable 'paragraph-start)
        "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t]*[0-9]+\\.\\|^[ \t]*: ")
