@@ -1164,6 +1164,51 @@ This file is not saved."
    ;; beginning-of-defun should move up to point-min
    (should (= (point) (point-min)))))
 
+(ert-deftest test-markdown-movement/block ()
+  "Test block movement."
+  (markdown-test-file "outline.text"
+   (markdown-end-of-block)
+   (should (looking-at "\n# A top-level header"))
+   (markdown-end-of-block)
+   (should (looking-at "\nfollowed by some body text"))
+   (markdown-end-of-block)
+   (should (looking-at "\n## A second-level header"))
+   (markdown-end-of-block)
+   (should (looking-at "\nfollowed by some body text"))
+   (markdown-end-of-block)
+   (should (looking-at "\n### Third level ###"))
+   (markdown-end-of-block)
+   (should (looking-at "\n\\* A list item"))
+   (markdown-end-of-block)
+   (should (looking-at "\n### Third level number two ###"))
+   (markdown-end-of-block)
+   (should (looking-at "\n### Level two again"))
+   (markdown-end-of-block)
+   (should (looking-at "\nfollowed by some body text"))
+
+   (markdown-test-goto-heading "Level two")
+   (markdown-end-of-block)
+   (should (looking-at "\nbar"))
+   (markdown-end-of-block)
+   (should (= (point) (point-max)))
+   (markdown-beginning-of-block)
+   (should (looking-at "bar"))
+   (markdown-beginning-of-block)
+   (should (looking-at "## Level two"))
+   (markdown-beginning-of-block)
+   (should (looking-at "foo"))
+   (markdown-beginning-of-block)
+   (should (looking-at "# Level one"))
+   (markdown-beginning-of-block)
+   (should (looking-at "* With"))
+   (markdown-beginning-of-block)
+   (should (looking-at "And a level two underline header"))
+
+   (goto-char (point-min))
+   (markdown-test-goto-heading "A top-level header")
+   (beginning-of-line)
+   (markdown-beginning-of-block)
+   (should (= (point) (point-min)))))
 
 ;;; Wiki link tests:
 

@@ -335,6 +335,16 @@
 ;;     at the point.  Finally, `C-M-u` will move up to a lower-level
 ;;     (more inclusive) visible heading.
 ;;
+;;   * Movement by Block:
+;;
+;;     markdown-mode supports the usual Emacs paragraph movement with
+;;     `M-{` and `M-}`.  These commands treat list items as
+;;     paragraphs, so they will stop at each line within a block of
+;;     list items.  Additionally, markdown-mode includes movement
+;;     commands, `M-[` and `M-]` for jumping to the beginning or end
+;;     of an entire block of text (with blocks being separated by at
+;;     least one blank line).
+;;
 ;;   * Movement by Defun:
 ;;
 ;;     The usual Emacs commands can be used to move by defuns
@@ -1025,6 +1035,10 @@ text.")
   "<\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+>"
   "Regular expression for matching inline email addresses.")
 
+(defconst markdown-regex-block-separator
+  "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)"
+  "Regular expression for matching block boundaries.")
+
 (defconst markdown-regex-latex-expression
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
   "Regular expression for itex $..$ or $$..$$ math mode expressions.")
@@ -1208,17 +1222,6 @@ Return nil if the current line is not the beginning of a list item."
     (forward-line -1)
     (markdown-cur-non-list-indent)))
 
-(defun markdown--next-block ()
-  "Move the point to the start of the next text block."
-  (forward-line)
-  (while (and (or (not (markdown-prev-line-blank-p))
-                  (markdown-cur-line-blank-p))
-              (not (or (looking-at markdown-regex-list)
-                       (looking-at markdown-regex-header)
-                       (looking-at markdown-regex-hr)))
-              (not (eobp)))
-    (forward-line)))
-
 (defun markdown-new-baseline-p ()
   "Determine if the current line begins a new baseline level."
   (save-excursion
@@ -1235,7 +1238,7 @@ Return nil if the current line is not the beginning of a list item."
   (end-of-line)
   (let (stop)
     (while (not (or stop (bobp)))
-      (re-search-backward "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)" nil t)
+      (re-search-backward markdown-regex-block-separator nil t)
       (when (match-end 2)
         (goto-char (match-end 2))
         (cond
@@ -1513,14 +1516,14 @@ Return bounds of form (beg . end) if THING is found, or nil otherwise."
        ((looking-at markdown-regex-list)
         (setq levels (markdown-update-list-levels
                       (match-string 2) (markdown-cur-line-indent) levels))
-        (markdown--next-block))
+        (markdown-end-of-block-element))
        ;; If this is the end of the indentation level, adjust levels accordingly.
        ;; Only match end of indentation level if levels is not the empty list.
        ((and (car levels) (looking-at end-regexp))
         (setq levels (markdown-update-list-levels
                       nil (markdown-cur-line-indent) levels))
-        (markdown--next-block))
-       (t (markdown--next-block))))
+        (markdown-end-of-block-element))
+       (t (markdown-end-of-block-element))))
 
     (if (not (and begin end))
         ;; Return nil if no pre block was found
@@ -2605,6 +2608,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-<up>") 'markdown-move-up)
     (define-key map (kbd "M-<down>") 'markdown-move-down)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
+    ;; Movement
+    (define-key map (kbd "M-[") 'markdown-beginning-of-block)
+    (define-key map (kbd "M-]") 'markdown-end-of-block)
     map)
   "Keymap for Markdown major mode.")
 
@@ -3163,6 +3169,39 @@ Move forward to the end of the current or following section."
       (goto-char (match-beginning 0))
     (goto-char (point-max)))
   (skip-syntax-backward "-"))
+
+(defun markdown-beginning-of-block ()
+  "Move the point to the start of the previous text block."
+  (interactive)
+  (if (re-search-backward markdown-regex-block-separator nil t)
+      (goto-char (or (match-end 2) (match-end 0)))
+    (goto-char (point-min))))
+
+(defun markdown-end-of-block ()
+  "Move the point to the start of the next text block."
+  (interactive)
+  (beginning-of-line)
+  (skip-syntax-forward "-")
+  (when (= (point) (point-min))
+    (forward-char))
+  (if (re-search-forward markdown-regex-block-separator nil t)
+      (goto-char (or (match-end 2) (match-end 0)))
+    (goto-char (point-max)))
+  (skip-syntax-backward "-")
+  (forward-line))
+
+(defun markdown-end-of-block-element ()
+  "Move the point to the start of the next block unit.
+Stops at blank lines, list items, headers, and horizontal rules."
+  (interactive)
+  (forward-line)
+  (while (and (or (not (markdown-prev-line-blank-p))
+                  (markdown-cur-line-blank-p))
+              (not (or (looking-at markdown-regex-list)
+                       (looking-at markdown-regex-header)
+                       (looking-at markdown-regex-hr)))
+              (not (eobp)))
+    (forward-line)))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
