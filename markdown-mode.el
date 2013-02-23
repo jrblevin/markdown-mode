@@ -1749,8 +1749,9 @@ place the cursor in between them."
                      (region-beginning) (region-end)
                      markdown-regex-code 2 4)))
         (markdown-wrap-or-insert "`" "`" nil (car bounds) (cdr bounds)))
-    ;; Word at point or markup insert
-    (unless (markdown-unwrap-thing-at-point markdown-regex-code 2 4)
+    ;; Code markup removal, code markup for word, or empty markup insertion
+    (if (thing-at-point-looking-at markdown-regex-code)
+        (markdown-unwrap-thing-at-point nil 2 4)
       (markdown-wrap-or-insert "`" "`" 'word nil nil))))
 
 (defun markdown-insert-link ()
