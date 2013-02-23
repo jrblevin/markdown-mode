@@ -2502,6 +2502,24 @@ Assumes match data is available for `markdown-regex-hr'."
                     (car strings)))))
     (replace-match new)))
 
+(defun markdown-cycle-bold ()
+  "Cycle bold markup between underscores and asterisks.
+Assumes match data is available for `markdown-regex-bold'."
+  (save-excursion
+    (let* ((old-delim (match-string 3))
+           (new-delim (if (string-equal old-delim "**") "__" "**")))
+      (replace-match new-delim t t nil 3)
+      (replace-match new-delim t t nil 5))))
+
+(defun markdown-cycle-italic ()
+  "Cycle italic markup between underscores and asterisks.
+Assumes match data is available for `markdown-regex-italic'."
+  (save-excursion
+    (let* ((old-delim (match-string 3))
+           (new-delim (if (string-equal old-delim "*") "_" "*")))
+      (replace-match new-delim t t nil 3)
+      (replace-match new-delim t t nil 5))))
+
 
 ;;; Keymap ====================================================================
 
@@ -3199,11 +3217,12 @@ When ARG is non-nil, cycle backwards when cycling."
         (if (markdown-incomplete-hr-p)
             (markdown-complete-hr)
           (markdown-cycle-hr dir)))
-       ;; list item
-       ((setq bounds (markdown-cur-list-item-bounds))
-        (if (> dir 0)
-            (markdown-demote-list-item)
-          (markdown-promote-list-item)))))))
+       ;; bold
+       ((thing-at-point-looking-at markdown-regex-bold)
+        (markdown-cycle-bold))
+       ;; italic
+       ((thing-at-point-looking-at markdown-regex-italic)
+        (markdown-cycle-italic))))))
 
 
 ;;; Commands ==================================================================

@@ -759,6 +759,22 @@ This file is not saved."
     (call-interactively 'markdown-complete-or-cycle)
     (should (string-equal (buffer-string) (nth 5 markdown-hr-strings)))))
 
+(ert-deftest test-markdown-cycle/bold ()
+  "Test cycling via `markdown-complete-or-cycle' for bold markup."
+  (markdown-test-string "**bold**"
+  (call-interactively 'markdown-complete-or-cycle)
+  (should (string-equal (buffer-string) "__bold__"))
+  (call-interactively 'markdown-complete-or-cycle)
+  (should (string-equal (buffer-string) "**bold**"))))
+
+(ert-deftest test-markdown-cycle/italic ()
+  "Test cycling via `markdown-complete-or-cycle' for italic markup."
+  (markdown-test-string "*italic*"
+  (call-interactively 'markdown-complete-or-cycle)
+  (should (string-equal (buffer-string) "_italic_"))
+  (call-interactively 'markdown-complete-or-cycle)
+  (should (string-equal (buffer-string) "*italic*"))))
+
 ;;; Indentation tests:
 
 (ert-deftest test-markdown-indentation/calc-indents ()
