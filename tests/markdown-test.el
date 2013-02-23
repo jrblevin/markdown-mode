@@ -638,6 +638,21 @@ This file is not saved."
    (should (string-equal (buffer-string) "****"))
    (should (= (point) 3))))
 
+(ert-deftest test-markdown-insertion/list-item ()
+  "Test `markdown-insert-list-item' on several lists."
+  (markdown-test-string "  * foo"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "  * foo\n  * ")))
+  (markdown-test-string "6. foo"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "6. foo\n7. ")))
+  (markdown-test-string "6. foo\n    1. bar"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. "))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
