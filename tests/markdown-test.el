@@ -818,6 +818,12 @@ This file is not saved."
    "*a*"
    (markdown-test-range-has-face 1 3 markdown-italic-face)))
 
+(ert-deftest test-markdown-font-lock/italics-after-hr ()
+  "Test italics after a horizontal rule with asterisks."
+  (markdown-test-string "* * *\n\n*italic*\n"
+   (markdown-test-range-has-face 1 5 markdown-header-face)
+   (markdown-test-range-has-face 8 15 markdown-italic-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
@@ -851,6 +857,12 @@ This file is not saved."
   (markdown-test-string
    "**a**"
    (markdown-test-range-has-face 1 5 markdown-bold-face)))
+
+(ert-deftest test-markdown-font-lock/bold-after-hr ()
+  "Test bold after a horizontal rule with asterisks."
+  (markdown-test-string "* * *\n\n**bold**\n"
+   (markdown-test-range-has-face 1 5 markdown-header-face)
+   (markdown-test-range-has-face 8 15 markdown-bold-face)))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
