@@ -2078,27 +2078,14 @@ automatically in order to have the correct markup."
   (cond
    ((eq markdown-footnote-location 'end) (goto-char (point-max)))
    ((eq markdown-footnote-location 'immediately) (forward-paragraph))
-   ((eq markdown-footnote-location 'header)
-    ;; search for a header. if none is found, go to the end of the document.
-    (catch 'eof
-      (while (progn
-               (forward-paragraph)
-               (unless (re-search-forward markdown-regex-header nil t)
-                 (throw 'eof nil))
-               (backward-paragraph)
-               (forward-line)
-               (not (looking-at markdown-regex-header)))))))
-  (forward-line -1)
+   ((eq markdown-footnote-location 'header) (markdown-end-of-defun)))
   ;; make sure we're on an empty line:
   (unless (markdown-cur-line-blank-p)
     (insert "\n"))
   ;; and make sure the previous line is empty:
-  (unless (markdown-prev-line-blank-p)
-    (insert "\n"))
+  (markdown-ensure-blank-line-before)
   ;; then make sure there's an empty line following the footnote:
-  (unless (markdown-next-line-blank-p)
-    (insert "\n")
-    (forward-line -1)))
+  (markdown-ensure-blank-line-after))
 
 (defun markdown-footnote-kill ()
   "Kill the footnote at point.

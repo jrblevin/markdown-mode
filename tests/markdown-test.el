@@ -653,6 +653,102 @@ This file is not saved."
    (call-interactively 'markdown-insert-list-item)
    (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. "))))
 
+;;; Footnote tests:
+
+(ert-deftest test-markdown-footnote/basic-end ()
+  "Basic footnote insertion and deletion tests for 'end location."
+  (let ((markdown-footnote-location 'end))
+    (markdown-test-string "first line\nsecond line\n"
+     ;; new buffer with no footnotes
+     (should (= markdown-footnote-counter 0))
+     ;; footnote insertion
+     (end-of-line)
+     (markdown-footnote-new)
+     (should (= (point) 35))
+     (should (= markdown-footnote-counter 1))
+     (should (looking-back "\\[^1\\]: "))
+     ;; kill with point in footnote definition
+     (insert "footnote text")
+     (markdown-footnote-kill)
+     (should (= (point) 25))
+     (should (bolp))
+     (should (string-equal (buffer-string) "first line\nsecond line\n\n"))
+     ;; insertion, counter should increment
+     (goto-char (point-min))
+     (end-of-line)
+     (markdown-footnote-new)
+     (should (= (point) 35))
+     (should (= markdown-footnote-counter 2))
+     (should (looking-back "\\[^2\\]: "))
+     (insert "footnote text")
+     ;; return to marker
+     (markdown-footnote-return)
+     (should (= (point) 15))
+     (should (looking-back "\\[^2\\]"))
+     ;; kill with point at marker
+     (markdown-footnote-kill)
+     (should (= (point) 11))
+     (should (eolp))
+     (should (string-equal (buffer-string) "first line\nsecond line\n\n")))))
+
+(ert-deftest test-markdown-footnote/basic-immediately ()
+  "Basic footnote insertion and deletion tests for 'immediately location."
+  (let ((markdown-footnote-location 'immediately))
+    (markdown-test-string "first paragraph\n\nsecond paragraph\n"
+     ;; new buffer with no footnotes
+     (should (= markdown-footnote-counter 0))
+     ;; footnote insertion
+     (end-of-line)
+     (markdown-footnote-new)
+     (should (= (point) 28))
+     (should (= markdown-footnote-counter 1))
+     (should (looking-back "\\[^1\\]: "))
+     ;; kill with point in footnote definition
+     (insert "footnote text")
+     (markdown-footnote-kill)
+     (should (= (point) 18))
+     (should (bolp))
+     (should (string-equal (buffer-string)
+                           "first paragraph\n\n\nsecond paragraph\n")))))
+
+(ert-deftest test-markdown-footnote/basic-header ()
+  "Basic footnote insertion and deletion tests for 'header location."
+  (let ((markdown-footnote-location 'header))
+    (markdown-test-string "par one\n\npar two\n\n### header\n"
+     ;; new buffer with no footnotes
+     (should (= markdown-footnote-counter 0))
+     ;; footnote insertion
+     (end-of-line)
+     (markdown-footnote-new)
+     (should (= (point) 29))
+     (should (= markdown-footnote-counter 1))
+     (should (looking-back "\\[^1\\]: "))
+     ;; kill with point in footnote definition
+     (insert "footnote text")
+     (markdown-footnote-kill)
+     (should (= (point) 19))
+     (should (bolp))
+     (should (string-equal (buffer-string)
+                           "par one\n\npar two\n\n\n### header\n"))
+     ;; insertion, counter should increment
+     (goto-char (point-min))
+     (end-of-line)
+     (markdown-footnote-new)
+     (should (= (point) 29))
+     (should (= markdown-footnote-counter 2))
+     (should (looking-back "\\[^2\\]: "))
+     (insert "footnote text")
+     ;; return to marker
+     (markdown-footnote-return)
+     (should (= (point) 12))
+     (should (looking-back "\\[^2\\]"))
+     ;; kill with point at marker
+     (markdown-footnote-kill)
+     (should (= (point) 8))
+     (should (eolp))
+     (should (string-equal (buffer-string)
+                           "par one\n\npar two\n\n\n\n### header\n")))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
