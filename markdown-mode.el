@@ -2127,6 +2127,9 @@ number)."
       (let ((text (delete-and-extract-region (second fn) (third fn))))
         (string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
         (kill-new (match-string 1 text))
+        (when (and (markdown-cur-line-blank-p)
+                   (markdown-prev-line-blank-p))
+          (delete-region (1- (point)) (point)))
         (second fn)))))
 
 (defun markdown-footnote-goto-text ()

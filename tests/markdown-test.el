@@ -670,9 +670,9 @@ This file is not saved."
      ;; kill with point in footnote definition
      (insert "footnote text")
      (markdown-footnote-kill)
-     (should (= (point) 25))
+     (should (= (point) 24))
      (should (bolp))
-     (should (string-equal (buffer-string) "first line\nsecond line\n\n"))
+     (should (string-equal (buffer-string) "first line\nsecond line\n"))
      ;; insertion, counter should increment
      (goto-char (point-min))
      (end-of-line)
@@ -689,7 +689,7 @@ This file is not saved."
      (markdown-footnote-kill)
      (should (= (point) 11))
      (should (eolp))
-     (should (string-equal (buffer-string) "first line\nsecond line\n\n")))))
+     (should (string-equal (buffer-string) "first line\nsecond line\n")))))
 
 (ert-deftest test-markdown-footnote/basic-immediately ()
   "Basic footnote insertion and deletion tests for 'immediately location."
@@ -709,7 +709,7 @@ This file is not saved."
      (should (= (point) 18))
      (should (bolp))
      (should (string-equal (buffer-string)
-                           "first paragraph\n\n\nsecond paragraph\n")))))
+                           "first paragraph\n\nsecond paragraph\n")))))
 
 (ert-deftest test-markdown-footnote/basic-header ()
   "Basic footnote insertion and deletion tests for 'header location."
@@ -729,7 +729,7 @@ This file is not saved."
      (should (= (point) 19))
      (should (bolp))
      (should (string-equal (buffer-string)
-                           "par one\n\npar two\n\n\n### header\n"))
+                           "par one\n\npar two\n\n### header\n"))
      ;; insertion, counter should increment
      (goto-char (point-min))
      (end-of-line)
@@ -747,7 +747,7 @@ This file is not saved."
      (should (= (point) 8))
      (should (eolp))
      (should (string-equal (buffer-string)
-                           "par one\n\npar two\n\n\n\n### header\n")))))
+                           "par one\n\npar two\n\n### header\n")))))
 
 (ert-deftest test-markdown-footnote/kill-empty-text ()
   "Test killing a footnote with marker but no text."
@@ -756,7 +756,7 @@ This file is not saved."
    (markdown-footnote-goto-text)
    (should (looking-back "\\[^1\\]: "))
    (markdown-footnote-kill)
-   (should (string-equal (buffer-string) "no text\n\n"))))
+   (should (string-equal (buffer-string) "no text\n"))))
 
 ;;; Promotion and demotion tests:
 
