@@ -1272,7 +1272,7 @@ it means we are at baseline (not inside of a nested list)."
    ;; that this block need not be the beginning of list item.
    ((< indent (car levels))
     (while (and (> (length levels) 1)
-                (< indent (+ (car (cdr levels)) 4)))
+                (< indent (+ (cadr levels) 4)))
       (setq levels (cdr levels)))
     levels)
    ;; Otherwise, do nothing.
@@ -2487,7 +2487,7 @@ Assumes match data is available for `markdown-regex-hr'."
                       (reverse markdown-hr-strings)
                     markdown-hr-strings))
          (tail (member (match-string 0) strings))
-         (new (or (car (cdr tail))
+         (new (or (cadr tail)
                   (if remove
                       (if (= arg 1)
                           ""
