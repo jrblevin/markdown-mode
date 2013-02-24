@@ -1165,20 +1165,18 @@ in XEmacs 21."
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
 If we are at the first line, then consider the previous line to be blank."
-  (save-excursion
-    (if (= (point-at-bol) (point-min))
-        t
-      (forward-line -1)
-      (markdown-cur-line-blank-p))))
+  (or (= (point-at-bol) (point-min))
+      (save-excursion
+        (forward-line -1)
+        (markdown-cur-line-blank-p))))
 
 (defun markdown-next-line-blank-p ()
   "Return t if the next line is blank and nil otherwise.
 If we are at the last line, then consider the next line to be blank."
-  (save-excursion
-    (if (= (point-at-eol) (point-max))
-        t
-      (forward-line 1)
-      (markdown-cur-line-blank-p))))
+  (or (= (point-at-eol) (point-max))
+      (save-excursion
+        (forward-line 1)
+        (markdown-cur-line-blank-p))))
 
 (defun markdown-prev-line-indent-p ()
   "Return t if the previous line is indented and nil otherwise."
