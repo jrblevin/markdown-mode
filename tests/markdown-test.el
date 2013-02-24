@@ -299,14 +299,6 @@ This file is not saved."
                    2704 3207 markdown-regex-italic 2 4)
                   (cons 2704 3201)))))
 
-(ert-deftest test-markdown-insertion/unwrap-things-in-region-links ()
-  "Test function `markdown-unwrap-things-in-region' on inline links."
-  (markdown-test-string "a [link](http://jblevins.org/) or [two](/).\n"
-   (should (equal (markdown-unwrap-things-in-region
-                   (point-min) (point-max) markdown-regex-link-inline 0 3)
-                  (cons 1 16)))
-   (should (string-equal (buffer-string) "a link or two.\n"))))
-
 (ert-deftest test-markdown-insertion/toggle-bold ()
   "Test toggling functionality of `markdown-insert-bold'."
   (markdown-test-string "one **two** three"
