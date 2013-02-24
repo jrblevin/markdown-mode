@@ -2071,21 +2071,18 @@ automatically in order to have the correct markup."
   (let ((fn (markdown-footnote-counter-inc)))
     (insert (format "[^%d]" fn))
     (markdown-footnote-text-find-new-location)
-    (insert (format "[^%d]: " fn))))
+    (markdown-ensure-blank-line-before)
+    (unless (markdown-cur-line-blank-p)
+      (insert "\n"))
+    (insert (format "[^%d]: " fn))
+    (markdown-ensure-blank-line-after)))
 
 (defun markdown-footnote-text-find-new-location ()
   "Position the cursor at the proper location for a new footnote text."
   (cond
    ((eq markdown-footnote-location 'end) (goto-char (point-max)))
    ((eq markdown-footnote-location 'immediately) (forward-paragraph))
-   ((eq markdown-footnote-location 'header) (markdown-end-of-defun)))
-  ;; make sure we're on an empty line:
-  (unless (markdown-cur-line-blank-p)
-    (insert "\n"))
-  ;; and make sure the previous line is empty:
-  (markdown-ensure-blank-line-before)
-  ;; then make sure there's an empty line following the footnote:
-  (markdown-ensure-blank-line-after))
+   ((eq markdown-footnote-location 'header) (markdown-end-of-defun))))
 
 (defun markdown-footnote-kill ()
   "Kill the footnote at point.
