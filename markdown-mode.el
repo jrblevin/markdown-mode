@@ -1795,8 +1795,7 @@ end of the current paragraph."
 The link will point to URL, will be referenced as LABEL, and will have the
 optional title text given by TITLE."
   (interactive "sLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
-  (let ((text (buffer-substring (region-beginning) (region-end))))
-    (delete-region (region-beginning) (region-end))
+  (let ((text (delete-and-extract-region (region-beginning) (region-end))))
     (markdown-insert-reference-link text url label title)))
 
 (defun markdown-insert-reference-link (text url label title)
@@ -1872,13 +1871,11 @@ header will be inserted."
   (when (null text)
     (if (markdown-use-region-p)
         ;; Active region
-        (progn
-          (setq text (buffer-substring (region-beginning) (region-end)))
-          (delete-region (region-beginning) (region-end)))
+        (setq text (delete-and-extract-region (region-beginning) (region-end)))
       ;; No active region
       (markdown-remove-header)
-      (setq text (buffer-substring (line-beginning-position) (line-end-position)))
-      (delete-region (line-beginning-position) (line-end-position))
+      (setq text (delete-and-extract-region
+                  (line-beginning-position) (line-end-position)))
       (when (and setext (string-match "^[ \t]*$" text))
         (setq text (read-string "Header text: "))))
     (setq text (markdown-compress-whitespace-string text)))
