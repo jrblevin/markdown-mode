@@ -1125,6 +1125,34 @@ This file is not saved."
    (markdown-test-range-has-face 1 1 markdown-header-face-2)
    (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
 
+;;; Markdown Parsing Functions:
+
+(ert-deftest test-markdown-parsing/reference-definition-basic ()
+  "Test reference definition function."
+  (markdown-test-file "syntax.text"
+   ;; Test accuracy of returned text and bounds
+   (should (equal (markdown-reference-definition "[1]")
+                  (list "http://docutils.sourceforge.net/mirror/setext.html" 1942 1992)))
+   (should (equal (markdown-reference-definition "[2]")
+                  (list "http://www.aaronsw.com/2002/atx/" 2000 2032)))
+   ;; Test that match data remains intact
+   (should (string-equal (match-string 2) "http://www.aaronsw.com/2002/atx/"))
+   ;; Test anchor-only relative URL
+   (should (equal (markdown-reference-definition "[bq]")
+                  (list "#blockquote" 7536 7547)))
+   ;; Example references that appear in pre blocks in the text
+   (should (not (markdown-reference-definition "[]")))
+   (should (not (markdown-reference-definition "[id]")))
+   (should (not (markdown-reference-definition "[foo]")))
+   (should (not (markdown-reference-definition "[A]")))
+   (should (not (markdown-reference-definition "[Google]")))
+   ;; Test that we don't pick up other text in square brackets
+   (should (not (markdown-reference-definition "[blockquoting]")))
+   (should (not (markdown-reference-definition "[square brackets]")))
+   ;; Test case insensitivity
+   (should (equal (markdown-reference-definition "[SRC]")
+                  (list "/projects/markdown/syntax.text" 1245 1275)))))
+
 ;;; Reference Checking:
 
 (ert-deftest test-markdown-references/goto-line-button ()

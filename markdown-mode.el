@@ -1470,6 +1470,24 @@ Return bounds of form (beg . end) if THING is found, or nil otherwise."
                (setq b (1- b)))))
       (cons a b))))
 
+(defun markdown-reference-definition (reference)
+  "Find out whether Markdown REFERENCE is defined.
+REFERENCE should include the square brackets, like [this].
+When REFERENCE is defined, return a list of the form (text start end)
+containing the definition text itself followed by the start and end
+locations of the text.  Otherwise, return nil.
+Leave match data for `markdown-regex-reference-definition'
+intact additional processing."
+  (let ((reference (downcase reference)))
+    (save-excursion
+      (goto-char (point-min))
+      (catch 'found
+        (while (re-search-forward markdown-regex-reference-definition nil t)
+          (when (string= reference (downcase (match-string-no-properties 1)))
+            (throw 'found
+                   (list (match-string-no-properties 2)
+                         (match-beginning 2) (match-end 2)))))))))
+
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
@@ -2748,17 +2766,6 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
 The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
-(defun markdown-has-reference-definition (reference)
-  "Find out whether Markdown REFERENCE is defined.
-REFERENCE should include the square brackets, like [this]."
-  (let ((reference (downcase reference)))
-    (save-excursion
-      (goto-char (point-min))
-      (catch 'found
-        (while (re-search-forward markdown-regex-reference-definition nil t)
-          (when (string= reference (downcase (match-string-no-properties 1)))
-            (throw 'found (match-string-no-properties 2))))))))
-
 (defun markdown-get-undefined-refs ()
   "Return a list of undefined Markdown references.
 Result is an alist of pairs (reference . occurrences), where
@@ -2774,7 +2781,7 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
         (let* ((label (match-string-no-properties 1))
                (reference (match-string-no-properties 2))
                (target (downcase (if (string= reference "[]") label reference))))
-          (unless (markdown-has-reference-definition target)
+          (unless (markdown-reference-definition target)
             (let ((entry (assoc target missing)))
               (if (not entry)
                   (add-to-list 'missing (cons target
@@ -3502,7 +3509,7 @@ not at a link or the link reference is not defined returns nil."
     (let* ((label (match-string-no-properties 1))
            (reference (match-string-no-properties 2))
            (target (downcase (if (string= reference "[]") label reference))))
-      (markdown-has-reference-definition target)))
+      (car (markdown-reference-definition target))))
    ((thing-at-point-looking-at markdown-regex-uri)
     (match-string-no-properties 0))
    ((thing-at-point-looking-at markdown-regex-angle-uri)
