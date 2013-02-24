@@ -1175,7 +1175,7 @@ If we are at the first line, then consider the previous line to be blank."
   "Return t if the next line is blank and nil otherwise.
 If we are at the last line, then consider the next line to be blank."
   (save-excursion
-    (if (= (point-at-bol) (point-max))
+    (if (= (point-at-eol) (point-max))
         t
       (forward-line 1)
       (markdown-cur-line-blank-p))))
