@@ -2845,6 +2845,7 @@ defined."
       (with-current-buffer refbuf
         (when view-mode
           (View-exit-and-edit))
+        (use-local-map button-buffer-map)
         (erase-buffer)
         (insert "Following references lack definitions:")
         (newline 2)

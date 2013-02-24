@@ -1146,6 +1146,16 @@ This file is not saved."
        (should (looking-at "line 2"))
        (should (equal (current-buffer) target))))))
 
+(ert-deftest test-markdown-references/button-map ()
+  "Verify that button-buffer-map is used for check references buffer."
+  (markdown-test-string "[undefined][ref]\n"
+   (let* ((target (buffer-name))
+          (check (format "*Undefined references for %s*" target)))
+   (markdown-check-refs)
+   (with-current-buffer (get-buffer check)
+     (should (equal (local-key-binding (kbd "TAB")) 'forward-button))
+     (should (equal (local-key-binding (kbd "<backtab>")) 'backward-button))))))
+
 ;;; Lists:
 
 (ert-deftest test-markdown-lists/levels-1 ()
