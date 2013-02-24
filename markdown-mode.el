@@ -2820,7 +2820,8 @@ references so that REF disappears from the list of those links."
               (message (button-get b 'buffer))
               (switch-to-buffer-other-window (button-get b 'target-buffer))
               ;; use call-interactively to silence compiler
-              (call-interactively 'goto-line (button-get b 'target-line)))))
+              (let ((current-prefix-arg (button-get b 'target-line)))
+                (call-interactively 'goto-line)))))
 
 (defun markdown-check-refs (&optional silent)
   "Show all undefined Markdown references in current `markdown-mode' buffer.

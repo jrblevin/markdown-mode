@@ -1122,6 +1122,30 @@ This file is not saved."
    (markdown-test-range-has-face 1 1 markdown-header-face-2)
    (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
 
+;;; Reference Checking:
+
+(ert-deftest test-markdown-references/goto-line-button ()
+  "Create and test a goto line button."
+  (markdown-test-string "line 1\nline 2\n"
+   ;; Store the temporary buffer with the text
+   (let ((target (current-buffer)))
+     ;; Create a new buffer for inserting
+     (with-temp-buffer
+       ;; Verify that point is in a different buffer
+       (should (not (equal (current-buffer) target)))
+       ;; Insert and press the button
+       (insert-button "goto line 2"
+                      :type 'goto-line-button
+                      'target-buffer target
+                      'target-line 2)
+       (should (string-equal (buffer-string) "goto line 2"))
+       (backward-button 1)
+       (call-interactively 'push-button)
+       ;; Verify that point is on line 2 of target buffer
+       (should (= (line-number-at-pos) 2))
+       (should (looking-at "line 2"))
+       (should (equal (current-buffer) target))))))
+
 ;;; Lists:
 
 (ert-deftest test-markdown-lists/levels-1 ()
