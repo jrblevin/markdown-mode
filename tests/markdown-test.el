@@ -749,6 +749,15 @@ This file is not saved."
      (should (string-equal (buffer-string)
                            "par one\n\npar two\n\n\n\n### header\n")))))
 
+(ert-deftest test-markdown-footnote/kill-empty-text ()
+  "Test killing a footnote with marker but no text."
+  (markdown-test-string "no text[^1]\n\n[^1]: \n"
+   (end-of-line)
+   (markdown-footnote-goto-text)
+   (should (looking-back "\\[^1\\]: "))
+   (markdown-footnote-kill)
+   (should (string-equal (buffer-string) "no text\n\n"))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
