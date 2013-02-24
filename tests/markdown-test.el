@@ -299,6 +299,17 @@ This file is not saved."
                    2704 3207 markdown-regex-italic 2 4)
                   (cons 2704 3201)))))
 
+(ert-deftest test-markdown-insertion/unwrap-things-in-region-bound ()
+  "Ensure that `markdown-unwrap-things-in-region' respects end bound"
+  (markdown-test-string "**a** **b** **c** **d** **e** **f**"
+   ;; Set region to unrwap a, b, c, and d only.  If endpoint is not
+   ;; respected (i.e, not adjusted for character removal), the
+   ;; function will unwrap e and f also.
+   (should (equal (markdown-unwrap-things-in-region
+                   1 24 markdown-regex-bold 2 4)
+                  (cons 1 8)))
+   (should (string-equal (buffer-string) "a b c d **e** **f**"))))
+
 (ert-deftest test-markdown-insertion/toggle-bold ()
   "Test toggling functionality of `markdown-insert-bold'."
   (markdown-test-string "one **two** three"

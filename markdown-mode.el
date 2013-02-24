@@ -1682,7 +1682,7 @@ Return a cons cell containing updated bounds for the region."
   (save-excursion
     (goto-char beg)
     (let ((removed 0) len-all len-text)
-      (while (re-search-forward regexp end t)
+      (while (re-search-forward regexp (- end removed) t)
         (setq len-all (length (match-string-no-properties all)))
         (setq len-text (length (match-string-no-properties text)))
         (setq removed (+ removed (- len-all len-text)))
