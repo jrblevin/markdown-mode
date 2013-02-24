@@ -1555,10 +1555,10 @@ If the point is not in a list item, do nothing."
 
 (defun markdown-cur-list-item-bounds ()
   "Return bounds and indentation of the current list item.
-Return a list of the form (begin end indent nonlist-indent).
+Return a list of the form (begin end indent nonlist-indent marker).
 If the point is not inside a list item, return nil.
 Leave match data intact for `markdown-regex-list'."
-  (let (cur prev-begin prev-end indent nonlist-indent)
+  (let (cur prev-begin prev-end indent nonlist-indent marker)
     ;; Store current location
     (setq cur (point))
     ;; Verify that cur is between beginning and end of item
@@ -1568,13 +1568,14 @@ Leave match data intact for `markdown-regex-list'."
         (setq prev-begin (match-beginning 0))
         (setq indent (length (match-string 1)))
         (setq nonlist-indent (length (match-string 0)))
+        (setq marker (concat (match-string 2) (match-string 3)))
         (save-match-data
           (markdown-cur-list-item-end nonlist-indent)
           (setq prev-end (point)))
         (when (and (>= cur prev-begin)
                    (<= cur prev-end)
                    nonlist-indent)
-          (list prev-begin prev-end indent nonlist-indent))))))
+          (list prev-begin prev-end indent nonlist-indent marker))))))
 
 (defun markdown-bounds-of-thing-at-point (thing)
   "Calls `bounds-of-thing-at-point' for THING with slight modifications.
@@ -3304,9 +3305,37 @@ decrease the indentation by one level.
 With two \\[universal-argument] prefixes (i.e., when ARG is 16),
 increase the indentation by one level."
   (interactive "p")
-  (let (bounds item-indent marker indent new-indent end)
+  (let (bounds item-indent marker indent new-indent new-loc)
     (save-match-data
-      (setq bounds (markdown-cur-list-item-bounds))
+      ;; Look for a list item on current or previous non-blank line
+      (save-excursion
+        (while (and (not (setq bounds (markdown-cur-list-item-bounds)))
+                    (not (bobp))
+                    (markdown-cur-line-blank-p))
+          (forward-line -1)))
+      (when bounds
+        (cond ((save-excursion
+                 (skip-chars-backward " \t")
+                 (looking-at markdown-regex-list))
+               (message "DEBUG: looking-at list item")
+               (beginning-of-line)
+               (insert "\n")
+               (forward-line -1))
+              ((not (markdown-cur-line-blank-p))
+               (newline)))
+        (setq new-loc (point)))
+      ;; Look ahead for a list item on next non-blank line
+      (unless bounds
+        (save-excursion
+          (while (and (null bounds)
+                      (not (eobp))
+                      (markdown-cur-line-blank-p))
+            (forward-line)
+            (setq bounds (markdown-cur-list-item-bounds))))
+        (when bounds
+          (setq new-loc (point))
+          (unless (markdown-cur-line-blank-p)
+            (newline))))
       (if (not bounds)
           ;; When not in a list, start a new unordered one
           (progn
@@ -3315,14 +3344,13 @@ increase the indentation by one level."
             (insert "* "))
         ;; Compute indentation for a new list item
         (setq item-indent (nth 2 bounds))
-        (setq marker (concat (match-string 2) (match-string 3)))
+        (setq marker (nth 4 bounds))
         (setq indent (cond
                       ((= arg 4) (max (- item-indent 4) 0))
                       ((= arg 16) (+ item-indent 4))
                       (t item-indent)))
         (setq new-indent (make-string indent 32))
-        (goto-char (nth 1 bounds))
-        (newline)
+        (goto-char new-loc)
         (cond
          ;; Ordered list
          ((string-match "[0-9]" marker)
@@ -3339,7 +3367,7 @@ increase the indentation by one level."
                             ". "))))
          ;; Unordered list
          ((string-match "[\\*\\+-]" marker)
-          (insert (concat new-indent marker))))))))
+          (insert new-indent marker)))))))
 
 (defun markdown-move-list-item-up ()
   "Move the current list item up in the list when possible."

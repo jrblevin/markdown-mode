@@ -738,14 +738,47 @@ This file is not saved."
 
 (ert-deftest test-markdown-insertion/list-item ()
   "Test `markdown-insert-list-item' on several lists."
+  ;; Following a list item, on the same line
   (markdown-test-string "  * foo"
    (goto-char (point-max))
    (call-interactively 'markdown-insert-list-item)
    (should (string-equal (buffer-string) "  * foo\n  * ")))
+  ;; Following a list item, on the next line
+  (markdown-test-string "- foo\n"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "- foo\n- ")))
+  ;; Following a list item, after a blank line
+  (markdown-test-string "- foo\n\n"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "- foo\n\n- ")))
+  ;; Preceding a list item
+  (markdown-test-string "- foo\n"
+   (goto-char (point-min))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "- \n- foo\n")))
+  ;; Preceding a list item and a blank line
+  (markdown-test-string "\n\n- foo\n"
+   (goto-char (point-min))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "- \n\n- foo\n")))
+  ;; In the middle of a list item
+  (markdown-test-string "- foo bar\n"
+   (forward-word)
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "- foo\n-  bar\n")))
+  ;; Before a list marker, but not at beginning of line
+  (markdown-test-string "   - foo\n"
+   (forward-char 2)
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "   - \n   - foo\n")))
+  ;; Following an ordered list item
   (markdown-test-string "6. foo"
    (goto-char (point-max))
    (call-interactively 'markdown-insert-list-item)
    (should (string-equal (buffer-string) "6. foo\n7. ")))
+  ;; Following a nested ordered list item
   (markdown-test-string "6. foo\n    1. bar"
    (goto-char (point-max))
    (call-interactively 'markdown-insert-list-item)
@@ -1443,11 +1476,11 @@ body"
     (markdown-next-list-item 4)
     (should (eq (point) 3700))
     (should (equal (markdown-cur-list-item-bounds)
-                   (list 3700 3901 0 4)))
+                   (list 3700 3901 0 4 "-   ")))
     (markdown-next-list-item 4)
     (should (eq (point) 3903))
     (should (equal (markdown-cur-list-item-bounds)
-                   (list 3903 3937 0 4)))))
+                   (list 3903 3937 0 4 "*   ")))))
 
 (ert-deftest test-markdown-lists/bounds-2 ()
   "Function `markdown-cur-list-item-bounds' should return nil outside of list items."
