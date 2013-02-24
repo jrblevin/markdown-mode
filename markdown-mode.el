@@ -1945,6 +1945,16 @@ See `markdown-insert-header'."
   (interactive "*")
   (markdown-insert-header 2 nil t))
 
+(defun markdown-blockquote-indentation (loc)
+  "Return string containing necessary indentation for a blockquote at LOC.
+Also see `markdown-pre-indentation'."
+  (save-excursion
+    (goto-char loc)
+    (let* ((list-level (length (markdown-calculate-list-levels)))
+           (indent ""))
+      (dotimes (count list-level indent)
+        (setq indent (concat indent "    "))))))
+
 (defun markdown-insert-blockquote ()
   "Start a blockquote section (or blockquote the region).
 If Transient Mark mode is on and a region is active, it is used as
@@ -1952,7 +1962,9 @@ the blockquote text."
   (interactive)
   (if (markdown-use-region-p)
       (markdown-blockquote-region (region-beginning) (region-end))
-    (insert "> ")))
+    (markdown-ensure-blank-line-before)
+    (insert (markdown-blockquote-indentation (point)) "> ")
+    (markdown-ensure-blank-line-after)))
 
 (defun markdown-block-region (beg end prefix)
   "Format the region using a block prefix.
@@ -1990,10 +2002,13 @@ of each line."
   "Blockquote the region.
 Arguments BEG and END specify the beginning and end of the region."
   (interactive "*r")
-  (markdown-block-region beg end "> "))
+  (markdown-block-region
+   beg end (concat (markdown-blockquote-indentation
+                    (max (point-min) (1- beg))) "> ")))
 
 (defun markdown-pre-indentation (loc)
-  "Return string containing necessary whitespace for a pre block at LOC."
+  "Return string containing necessary whitespace for a pre block at LOC.
+Also see `markdown-blockquote-indentation'."
   (save-excursion
     (goto-char loc)
     (let* ((list-level (length (markdown-calculate-list-levels)))

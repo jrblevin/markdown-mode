@@ -624,6 +624,33 @@ This file is not saved."
   (markdown-test-string "    * pre block, not a list item\n"
    (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
 
+(ert-deftest test-markdown-insertion/blockquote-nested-lists ()
+  "Test blockquote insertion in a nested list context."
+  (markdown-test-string "* item\n    * item\n"
+   ;; before the first item
+   (should (string-equal (markdown-blockquote-indentation (point)) ""))
+   (markdown-insert-blockquote)
+   (beginning-of-line)
+   (should (markdown-prev-line-blank-p))
+   (should (looking-at "^> $"))
+   (should (markdown-next-line-blank-p))
+   ;; before the second item
+   (forward-line 3)
+   (should (string-equal (markdown-blockquote-indentation (point)) "    "))
+   (markdown-insert-blockquote)
+   (beginning-of-line)
+   (should (markdown-prev-line-blank-p))
+   (should (looking-at "^    > $"))
+   (should (markdown-next-line-blank-p))
+   ;; after the second item
+   (forward-line 3)
+   (should (string-equal (markdown-blockquote-indentation (point)) "        "))
+   (markdown-insert-blockquote)
+   (beginning-of-line)
+   (should (markdown-prev-line-blank-p))
+   (should (looking-at "^        > $"))
+   (should (markdown-next-line-blank-p))))
+
 (ert-deftest test-markdown-insertion/empty-italic ()
   "Test `markdown-insert-italic' with no word at point and no region."
   (markdown-test-string ""
