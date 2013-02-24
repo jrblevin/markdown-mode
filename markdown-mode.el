@@ -1895,6 +1895,25 @@ header will be inserted."
       (backward-char (1+ (length text)))
     (backward-char (1+ level))))
 
+(defun markdown-insert-header-dwim (&optional arg)
+  "Insert or replace header markup.
+The level of the header is determined by the numerical argument,
+if present, or the level of the previous header.
+The type of the header is determined by the type of the previous header.
+See `markdown-insert-header' for details about how the header text
+is determined."
+  (interactive "*P")
+  (let (level setext)
+    (save-excursion
+      (when (re-search-backward markdown-regex-header nil t)
+        (setq level (markdown-outline-level))
+        (setq setext (or (match-end 1) (match-end 3)))))
+    ;; use prefix if given, or level of previous header
+    (setq level (if arg (prefix-numeric-value arg) level))
+    ;; match groups 1 and 2 indicate setext headers
+    (setq setext (and level (<= level 2) setext))
+    (markdown-insert-header level nil setext)))
+
 (defun markdown-insert-header-atx-1 ()
   "Insert a first level atx-style (hash mark) header.
 See `markdown-insert-header'."
@@ -2546,6 +2565,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-t4" 'markdown-insert-header-atx-4)
     (define-key map "\C-c\C-t5" 'markdown-insert-header-atx-5)
     (define-key map "\C-c\C-t6" 'markdown-insert-header-atx-6)
+    (define-key map "\C-c\C-th" 'markdown-insert-header-dwim)
     (define-key map "\C-c\C-pb" 'markdown-insert-bold)
     (define-key map "\C-c\C-ss" 'markdown-insert-bold)
     (define-key map "\C-c\C-pi" 'markdown-insert-italic)

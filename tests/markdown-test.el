@@ -493,6 +493,20 @@ This file is not saved."
    (should (string-equal (buffer-string) "replace\n=======\n\n"))
    (should (looking-at "\n==="))))
 
+(ert-deftest test-markdown-insertion/header-dwim ()
+  "Test 'do what I mean' header insertion."
+  (markdown-test-file "outline.text"
+   (call-interactively 'markdown-insert-header-dwim)
+   (should (looking-at " #$"))
+   (end-of-defun 2)
+   (call-interactively 'markdown-insert-header-dwim)
+   (beginning-of-line)
+   (should (looking-at "^#  #$"))
+   (end-of-defun 3)
+   (call-interactively 'markdown-insert-header-dwim)
+   (beginning-of-line)
+   (should (looking-at "^###  ###$"))))
+
 (ert-deftest test-markdown-insertion/remove-header ()
   "Test ATX and setext header."
   (markdown-test-string
