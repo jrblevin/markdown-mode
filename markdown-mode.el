@@ -206,7 +206,7 @@
 ;;     when mapping wiki links to filenames (default: `_`).
 ;;     For example, use an underscore for compatibility with the
 ;;     Python Markdown WikiLinks extension or a hyphen for compatibility
-;;     with Github wiki links.
+;;     with GitHub wiki links.
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
@@ -419,21 +419,41 @@
 ;; can be enabled by setting `markdown-enable-math' to a non-nil value,
 ;; either via customize or by placing `(setq markdown-enable-itex t)`
 ;; in `.emacs`, and restarting Emacs.
+
+;;; GitHub Flavored Markdown:
+
+;; A [GitHub Flavored Markdown][GFM] (GFM) mode, `gfm-mode', is also
+;; available.  The GitHub implementation of differs slightly from
+;; standard Markdown.  The most important differences are that
+;; newlines are significant, triggering hard line breaks, and that
+;; underscores inside of words (e.g., variable names) need not be
+;; escaped.  As such, `gfm-mode' turns off `auto-fill-mode' and turns
+;; on `visual-line-mode' (or `longlines-mode' if `visual-line-mode' is
+;; not available).  Underscores inside of words (such as
+;; test_variable) will not trigger emphasis.
 ;;
-;; A [GitHub Flavored Markdown](http://github.github.com/github-flavored-markdown/)
-;; mode, `gfm-mode', is also available.  The GitHub implementation of
-;; differs slightly from standard Markdown.  Most importantly, newlines are
-;; significant and trigger hard line breaks.  As such, `gfm-mode' turns off
-;; `auto-fill-mode' and turns on `visual-line-mode' (or `longlines-mode' if
-;; `visual-line-mode' is not available).  Wiki links in this mode will be
-;; treated as on GitHub, with hyphens replacing spaces in filenames and
-;; where the first letter of the filename capitalized.  For example,
-;; `[[wiki link]]' will map to a file named `Wiki-link` with the same
-;; extension as the current file.  GFM code blocks, with optional
-;; programming language keywords, will be highlighted.  They can be inserted
-;;  with `C-c C-s l`.  If there is an active region, the text in the region
-;; will be placed inside the code block.  You will be prompted for the name
-;; of the language, but may press enter to continue without naming a language.
+;; Wiki links in this mode will be treated as on GitHub, with hyphens
+;; replacing spaces in filenames and where the first letter of the
+;; filename capitalized.  For example, `[[wiki link]]' will map to a
+;; file named `Wiki-link` with the same extension as the current file.
+;;
+;; GFM code blocks, with optional programming language keywords, will
+;; be highlighted.  They can be inserted with `C-c C-s l`.  If there
+;; is an active region, the text in the region will be placed inside
+;; the code block.  You will be prompted for the name of the language,
+;; but may press enter to continue without naming a language.
+;;
+;; For a more complete GitHub-flavored markdown experience, consider
+;; adding README.md to your `auto-mode-alist':
+;;
+;;     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+;;
+;; For GFM preview can be powered by setting `markdown-command' to
+;; use [Docter][].  This may also be configured to work with [Marked][]
+;; for `markdown-open-command'.
+;;
+;; [GFM]: http://github.github.com/github-flavored-markdown/
+;; [Docter]: https://github.com/alampros/Docter
 
 ;;; Acknowledgments:
 
@@ -506,6 +526,7 @@
 ;;     related to orgtbl-mode.
 ;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
 ;;     export hooks and unit test improvements.
+;;   * Michael Dwyer <mdwyer@ehtech.in> for `gfm-mode' underscore regexp.
 
 ;;; Bugs:
 
