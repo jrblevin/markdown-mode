@@ -1125,6 +1125,49 @@ This file is not saved."
    (markdown-test-range-has-face 1 1 markdown-header-face-2)
    (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
 
+(ert-deftest test-markdown-font-lock/mmd-metadata ()
+  "Basic MultMarkdown metadata tests."
+  (markdown-test-string "Title: peg-multimarkdown User's Guide  
+Author: Fletcher T. Penney  
+Base Header Level: 2  "
+   (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
+   (markdown-test-range-has-face 6 6 nil)
+   (markdown-test-range-has-face 8 39 markdown-metadata-value-face)
+   (markdown-test-range-has-face 41 46 markdown-metadata-key-face)
+   (markdown-test-range-has-face 47 47 nil)
+   (markdown-test-range-has-face 49 68 markdown-metadata-value-face)
+   (markdown-test-range-has-face 70 86 markdown-metadata-key-face)
+   (markdown-test-range-has-face 87 87 nil)
+   (markdown-test-range-has-face 89 91 markdown-metadata-value-face)))
+
+(ert-deftest test-markdown-font-lock/mmd-metadata-after-header ()
+  "Ensure that similar lines are not matched after the header."
+  (markdown-test-string "Title: peg-multimarkdown User's Guide  
+
+Author: Fletcher T. Penney  
+Base Header Level: 2  "
+   (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
+   (markdown-test-range-has-face 6 6 nil)
+   (markdown-test-range-has-face 8 39 markdown-metadata-value-face)
+   (markdown-test-range-has-face 40 (point-max) nil)))
+
+(ert-deftest test-markdown-font-lock/pandoc-metadata ()
+  "Basic Pandoc metadata tests."
+  (markdown-test-string "% title
+  two-line title
+% first author;
+  second author
+% date
+
+body"
+   (markdown-test-range-has-face 1 1 markdown-comment-face)
+   (markdown-test-range-has-face 3 24 markdown-metadata-value-face)
+   (markdown-test-range-has-face 26 26 markdown-comment-face)
+   (markdown-test-range-has-face 28 56 markdown-metadata-value-face)
+   (markdown-test-range-has-face 58 58 markdown-comment-face)
+   (markdown-test-range-has-face 60 63 markdown-metadata-value-face)
+   (markdown-test-range-has-face 64 69 nil)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/reference-definition-basic ()

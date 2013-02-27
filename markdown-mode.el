@@ -798,6 +798,12 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defvar markdown-math-face 'markdown-math-face
   "Face name to use for LaTeX expressions.")
 
+(defvar markdown-metadata-key-face 'markdown-metadata-key-face
+  "Face name to use for metadata keys.")
+
+(defvar markdown-metadata-value-face 'markdown-metadata-value-face
+  "Face name to use for metadata values.")
+
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
   :group 'markdown
@@ -921,6 +927,16 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defface markdown-math-face
   '((t (:inherit font-lock-string-face)))
   "Face for LaTeX expressions."
+  :group 'markdown-faces)
+
+(defface markdown-metadata-key-face
+  '((t (:inherit font-lock-variable-name-face)))
+  "Face for metadata keys."
+  :group 'markdown-faces)
+
+(defface markdown-metadata-value-face
+  '((t (:inherit font-lock-string-face)))
+  "Face for metadata values."
   :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
@@ -1073,8 +1089,20 @@ text.")
   "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
+(defconst markdown-regex-multimarkdown-metadata
+  "^\\([[:alpha:]][[:alpha:] _-]*?\\):[ \t]*\\(.*\\)$"
+  "Regular expression for matching MultiMarkdown metadata.")
+
+(defconst markdown-regex-pandoc-metadata
+  "^\\(%\\)[ \t]*\\(.*\\)$"
+  "Regular expression for matching Pandoc metadata.")
+
 (defvar markdown-mode-font-lock-keywords-basic
   (list
+   (cons 'markdown-match-multimarkdown-metadata '((1 markdown-metadata-key-face)
+                                                  (2 markdown-metadata-value-face)))
+   (cons 'markdown-match-pandoc-metadata '((1 markdown-comment-face)
+                                           (2 markdown-metadata-value-face)))
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
@@ -1608,6 +1636,42 @@ intact additional processing."
                   t)
                  (t nil)))
           (t nil))))
+
+(defun markdown-match-generic-metadata (regexp last)
+  "Match generic metadata specified by REGEXP from the point to LAST."
+  (let ((header-end (save-excursion
+                      (goto-char (point-min))
+                      (if (re-search-forward "\n\n" (point-max) t)
+                          (match-beginning 0)
+                        (point-max)))))
+    (cond ((>= (point) header-end)
+           ;; Don't match anything outside of the header.
+           nil)
+          ((re-search-forward regexp (min last header-end) t)
+           ;; If a metadata item is found, it may span several lines.
+           (let ((key-beginning (match-beginning 1))
+                 (key-end (match-end 1))
+                 (value-beginning (match-beginning 2)))
+             (while (and (not (looking-at regexp))
+                         (not (> (point) (min last header-end)))
+                         (not (eobp)))
+               (forward-line))
+             (unless (eobp)
+               (forward-line -1)
+               (end-of-line))
+             (set-match-data (list key-beginning (point) ; complete metadata
+                                   key-beginning key-end ; key
+                                   value-beginning (point))) ; value
+           t))
+          (t nil))))
+
+(defun markdown-match-multimarkdown-metadata (last)
+  "Match MultiMarkdown metadata from the point to LAST."
+  (markdown-match-generic-metadata markdown-regex-multimarkdown-metadata last))
+
+(defun markdown-match-pandoc-metadata (last)
+  "Match Pandoc metadata from the point to LAST."
+  (markdown-match-generic-metadata markdown-regex-pandoc-metadata last))
 
 (defun markdown-font-lock-extend-region ()
   "Extend the search region to include an entire block of text.
