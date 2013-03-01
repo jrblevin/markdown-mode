@@ -589,12 +589,16 @@ This file is not saved."
   (markdown-test-string "line one\nline two\n"
    (markdown-pre-region (line-beginning-position) (line-end-position))
    (should (string-equal (buffer-string) "    line one\n\nline two\n")))
+  ;; Test removal of whitespace before and after region
+  (markdown-test-string "line one abc\nline two\n"
+   (markdown-pre-region 6 9)
+   (should (string-equal (buffer-string) "line\n\n    one\n\nabc\nline two\n")))
   ;; Simple test as interactive command
   (markdown-test-string "line one\nline two\n"
    (push-mark (point) t t)
    (forward-line 2)
    (call-interactively 'markdown-pre-region)
-   (should (string-equal (buffer-string) "    line one\n    line two\n"))))
+   (should (string-equal (buffer-string) "    line one\n    line two\n\n"))))
 
 (ert-deftest test-markdown-insertion/blockquote-region-1 ()
   "Test `markdown-blockquote-region'."
@@ -602,12 +606,16 @@ This file is not saved."
   (markdown-test-string "line one\nline two\n"
    (markdown-blockquote-region (line-beginning-position) (line-end-position))
    (should (string-equal (buffer-string) "> line one\n\nline two\n")))
+  ;; Test removal of whitespace before and after region
+  (markdown-test-string "line one abc\nline two\n"
+   (markdown-blockquote-region 6 9)
+   (should (string-equal (buffer-string) "line\n\n> one\n\nabc\nline two\n")))
   ;; Simple test as interactive command
   (markdown-test-string "line one\nline two\n"
    (push-mark (point) t t)
    (forward-line 2)
    (call-interactively 'markdown-blockquote-region)
-   (should (string-equal (buffer-string) "> line one\n> line two\n"))))
+   (should (string-equal (buffer-string) "> line one\n> line two\n\n"))))
 
 (ert-deftest test-markdown-insertion/pre-nested-lists ()
   "Test `markdown-pre-indentation' and `markdown-insert-pre' with nested list."
