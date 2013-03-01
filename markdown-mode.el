@@ -1070,16 +1070,11 @@ expression, #1 matches the page name and #3 matches the link
 text.")
 
 (defconst markdown-regex-uri
-  (concat
-   "\\(" (mapconcat 'identity markdown-uri-types "\\|")
-   "\\):[^]\t\n\r<>,;() ]+")
+  (concat (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+")
   "Regular expression for matching inline URIs.")
 
 (defconst markdown-regex-angle-uri
-  (concat
-   "\\(<\\)\\(\\(?:"
-   (mapconcat 'identity markdown-uri-types "\\|")
-   "\\):[^]\t\n\r<>,;()]+\\)\\(>\\)")
+  (concat "\\(<\\)\\(" (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;()]+\\)\\(>\\)")
   "Regular expression for matching inline URIs in angle brackets.")
 
 (defconst markdown-regex-email
