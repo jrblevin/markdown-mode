@@ -325,7 +325,7 @@
 ;;
 ;;   * Jumping:
 ;;
-;;     Use `C-c C-j` to jump from the object point to its counterpart
+;;     Use `C-c C-j` to jump from the object at point to its counterpart
 ;;     elsewhere in the text, when possible.  Jumps between reference
 ;;     links and definitions; between footnote markers and footnote
 ;;     text.  If more than one link uses the same reference text, a
