@@ -323,6 +323,15 @@
 ;;     wiki link, open it in another buffer (in the current window,
 ;;     or in the other window with the `C-u` prefix).
 ;;
+;;   * Jumping:
+;;
+;;     Use `C-c C-j` to jump from the object point to its counterpart
+;;     elsewhere in the text, when possible.  Jumps between reference
+;;     links and definitions; between footnote markers and footnote
+;;     text.  If more than one link uses the same reference text, a
+;;     new buffer will be created containing clickable links to each
+;;     link using the given reference in the main buffer.
+;;
 ;;   * Wiki-Link Navigation:
 ;;
 ;;     Use `M-p` and `M-n` to quickly jump to the previous and next
@@ -2704,8 +2713,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-r") 'markdown-demote)
     (define-key map (kbd "C-c C-=") 'markdown-complete-or-cycle)
     (define-key map (kbd "C-c C-c =") 'markdown-complete-buffer)
-    ;; Link Following
+    ;; Following and Jumping
     (define-key map "\C-c\C-o" 'markdown-follow-thing-at-point)
+    (define-key map "\C-c\C-j" 'markdown-jump)
     ;; Indentation
     (define-key map "\C-m" 'markdown-enter-key)
     (define-key map (kbd "<backspace>") 'markdown-dedent-or-delete)
@@ -2851,13 +2861,99 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
       (cdr root))))
 
 
-;;; Reference Checking ========================================================
+;;; References ================================================================
 
 (defconst markdown-refcheck-buffer
   "*Undefined references for %buffer%*"
   "Pattern for name of buffer for listing undefined references.
 The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
+
+(defconst markdown-links-buffer
+  "*Reference links for %buffer%*"
+  "Pattern for name of buffer for listing references.
+The string %buffer% will be replaced by the corresponding buffer name.")
+
+(defun markdown-reference-goto-definition ()
+  "Jump to the definition of the reference at point."
+  (interactive)
+  (when (thing-at-point-looking-at markdown-regex-link-reference)
+    (let* ((label (match-string-no-properties 1))
+           (reference (match-string-no-properties 2))
+           (target (downcase (if (string= reference "[]") label reference)))
+           (loc (cadr (markdown-reference-definition target))))
+      (if loc
+          (goto-char loc)
+        (error "Reference %s not defined." target)))))
+
+(defun markdown-reference-find-links (reference)
+  "Return a list of all links for REFERENCE.
+REFERENCE should include the surrounding square brackets like [this].
+Elements of the list have the form (text start line), where
+text is the link text, start is the location at the beginning of
+the link, and line is the line number on which the link appears."
+  (let* ((ref-quote (regexp-quote (substring reference 1 -1)))
+         (regexp (format "!?\\(?:\\[\\(%s\\)\\][ ]?\\[\\]\\|\\[\\([^]]+?\\)\\][ ]?\\[%s\\]\\)"
+                         ref-quote ref-quote))
+         links)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward regexp nil t)
+        (let* ((text (or (match-string-no-properties 1)
+                         (match-string-no-properties 2)))
+               (start (match-beginning 0))
+               (line (markdown-line-number-at-pos)))
+          (add-to-list 'links (list text start line)))))
+    links))
+
+(defun markdown-reference-goto-link (&optional reference)
+  "Jump to the location of the first use of reference."
+  (interactive)
+  (unless reference
+    (if (thing-at-point-looking-at markdown-regex-reference-definition)
+        (setq reference (match-string-no-properties 1))
+      (error "No reference definition at point.")))
+  (let ((links (markdown-reference-find-links reference)))
+    (cond ((= (length links) 1)
+           (goto-char (cadr (car links))))
+          ((> (length links) 1)
+           (let ((oldbuf (current-buffer))
+                 (linkbuf (get-buffer-create
+                           (markdown-replace-regexp-in-string
+                            "%buffer%" (buffer-name) markdown-links-buffer))))
+             (with-current-buffer linkbuf
+               (when view-mode
+                 (View-exit-and-edit))
+               (use-local-map button-buffer-map)
+               (erase-buffer)
+               (insert "Links using reference " reference ":")
+               (newline 2)
+               (dolist (link links)
+                 (let ((button-label (format "%s" (car link)))
+                       (char (cadr link)))
+                   (if (>= emacs-major-version 22)
+                       ;; Create a reference button in Emacs 22
+                       (insert-text-button button-label
+                                           :type 'markdown-link-button
+                                           'target-buffer oldbuf
+                                           'target-char char)
+                     ;; Insert reference as text in Emacs < 22
+                     (insert button-label)))
+                 (insert " (")
+                 (let ((line (third link)))
+                   (if (>= emacs-major-version 22)
+                       ;; Create a line number button in Emacs 22
+                       (insert-button (number-to-string line)
+                                      :type 'goto-line-button
+                                      'target-buffer oldbuf
+                                      'target-line line)
+                     ;; Insert line number as text in Emacs < 22
+                     (insert (number-to-string line))))
+                 (insert ")")
+                 (newline)))
+             (view-buffer-other-window linkbuf)
+             (goto-char (point-min))
+             (forward-line 2))))))
 
 (defun markdown-get-undefined-refs ()
   "Return a list of undefined Markdown references.
@@ -2922,6 +3018,15 @@ references so that REF disappears from the list of those links."
               ;; use call-interactively to silence compiler
               (let ((current-prefix-arg (button-get b 'target-line)))
                 (call-interactively 'goto-line)))))
+
+;; Button which jumps to a particular link.  Link text is button's label.
+(when (>= emacs-major-version 22)
+  (define-button-type 'markdown-link-button
+    'help-echo "Push to jump to the link"
+    'face 'bold
+    'action (lambda (b)
+              (switch-to-buffer-other-window (button-get b 'target-buffer))
+              (goto-char (button-get b 'target-char)))))
 
 (defun markdown-check-refs (&optional silent)
   "Show all undefined Markdown references in current `markdown-mode' buffer.
@@ -3783,7 +3888,7 @@ given range."
   (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
 
 
-;;; Generic Following =========================================================
+;;; Following and Jumping =====================================================
 
 (defun markdown-follow-thing-at-point (arg)
   "Follow thing at point if possible, such as a reference link or wiki link.
@@ -3796,7 +3901,26 @@ See `markdown-follow-link-at-point' and
   (cond ((markdown-link-p)
          (markdown-follow-link-at-point))
         ((markdown-wiki-link-p)
-         (markdown-follow-wiki-link-at-point arg))))
+         (markdown-follow-wiki-link-at-point arg))
+        (t
+         (error "Nothing to follow at point."))))
+
+(defun markdown-jump ()
+  "Jump to another location based on context at point.
+Jumps between reference links and definitions; between footnote
+markers and footnote text."
+  (interactive)
+  (cond ((markdown-footnote-text-positions)
+         (message "DEBUG: in footnote text")
+         (markdown-footnote-return))
+        ((markdown-footnote-marker-positions)
+         (markdown-footnote-goto-text))
+        ((thing-at-point-looking-at markdown-regex-link-reference)
+         (markdown-reference-goto-definition))
+        ((thing-at-point-looking-at markdown-regex-reference-definition)
+         (markdown-reference-goto-link (match-string-no-properties 1)))
+        (t
+         (error "Nothing to jump to from context at point."))))
 
 
 ;;; Miscellaneous =============================================================
