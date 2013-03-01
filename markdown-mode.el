@@ -1233,12 +1233,12 @@ in XEmacs 21."
   "Return t if the current line is blank and nil otherwise."
   (save-excursion
     (beginning-of-line)
-    (re-search-forward "^\\s *$" (point-at-eol) t)))
+    (re-search-forward "^\\s *$" (line-end-position) t)))
 
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
 If we are at the first line, then consider the previous line to be blank."
-  (or (= (point-at-bol) (point-min))
+  (or (= (line-beginning-position) (point-min))
       (save-excursion
         (forward-line -1)
         (markdown-cur-line-blank-p))))
@@ -1246,7 +1246,7 @@ If we are at the first line, then consider the previous line to be blank."
 (defun markdown-next-line-blank-p ()
   "Return t if the next line is blank and nil otherwise.
 If we are at the last line, then consider the next line to be blank."
-  (or (= (point-at-eol) (point-max))
+  (or (= (line-end-position) (point-max))
       (save-excursion
         (forward-line 1)
         (markdown-cur-line-blank-p))))
@@ -1255,15 +1255,15 @@ If we are at the last line, then consider the next line to be blank."
   "Return t if the previous line is indented and nil otherwise."
   (save-excursion
     (forward-line -1)
-    (goto-char (point-at-bol))
-    (if (re-search-forward "^\\s " (point-at-eol) t) t)))
+    (goto-char (line-beginning-position))
+    (if (re-search-forward "^\\s " (line-end-position) t) t)))
 
 (defun markdown-cur-line-indent ()
   "Return the number of leading whitespace characters in the current line."
   (save-match-data
     (save-excursion
-      (goto-char (point-at-bol))
-      (re-search-forward "^[ \t]+" (point-at-eol) t)
+      (goto-char (line-beginning-position))
+      (re-search-forward "^[ \t]+" (line-end-position) t)
       (current-column))))
 
 (defun markdown-prev-line-indent ()
@@ -1284,7 +1284,7 @@ Return nil if the current line is not the beginning of a list item."
   (save-match-data
     (save-excursion
       (beginning-of-line)
-      (when (re-search-forward markdown-regex-list (point-at-eol) t)
+      (when (re-search-forward markdown-regex-list (line-end-position) t)
         (current-column)))))
 
 (defun markdown-prev-non-list-indent ()
@@ -2137,7 +2137,7 @@ of each line."
     ;; Insert PREFIX
     (goto-char beg)
     (beginning-of-line)
-    (while (< (point-at-bol) end)
+    (while (< (line-beginning-position) end)
       (insert prefix)
       (setq end (+ (length prefix) end))
       (forward-line))))
@@ -2341,7 +2341,7 @@ footnote text is found, NIL is returned."
 The return value is a list (ID START END).  If point is not on a
 footnote, NIL is returned."
   ;; first make sure we're at a footnote marker
-  (if (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (point-at-bol))
+  (if (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (line-beginning-position))
           (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
       (save-excursion
         ;; move point between [ and ^:
