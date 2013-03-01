@@ -328,9 +328,10 @@
 ;;     Use `C-c C-j` to jump from the object at point to its counterpart
 ;;     elsewhere in the text, when possible.  Jumps between reference
 ;;     links and definitions; between footnote markers and footnote
-;;     text.  If more than one link uses the same reference text, a
-;;     new buffer will be created containing clickable links to each
-;;     link using the given reference in the main buffer.
+;;     text.  If more than one link uses the same reference name, a
+;;     new buffer will be created containing clickable buttons for jumping
+;;     to each link.  You may press `TAB` or `S-TAB` to jump between
+;;     buttons in this window.
 ;;
 ;;   * Wiki-Link Navigation:
 ;;
@@ -2875,7 +2876,7 @@ The string %buffer% will be replaced by the corresponding
 The string %buffer% will be replaced by the corresponding buffer name.")
 
 (defun markdown-reference-goto-definition ()
-  "Jump to the definition of the reference at point."
+  "Jump to the definition of the reference at point or create it."
   (interactive)
   (when (thing-at-point-looking-at markdown-regex-link-reference)
     (let* ((label (match-string-no-properties 1))
@@ -2884,7 +2885,7 @@ The string %buffer% will be replaced by the corresponding buffer name.")
            (loc (cadr (markdown-reference-definition target))))
       (if loc
           (goto-char loc)
-        (error "Reference %s not defined." target)))))
+        (markdown-insert-reference-definition reference (current-buffer))))))
 
 (defun markdown-reference-find-links (reference)
   "Return a list of all links for REFERENCE.
@@ -2926,9 +2927,8 @@ the link, and line is the line number on which the link appears."
                  (View-exit-and-edit))
                (use-local-map button-buffer-map)
                (erase-buffer)
-               (insert "Links using reference " reference ":")
-               (newline 2)
-               (dolist (link links)
+               (insert "Links using reference " reference ":\n\n")
+               (dolist (link (reverse links))
                  (let ((button-label (format "%s" (car link)))
                        (char (cadr link)))
                    (if (>= emacs-major-version 22)
@@ -2939,18 +2939,7 @@ the link, and line is the line number on which the link appears."
                                            'target-char char)
                      ;; Insert reference as text in Emacs < 22
                      (insert button-label)))
-                 (insert " (")
-                 (let ((line (third link)))
-                   (if (>= emacs-major-version 22)
-                       ;; Create a line number button in Emacs 22
-                       (insert-button (number-to-string line)
-                                      :type 'goto-line-button
-                                      'target-buffer oldbuf
-                                      'target-line line)
-                     ;; Insert line number as text in Emacs < 22
-                     (insert (number-to-string line))))
-                 (insert ")")
-                 (newline)))
+                 (insert (format " (line %d)\n" (third link)))))
              (view-buffer-other-window linkbuf)
              (goto-char (point-min))
              (forward-line 2))))))
@@ -2979,21 +2968,14 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
                         (append (cdr entry) (list (cons label (markdown-line-number-at-pos))))))))))
       missing)))
 
-(defun markdown-add-missing-ref-definition (ref buffer &optional recheck)
+(defun markdown-insert-reference-definition (ref &optional buffer)
   "Add blank REF definition to the end of BUFFER.
-REF is a Markdown reference in square brackets, like \"[lisp-history]\".
-When RECHECK is non-nil, BUFFER gets rechecked for undefined
-references so that REF disappears from the list of those links."
+REF is a Markdown reference in square brackets, like \"[lisp-history]\"."
+  (or buffer (setq buffer (current-buffer)))
   (with-current-buffer buffer
-    (when (not (eq major-mode 'markdown-mode))
-      (error "Not available in current mode"))
     (goto-char (point-max))
     (indent-new-comment-line)
-    (insert (concat ref ": ")))
-  (switch-to-buffer-other-window buffer)
-  (goto-char (point-max))
-  (when recheck
-    (markdown-check-refs t)))
+    (insert (concat ref ": "))))
 
 ;; Button which adds an empty Markdown reference definition to the end
 ;; of buffer specified as its 'target-buffer property. Reference name
@@ -3003,8 +2985,11 @@ references so that REF disappears from the list of those links."
     'help-echo "Push to create an empty reference definition"
     'face 'bold
     'action (lambda (b)
-              (markdown-add-missing-ref-definition
-               (button-label b) (button-get b 'target-buffer) t))))
+              (let ((buffer (button-get b 'target-buffer)))
+                (markdown-insert-reference-definition (button-label b) buffer)
+                (switch-to-buffer-other-window buffer)
+                (goto-char (point-max))
+                (markdown-check-refs t)))))
 
 ;; Button jumping to line in buffer specified as its 'target-buffer
 ;; property. Line number is button's 'line property.
@@ -3025,8 +3010,11 @@ references so that REF disappears from the list of those links."
     'help-echo "Push to jump to the link"
     'face 'bold
     'action (lambda (b)
-              (switch-to-buffer-other-window (button-get b 'target-buffer))
-              (goto-char (button-get b 'target-char)))))
+              (let ((target (button-get b 'target-buffer))
+                    (loc (button-get b 'target-char)))
+                (kill-buffer-and-window)
+                (switch-to-buffer target)
+                (goto-char loc)))))
 
 (defun markdown-check-refs (&optional silent)
   "Show all undefined Markdown references in current `markdown-mode' buffer.
