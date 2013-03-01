@@ -316,10 +316,12 @@
 ;;
 ;;     `C-c -` inserts a horizontal rule.
 ;;
-;;   * Links:
+;;   * Following Links:
 ;;
 ;;     Press `C-c C-o` when the point is on an inline or reference
-;;     link to open the URL in a browser.
+;;     link to open the URL in a browser.  When the point is at a
+;;     wiki link, open it in another buffer (in the current window,
+;;     or in the other window with the `C-u` prefix).
 ;;
 ;;   * Wiki-Link Navigation:
 ;;
@@ -391,9 +393,9 @@
 
 ;; Besides supporting the basic Markdown syntax, markdown-mode also
 ;; includes syntax highlighting for `[[Wiki Links]]` by default. Wiki
-;; links may be followed automatically by hitting the enter key when
-;; your curser is on a wiki link or by hitting `C-c C-w`. The
-;; autofollowing on enter key may be controlled with the
+;; links may be followed automatically by pressing the enter key when
+;; your curser is on a wiki link or by pressing `C-c C-o`. The
+;; auto-following on enter key may be controlled with the
 ;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
 ;; `M-n` to quickly jump to the previous and next wiki links,
 ;; respectively.  Aliased or piped wiki links of the form
@@ -2702,12 +2704,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-r") 'markdown-demote)
     (define-key map (kbd "C-c C-=") 'markdown-complete-or-cycle)
     (define-key map (kbd "C-c C-c =") 'markdown-complete-buffer)
-    ;; Regular Link Following
-    (define-key map "\C-c\C-o" 'markdown-follow-link-at-point)
-    ;; WikiLink Following
-    (define-key map "\C-c\C-w" 'markdown-follow-wiki-link-at-point)
-    (define-key map "\M-n" 'markdown-next-wiki-link)
-    (define-key map "\M-p" 'markdown-previous-wiki-link)
+    ;; Link Following
+    (define-key map "\C-c\C-o" 'markdown-follow-thing-at-point)
     ;; Indentation
     (define-key map "\C-m" 'markdown-enter-key)
     (define-key map (kbd "<backspace>") 'markdown-dedent-or-delete)
@@ -2739,6 +2737,8 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Movement
     (define-key map (kbd "M-[") 'markdown-beginning-of-block)
     (define-key map (kbd "M-]") 'markdown-end-of-block)
+    (define-key map (kbd "M-n") 'markdown-next-wiki-link)
+    (define-key map (kbd "M-p") 'markdown-previous-wiki-link)
     map)
   "Keymap for Markdown major mode.")
 
@@ -3781,6 +3781,19 @@ given range."
   "Refontify all wiki links in the buffer."
   (interactive)
   (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
+
+
+;;; Generic Following =========================================================
+
+(defun markdown-follow-thing-at-point (arg)
+  "Follow thing at point if possible, such as a reference link or wiki link.
+Opens inline and reference links in a browser.  Opens wiki links
+to other files"
+  (interactive "P")
+  (cond ((markdown-link-p)
+         (markdown-follow-link-at-point))
+        ((markdown-wiki-link-p)
+         (markdown-follow-wiki-link-at-point arg))))
 
 
 ;;; Miscellaneous =============================================================
