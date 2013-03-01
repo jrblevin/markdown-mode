@@ -1470,9 +1470,9 @@ body"
   "Test filename extraction for aliased wiki links."
   (markdown-test-file "wiki-links.text"
    ;; Confirm location of first wiki link
-   (should (eq (markdown-next-wiki-link) 8))
+   (should (eq (markdown-next-link) 8))
    ;; Confirm location of second wiki link
-   (should (eq (markdown-next-wiki-link) 73))
+   (should (eq (markdown-next-link) 73))
    ;; Test predicate function
    (should (markdown-wiki-link-p))
    ;; Test alias-first filename extraction
@@ -1486,20 +1486,20 @@ body"
   "Test wiki link navigation."
   (markdown-test-file "wiki-links.text"
    ;; Advance to first link
-   (should (eq (markdown-next-wiki-link) 8))
+   (should (eq (markdown-next-link) 8))
    ;; Advance to second link
-   (should (eq (markdown-next-wiki-link) 73))
+   (should (eq (markdown-next-link) 73))
    ;; Avance to final link
-   (should (eq (markdown-next-wiki-link) 155))
+   (should (eq (markdown-next-link) 155))
    ;; Return nil and don't advance point
-   (should (eq (markdown-next-wiki-link) nil))
+   (should (eq (markdown-next-link) nil))
    (should (eq (point) 155))
    ;; Move back to second link
-   (should (eq (markdown-previous-wiki-link) 73))
+   (should (eq (markdown-previous-link) 73))
    ;; Move back to first link
-   (should (eq (markdown-previous-wiki-link) 8))
+   (should (eq (markdown-previous-link) 8))
    ;; Return nil and don't move point
-   (should (eq (markdown-previous-wiki-link) nil))
+   (should (eq (markdown-previous-link) nil))
    (should (eq (point) 8))))
 
 (ert-deftest test-markdown-wiki-link/font-lock ()
@@ -1511,14 +1511,14 @@ body"
      (write-region "" nil fn nil 1)
      (markdown-fontify-buffer-wiki-links)
      ;; Confirm location of first wiki link
-     (should (eq (markdown-next-wiki-link) 8))
+     (should (eq (markdown-next-link) 8))
      ;; First wiki link doesn't have a corresponding file
      (markdown-test-range-has-property 8 20 'font-lock-face markdown-missing-link-face)
      ;; Second wiki link doesn't have a corresponding file
-     (should (eq (markdown-next-wiki-link) 73))
+     (should (eq (markdown-next-link) 73))
      (markdown-test-range-has-property 73 88 'font-lock-face markdown-missing-link-face)
      ;; Move to third wiki link, and create the missing file
-     (should (eq (markdown-next-wiki-link) 155))
+     (should (eq (markdown-next-link) 155))
      (should (string-equal (markdown-wiki-link-link) "inline"))
      (markdown-test-range-has-property 155 164 'font-lock-face markdown-link-face)
      ;; Remove temporary files

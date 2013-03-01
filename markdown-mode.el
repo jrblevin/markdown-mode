@@ -322,6 +322,8 @@
 ;;     link to open the URL in a browser.  When the point is at a
 ;;     wiki link, open it in another buffer (in the current window,
 ;;     or in the other window with the `C-u` prefix).
+;;     To move between links, use `M-p` and `M-n` to quickly jump
+;;     to the previous or next link of any type.
 ;;
 ;;   * Jumping:
 ;;
@@ -332,11 +334,6 @@
 ;;     new buffer will be created containing clickable buttons for jumping
 ;;     to each link.  You may press `TAB` or `S-TAB` to jump between
 ;;     buttons in this window.
-;;
-;;   * Wiki-Link Navigation:
-;;
-;;     Use `M-p` and `M-n` to quickly jump to the previous and next
-;;     wiki links, respectively.
 ;;
 ;;   * Outline Navigation:
 ;;
@@ -1088,6 +1085,13 @@ text.")
 (defconst markdown-regex-email
   "<\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+>"
   "Regular expression for matching inline email addresses.")
+
+(defconst markdown-regex-link-generic
+  (concat "\\(?:" markdown-regex-wiki-link
+          "\\|" markdown-regex-link-inline
+          "\\|" markdown-regex-link-reference
+          "\\|" markdown-regex-angle-uri "\\)")
+  "Regular expression for matching any recognized link.")
 
 (defconst markdown-regex-block-separator
   "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)"
@@ -2752,8 +2756,8 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Movement
     (define-key map (kbd "M-[") 'markdown-beginning-of-block)
     (define-key map (kbd "M-]") 'markdown-end-of-block)
-    (define-key map (kbd "M-n") 'markdown-next-wiki-link)
-    (define-key map (kbd "M-p") 'markdown-previous-wiki-link)
+    (define-key map (kbd "M-n") 'markdown-next-link)
+    (define-key map (kbd "M-p") 'markdown-previous-link)
     map)
   "Keymap for Markdown major mode.")
 
@@ -3450,6 +3454,32 @@ Stops at blank lines, list items, headers, and horizontal rules."
               (not (eobp)))
     (forward-line)))
 
+(defun markdown-next-link ()
+  "Jump to next inline, reference, or wiki link.
+If successful, return point.  Otherwise, return nil.
+See `markdown-wiki-link-p' and `markdown-previous-wiki-link'."
+  (interactive)
+  (let ((opoint (point)))
+    (when (or (markdown-link-p) (markdown-wiki-link-p))
+      ;; At a link already, move past it.
+      (goto-char (+ (match-end 0) 1)))
+    ;; Search for the next wiki link and move to the beginning.
+    (if (re-search-forward markdown-regex-link-generic nil t)
+        ;; Group 1 will move past non-escape character in wiki link regexp.
+        ;; Go to beginning of group zero for all other link types.
+        (goto-char (or (match-beginning 1) (match-beginning 0)))
+      (goto-char opoint)
+      nil)))
+
+(defun markdown-previous-link ()
+  "Jump to previous wiki link.
+If successful, return point.  Otherwise, return nil.
+See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
+  (interactive)
+  (if (re-search-backward markdown-regex-link-generic nil t)
+      (goto-char (or (match-beginning 1) (match-beginning 0)))
+    nil))
+
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
 
@@ -3804,30 +3834,6 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   (if (markdown-wiki-link-p)
       (markdown-follow-wiki-link (markdown-wiki-link-link) arg)
     (error "Point is not at a Wiki Link")))
-
-(defun markdown-next-wiki-link ()
-  "Jump to next wiki link.
-If successful, return point.  Otherwise, return nil.
-See `markdown-wiki-link-p' and `markdown-previous-wiki-link'."
-  (interactive)
-  (let ((opoint (point)))
-    (when (markdown-wiki-link-p)
-      ;; At a wiki link already, move past it.
-      (goto-char (+ (match-end 0) 1)))
-      ;; Search for the next wiki link and move to the beginning.
-    (if (re-search-forward markdown-regex-wiki-link nil t)
-        (goto-char (match-beginning 1))
-      (goto-char opoint)
-      nil)))
-
-(defun markdown-previous-wiki-link ()
-  "Jump to previous wiki link.
-If successful, return point.  Otherwise, return nil.
-See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
-  (interactive)
-  (if (re-search-backward markdown-regex-wiki-link nil t)
-      (goto-char (match-beginning 1))
-    nil))
 
 (defun markdown-highlight-wiki-link (from to face)
   "Highlight the wiki link in the region between FROM and TO using FACE."
