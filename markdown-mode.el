@@ -2864,16 +2864,28 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
 
 ;;; References ================================================================
 
-(defconst markdown-refcheck-buffer
+(defconst markdown-reference-check-buffer
   "*Undefined references for %buffer%*"
   "Pattern for name of buffer for listing undefined references.
 The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
-(defconst markdown-links-buffer
+(defun markdown-reference-check-buffer (&optional buffer-name)
+  "Name and return buffer for reference checking."
+  (get-buffer-create (markdown-replace-regexp-in-string
+                      "%buffer%" (or buffer-name (buffer-name))
+                      markdown-reference-check-buffer)))
+
+(defconst markdown-reference-links-buffer
   "*Reference links for %buffer%*"
   "Pattern for name of buffer for listing references.
 The string %buffer% will be replaced by the corresponding buffer name.")
+
+(defun markdown-reference-links-buffer (&optional buffer-name)
+  "Name and return buffer for listing links."
+  (get-buffer-create (markdown-replace-regexp-in-string
+                      "%buffer%"  (or buffer-name (buffer-name))
+                      markdown-reference-links-buffer)))
 
 (defun markdown-reference-goto-definition ()
   "Jump to the definition of the reference at point or create it."
@@ -2919,9 +2931,7 @@ the link, and line is the line number on which the link appears."
            (goto-char (cadr (car links))))
           ((> (length links) 1)
            (let ((oldbuf (current-buffer))
-                 (linkbuf (get-buffer-create
-                           (markdown-replace-regexp-in-string
-                            "%buffer%" (buffer-name) markdown-links-buffer))))
+                 (linkbuf (markdown-reference-links-buffer)))
              (with-current-buffer linkbuf
                (when view-mode
                  (View-exit-and-edit))
@@ -3027,9 +3037,7 @@ defined."
     (error "Not available in current mode"))
   (let ((oldbuf (current-buffer))
         (refs (markdown-get-undefined-refs))
-        (refbuf (get-buffer-create (markdown-replace-regexp-in-string
-                                 "%buffer%" (buffer-name)
-                                 markdown-refcheck-buffer))))
+        (refbuf (markdown-reference-check-buffer)))
     (if (null refs)
         (progn
           (when (not silent)
