@@ -267,8 +267,9 @@
 ;;
 ;;   * Images: `C-c C-i`
 ;;
-;;     `C-c C-i i` inserts an image, using the active region (if any)
-;;     as the alt text.
+;;     `C-c C-i i` inserts markup for an inline image, using the
+;;     active region (if any) or the word at point as the alt text.
+;;     To insert reference-style image markup, provide a `C-u` prefix.
 ;;
 ;;   * Physical styles: `C-c C-p`
 ;;
@@ -1955,15 +1956,18 @@ as the link text."
   (markdown-wrap-or-insert "[[" "]]")
   (backward-char 2))
 
-(defun markdown-insert-image ()
-  "Insert inline image markup using region or word as alt text if possible.
+(defun markdown-insert-image (&optional arg)
+  "Insert image markup using region or word as alt text if possible.
 If there is an active region, use the region as the alt text.  If the
 point is at a word, use the word as the alt text.  In these cases, the
 point will be left at the position for inserting a URL.  If there is no
 active region and the point is not at word, simply insert image markup and
-place the point in the position to enter alt text."
-  (interactive)
-  (let ((bounds (markdown-wrap-or-insert "![" "]()")))
+place the point in the position to enter alt text.  If ARG is nil, insert
+inline image markup. Otherwise, insert reference image markup."
+  (interactive "*P")
+  (let ((bounds (if arg
+                    (markdown-wrap-or-insert "![" "][]")
+                  (markdown-wrap-or-insert "![" "]()"))))
     (when bounds
       (goto-char (- (cdr bounds) 1)))))
 
