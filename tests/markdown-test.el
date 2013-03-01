@@ -1259,6 +1259,16 @@ body"
                 (should (equal (markdown-calculate-list-levels) value))
                 (forward-line))))))
 
+(ert-deftest test-markdown-lists/levels-interior ()
+  "Test `markdown-calculate-list-levels' from inside a list item."
+  (markdown-test-file "nested-list.text"
+    (goto-char 36)
+    (should (equal (markdown-calculate-list-levels) (list 3)))
+    (goto-char 267)
+    (should (equal (markdown-calculate-list-levels) (list 7 3)))
+    (goto-char 540)
+    (should (equal (markdown-calculate-list-levels) (list 11 7 3)))))
+
 (ert-deftest test-markdown-lists/bounds-1 ()
   "Test list item bounds function `markdown-cur-list-item-bounds'."
   (markdown-test-file "lists.text"

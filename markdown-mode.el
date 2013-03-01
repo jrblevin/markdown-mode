@@ -1361,7 +1361,8 @@ immediately  after a list item, return nil."
       ;; Find a baseline point with zero list indentation
       (markdown-search-backward-baseline)
       ;; Search for all list items between baseline and LOC
-      (while (re-search-forward markdown-regex-list first t)
+      (while (and (< (point) first)
+                  (re-search-forward markdown-regex-list first t))
         (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" (1+ (length levels))))
         (beginning-of-line)
         (cond
