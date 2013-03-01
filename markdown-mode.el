@@ -3788,7 +3788,10 @@ given range."
 (defun markdown-follow-thing-at-point (arg)
   "Follow thing at point if possible, such as a reference link or wiki link.
 Opens inline and reference links in a browser.  Opens wiki links
-to other files"
+to other files in the current window, or the another window if
+ARG is non-nil.
+See `markdown-follow-link-at-point' and
+`markdown-follow-wiki-link-at-point'."
   (interactive "P")
   (cond ((markdown-link-p)
          (markdown-follow-link-at-point))
