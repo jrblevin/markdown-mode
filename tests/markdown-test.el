@@ -844,6 +844,41 @@ This file is not saved."
    (markdown-footnote-kill)
    (should (string-equal (buffer-string) "no text\n"))))
 
+;;; Element removal tests:
+
+(ert-deftest test-markdown-kill/simple ()
+  "Simple tests for `markdown-kill-thing-at-point'."
+  (let ((tests (list '("`foo`" . "foo")
+                     '("## foo ##" . "foo")
+                     '("## foo" . "foo")
+                     '("foo\n---" . "foo")
+                     '("foo\n===" . "foo")
+                     '("* * * * *" . "* * * * *")
+                     '("[foo](http://bar.com/)" . "foo")
+                     '("![foo](http://bar.com/)" . "foo")
+                     '("[foo][bar]" . "foo")
+                     '("![foo][bar]" . "foo")
+                     '("<http://foo.com/>" . "http://foo.com/")
+                     '("<foo@bar.com>" . "foo@bar.com")
+                     '("[[foo]]" . "foo")
+                     '("[[foo|bar]]" . "foo")
+                     '("**foo**" . "foo")
+                     '("__foo__" . "foo")
+                     '("*foo*" . "foo")
+                     '("_foo_" . "foo")
+                     '("  [foo]: http://bar.com/" . "http://bar.com/")
+                     '("  [foo]: http://bar.com/ \"title\"" . "http://bar.com/")
+                     '("foo[^bar]\n\n[^bar]: baz" . "baz")
+                     '("[^bar]: baz" . "baz")
+                     '("  * foo\n  bar" . "  * foo\n  bar"))))
+    (dolist (test tests)
+      ;; Load test string (the car), move to end of first line, kill
+      ;; thing at point, and then verify that the kill ring contains cdr.
+      (markdown-test-string (car test)
+       (end-of-line)
+       (call-interactively 'markdown-kill-thing-at-point)
+       (should (string-equal (current-kill 0) (cdr test)))))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()

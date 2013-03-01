@@ -336,6 +336,17 @@
 ;;     to each link.  You may press `TAB` or `S-TAB` to jump between
 ;;     buttons in this window.
 ;;
+;;   * Killing Elements:
+;;
+;;     Press `C-c C-k` to kill the thing at point and add important
+;;     text, without markup, to the kill ring.  Possible things to
+;;     kill include (roughly in order of precedece): inline code,
+;;     headers, horizonal rules, links (add link text to kill ring),
+;;     images (add alt text to kill ring), angle URIs, email
+;;     addresses, bold, italics, reference definitions (add URI to
+;;     kill ring), footnote markers and text (kill both marker and
+;;     text, add text to kill ring), and list items.
+;;
 ;;   * Outline Navigation:
 ;;
 ;;     Navigation between headings is possible using `outline-mode'.
@@ -950,11 +961,11 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
-  "\\(!?\\[[^]]*?\\]\\)\\(([^\\)]*)\\)"
+  "\\(!?\\[\\([^]]*?\\)\\]\\)\\((\\([^\\)]*\\))\\)"
   "Regular expression for a [text](file) or an image link ![text](file).")
 
 (defconst markdown-regex-link-reference
-  "\\(!?\\[[^]]+?\\]\\)[ ]?\\(\\[[^]]*?\\]\\)"
+  "\\(!?\\[\\([^]]+?\\)\\]\\)[ ]?\\(\\[\\([^]]*?\\)\\]\\)"
   "Regular expression for a reference link [text][id].")
 
 (defconst markdown-regex-reference-definition
@@ -1079,7 +1090,7 @@ text.")
   "Regular expression for matching inline URIs in angle brackets.")
 
 (defconst markdown-regex-email
-  "<\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+>"
+  "<\\(\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+\\)>"
   "Regular expression for matching inline email addresses.")
 
 (defconst markdown-regex-link-generic
@@ -1148,9 +1159,9 @@ text.")
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-list '(2 markdown-list-face))
    (cons markdown-regex-link-inline '((1 markdown-link-face t)
-                                      (2 markdown-url-face t)))
+                                      (3 markdown-url-face t)))
    (cons markdown-regex-link-reference '((1 markdown-link-face t)
-                                         (2 markdown-reference-face t)))
+                                         (3 markdown-reference-face t)))
    (cons markdown-regex-reference-definition '((1 markdown-reference-face t)
                                                (2 markdown-url-face t)
                                                (3 markdown-link-title-face t)))
@@ -2400,6 +2411,82 @@ NIL is returned instead."
         (append fn (list (point)))))))
 
 
+;;; Element Removal ===========================================================
+
+(defun markdown-kill-thing-at-point ()
+  "Kill thing at point and add important text, without markup, to kill ring.
+Possible things to kill include (roughly in order of precedence):
+inline code, headers, horizonal rules, links (add link text to
+kill ring), images (add alt text to kill ring), angle uri, email
+addresses, bold, italics, reference definition (add URI to kill
+ring), footnote markers and text (kill both marker and text, add
+text to kill ring), and list items."
+  (interactive "*")
+  (let (val tmp)
+    (cond
+     ;; Inline code
+     ((thing-at-point-looking-at markdown-regex-code)
+      (kill-new (match-string 4))
+      (delete-region (match-beginning 2) (match-end 2)))
+     ;; ATX header
+     ((thing-at-point-looking-at markdown-regex-header-atx)
+      (kill-new (match-string 2))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Setext header
+     ((thing-at-point-looking-at markdown-regex-header-setext)
+      (kill-new (match-string 1))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Horizonal rule
+     ((thing-at-point-looking-at markdown-regex-hr)
+      (kill-new (match-string 0))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Inline link or image (add link or alt text to kill ring)
+     ((thing-at-point-looking-at markdown-regex-link-inline)
+      (kill-new (match-string 2))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Reference link or image (add link or alt text to kill ring)
+     ((thing-at-point-looking-at markdown-regex-link-reference)
+      (kill-new (match-string 2))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Angle URI (add URL to kill ring)
+     ((thing-at-point-looking-at markdown-regex-angle-uri)
+      (kill-new (match-string 2))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Email address in angle brackets (add email address to kill ring)
+     ((thing-at-point-looking-at markdown-regex-email)
+      (kill-new (match-string 1))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Wiki link (add alias text to kill ring)
+     ((thing-at-point-looking-at markdown-regex-wiki-link)
+      (kill-new (if markdown-wiki-link-alias-first
+                    (match-string-no-properties 2)
+                  (or (match-string-no-properties 2) (match-string-no-properties 4))))
+      (delete-region (match-beginning 1) (match-end 1)))
+     ;; Bold
+     ((thing-at-point-looking-at markdown-regex-bold)
+      (kill-new (match-string 4))
+      (delete-region (match-beginning 2) (match-end 2)))
+     ;; Italics
+     ((thing-at-point-looking-at markdown-regex-italic)
+      (kill-new (match-string 4))
+      (delete-region (match-beginning 2) (match-end 2)))
+     ;; Reference definition (add URL to kill ring)
+     ((thing-at-point-looking-at markdown-regex-reference-definition)
+      (kill-new (match-string 2))
+      (delete-region (match-beginning 0) (match-end 0)))
+     ;; Footnote marker (add footnote text to kill ring)
+     ((thing-at-point-looking-at markdown-regex-footnote)
+      (markdown-footnote-kill))
+     ;; Footnote text (add footnote text to kill ring)
+     ((setq val (markdown-footnote-text-positions))
+      (markdown-footnote-kill))
+     ;; List item
+     ((setq val (markdown-cur-list-item-bounds))
+      (kill-new (delete-and-extract-region (first val) (second val))))
+     (t
+      (error "Nothing found at point to kill")))))
+
+
 ;;; Indentation ====================================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
@@ -2732,6 +2819,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c-" 'markdown-insert-hr)
     (define-key map "\C-c\C-tt" 'markdown-insert-header-setext-1)
     (define-key map "\C-c\C-ts" 'markdown-insert-header-setext-2)
+    ;; Element removal
+    (define-key map (kbd "C-c C-k") 'markdown-kill-thing-at-point)
     ;; Footnotes
     (define-key map "\C-c\C-fn" 'markdown-footnote-new)
     (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
@@ -2908,7 +2997,7 @@ REF is a Markdown reference in square brackets, like \"[lisp-history]\"."
   (interactive)
   (when (thing-at-point-looking-at markdown-regex-link-reference)
     (let* ((label (match-string-no-properties 1))
-           (reference (match-string-no-properties 2))
+           (reference (match-string-no-properties 3))
            (target (downcase (if (string= reference "[]") label reference)))
            (loc (cadr (markdown-reference-definition target))))
       (if loc
@@ -2948,7 +3037,7 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
       (while
           (re-search-forward markdown-regex-link-reference nil t)
         (let* ((label (match-string-no-properties 1))
-               (reference (match-string-no-properties 2))
+               (reference (match-string-no-properties 3))
                (target (downcase (if (string= reference "[]") label reference))))
           (unless (markdown-reference-definition target)
             (let ((entry (assoc target missing)))
@@ -3777,10 +3866,10 @@ Works with both inline and reference style links.  If point is
 not at a link or the link reference is not defined returns nil."
   (cond
    ((thing-at-point-looking-at markdown-regex-link-inline)
-    (substring-no-properties (match-string 2) 1 -1))
+    (match-string-no-properties 4))
    ((thing-at-point-looking-at markdown-regex-link-reference)
     (let* ((label (match-string-no-properties 1))
-           (reference (match-string-no-properties 2))
+           (reference (match-string-no-properties 3))
            (target (downcase (if (string= reference "[]") label reference))))
       (car (markdown-reference-definition target))))
    ((thing-at-point-looking-at markdown-regex-uri)
