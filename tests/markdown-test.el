@@ -510,6 +510,40 @@ This file is not saved."
    (beginning-of-line)
    (should (looking-at "^###  ###$"))))
 
+(ert-deftest test-markdown-insertion/header-dwim-prefix ()
+  "Test 'do what I mean' header insertion with prefix arguments."
+  (let ((tests (list '(nil . "# abc #")
+                     '(1 . "# abc #")
+                     '(2 . "## abc ##")
+                     '(3 . "### abc ###")
+                     '(4 . "#### abc ####")
+                     '(5 . "##### abc #####")
+                     '(6 . "###### abc ######")
+                     '((4) . "abc\n===")
+                     '((16) . "abc\n---"))))
+    (dolist (test tests)
+      (markdown-test-string "abc"
+       (let ((current-prefix-arg (car test)))
+         (call-interactively 'markdown-insert-header-dwim)
+         (should (string-equal (buffer-string) (cdr test))))))))
+
+(ert-deftest test-markdown-insertion/header-setext-dwim-prefix ()
+  "Test 'do what I mean' header insertion with prefix arguments."
+  (let ((tests (list '(nil . "abc\n===")
+                     '(1 . "abc\n===")
+                     '(2 . "abc\n---")
+                     '(3 . "### abc ###")
+                     '(4 . "#### abc ####")
+                     '(5 . "##### abc #####")
+                     '(6 . "###### abc ######")
+                     '((4) . "abc\n===")
+                     '((16) . "abc\n---"))))
+    (dolist (test tests)
+      (markdown-test-string "abc"
+       (let ((current-prefix-arg (car test)))
+         (call-interactively 'markdown-insert-header-setext-dwim)
+         (should (string-equal (buffer-string) (cdr test))))))))
+
 (ert-deftest test-markdown-insertion/remove-header ()
   "Test ATX and setext header."
   (markdown-test-string

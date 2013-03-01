@@ -2022,24 +2022,52 @@ header will be inserted."
       (backward-char (1+ (length text)))
     (backward-char (1+ level))))
 
-(defun markdown-insert-header-dwim (&optional arg)
+(defun markdown-insert-header-dwim (&optional arg setext)
   "Insert or replace header markup.
-The level of the header is determined by the numerical argument,
-if present, or the level of the previous header.
-The type of the header is determined by the type of the previous header.
-See `markdown-insert-header' for details about how the header text
-is determined."
+The level and type of the header are determined automatically by
+the type and level of the previous header, unless a prefix
+argument is given.
+With a numeric prefix valued 1 to 6, insert a header of the given
+level, with the type being determined automatically (note that
+only level 1 or 2 setext headers are possible).
+With C-u, insert a level-one setext header.
+With C-u C-u, insert a level two setext header.
+
+When there is an active region, use it for the header text.  When
+the point is at an existing header, change the type and level
+according to the rules above.
+Otherwise, if the line is not empty, create a header using the
+text on the current line as the header text.
+Finally, if the point is on a blank line, insert empty header
+markup (atx) or prompt for text (setext).
+See `markdown-insert-header' for more details about how the
+header text is determined."
   (interactive "*P")
-  (let (level setext)
-    (save-excursion
-      (when (re-search-backward markdown-regex-header nil t)
-        (setq level (markdown-outline-level))
-        (setq setext (or (match-end 1) (match-end 3)))))
-    ;; use prefix if given, or level of previous header
-    (setq level (if arg (prefix-numeric-value arg) level))
-    ;; match groups 1 and 2 indicate setext headers
-    (setq setext (and level (<= level 2) setext))
+  (let (level)
+    (cond ((equal arg '(4))             ; level-one setext with C-u
+           (setq setext t)
+           (setq level 1))
+          ((equal arg '(16))            ; level-two setext with C-u C-u
+           (setq setext t)
+           (setq level 2))
+          (t                            ; automatic with numeric override
+           (save-excursion
+             (when (re-search-backward markdown-regex-header nil t)
+               ;; level of previous header
+               (setq level (markdown-outline-level))
+               ;; match groups 1 and 2 indicate setext headers
+               (setq setext (or setext (match-end 1) (match-end 3)))))
+           ;; use prefix if given, or level of previous header
+           (setq level (if arg (prefix-numeric-value arg) level))
+           ;; setext headers must be level one or two
+           (and level (setq setext (and setext (<= level 2))))))
     (markdown-insert-header level nil setext)))
+
+(defun markdown-insert-header-setext-dwim (&optional arg)
+  "Insert or replace header markup, with preference for setext.
+See `markdown-insert-header-dwim' for details."
+  (interactive "*P")
+  (markdown-insert-header-dwim arg t))
 
 (defun markdown-insert-header-atx-1 ()
   "Insert a first level atx-style (hash mark) header.
