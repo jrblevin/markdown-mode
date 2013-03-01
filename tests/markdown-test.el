@@ -1209,7 +1209,7 @@ body"
        (should (not (equal (current-buffer) target)))
        ;; Insert and press the button
        (insert-button "goto line 2"
-                      :type 'goto-line-button
+                      :type 'markdown-goto-line-button
                       'target-buffer target
                       'target-line 2)
        (should (string-equal (buffer-string) "goto line 2"))
