@@ -3907,7 +3907,6 @@ Jumps between reference links and definitions; between footnote
 markers and footnote text."
   (interactive)
   (cond ((markdown-footnote-text-positions)
-         (message "DEBUG: in footnote text")
          (markdown-footnote-return))
         ((markdown-footnote-marker-positions)
          (markdown-footnote-goto-text))
