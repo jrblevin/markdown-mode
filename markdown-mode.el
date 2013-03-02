@@ -4105,6 +4105,22 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; inside in square brackets (e.g., link anchor text)
   (looking-back "\\[[^]]*"))
 
+(defun markdown-adaptive-fill-function ()
+  "Return prefix for filling paragraph or nil if not determined."
+  (cond
+   ;; List item inside blockquote
+   ((looking-at "^[ \t]*>[ \t]*\\([0-9]+\\.\\|[*+-]\\)[ \t]+")
+    (replace-regexp-in-string
+     "[0-9\\.*+-]" " " (match-string-no-properties 0)))
+   ;; Blockquote
+   ((looking-at "^[ \t]*>[ \t]*")
+    (match-string-no-properties 0))
+   ;; List items
+   ((looking-at markdown-regex-list)
+    (match-string-no-properties 0))
+   ;; No match
+   (t nil)))
+
 
 ;;; Mode Definition  ==========================================================
 
@@ -4140,9 +4156,13 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
        'markdown-beginning-of-defun)
   (set (make-local-variable 'end-of-defun-function)
        'markdown-end-of-defun)
-  ;; Make filling work with lists (unordered, ordered, and definition)
+  ;; Paragraph filling
   (set (make-local-variable 'paragraph-start)
-       "\f\\|[ \t]*$\\|^[ \t]*[*+-] \\|^[ \t]*[0-9]+\\.\\|^[ \t]*: ")
+       "\f\\|[ \t]*$\\|[ \t]*[*+-] \\|[ \t]*[0-9]+\\.\\|[ \t]*: ")
+  (set (make-local-variable 'adaptive-fill-first-line-regexp)
+       "\\`[ \t]*>[ \t]*?\\'")
+  (set (make-local-variable 'adaptive-fill-function)
+       'markdown-adaptive-fill-function)
   ;; Outline mode
   (make-local-variable 'outline-regexp)
   (setq outline-regexp markdown-regex-header)

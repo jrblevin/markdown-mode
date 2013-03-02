@@ -1636,6 +1636,29 @@ body"
      (delete-file fn)
      )))
 
+;;; Filling tests:
+
+(ert-deftest test-markdown-filling/blockquote ()
+  "Test filling of blockquotes.
+See `adaptive-fill-first-line-regexp'."
+  (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+   (fill-paragraph)
+   (should (string-equal (buffer-string) "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n> eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
+
+(ert-deftest test-markdown-filling/list-item-plus ()
+  "Test filling of list items with plus sign markers.
+See `adaptive-fill-regexp'."
+  (markdown-test-string "  + Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+   (fill-paragraph)
+   (should (string-equal (buffer-string) "  + Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n    eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
+
+(ert-deftest test-markdown-filling/list-item-plus-in-blockquote ()
+  "Test filling of list items with plus sign markers inside blockquote.
+See `adaptive-fill-regexp'."
+  (markdown-test-string ">  + Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+   (fill-paragraph)
+   (should (string-equal (buffer-string) ">  + Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n>    eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
+
 ;;; Hook tests:
 
 (ert-deftest test-markdown-hook/before-export ()
