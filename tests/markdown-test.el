@@ -1151,6 +1151,30 @@ This file is not saved."
    (markdown-test-range-has-face 815 891 nil)
    ))
 
+(ert-deftest test-markdown-font-lock/code-2 ()
+  "Multiple code spans in a row and on different lines."
+  (markdown-test-string "`foo` `bar` `baz`"
+   (markdown-test-range-has-face 1 5 markdown-inline-code-face)
+   (markdown-test-range-has-face 6 6 nil)
+   (markdown-test-range-has-face 7 11 markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 nil)
+   (markdown-test-range-has-face 13 17 markdown-inline-code-face))
+  (markdown-test-string "`a`\n`b`\n`c`\n"
+   (markdown-test-range-has-face 1 3 markdown-inline-code-face)
+   (markdown-test-range-has-face 4 4 nil)
+   (markdown-test-range-has-face 5 7 markdown-inline-code-face)
+   (markdown-test-range-has-face 8 8 nil)
+   (markdown-test-range-has-face 9 11 markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 nil))
+  (markdown-test-string "a`foo`b`bar`c`baz`d"
+   (markdown-test-range-has-face 1 1 nil)
+   (markdown-test-range-has-face 2 6 markdown-inline-code-face)
+   (markdown-test-range-has-face 7 7 nil)
+   (markdown-test-range-has-face 8 12 markdown-inline-code-face)
+   (markdown-test-range-has-face 13 13 nil)
+   (markdown-test-range-has-face 14 18 markdown-inline-code-face)
+   (markdown-test-range-has-face 19 19 nil)))
+
 (ert-deftest test-markdown-font-lock/lists-1 ()
   "A simple list marker font lock test."
   (markdown-test-file "lists.text"

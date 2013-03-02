@@ -1153,7 +1153,7 @@ text.")
                                        (3 markdown-header-delimiter-face)))
    (cons markdown-regex-hr 'markdown-header-face)
    (cons 'markdown-match-comments '((0 markdown-comment-face t t)))
-   (cons markdown-regex-code '(2 markdown-inline-code-face))
+   (cons 'markdown-match-code '((0 markdown-inline-code-face)))
    (cons markdown-regex-angle-uri 'markdown-link-face)
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
@@ -1586,6 +1586,16 @@ intact additional processing."
                   t)
                  (t nil))))
         (t nil)))
+
+(defun markdown-match-code (last)
+  "Match inline code from the point to LAST."
+  (unless (bobp)
+    (backward-char 1))
+  (cond ((re-search-forward markdown-regex-code last t)
+         (set-match-data (list (match-beginning 2) (match-end 2)))
+         (goto-char (match-end 0))
+         t)
+        (t (forward-char 2) nil)))
 
 (defun markdown-match-pre-blocks (last)
   "Match Markdown pre blocks from point to LAST."
