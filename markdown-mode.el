@@ -390,6 +390,13 @@
 ;; is bound to `C-c C-s C-b` and always applies to the region (when
 ;; nonempty).
 ;;
+;; Note that these region-specific functions are useful in many
+;; cases where it may not be obvious.  For example, yanking text from
+;; the kill ring sets the mark at the beginning of the yanked text
+;; and moves the point to the end.  Therefore, the (inactive) region
+;; contains the yanked text.  So, `C-y` then `C-c C-s C-b` will yank
+;; text and make it a blockquote.
+;;
 ;; markdown-mode attempts to be flexible in how it handles
 ;; indentation.  When you press `TAB` repeatedly, the point will cycle
 ;; through several possible indentation levels corresponding to things
