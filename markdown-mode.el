@@ -2189,7 +2189,8 @@ of each line."
       (set-marker beg-marker (point))
       ;; Insert PREFIX before each line
       (goto-char beg-marker)
-      (while (< (line-beginning-position) end-marker)
+      (while (and (< (line-beginning-position) end-marker)
+                  (not (eobp)))
         (insert prefix)
         (forward-line)))))
 
