@@ -2038,16 +2038,13 @@ header will be inserted."
     (setq text (markdown-compress-whitespace-string text)))
   ;; Insertion with given text
   (markdown-ensure-blank-line-before)
-  (if setext
-      ;; setext
-      (progn
-        (insert text "\n")
-        (dotimes (n (length text))
-          (insert (if (= level 2) "-" "="))))
-    ;; atx
-    (dotimes (count level) (insert "#"))
-    (insert " " text " ")
-    (dotimes (count level) (insert "#")))
+  (let (hdr)
+    (cond (setext
+           (setq hdr (make-string (length text) (if (= level 2) ?- ?=)))
+           (insert text "\n" hdr))
+          (t
+           (setq hdr (make-string level ?#))
+           (insert hdr " " text " " hdr))))
   (markdown-ensure-blank-line-after)
   ;; Leave point at end of text
   (if setext
