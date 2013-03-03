@@ -755,7 +755,8 @@ This file is not saved."
      (should (looking-back "\\[^1\\]: "))
      ;; kill with point in footnote definition
      (insert "footnote text")
-     (markdown-footnote-kill)
+     (let (kill-ring)
+       (markdown-footnote-kill))
      (should (= (point) 24))
      (should (bolp))
      (should (string-equal (buffer-string) "first line\nsecond line\n"))
@@ -772,7 +773,8 @@ This file is not saved."
      (should (= (point) 15))
      (should (looking-back "\\[^2\\]"))
      ;; kill with point at marker
-     (markdown-footnote-kill)
+     (let (kill-ring)
+       (markdown-footnote-kill))
      (should (= (point) 11))
      (should (eolp))
      (should (string-equal (buffer-string) "first line\nsecond line\n")))))
@@ -791,7 +793,8 @@ This file is not saved."
      (should (looking-back "\\[^1\\]: "))
      ;; kill with point in footnote definition
      (insert "footnote text")
-     (markdown-footnote-kill)
+     (let (kill-ring)
+       (markdown-footnote-kill))
      (should (= (point) 18))
      (should (bolp))
      (should (string-equal (buffer-string)
@@ -811,7 +814,8 @@ This file is not saved."
      (should (looking-back "\\[^1\\]: "))
      ;; kill with point in footnote definition
      (insert "footnote text")
-     (markdown-footnote-kill)
+     (let (kill-ring)
+       (markdown-footnote-kill))
      (should (= (point) 19))
      (should (bolp))
      (should (string-equal (buffer-string)
@@ -829,7 +833,8 @@ This file is not saved."
      (should (= (point) 12))
      (should (looking-back "\\[^2\\]"))
      ;; kill with point at marker
-     (markdown-footnote-kill)
+     (let (kill-ring)
+       (markdown-footnote-kill))
      (should (= (point) 8))
      (should (eolp))
      (should (string-equal (buffer-string)
@@ -841,14 +846,16 @@ This file is not saved."
    (end-of-line)
    (markdown-footnote-goto-text)
    (should (looking-back "\\[^1\\]: "))
-   (markdown-footnote-kill)
+   (let (kill-ring)
+     (markdown-footnote-kill))
    (should (string-equal (buffer-string) "no text\n"))))
 
 ;;; Element removal tests:
 
 (ert-deftest test-markdown-kill/simple ()
   "Simple tests for `markdown-kill-thing-at-point'."
-  (let ((tests (list '("`foo`" . "foo")
+  (let ((kill-ring nil)
+        (tests (list '("`foo`" . "foo")
                      '("## foo ##" . "foo")
                      '("## foo" . "foo")
                      '("foo\n---" . "foo")
