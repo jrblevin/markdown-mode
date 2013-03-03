@@ -1659,6 +1659,21 @@ See `adaptive-fill-regexp'."
    (fill-paragraph)
    (should (string-equal (buffer-string) ">  + Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n>    eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
 
+;;; Export tests:
+
+(ert-deftest test-markdown-hook/xhtml-standalone ()
+  "Test `markdown-xhtml-standalone-regexp' and `markdown-output-standalone-p'."
+  (should (string-match markdown-xhtml-standalone-regexp
+                        "<?xml version='1.0' encoding='UTF-8'?>"))
+  (should (string-match markdown-xhtml-standalone-regexp
+                        "<!DOCTYPE html>"))
+  (should (string-match markdown-xhtml-standalone-regexp
+                        "<html>"))
+  (should-not (string-match markdown-xhtml-standalone-regexp
+                            "<h1>title</h1>"))
+  (should-not (string-match markdown-xhtml-standalone-regexp
+                            "<div id=\"name\">")))
+
 ;;; Hook tests:
 
 (ert-deftest test-markdown-hook/before-export ()

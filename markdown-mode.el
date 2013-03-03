@@ -731,7 +731,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :type 'string)
 
 (defcustom markdown-xhtml-standalone-regexp
-  "^\\(\<\?xml\\|\<!DOCTYPE\\|\<html\\)"
+  "^\\(<\\?xml\\|<!DOCTYPE\\|<html\\)"
   "Regexp indicating whether `markdown-command' output is standalone XHTML."
   :group 'markdown
   :type 'regexp)
