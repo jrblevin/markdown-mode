@@ -1458,30 +1458,33 @@ body"
 (ert-deftest test-markdown-outline/visibility-atx ()
   "Test outline visibility cycling for ATX-style headers."
   (markdown-test-file "outline.text"
-   ;; Navigate to the second visible heading
-   (outline-next-visible-heading 2)
-   (should (eq (point) 69))
-   (should (looking-at "^## A second-level header$"))
-   ;; Cycle visibility of this subtree
-   (markdown-cycle)
-   (should (eq (point) 69))
-   (should (looking-at "^## A second-level header$"))
-   ;; Test that the entire subtree is invisible
-   (markdown-test-range-has-property 93 349 'invisible 'outline)
-   ;; Cycle visibility of this subtree again
-   (markdown-cycle)
-   (should (eq (point) 69))
-   (should (looking-at "^## A second-level header$"))
-   ;; Test that text is visible
-   (markdown-test-range-has-property 95 121 'invisible nil)
-   ;; Test that subheadings are visible
-   (markdown-test-range-has-property 123 141 'invisible nil)
-   ;; Cycle visibility of this subtree again
-   (markdown-cycle)
-   (should (eq (point) 69))
-   (should (looking-at "^## A second-level header$"))
-   ;; Verify that entire subtree is visible
-   (markdown-test-range-has-property 93 349 'invisible nil)))
+   (let (last-command this-command)
+     ;; Navigate to the second visible heading
+     (outline-next-visible-heading 2)
+     (should (eq (point) 69))
+     (should (looking-at "^## A second-level header$"))
+     ;; Cycle visibility of this subtree
+     (setq this-command 'markdown-cycle)
+     (markdown-cycle)
+     (setq last-command 'markdown-cycle)
+     (should (eq (point) 69))
+     (should (looking-at "^## A second-level header$"))
+     ;; Test that the entire subtree is invisible
+     (markdown-test-range-has-property 93 349 'invisible 'outline)
+     ;; Cycle visibility of this subtree again
+     (markdown-cycle)
+     (should (eq (point) 69))
+     (should (looking-at "^## A second-level header$"))
+     ;; Test that text is visible
+     (markdown-test-range-has-property 95 121 'invisible nil)
+     ;; Test that subheadings are visible
+     (markdown-test-range-has-property 123 141 'invisible nil)
+     ;; Cycle visibility of this subtree again
+     (markdown-cycle)
+     (should (eq (point) 69))
+     (should (looking-at "^## A second-level header$"))
+     ;; Verify that entire subtree is visible
+     (markdown-test-range-has-property 93 349 'invisible nil))))
 
 (ert-deftest test-markdown-outline/visibility-setext ()
   "Test outline visibility cycling for setext-style headers."
