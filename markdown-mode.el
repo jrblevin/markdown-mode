@@ -4166,6 +4166,8 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   ;; Paragraph filling
   (set (make-local-variable 'paragraph-start)
        "\f\\|[ \t]*$\\|[ \t]*[*+-] \\|[ \t]*[0-9]+\\.\\|[ \t]*: ")
+  (set (make-local-variable 'paragraph-separate)
+       "\\(?:[ \t\f]\\|.*  \\)*$")
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
        "\\`[ \t]*>[ \t]*?\\'")
   (set (make-local-variable 'adaptive-fill-function)

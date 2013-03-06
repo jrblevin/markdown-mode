@@ -1680,6 +1680,14 @@ See `adaptive-fill-regexp'."
    (fill-paragraph)
    (should (string-equal (buffer-string) ">  + Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n>    eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
 
+(ert-deftest test-markdown-filling/line-break ()
+  "Test filling of paragraphs with hard line breaks.
+See `paragraph-separate'."
+  (markdown-test-string "Lorem ipsum dolor sit amet,  \nconsectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+   (let ((fill-column 70))
+     (fill-paragraph)
+     (should (string-equal (buffer-string) "Lorem ipsum dolor sit amet,  \nconsectetur adipisicing elit, sed do eiusmod tempor incididunt ut\nlabore et dolore magna aliqua.")))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
