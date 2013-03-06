@@ -820,6 +820,9 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defvar markdown-link-title-face 'markdown-link-title-face
   "Face name to use for reference link titles.")
 
+(defvar markdown-line-break-face 'markdown-line-break-face
+  "Face name to use for hard line breaks.")
+
 (defvar markdown-comment-face 'markdown-comment-face
   "Face name to use for HTML comments.")
 
@@ -945,6 +948,11 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defface markdown-link-title-face
   '((t (:inherit font-lock-comment-face)))
   "Face for reference link titles."
+  :group 'markdown-faces)
+
+(defface markdown-line-break-face
+  '((t (:inherit font-lock-constant-face :underline t)))
+  "Face for hard line breaks."
   :group 'markdown-faces)
 
 (defface markdown-comment-face
@@ -1077,7 +1085,7 @@ Underscores in words are not treated as special.")
   "Regular expression for matching blockquote lines.")
 
 (defconst markdown-regex-line-break
-  "  $"
+  "[^ \n\t][ \t]*\\(  \\)$"
   "Regular expression for matching line breaks.")
 
 (defconst markdown-regex-wiki-link
@@ -1174,6 +1182,7 @@ text.")
                                                (3 markdown-link-title-face t)))
    (cons markdown-regex-footnote 'markdown-footnote-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
+   (cons markdown-regex-line-break '(1 markdown-line-break-face prepend))
    )
   "Syntax highlighting for Markdown files.")
 

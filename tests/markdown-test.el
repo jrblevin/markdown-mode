@@ -90,9 +90,13 @@ This file is not saved."
 
 (defun markdown-test-range-has-property (begin end prop value)
   "Verify that the range from BEGIN to END has property PROP equal to VALUE."
-  (let (loc)
+  (let (loc props)
     (dolist (loc (number-sequence begin end))
-      (should (eq (get-char-property loc prop) value)))))
+      (setq props (get-char-property loc prop))
+      (cond ((and props (listp props))
+             (should (memq value props)))
+            (t
+             (should (eq props value)))))))
 
 (defun markdown-test-range-has-face (begin end face)
   "Verify that the range from BEGIN to END has face equal to FACE."
@@ -1240,13 +1244,13 @@ Author: Fletcher T. Penney
 Base Header Level: 2  "
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
    (markdown-test-range-has-face 6 6 nil)
-   (markdown-test-range-has-face 8 39 markdown-metadata-value-face)
+   (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
    (markdown-test-range-has-face 41 46 markdown-metadata-key-face)
    (markdown-test-range-has-face 47 47 nil)
-   (markdown-test-range-has-face 49 68 markdown-metadata-value-face)
+   (markdown-test-range-has-face 49 66 markdown-metadata-value-face)
    (markdown-test-range-has-face 70 86 markdown-metadata-key-face)
    (markdown-test-range-has-face 87 87 nil)
-   (markdown-test-range-has-face 89 91 markdown-metadata-value-face)))
+   (markdown-test-range-has-face 89 89 markdown-metadata-value-face)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata-after-header ()
   "Ensure that similar lines are not matched after the header."
@@ -1256,8 +1260,9 @@ Author: Fletcher T. Penney
 Base Header Level: 2  "
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
    (markdown-test-range-has-face 6 6 nil)
-   (markdown-test-range-has-face 8 39 markdown-metadata-value-face)
-   (markdown-test-range-has-face 40 (point-max) nil)))
+   (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
+   (markdown-test-range-has-face 40 67 nil)
+   (markdown-test-range-has-face 71 90 nil)))
 
 (ert-deftest test-markdown-font-lock/pandoc-metadata ()
   "Basic Pandoc metadata tests."
@@ -1275,6 +1280,12 @@ body"
    (markdown-test-range-has-face 58 58 markdown-comment-face)
    (markdown-test-range-has-face 60 63 markdown-metadata-value-face)
    (markdown-test-range-has-face 64 69 nil)))
+
+(ert-deftest test-markdown-font-lock/line-break ()
+  "Basic line break tests."
+  (markdown-test-string "    \nasdf  \n"
+   (markdown-test-range-has-face 1 9 nil)
+   (markdown-test-range-has-face 10 11 markdown-line-break-face)))
 
 ;;; Markdown Parsing Functions:
 
