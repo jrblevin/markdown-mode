@@ -743,6 +743,19 @@ This file is not saved."
    (call-interactively 'markdown-insert-list-item)
    (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. "))))
 
+(ert-deftest test-markdown-insertion/reference-link ()
+  "Basic tests for `markdown-insert-reference-link'."
+   ;; Test optional parameters
+  (markdown-test-string ""
+   (markdown-insert-reference-link "abc" "1")
+   (should (equal (buffer-string) "[abc][1]")))
+  (markdown-test-string ""
+   (markdown-insert-reference-link "link" "label" "http://jblevins.org/")
+   (should (equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/\n")))
+  (markdown-test-string ""
+   (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+   (should (equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/\n"))))
+
 ;;; Footnote tests:
 
 (ert-deftest test-markdown-footnote/basic-end ()
@@ -1314,6 +1327,16 @@ body"
    ;; Test case insensitivity
    (should (equal (markdown-reference-definition "[SRC]")
                   (list "/projects/markdown/syntax.text" 1245 1275)))))
+
+(ert-deftest test-markdown-parsing/get-defined-references ()
+  "Test `markdown-get-defined-references'."
+  (markdown-test-file "syntax.text"
+   (should (equal (markdown-get-defined-references)
+                  '("[src]" "[1]" "[2]" "[3]" "[4]" "[5]" "[6]" "[bq]" "[l]"))))
+  (markdown-test-file "outline.text"
+   (should (equal (markdown-get-defined-references) nil)))
+  (markdown-test-file "wiki-links.text"
+   (should (equal (markdown-get-defined-references) nil))))
 
 ;;; Reference Checking:
 

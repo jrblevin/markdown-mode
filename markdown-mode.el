@@ -555,6 +555,8 @@
 ;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
 ;;     export hooks and unit test improvements.
 ;;   * Michael Dwyer <mdwyer@ehtech.in> for `gfm-mode' underscore regexp.
+;;   * Chris Lott <chris@chrislott.org> for suggesting reference label
+;;     completion.
 
 ;;; Bugs:
 
@@ -604,6 +606,12 @@
 
 (defconst markdown-output-buffer-name "*markdown-output*"
   "Name of temporary buffer for markdown command output.")
+
+
+;;; Global Variables ==========================================================
+
+(defvar markdown-reference-label-history nil
+  "History of used reference labels.")
 
 
 ;;; Customizable Variables ====================================================
@@ -1589,6 +1597,16 @@ intact additional processing."
                    (list (match-string-no-properties 2)
                          (match-beginning 2) (match-end 2)))))))))
 
+(defun markdown-get-defined-references ()
+  "Return a list of all defined reference labels (including square brackets)."
+  (save-excursion
+    (goto-char (point-min))
+    (let (refs)
+      (while (re-search-forward markdown-regex-reference-definition nil t)
+        (let ((target (match-string-no-properties 1)))
+          (add-to-list 'refs target t)))
+      refs)))
+
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
@@ -1941,49 +1959,62 @@ place the point in the position to enter link text."
     (when bounds
       (goto-char (- (cdr bounds) 1)))))
 
-(defun markdown-insert-reference-link-dwim ()
-  "Insert a reference link of the form [text][label] at point.
-If Transient Mark mode is on and a region is active, the region
-is used as the link text.  Otherwise, the link text will be read
-from the minibuffer.  The link URL, label, and title will be read
-from the minibuffer.  The link label definition is placed at the
-end of the current paragraph."
-  (interactive)
-  (if (markdown-use-region-p)
-      (call-interactively 'markdown-insert-reference-link-region)
-    (call-interactively 'markdown-insert-reference-link)))
-
-(defun markdown-insert-reference-link-region (url label title)
-  "Insert a reference link at point using the region as the link text.
-The link will point to URL, will be referenced as LABEL, and will have the
-optional title text given by TITLE."
-  (interactive "sLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
-  (let ((text (delete-and-extract-region (region-beginning) (region-end))))
-    (markdown-insert-reference-link text url label title)))
-
-(defun markdown-insert-reference-link (text url label title)
-  "Insert a reference link at point.
-The link TEXT will point to the given URL and may be referenced using
-LABEL.  The link TITLE is optional and will be used to populate the
-title attribute when converted to XHTML."
-  (interactive "sLink Text: \nsLink URL: \nsLink Label (optional): \nsLink Title (optional): ")
+(defun markdown-insert-reference-link (text label &optional url title)
+  "Insert a reference link and, optionally, a reference definition.
+The link TEXT will be inserted followed by the optional LABEL.
+If a URL is given, also insert a definition for the reference
+LABEL after the end of the paragraph.  If a TITLE is given, it
+will be added to the end of the reference definition and will be
+used to populate the title attribute when converted to XHTML.  If
+URL is nil, insert only the link portion (for example, when a
+reference label is already defined)."
   (let (end)
     (insert (concat "[" text "][" label "]"))
     (setq end (point))
-    (forward-paragraph)
-    (insert "\n[")
-    (if (> (length label) 0)
-        (insert label)
-      (insert text))
-    (insert (concat "]: " url))
-    (unless (> (length url) 0)
-      (setq end (point)))
-    (when (> (length title) 0)
-      (insert (concat " \"" title "\"")))
-    (insert "\n")
-    (unless (looking-at "\n")
-      (insert "\n"))
-    (goto-char end)))
+    (when url
+      (forward-paragraph)
+      (unless (markdown-cur-line-blank-p) (insert "\n"))
+      (insert "\n[" (if (> (length label) 0) label text) "]: " url)
+      (unless (> (length url) 0)
+        (setq end (point)))
+      (when (> (length title) 0)
+        (insert " \"" title "\""))
+      (insert "\n")
+      (unless (or (eobp) (looking-at "\n"))
+        (insert "\n"))
+      (goto-char end))))
+
+(defun markdown-insert-reference-link-dwim ()
+  "Insert a reference link of the form [text][label] at point.
+If there is an active region, the text in the region will be used
+as the link text.  If the point is at a word, it will be used as
+the link text.  Otherwise, the link text will be read from the
+minibuffer.  The link label will be read from the minibuffer in
+both cases, with completion from the set of currently defined
+references.  To create an implicit reference link, press RET to
+accept the default, an empty label.  If the entered referenced
+label is not defined, additionally prompt for the URL
+and (optional) title.  The reference definition is placed at the
+end of the current paragraph."
+  (interactive)
+  (let* ((defined-labels (mapcar (lambda (x) (substring x 1 -1))
+                                 (markdown-get-defined-references)))
+         (bounds (or (and (markdown-use-region-p)
+                          (cons (region-beginning) (region-end)))
+                     (markdown-bounds-of-thing-at-point 'word)))
+         (text (if bounds
+                   (buffer-substring (car bounds) (cdr bounds))
+                 (read-string "Link Text: ")))
+         (label (completing-read
+                 "Link Label (default: none): " defined-labels
+                 nil nil nil 'markdown-reference-label-history nil))
+         (ref (markdown-reference-definition
+               (concat "[" (if (> (length label) 0) label text) "]")))
+         (url (unless ref (read-string "Link URL: ")))
+         (title (when (> (length url) 0)
+                  (read-string "Link Title (optional): "))))
+    (when bounds (delete-region (car bounds) (cdr bounds)))
+    (markdown-insert-reference-link text label url title)))
 
 (defun markdown-insert-wiki-link ()
   "Insert a wiki link of the form [[WikiLink]].
