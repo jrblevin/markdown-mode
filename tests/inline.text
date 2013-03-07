@@ -26,3 +26,5 @@ they should even match across across lines `` ```
 ``, like so.  However, backquotes should not `` ``` match
 
 across two blocks``.
+
+Links have several components: [text](http://www.w3.org/ "title").

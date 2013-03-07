@@ -984,8 +984,14 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
-  "\\(!?\\[\\([^]]*?\\)\\]\\)\\((\\([^\\)]*\\))\\)"
-  "Regular expression for a [text](file) or an image link ![text](file).")
+  "\\(!\\)?\\(\\[\\([^]]*?\\)\\]\\)\\((\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?)\\)"
+  "Regular expression for a [text](file) or an image link ![text](file).
+Group 1 matches the leading exclamation point, if any.
+Group 2 matchs the entire square bracket term, including the text.
+Group 3 matches the text inside the square brackets.
+Group 4 matches the entire parenthesis term, including the URL and title.
+Group 5 matches the URL.
+Group 6 matches (optional) title.")
 
 (defconst markdown-regex-link-reference
   "\\(!?\\[\\([^]]+?\\)\\]\\)[ ]?\\(\\[\\([^]]*?\\)\\]\\)"
@@ -1181,8 +1187,10 @@ text.")
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-list '(2 markdown-list-face))
-   (cons markdown-regex-link-inline '((1 markdown-link-face t)
-                                      (3 markdown-url-face t)))
+   (cons markdown-regex-link-inline '((1 markdown-link-face t t)
+                                      (2 markdown-link-face t)
+                                      (4 markdown-url-face t)
+                                      (6 markdown-link-title-face t t)))
    (cons markdown-regex-link-reference '((1 markdown-link-face t)
                                          (3 markdown-reference-face t)))
    (cons markdown-regex-reference-definition '((1 markdown-reference-face t)
@@ -2497,7 +2505,7 @@ text to kill ring), and list items."
       (delete-region (match-beginning 0) (match-end 0)))
      ;; Inline link or image (add link or alt text to kill ring)
      ((thing-at-point-looking-at markdown-regex-link-inline)
-      (kill-new (match-string 2))
+      (kill-new (match-string 3))
       (delete-region (match-beginning 0) (match-end 0)))
      ;; Reference link or image (add link or alt text to kill ring)
      ((thing-at-point-looking-at markdown-regex-link-reference)
@@ -3921,7 +3929,7 @@ Works with both inline and reference style links.  If point is
 not at a link or the link reference is not defined returns nil."
   (cond
    ((thing-at-point-looking-at markdown-regex-link-inline)
-    (match-string-no-properties 4))
+    (match-string-no-properties 5))
    ((thing-at-point-looking-at markdown-regex-link-reference)
     (let* ((label (match-string-no-properties 1))
            (reference (match-string-no-properties 3))

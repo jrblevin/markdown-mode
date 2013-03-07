@@ -314,6 +314,14 @@ This file is not saved."
                   (cons 1 8)))
    (should (string-equal (buffer-string) "a b c d **e** **f**"))))
 
+(ert-deftest test-markdown-insertion/unwrap-things-in-region-links ()
+  "Test function `markdown-unwrap-things-in-region' on inline links."
+  (markdown-test-string "a [link](http://jblevins.org/) or [two](/).\n"
+   (should (equal (markdown-unwrap-things-in-region
+                   (point-min) (point-max) markdown-regex-link-inline 0 3)
+                  (cons 1 16)))
+   (should (string-equal (buffer-string) "a link or two.\n"))))
+
 (ert-deftest test-markdown-insertion/toggle-bold ()
   "Test toggling functionality of `markdown-insert-bold'."
   (markdown-test-string "one **two** three"
@@ -1249,6 +1257,14 @@ This file is not saved."
   (markdown-test-string "b\n-\n"
    (markdown-test-range-has-face 1 1 markdown-header-face-2)
    (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
+
+(ert-deftest test-markdown-font-lock/inline-links ()
+  "Test font lock for inline links."
+  (markdown-test-file "inline.text"
+   (markdown-test-range-has-face 925 930 markdown-link-face)
+   (markdown-test-range-has-face 931 950 markdown-url-face)
+   (markdown-test-range-has-face 951 957 markdown-link-title-face)
+   (markdown-test-range-has-face 958 958 markdown-url-face)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata ()
   "Basic MultMarkdown metadata tests."
