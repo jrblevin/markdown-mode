@@ -1266,6 +1266,13 @@ This file is not saved."
    (markdown-test-range-has-face 951 957 markdown-link-title-face)
    (markdown-test-range-has-face 958 958 markdown-url-face)))
 
+(ert-deftest test-markdown-font-lock/footnote-markers-links ()
+  "Test an edge case involving footnote markers and inline reference links."
+  (markdown-test-string "Harvard[^1] [tuition][]"
+   (markdown-test-range-has-face 8 11 markdown-footnote-face)
+   (markdown-test-range-has-face 13 21 markdown-link-face)
+   (markdown-test-range-has-face 22 23 markdown-reference-face)))
+
 (ert-deftest test-markdown-font-lock/mmd-metadata ()
   "Basic MultMarkdown metadata tests."
   (markdown-test-string "Title: peg-multimarkdown User's Guide  

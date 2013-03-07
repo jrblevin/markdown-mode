@@ -984,7 +984,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown-faces)
 
 (defconst markdown-regex-link-inline
-  "\\(!\\)?\\(\\[\\([^]]*?\\)\\]\\)\\((\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?)\\)"
+  "\\(!\\)?\\(\\[\\([^]^][^]]*\\|\\)\\]\\)\\((\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?)\\)"
   "Regular expression for a [text](file) or an image link ![text](file).
 Group 1 matches the leading exclamation point, if any.
 Group 2 matchs the entire square bracket term, including the text.
@@ -994,7 +994,7 @@ Group 5 matches the URL.
 Group 6 matches (optional) title.")
 
 (defconst markdown-regex-link-reference
-  "\\(!?\\[\\([^]]+?\\)\\]\\)[ ]?\\(\\[\\([^]]*?\\)\\]\\)"
+  "\\(!?\\[\\(\\(?:[^]^][^]]*\\|\\)\\)\\]\\)[ ]?\\(\\[\\([^]]*?\\)\\]\\)"
   "Regular expression for a reference link [text][id].")
 
 (defconst markdown-regex-reference-definition
@@ -1187,6 +1187,7 @@ text.")
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-list '(2 markdown-list-face))
+   (cons markdown-regex-footnote 'markdown-footnote-face)
    (cons markdown-regex-link-inline '((1 markdown-link-face t t)
                                       (2 markdown-link-face t)
                                       (4 markdown-url-face t)
@@ -1196,7 +1197,6 @@ text.")
    (cons markdown-regex-reference-definition '((1 markdown-reference-face t)
                                                (2 markdown-url-face t)
                                                (3 markdown-link-title-face t)))
-   (cons markdown-regex-footnote 'markdown-footnote-face)
    (cons markdown-regex-bold '(2 markdown-bold-face))
    (cons markdown-regex-line-break '(1 markdown-line-break-face prepend))
    )
