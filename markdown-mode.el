@@ -1247,7 +1247,7 @@ Includes features which are overridden by some variants.")
 ;;; Compatibility =============================================================
 
 (defun markdown-replace-regexp-in-string (regexp rep string)
-  "Replace all matches for REGEXP with REP in STRING.
+  "Replace ocurrences of REGEXP with REP in STRING.
 This is a compatibility wrapper to provide `replace-regexp-in-string'
 in XEmacs 21."
   (if (featurep 'xemacs)
@@ -1577,7 +1577,7 @@ Leave match data intact for `markdown-regex-list'."
           (list prev-begin prev-end indent nonlist-indent marker))))))
 
 (defun markdown-bounds-of-thing-at-point (thing)
-  "Calls `bounds-of-thing-at-point' for THING with slight modifications.
+  "Call `bounds-of-thing-at-point' for THING with slight modifications.
 Does not include trailing newlines when THING is 'line.  Handles the
 end of buffer case by setting both endpoints equal to the value of
 `point-max', since an empty region will trigger empty markup insertion.
@@ -1841,8 +1841,10 @@ and S1 and S2 were only inserted."
 
 (defun markdown-point-after-unwrap (cur prefix suffix)
   "Return desired position of point after an unwrapping operation.
-Two cons cells must be provided.  PREFIX gives the bounds of the
-prefix string and SUFFIX gives the bounds of the suffix string."
+CUR gives the position of the point before the operation.
+Additionally, two cons cells must be provided.  PREFIX gives the
+bounds of the prefix string and SUFFIX gives the bounds of the
+suffix string."
   (cond ((< cur (cdr prefix)) (car prefix))
         ((< cur (car suffix)) (- cur (- (cdr prefix) (car prefix))))
         ((<= cur (cdr suffix))
@@ -1872,7 +1874,7 @@ When REGEXP is nil, assumes match data is already set."
                          (- (cdr bounds) (- (cdr prefix) (car prefix))))))))
 
 (defun markdown-unwrap-things-in-region (beg end regexp all text)
-  "Remove prefix and suffix of all things in region.
+  "Remove prefix and suffix of all things in region from BEG to END.
 When a thing in the region matches REGEXP, replace the
 subexpression ALL with the string in subexpression TEXT.
 Return a cons cell containing updated bounds for the region."
@@ -2045,7 +2047,7 @@ point is at a word, use the word as the alt text.  In these cases, the
 point will be left at the position for inserting a URL.  If there is no
 active region and the point is not at word, simply insert image markup and
 place the point in the position to enter alt text.  If ARG is nil, insert
-inline image markup. Otherwise, insert reference image markup."
+inline image markup.  Otherwise, insert reference image markup."
   (interactive "*P")
   (let ((bounds (if arg
                     (markdown-wrap-or-insert "![" "][]")
@@ -2148,7 +2150,7 @@ header text is determined."
 
 (defun markdown-insert-header-setext-dwim (&optional arg)
   "Insert or replace header markup, with preference for setext.
-See `markdown-insert-header-dwim' for details."
+See `markdown-insert-header-dwim' for details, including how ARG is handled."
   (interactive "*P")
   (markdown-insert-header-dwim arg t))
 
@@ -2567,7 +2569,7 @@ Positions are calculated by `markdown-calc-indents'."
   (or (cadr positions) 0))
 
 (defun markdown-exdent-find-next-position (cur-pos positions)
-  "Return the maximal position in POSITIONS that precedes CUR-POS.
+  "Return the maximal element that precedes CUR-POS from POSITIONS.
 Positions are calculated by `markdown-calc-indents'."
   (let ((result 0))
     (dolist (i positions)
@@ -2664,7 +2666,7 @@ Otherwise, do normal delete by repeating
       (backward-delete-char-untabify arg))))
 
 (defun markdown-find-leftmost-column (beg end)
-  "Finds the leftmost column in the region."
+  "Find the leftmost column in the region from BEG to END."
   (let ((mincol 1000))
     (save-excursion
       (goto-char beg)
@@ -2787,7 +2789,7 @@ order."
         finally (funcall function)))
 
 (defun markdown-complete-region (beg end)
-  "Complete markup of object near point.
+  "Complete markup of objects in region from BEG to END.
 Handle all objects in `markdown-complete-alist', in
 order."
   (interactive "*r")
@@ -3158,7 +3160,8 @@ The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
 (defun markdown-reference-check-buffer (&optional buffer-name)
-  "Name and return buffer for reference checking."
+  "Name and return buffer for reference checking.
+BUFFER-NAME is the name of the main buffer being visited."
   (or buffer-name (setq buffer-name (buffer-name)))
   (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
                                     "%buffer%" buffer-name
@@ -3176,7 +3179,8 @@ The string %buffer% will be replaced by the corresponding
 The string %buffer% will be replaced by the corresponding buffer name.")
 
 (defun markdown-reference-links-buffer (&optional buffer-name)
-  "Name, setup, and return a buffer for listing links."
+  "Name, setup, and return a buffer for listing links.
+BUFFER-NAME is the name of the main buffer being visited."
   (or buffer-name (setq buffer-name (buffer-name)))
   (let ((linkbuf (get-buffer-create (markdown-replace-regexp-in-string
                                      "%buffer%" buffer-name
@@ -3275,7 +3279,7 @@ the link text, location, and line number."
     (insert (format " (line %d)\n" line))))
 
 (defun markdown-reference-goto-link (&optional reference)
-  "Jump to the location of the first use of reference."
+  "Jump to the location of the first use of REFERENCE."
   (interactive)
   (unless reference
     (if (thing-at-point-looking-at markdown-regex-reference-definition)
