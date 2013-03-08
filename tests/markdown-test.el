@@ -771,6 +771,12 @@ This file is not saved."
 
 (ert-deftest test-markdown-insertion/list-item ()
   "Test `markdown-insert-list-item' on several lists."
+  ;; No existing list
+  (markdown-test-string "abc"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "abc\n* "))
+   (should (= (point) 7)))
   ;; Following a list item, on the same line
   (markdown-test-string "  * foo"
    (goto-char (point-max))
