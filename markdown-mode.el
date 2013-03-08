@@ -543,8 +543,7 @@
 ;;   * Michael Sperber <sperber@deinprogramm.de> for XEmacs fixes.
 ;;   * Francois Gannaz <francois.gannaz@free.fr> for suggesting charset
 ;;     declaration in XHTML output.
-;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart (dedention)
-;;     un-indentation function.
+;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart exdention function.
 ;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following
 ;;     and GFM code block insertion.
 ;;   * Peter Jones <pjones@pmade.com> for link following functions.
@@ -2567,6 +2566,15 @@ Positions are calculated by `markdown-calc-indents'."
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
+(defun markdown-exdent-find-next-position (cur-pos positions)
+  "Return the maximal position in POSITIONS that precedes CUR-POS.
+Positions are calculated by `markdown-calc-indents'."
+  (let ((result 0))
+    (dolist (i positions)
+      (when (< i cur-pos)
+        (setq result (max result i))))
+    result))
+
 (defun markdown-indent-line ()
   "Indent the current line using some heuristics.
 If the _previous_ command was either `markdown-enter-key' or
@@ -2639,23 +2647,20 @@ it in the usual way."
       (markdown-follow-wiki-link-at-point)
     (markdown-do-normal-return)))
 
-(defun markdown-dedent-or-delete (arg)
+(defun markdown-exdent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
 When BACKSPACE is pressed, if there is only whitespace
-before the current point, then dedent the line one level.
+before the current point, then exdent the line one level.
 Otherwise, do normal delete by repeating
 `backward-delete-char-untabify' ARG times."
   (interactive "*p")
   (let ((cur-pos (current-column))
         (start-of-indention (save-excursion
                               (back-to-indentation)
-                              (current-column))))
+                              (current-column)))
+        (positions (markdown-calc-indents)))
     (if (and (> cur-pos 0) (= cur-pos start-of-indention))
-        (let ((result 0))
-          (dolist (i (markdown-calc-indents))
-            (when (< i cur-pos)
-              (setq result (max result i))))
-          (indent-line-to result))
+        (indent-line-to (markdown-exdent-find-next-position cur-pos positions))
       (backward-delete-char-untabify arg))))
 
 
@@ -2907,8 +2912,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-o" 'markdown-follow-thing-at-point)
     (define-key map "\C-c\C-j" 'markdown-jump)
     ;; Indentation
-    (define-key map "\C-m" 'markdown-enter-key)
-    (define-key map (kbd "<backspace>") 'markdown-dedent-or-delete)
+    (define-key map (kbd "C-m") 'markdown-enter-key)
+    (define-key map (kbd "<backspace>") 'markdown-exdent-or-delete)
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
