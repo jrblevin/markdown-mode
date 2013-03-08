@@ -721,7 +721,8 @@ Otherwise, they will be treated as [[PageName|alias text]]."
   "Syntax highlighting for inline LaTeX expressions.
 This will not take effect until Emacs is restarted."
   :group 'markdown
-  :type 'boolean)
+  :type 'boolean
+  :safe 'booleanp)
 
 (defcustom markdown-css-path ""
   "URL of CSS file to link to in the output XHTML."
@@ -1244,13 +1245,10 @@ Includes features which are overridden by some variants.")
    (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
   "Syntax highlighting for LaTeX fragments.")
 
-(defvar markdown-mode-font-lock-keywords
-  (append
-   (if markdown-enable-math
-       markdown-mode-font-lock-keywords-latex)
-   markdown-mode-font-lock-keywords-basic
-   markdown-mode-font-lock-keywords-core)
-  "Default highlighting expressions for Markdown mode.")
+(defvar markdown-mode-font-lock-keywords nil
+  "Default highlighting expressions for Markdown mode.
+This variable is defined as a buffer-local variable for dynamic
+extension support.")
 
 ;; Footnotes
 (defvar markdown-footnote-counter 0
@@ -4322,7 +4320,15 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (setq comment-start-skip "<!--[ \t]*")
   (make-local-variable 'comment-column)
   (setq comment-column 0)
+  ;; Extensions
+  (make-local-variable 'markdown-enable-math)
   ;; Font lock.
+  (set (make-local-variable 'markdown-mode-font-lock-keywords)
+       (append
+        (if markdown-enable-math
+            markdown-mode-font-lock-keywords-latex)
+        markdown-mode-font-lock-keywords-basic
+        markdown-mode-font-lock-keywords-core))
   (set (make-local-variable 'font-lock-defaults)
        '(markdown-mode-font-lock-keywords))
   (set (make-local-variable 'font-lock-multiline) t)
