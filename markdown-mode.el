@@ -994,8 +994,13 @@ Group 5 matches the URL.
 Group 6 matches (optional) title.")
 
 (defconst markdown-regex-link-reference
-  "\\(!?\\[\\(\\(?:[^]^][^]]*\\|\\)\\)\\]\\)[ ]?\\(\\[\\([^]]*?\\)\\]\\)"
-  "Regular expression for a reference link [text][id].")
+  "\\(!\\)?\\(\\[\\([^]^][^]]*\\|\\)\\]\\)[ ]?\\(\\[\\([^]]*?\\)\\]\\)"
+  "Regular expression for a reference link [text][id].
+Group 1 matches the leading exclamation point, if any.
+Group 2 matchs the entire first square bracket term, including the text.
+Group 3 matches the text inside the square brackets.
+Group 4 matches the entire second square bracket term.
+Group 5 matches the reference label.")
 
 (defconst markdown-regex-reference-definition
   "^ \\{0,3\\}\\(\\[[^\n]+?\\]\\):\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
@@ -1192,8 +1197,9 @@ text.")
                                       (2 markdown-link-face t)
                                       (4 markdown-url-face t)
                                       (6 markdown-link-title-face t t)))
-   (cons markdown-regex-link-reference '((1 markdown-link-face t)
-                                         (3 markdown-reference-face t)))
+   (cons markdown-regex-link-reference '((1 markdown-link-face t t)
+                                         (2 markdown-link-face t)
+                                         (4 markdown-reference-face t)))
    (cons markdown-regex-reference-definition '((1 markdown-reference-face t)
                                                (2 markdown-url-face t)
                                                (3 markdown-link-title-face t)))
@@ -2509,7 +2515,7 @@ text to kill ring), and list items."
       (delete-region (match-beginning 0) (match-end 0)))
      ;; Reference link or image (add link or alt text to kill ring)
      ((thing-at-point-looking-at markdown-regex-link-reference)
-      (kill-new (match-string 2))
+      (kill-new (match-string 3))
       (delete-region (match-beginning 0) (match-end 0)))
      ;; Angle URI (add URL to kill ring)
      ((thing-at-point-looking-at markdown-regex-angle-uri)
@@ -3059,13 +3065,13 @@ REF is a Markdown reference in square brackets, like \"[lisp-history]\"."
   "Jump to the definition of the reference at point or create it."
   (interactive)
   (when (thing-at-point-looking-at markdown-regex-link-reference)
-    (let* ((label (match-string-no-properties 1))
-           (reference (match-string-no-properties 3))
-           (target (downcase (if (string= reference "[]") label reference)))
+    (let* ((text (match-string-no-properties 2))
+           (reference (match-string-no-properties 4))
+           (target (downcase (if (string= reference "[]") text reference)))
            (loc (cadr (markdown-reference-definition target))))
       (if loc
           (goto-char loc)
-        (markdown-insert-reference-definition reference (current-buffer))))))
+        (markdown-insert-reference-definition target (current-buffer))))))
 
 (defun markdown-reference-find-links (reference)
   "Return a list of all links for REFERENCE.
@@ -3099,16 +3105,16 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
       (goto-char (point-min))
       (while
           (re-search-forward markdown-regex-link-reference nil t)
-        (let* ((label (match-string-no-properties 1))
-               (reference (match-string-no-properties 3))
-               (target (downcase (if (string= reference "[]") label reference))))
+        (let* ((text (match-string-no-properties 2))
+               (reference (match-string-no-properties 4))
+               (target (downcase (if (string= reference "[]") text reference))))
           (unless (markdown-reference-definition target)
             (let ((entry (assoc target missing)))
               (if (not entry)
                   (add-to-list 'missing (cons target
-                                              (list (cons label (markdown-line-number-at-pos)))) t)
+                                              (list (cons text (markdown-line-number-at-pos)))) t)
                 (setcdr entry
-                        (append (cdr entry) (list (cons label (markdown-line-number-at-pos))))))))))
+                        (append (cdr entry) (list (cons text (markdown-line-number-at-pos))))))))))
       missing)))
 
 (defconst markdown-reference-check-buffer
@@ -3931,9 +3937,9 @@ not at a link or the link reference is not defined returns nil."
    ((thing-at-point-looking-at markdown-regex-link-inline)
     (match-string-no-properties 5))
    ((thing-at-point-looking-at markdown-regex-link-reference)
-    (let* ((label (match-string-no-properties 1))
-           (reference (match-string-no-properties 3))
-           (target (downcase (if (string= reference "[]") label reference))))
+    (let* ((text (match-string-no-properties 2))
+           (reference (match-string-no-properties 4))
+           (target (downcase (if (string= reference "[]") text reference))))
       (car (markdown-reference-definition target))))
    ((thing-at-point-looking-at markdown-regex-uri)
     (match-string-no-properties 0))

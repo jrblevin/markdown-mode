@@ -1642,6 +1642,22 @@ body"
    (markdown-beginning-of-block)
    (should (= (point) (point-min)))))
 
+(ert-deftest test-markdown-movement/reference-definition ()
+  "Test jumping to reference definitions."
+  ;; Jumping to explicit reference definition
+  (markdown-test-string "[a][ref]\n\n[ref]: gopher://localhost/\n"
+   (markdown-reference-goto-definition)
+   (should (= (point) 18)))
+  ;; Jumping to implicit reference definition
+  (markdown-test-string "[a][]\n\n[a]: ftp://localhost/\n"
+   (markdown-reference-goto-definition)
+   (should (= (point) 13)))
+  ;; Creating non-existent reference definition
+  (markdown-test-string "[a][]\n"
+   (markdown-reference-goto-definition)
+   (should (= (point) 13))
+   (should (string-equal (buffer-string) "[a][]\n\n[a]: "))))
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/aliasing ()
