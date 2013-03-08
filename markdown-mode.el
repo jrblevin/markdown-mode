@@ -2663,6 +2663,32 @@ Otherwise, do normal delete by repeating
         (indent-line-to (markdown-exdent-find-next-position cur-pos positions))
       (backward-delete-char-untabify arg))))
 
+(defun markdown-find-leftmost-column (beg end)
+  "Finds the leftmost column in the region."
+  (let ((mincol 1000))
+    (save-excursion
+      (goto-char beg)
+      (while (< (point) end)
+        (back-to-indentation)
+        (unless (looking-at "[ \t]*$")
+	  (setq mincol (min mincol (current-column))))
+        (forward-line 1)
+        ))
+    mincol))
+
+(defun markdown-indent-region (beg end arg)
+  "Indent the region from BEG to END using some heuristics.
+When ARG is non-nil, exdent the region instead.
+See `markdown-indent-line' and `markdown-indent-line'."
+  (interactive "*r\nP")
+  (let* ((positions (sort (delete-dups (markdown-calc-indents)) '<))
+         (leftmostcol (markdown-find-leftmost-column beg end))
+         (next-pos (if arg
+                       (markdown-exdent-find-next-position leftmostcol positions)
+                     (markdown-indent-find-next-position leftmostcol positions))))
+    (indent-rigidly beg end (- next-pos leftmostcol))
+    (setq deactivate-mark nil)))
+
 
 ;;; Markup Completion =========================================================
 
@@ -2914,6 +2940,8 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Indentation
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "<backspace>") 'markdown-exdent-or-delete)
+    (define-key map (kbd "C-c >") 'markdown-indent-region)
+    (define-key map (kbd "C-c <") (kbd "C-u C-c >"))
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)

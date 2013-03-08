@@ -40,6 +40,7 @@
   "Run body in a temporary buffer containing STRING."
   `(with-temp-buffer
     (markdown-mode)
+    (setq-default indent-tabs-mode nil)
     (insert ,string)
     (goto-char (point-min))
     (font-lock-fontify-buffer)
@@ -1171,6 +1172,20 @@ This file is not saved."
                      17 ; indentation of previous line
                      21 ; previous line plus tab-width
                      ))))))
+
+(ert-deftest test-markdown-indentation/indent-region ()
+  "Test `markdown-indent-region'."
+  ;; Basic test with multiple lines
+  (markdown-test-string "abc\ndef\nghi\n"
+    (markdown-indent-region (point-min) (point-max) nil)
+    (should (string-equal (buffer-string) "    abc\n    def\n    ghi\n")))
+  ;; Following a list item
+  (markdown-test-string "  * abc\ndef\n"
+    (forward-line)
+    (markdown-indent-region (line-beginning-position) (line-end-position) nil)
+    (should (string-equal (buffer-string) "  * abc\n  def\n"))
+    (markdown-indent-region (line-beginning-position) (line-end-position) nil)
+    (should (string-equal (buffer-string) "  * abc\n    def\n"))))
 
 ;;; Font lock tests:
 
