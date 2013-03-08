@@ -328,8 +328,10 @@ This file is not saved."
    (forward-word 2)
    (markdown-insert-bold)
    (should (string-equal (buffer-string) "one two three"))
+   (should (= (point) 8))
    (forward-word)
    (markdown-insert-bold)
+   (should (= (point) 16))
    (should (string-equal (buffer-string) "one two **three**"))))
 
 (ert-deftest test-markdown-insertion/toggle-italic ()
@@ -338,9 +340,11 @@ This file is not saved."
    (forward-word 2)
    (markdown-insert-italic)
    (should (string-equal (buffer-string) "one two three"))
+   (should (= (point) 8))
    (forward-word)
    (markdown-insert-italic)
-   (should (string-equal (buffer-string) "one two *three*"))))
+   (should (string-equal (buffer-string) "one two *three*"))
+   (should (= (point) 15))))
 
 (ert-deftest test-markdown-insertion/toggle-code ()
   "Test toggling functionality of `markdown-insert-code'."
@@ -348,9 +352,38 @@ This file is not saved."
    (forward-word 2)
    (markdown-insert-code)
    (should (string-equal (buffer-string) "one two three"))
+   (should (= (point) 8))
    (forward-word)
    (markdown-insert-code)
-   (should (string-equal (buffer-string) "one two `three`"))))
+   (should (string-equal (buffer-string) "one two `three`"))
+   (should (= (point) 15))))
+
+(ert-deftest test-markdown-insertion/bold-region ()
+  "Test region functionality of `markdown-insert-bold'."
+  (markdown-test-string "one two three"
+   (push-mark (point) t t)
+   (forward-word 2)
+   (markdown-insert-bold)
+   (should (string-equal (buffer-string) "**one two** three"))
+   (should (= (point) 10))))
+
+(ert-deftest test-markdown-insertion/italic-region ()
+  "Test region functionality of `markdown-insert-italic'."
+  (markdown-test-string "one two three"
+   (push-mark (point) t t)
+   (forward-word 2)
+   (markdown-insert-italic)
+   (should (string-equal (buffer-string) "*one two* three"))
+   (should (= (point) 9))))
+
+(ert-deftest test-markdown-insertion/code-region ()
+  "Test region functionality of `markdown-insert-code'."
+  (markdown-test-string "one two three"
+   (push-mark (point) t t)
+   (forward-word 2)
+   (markdown-insert-code)
+   (should (string-equal (buffer-string) "`one two` three"))
+   (should (= (point) 9))))
 
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."

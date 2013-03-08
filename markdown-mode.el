@@ -3317,7 +3317,6 @@ increase the indentation by one level."
         (cond ((save-excursion
                  (skip-chars-backward " \t")
                  (looking-at markdown-regex-list))
-               (message "DEBUG: looking-at list item")
                (beginning-of-line)
                (insert "\n")
                (forward-line -1))
