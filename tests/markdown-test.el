@@ -819,16 +819,48 @@ This file is not saved."
 
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."
-   ;; Test optional parameters
+   ;; Test optional parameters (leave point after link)
   (markdown-test-string ""
    (markdown-insert-reference-link "abc" "1")
-   (should (equal (buffer-string) "[abc][1]")))
+   (should (string-equal (buffer-string) "[abc][1]"))
+   (should (= (point) 9)))
+   ;; Full link without title (leave point after link)
   (markdown-test-string ""
    (markdown-insert-reference-link "link" "label" "http://jblevins.org/")
-   (should (equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/\n")))
+   (should (string-equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/\n"))
+   (should (= (point) 14)))
+   ;; Full link without label or title (leave point after link)
   (markdown-test-string ""
    (markdown-insert-reference-link "link" "" "http://jblevins.org/")
-   (should (equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/\n"))))
+   (should (string-equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/\n"))
+   (should (= (point) 9)))
+   ;; Link only with no label, URL, or title (leave point after link)
+  (markdown-test-string ""
+   (markdown-insert-reference-link "link" "")
+   (should (string-equal (buffer-string) "[link][]"))
+   (should (= (point) 9))))
+
+(ert-deftest test-markdown-insertion/inline-link ()
+  "Basic tests for `markdown-insert-link'."
+   ;; Test empty markup insertion (leave point in square brackets)
+  (markdown-test-string "abc "
+   (end-of-line)
+   (call-interactively 'markdown-insert-link)
+   (should (string-equal (buffer-string) "abc []()"))
+   (should (= (point) 6)))
+  ;; Test with word at point (leave point in parentheses)
+  (markdown-test-string "abc def ghi"
+   (forward-word 2)
+   (call-interactively 'markdown-insert-link)
+   (should (string-equal (buffer-string) "abc [def]() ghi"))
+   (should (= (point) 11)))
+  ;; Test with region (leave point in parentheses)
+  (markdown-test-string "abc def ghi"
+   (push-mark (point) t t)
+   (forward-word 2)
+   (call-interactively 'markdown-insert-link)
+   (should (string-equal (buffer-string) "[abc def]() ghi"))
+   (should (= (point) 11))))
 
 ;;; Footnote tests:
 
