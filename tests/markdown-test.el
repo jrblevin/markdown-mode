@@ -2017,6 +2017,37 @@ See `paragraph-separate'."
      (kill-buffer (get-file-buffer ofile))
      (delete-file ofile))))
 
+;;; Extension: math support
+
+(ert-deftest test-markdown-math/file-local-variable ()
+  "Test enabling math mode via `hack-local-variables-hook'."
+  (markdown-test-file "math.text"
+   (should-not markdown-enable-math)
+   (hack-local-variables)
+   (should markdown-enable-math)))
+
+(ert-deftest test-markdown-math/reload ()
+  "Test enabling math mode via function `markdown-enable-math'."
+  (markdown-test-file "math.text"
+    (markdown-enable-math t)
+    ;; Flag should be set to t
+    (should markdown-enable-math)
+    ;; Font-lock keywords should be updated
+    (should (member (cons markdown-regex-math-display 'markdown-math-face)
+                    markdown-mode-font-lock-keywords))))
+
+(ert-deftest test-markdown-math/font-lock ()
+  "Test markdown math mode."
+  (markdown-test-file "math.text"
+   (markdown-enable-math t)
+   (font-lock-fontify-buffer)
+   (markdown-test-range-has-face 1 32 nil)
+   (markdown-test-range-has-face 33 46 markdown-math-face)
+   (markdown-test-range-has-face 47 49 nil)
+   (markdown-test-range-has-face 50 65 markdown-math-face)
+   (markdown-test-range-has-face 66 98 nil)
+   (markdown-test-range-has-face 99 114 markdown-math-face)))
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()

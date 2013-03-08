@@ -452,11 +452,12 @@
 ;;
 ;; [SmartyPants]: http://daringfireball.net/projects/smartypants/
 ;;
-;; Experimental syntax highlighting for mathematical expressions written
+;; Syntax highlighting for mathematical expressions written
 ;; in LaTeX (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`)
 ;; can be enabled by setting `markdown-enable-math' to a non-nil value,
-;; either via customize or by placing `(setq markdown-enable-itex t)`
-;; in `.emacs`, and restarting Emacs.
+;; either via customize or by placing `(setq markdown-enable-math t)`
+;; in `.emacs`, and then restarting Emacs or calling
+;; `markdown-reload-extensions'.
 
 ;;; GitHub Flavored Markdown:
 
@@ -718,10 +719,13 @@ Otherwise, they will be treated as [[PageName|alias text]]."
   :type 'list)
 
 (defcustom markdown-enable-math nil
-  "Syntax highlighting for inline LaTeX expressions.
-This will not take effect until Emacs is restarted."
+  "Syntax highlighting for inline LaTeX and itex expressions.
+Set this to a non-nil value to turn on math support by default.
+Math support can be toggled later using `markdown-enable-math'
+or \\[markdown-enable-math]."
   :group 'markdown
-  :type 'boolean)
+  :type 'boolean
+  :safe 'booleanp)
 
 (defcustom markdown-css-path ""
   "URL of CSS file to link to in the output XHTML."
@@ -1155,11 +1159,11 @@ text.")
   "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)"
   "Regular expression for matching block boundaries.")
 
-(defconst markdown-regex-latex-expression
+(defconst markdown-regex-math-inline
   "\\(^\\|[^\\]\\)\\(\\$\\($\\([^\\$]\\|\\\\.\\)*\\$\\|\\([^\\$]\\|\\\\.\\)*\\)\\$\\)"
   "Regular expression for itex $..$ or $$..$$ math mode expressions.")
 
-(defconst markdown-regex-latex-display
+(defconst markdown-regex-math-display
   "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
@@ -1232,25 +1236,22 @@ text.")
   "Additional syntax highlighting for Markdown files.
 Includes features which are overridden by some variants.")
 
-(defconst markdown-mode-font-lock-keywords-latex
+(defconst markdown-mode-font-lock-keywords-math
   (list
    ;; Math mode $..$ or $$..$$
-   (cons markdown-regex-latex-expression '(2 markdown-math-face))
+   (cons markdown-regex-math-inline '(2 markdown-math-face))
    ;; Display mode equations with brackets: \[ \]
-   (cons markdown-regex-latex-display 'markdown-math-face)
+   (cons markdown-regex-math-display 'markdown-math-face)
    ;; Equation reference (eq:foo)
    (cons "(eq:\\w+)" 'markdown-reference-face)
    ;; Equation reference \eqref{foo}
    (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
-  "Syntax highlighting for LaTeX fragments.")
+  "Syntax highlighting for LaTeX and itex fragments.")
 
-(defvar markdown-mode-font-lock-keywords
-  (append
-   (if markdown-enable-math
-       markdown-mode-font-lock-keywords-latex)
-   markdown-mode-font-lock-keywords-basic
-   markdown-mode-font-lock-keywords-core)
-  "Default highlighting expressions for Markdown mode.")
+(defvar markdown-mode-font-lock-keywords nil
+  "Default highlighting expressions for Markdown mode.
+This variable is defined as a buffer-local variable for dynamic
+extension support.")
 
 ;; Footnotes
 (defvar markdown-footnote-counter 0
@@ -4301,6 +4302,37 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
    (t nil)))
 
 
+;;; Extensions ================================================================
+
+(defun markdown-reload-extensions ()
+  "Check settings, update font-lock keywords, and re-fontify buffer."
+  (interactive)
+  (when (eq major-mode 'markdown-mode)
+    (setq markdown-mode-font-lock-keywords
+          (append
+           (when markdown-enable-math
+             markdown-mode-font-lock-keywords-math)
+           markdown-mode-font-lock-keywords-basic
+           markdown-mode-font-lock-keywords-core))
+    (setq font-lock-defaults '(markdown-mode-font-lock-keywords))
+    (font-lock-refresh-defaults)))
+
+(defun markdown-enable-math (&optional arg)
+  "Toggle support for inline and display LaTeX math expressions.
+With a prefix argument ARG, enable math mode if ARG is positive,
+and disable it otherwise.  If called from Lisp, enable the mode
+if ARG is omitted or nil."
+  (interactive (list (or current-prefix-arg 'toggle)))
+  (setq markdown-enable-math
+        (if (eq arg 'toggle)
+            (not markdown-enable-math)
+          (> (prefix-numeric-value arg) 0)))
+  (if markdown-enable-math
+      (message "markdown-mode math support enabled")
+    (message "markdown-mode math support disabled"))
+  (markdown-reload-extensions))
+
+
 ;;; Mode Definition  ==========================================================
 
 (defun markdown-show-version ()
@@ -4323,9 +4355,13 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (make-local-variable 'comment-column)
   (setq comment-column 0)
   ;; Font lock.
-  (set (make-local-variable 'font-lock-defaults)
-       '(markdown-mode-font-lock-keywords))
+  (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
+  (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
+  (markdown-reload-extensions)
+  ;; Extensions
+  (make-local-variable 'markdown-enable-math)
+  (add-hook 'hack-local-variables-hook 'markdown-reload-extensions)
   ;; For imenu support
   (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
