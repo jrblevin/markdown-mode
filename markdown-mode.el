@@ -174,8 +174,8 @@
 ;;   * `markdown-uri-types' - a list of protocols for URIs that
 ;;     `markdown-mode' should highlight.
 ;;
-;;   * `markdown-enable-math' - syntax highlighting for
-;;     LaTeX fragments (default: `nil').
+;;   * `markdown-itex-mode' - syntax highlighting for itex and LaTeX
+;;      fragments (default: `nil').
 ;;
 ;;   * `markdown-css-path' - CSS file to link to in XHTML output.
 ;;
@@ -454,9 +454,10 @@
 ;;
 ;; Experimental syntax highlighting for mathematical expressions written
 ;; in LaTeX (only expressions denoted by `$..$`, `$$..$$`, or `\[..\]`)
-;; can be enabled by setting `markdown-enable-math' to a non-nil value,
-;; either via customize or by placing `(setq markdown-enable-itex t)`
-;; in `.emacs`, and restarting Emacs.
+;; can be enabled by turning on the `markdown-itex-mode' minor mode,
+;; or setting the variable `markdown-itex-mode' to a non-nil value
+;; via `M-x customize`, by placing `(setq markdown-itex-mode t)`
+;; in `.emacs`, or via a file variable.
 
 ;;; GitHub Flavored Markdown:
 
@@ -717,10 +718,11 @@ Otherwise, they will be treated as [[PageName|alias text]]."
   :group 'markdown
   :type 'list)
 
-(defcustom markdown-enable-math nil
+(defcustom markdown-itex-mode nil
   "Syntax highlighting for inline LaTeX and itex expressions.
-Set this to a non-nil value to turn on math support by default.
-Math support can be toggled later using `markdown-math' or \\[markdown-math]."
+Set this to a non-nil value to turn on itex support by default.
+Support can be toggled later using `markdown-itex-mode' or
+\\[markdown-itex-mode]."
   :group 'markdown
   :type 'boolean
   :safe 'booleanp)
@@ -3032,6 +3034,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-]") 'markdown-end-of-block)
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
+    ;; Extensions
+    (define-key map (kbd "C-c C-m C-i") 'markdown-itex-mode)
     map)
   "Keymap for Markdown major mode.")
 
@@ -4302,44 +4306,57 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 ;;; Extensions ================================================================
 
-(defun markdown-font-lock-refresh-defaults ()
+(defun markdown-refresh-settings ()
   "Check settings, update font-lock keywords, and re-fontify buffer."
   (interactive)
-  (when (eq major-mode 'markdown-mode)
+  (when (markdown-mode-p)
     (setq markdown-mode-font-lock-keywords
           (append
-           (when markdown-enable-math
+           (when markdown-itex-mode
              markdown-mode-font-lock-keywords-math)
            markdown-mode-font-lock-keywords-basic
            markdown-mode-font-lock-keywords-core))
     (setq font-lock-defaults '(markdown-mode-font-lock-keywords))
+    (markdown-set-mode-name)
     (font-lock-refresh-defaults)))
 
-(defun markdown-math (&optional arg)
-  "Toggle support for LaTeX and itex math.
-With a prefix argument ARG, enable math mode if ARG is positive,
-and disable it otherwise.  If called from Lisp, enable the mode
-if ARG is omitted or nil."
-  (interactive (list (or current-prefix-arg 'toggle)))
-  (setq markdown-enable-math
-        (if (eq arg 'toggle)
-            (not markdown-enable-math)
-          (> (prefix-numeric-value arg) 0)))
-  (if markdown-enable-math
-      (message "markdown-mode math support enabled")
-    (message "markdown-mode math support disabled"))
-  (markdown-font-lock-refresh-defaults))
+(define-minor-mode markdown-itex-mode
+  "Minor mode for supporting inline LaTeX and itex expressions.
+
+You can customize an initial value of variable `markdown-itex-mode'.
+This mode can be toggled using the funciton `markdown-itex-mode' or
+\\[markdown-itex-mode]."
+  :group 'markdown
+  (when (markdown-mode-p)
+    (markdown-refresh-settings)))
+(add-to-list 'minor-mode-alist '(markdown-itex-mode ""))
 
 
 ;;; Mode Definition  ==========================================================
+
+(defconst markdown-base-mode-name "Markdown"
+  "String to use in mode line when `markdown-mode' is active.")
 
 (defun markdown-show-version ()
   "Show the version number in the minibuffer."
   (interactive)
   (message "markdown-mode, version %s" markdown-mode-version))
 
+(defun markdown-mode-p ()
+  "Predicate for checking whether `markdown-mode' is enabled.
+Return t if the current major mode is `markdown-mode' and nil otherwise."
+  (eq major-mode 'markdown-mode))
+
+(defun markdown-set-mode-name ()
+  "Set the modeline string given the currently enabled features."
+  (when (markdown-mode-p)
+    (let ((flags (and markdown-itex-mode "$")))
+      (setq mode-name (concat markdown-base-mode-name
+                              (when (> (length flags) 0)
+                                (concat "/" flags)))))))
+
 ;;;###autoload
-(define-derived-mode markdown-mode text-mode "Markdown"
+(define-derived-mode markdown-mode text-mode markdown-base-mode-name
   "Major mode for editing Markdown files."
   ;; Natural Markdown tab width
   (setq tab-width 4)
@@ -4356,10 +4373,9 @@ if ARG is omitted or nil."
   (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
-  (markdown-font-lock-refresh-defaults)
+  (markdown-refresh-settings)
   ;; Extensions
-  (make-local-variable 'markdown-enable-math)
-  (add-hook 'hack-local-variables-hook 'markdown-font-lock-refresh-defaults)
+  (add-hook 'hack-local-variables-hook 'markdown-refresh-settings)
   ;; For imenu support
   (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
