@@ -1492,6 +1492,8 @@ This file is not saved."
   (markdown-test-string "Title: peg-multimarkdown User's Guide  
 Author: Fletcher T. Penney  
 Base Header Level: 2  "
+   (markdown-mmd-mode)
+   (font-lock-fontify-buffer)
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
    (markdown-test-range-has-face 6 6 nil)
    (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
@@ -1508,6 +1510,8 @@ Base Header Level: 2  "
 
 Author: Fletcher T. Penney  
 Base Header Level: 2  "
+   (markdown-mmd-mode)
+   (font-lock-fontify-buffer)
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
    (markdown-test-range-has-face 6 6 nil)
    (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
@@ -1523,6 +1527,8 @@ Base Header Level: 2  "
 % date
 
 body"
+   (markdown-pandoc-mode)
+   (font-lock-fontify-buffer)
    (markdown-test-range-has-face 1 1 markdown-comment-face)
    (markdown-test-range-has-face 3 24 markdown-metadata-value-face)
    (markdown-test-range-has-face 26 26 markdown-comment-face)

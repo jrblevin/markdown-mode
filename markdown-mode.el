@@ -727,6 +727,24 @@ Support can be toggled later using `markdown-itex-mode' or
   :type 'boolean
   :safe 'booleanp)
 
+(defcustom markdown-mmd-mode nil
+  "Syntax highlighting for selected MultiMarkdown extensions.
+Set this to a non-nil value to turn on MultiMarkdown support by default.
+MultiMarkdown support can be toggled later using
+`markdown-mmd-mode' or \\[markdown-mmd-mode]."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp)
+
+(defcustom markdown-pandoc-mode nil
+  "Syntax highlighting for selected Pandoc extensions.
+Set this to a non-nil value to turn on Pandoc support by default.
+Pandoc support can be toggled later using `markdown-pandoc-mode' or
+\\[markdown-pandoc-mode]."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp)
+
 (defcustom markdown-css-path ""
   "URL of CSS file to link to in the output XHTML."
   :group 'markdown
@@ -1167,7 +1185,7 @@ text.")
   "^\\\\\\[\\(.\\|\n\\)*?\\\\\\]$"
   "Regular expression for itex \[..\] display mode expressions.")
 
-(defconst markdown-regex-multimarkdown-metadata
+(defconst markdown-regex-mmd-metadata
   "^\\([[:alpha:]][[:alpha:] _-]*?\\):[ \t]*\\(.*\\)$"
   "Regular expression for matching MultiMarkdown metadata.")
 
@@ -1177,10 +1195,6 @@ text.")
 
 (defvar markdown-mode-font-lock-keywords-basic
   (list
-   (cons 'markdown-match-multimarkdown-metadata '((1 markdown-metadata-key-face)
-                                                  (2 markdown-metadata-value-face)))
-   (cons 'markdown-match-pandoc-metadata '((1 markdown-comment-face)
-                                           (2 markdown-metadata-value-face)))
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
@@ -1247,6 +1261,22 @@ Includes features which are overridden by some variants.")
    ;; Equation reference \eqref{foo}
    (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
   "Syntax highlighting for LaTeX fragments.")
+
+(defconst markdown-mode-font-lock-keywords-pandoc
+  (list
+   ;; Title blocks
+   (cons 'markdown-match-pandoc-metadata '((1 markdown-comment-face)
+                                           (2 markdown-metadata-value-face)))
+   )
+  "Font-lock keywords for selected extensions are unique to Pandoc.")
+
+(defconst markdown-mode-font-lock-keywords-mmd
+  (list
+   ;; Metadata
+   (cons 'markdown-match-mmd-metadata '((1 markdown-metadata-key-face)
+                                        (2 markdown-metadata-value-face)))
+   )
+  "Font-lock keywords for selected extensions unique to MultiMarkdown.")
 
 (defvar markdown-mode-font-lock-keywords nil
   "Default highlighting expressions for Markdown mode.
@@ -1770,9 +1800,9 @@ intact additional processing."
            t))
           (t nil))))
 
-(defun markdown-match-multimarkdown-metadata (last)
+(defun markdown-match-mmd-metadata (last)
   "Match MultiMarkdown metadata from the point to LAST."
-  (markdown-match-generic-metadata markdown-regex-multimarkdown-metadata last))
+  (markdown-match-generic-metadata markdown-regex-mmd-metadata last))
 
 (defun markdown-match-pandoc-metadata (last)
   "Match Pandoc metadata from the point to LAST."
@@ -3036,6 +3066,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Extensions
     (define-key map (kbd "C-c C-m C-i") 'markdown-itex-mode)
+    (define-key map (kbd "C-c C-m C-m") 'markdown-mmd-mode)
+    (define-key map (kbd "C-c C-m C-p") 'markdown-pandoc-mode)
     map)
   "Keymap for Markdown major mode.")
 
@@ -4314,6 +4346,10 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
           (append
            (when markdown-itex-mode
              markdown-mode-font-lock-keywords-math)
+           (when markdown-mmd-mode
+             markdown-mode-font-lock-keywords-mmd)
+           (when markdown-pandoc-mode
+             markdown-mode-font-lock-keywords-pandoc)
            markdown-mode-font-lock-keywords-basic
            markdown-mode-font-lock-keywords-core))
     (setq font-lock-defaults '(markdown-mode-font-lock-keywords))
@@ -4322,7 +4358,6 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 (define-minor-mode markdown-itex-mode
   "Minor mode for supporting inline LaTeX and itex expressions.
-
 You can customize an initial value of variable `markdown-itex-mode'.
 This mode can be toggled using the funciton `markdown-itex-mode' or
 \\[markdown-itex-mode]."
@@ -4330,6 +4365,26 @@ This mode can be toggled using the funciton `markdown-itex-mode' or
   (when (markdown-mode-p)
     (markdown-refresh-settings)))
 (add-to-list 'minor-mode-alist '(markdown-itex-mode ""))
+
+(define-minor-mode markdown-mmd-mode
+  "Minor mode for supporting selected MultiMarkdown extensions.
+You can customize an initial value of variable `markdown-mmd-mode'.
+This mode can be toggled using the funciton `markdown-mmd-mode' or
+\\[markdown-mmd-mode]."
+  :group 'markdown
+  (when (markdown-mode-p)
+    (markdown-refresh-settings)))
+(add-to-list 'minor-mode-alist '(markdown-mmd-mode ""))
+
+(define-minor-mode markdown-pandoc-mode
+  "Minor mode for supporting selected Pandoc extensions.
+You can customize an initial value of variable `markdown-pandoc-mode'.
+This mode can be toggled using the funciton `markdown-pandoc-mode' or
+\\[markdown-pandoc-mode]."
+  :group 'markdown
+  (when (markdown-mode-p)
+    (markdown-refresh-settings)))
+(add-to-list 'minor-mode-alist '(markdown-pandoc-mode ""))
 
 
 ;;; Mode Definition  ==========================================================
@@ -4350,7 +4405,9 @@ Return t if the current major mode is `markdown-mode' and nil otherwise."
 (defun markdown-set-mode-name ()
   "Set the modeline string given the currently enabled features."
   (when (markdown-mode-p)
-    (let ((flags (and markdown-itex-mode "$")))
+    (let ((flags (concat (and markdown-itex-mode "$")
+                         (and markdown-mmd-mode "M")
+                         (and markdown-pandoc-mode "P"))))
       (setq mode-name (concat markdown-base-mode-name
                               (when (> (length flags) 0)
                                 (concat "/" flags)))))))
