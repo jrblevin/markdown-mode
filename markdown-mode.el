@@ -122,23 +122,17 @@
 ;; provides an interface to all of the possible customizations:
 ;;
 ;;   * `markdown-command' - the command used to run Markdown (default:
-;;     `markdown').  This variable may be customized to pass
-;;     command-line options to your Markdown processor of choice, but
-;;     this command must accept input from `stdin`.  If it does not, a
-;;     simple wrapper script can be used to write `stdin` to a file
-;;     and then pass that file to your Markdown interpreter.  Ideally,
-;;     this command will produce an XHTML fragment around which
-;;     markdown-mode will wrap a header and footer (which can be
-;;     further customized).  However, it attempts to detect whether
-;;     the command produces standalone XHTML output (via
-;;     `markdown-xhtml-standalone-regexp'), in which case no header
-;;     and footer content will be added.
+;;     `markdown`).  This variable may be customized to pass
+;;     command-line options to your Markdown processor of choice.
 ;;
-;;   * `markdown-command-needs-filename' - set to non-nil if
-;;     `markdown-command' does not accept input from stdin (default: nil).
-;;      Instead, it will be passed a filename as the final command-line
-;;      option.  As a result, you will only be able to run Markdown
-;;      from buffers which are visiting a file.
+;;   * `markdown-command-needs-filename' - by default, `markdown-mode'
+;;     will pass the Markdown content to `markdown-command' using
+;;     standard input (`stdin`).  If `markdown-command' does not
+;;     accept standard input, then `markdown-command-needs-filename'
+;;     should be set to non-nil, which instructs `markdown-mode' to
+;;     pass the name of the file as the final command-line argument.
+;;     Note that with this option, you will only be able to run
+;;     `markdown-command' from buffers which are visiting a file.
 ;;
 ;;   * `markdown-open-command' - the command used for calling a standalone
 ;;     Markdown previewer which is capable of opening Markdown source files
@@ -196,11 +190,19 @@
 ;;   * `markdown-xhtml-header-content' - additional content to include
 ;;     in the XHTML `<head>` block.
 ;;
+;;   * `markdown-command-needs-filename' - set to non-nil if
+;;     `markdown-command' does not accept input from stdin (default: nil).
+;;      Instead, it will be passed a filename as the final command-line
+;;      argument.  As a result, you will only be able to run Markdown
+;;      from buffers which are visiting a file.
+;;
 ;;   * `markdown-xhtml-standalone-regexp' - a regular expression which
-;;     indicates whether the output of `markdown-command' is standalone
-;;     XHTML (default: `^\\(\<\?xml\\|\<!DOCTYPE\\|\<html\\)`).  If
-;;     this is not matched, we assume this output is a fragment and add
-;;     our own header and footer.
+;;     `markdown-mode' uses to determine whether the output of
+;;     `markdown-command' is a standalone XHTML document or an XHTML
+;;     fragment (default: `"^\\(\<\\?xml\\|\<!DOCTYPE\\|\<html\\)"`).  If
+;;     this regular expression not matched in the first five lines of
+;;     output, `markdown-mode' assumes the output is a fragment and
+;;     adds a header and footer.
 ;;
 ;;   * `markdown-link-space-sub-char' - a character to replace spaces
 ;;     when mapping wiki links to filenames (default: `_`).
@@ -495,24 +497,24 @@
 ;;   * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and running
 ;;     `markdown' with an active region.
 ;;   * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
-;;   * Peter S. Galbraith <psg@debian.org> for maintaining emacs-goodies-el.
+;;   * Peter S. Galbraith <psg@debian.org> for maintaining `emacs-goodies-el`.
 ;;   * Dmitry Dzhus <mail@sphinx.net.ru> for undefined reference checking.
-;;   * Carsten Dominik <carsten@orgmode.org> for org-mode, from which the
+;;   * Carsten Dominik <carsten@orgmode.org> for `org-mode', from which the
 ;;     visibility cycling functionality was derived, and for a bug fix
-;;     related to orgtbl-mode.
+;;     related to `orgtbl-mode'.
 ;;   * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
 ;;   * Ben Voui <intrigeri@boum.org> for font-lock face customizations.
-;;   * Ankit Solanki <ankit.solanki@gmail.com> for longlines.el
+;;   * Ankit Solanki <ankit.solanki@gmail.com> for `longlines.el`
 ;;     compatibility and custom CSS.
 ;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
 ;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
-;;   * Nelson Minar <nelson@santafe.edu> for html-helper-mode, from which
+;;   * Nelson Minar <nelson@santafe.edu> for `html-helper-mode', from which
 ;;     comment matching functions were derived.
 ;;   * Alec Resnick <alec@sproutward.org> for bug reports.
 ;;   * Joost Kremers <joostkremers@fastmail.fm> for footnote-handling
 ;;     functions, bug reports regarding indentation, and
 ;;     fixes for byte-compilation warnings.
-;;   * Peter Williams <pezra@barelyenough.org> for fill-paragraph
+;;   * Peter Williams <pezra@barelyenough.org> for `fill-paragraph'
 ;;     enhancements.
 ;;   * George Ogata <george.ogata@gmail.com> for fixing several
 ;;     byte-compilation warnings.
@@ -522,7 +524,7 @@
 ;;   * Jeremiah Dodds <jeremiah.dodds@gmail.com> for supporting
 ;;     Markdown processors which do not accept input from stdin.
 ;;   * Werner Dittmann <werner.dittmann@t-online.de> for bug reports
-;;     regarding the cl dependency and auto-fill-mode and indentation.
+;;     regarding the `cl` dependency and `auto-fill-mode' and indentation.
 ;;   * Scott Pfister <scott.pfister@gmail.com> for generalizing the space
 ;;     substitution character for mapping wiki links to filenames.
 ;;   * Marcin Kasperski <marcin.kasperski@mekk.waw.pl> for a patch to
@@ -531,7 +533,7 @@
 ;;     data bug and to prefer `visual-line-mode' in `gfm-mode'.
 ;;   * Shigeru Fukaya <shigeru.fukaya@gmail.com> for better adherence to
 ;;     Emacs Lisp coding conventions.
-;;   * Donald Ephraim Curtis <dcurtis@milkbox.net> for fixing the `paragraph-fill'
+;;   * Donald Ephraim Curtis <dcurtis@milkbox.net> for fixing the `fill-paragraph'
 ;;     regexp, refactoring the compilation and preview functions,
 ;;     heading font-lock generalizations, list renumbering,
 ;;     and kill ring save.
@@ -550,7 +552,7 @@
 ;;   * Bryan Fink <bryan.fink@gmail.com> for a bug report regarding
 ;;     externally modified files.
 ;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> for a bug fix
-;;     related to orgtbl-mode.
+;;     related to `orgtbl-mode'.
 ;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
 ;;     export hooks and unit test improvements.
 ;;   * Michael Dwyer <mdwyer@ehtech.in> for `gfm-mode' underscore regexp.
@@ -1891,8 +1893,10 @@ Return a cons cell containing updated bounds for the region."
 (defun markdown-insert-hr (arg)
   "Insert or replace a horizonal rule.
 By default, use the first element of `markdown-hr-strings'.  When
-prefixed with C-u, use the last element of `markdown-hr-strings'
-instead.  When prefixed with an integer from 1 to the length of
+ARG is non-nil, as when given a prefix, select a different
+element as follows.  When prefixed with \\[universal-argument],
+use the last element of `markdown-hr-strings' instead.  When
+prefixed with an integer from 1 to the length of
 `markdown-hr-strings', use the element in that position instead."
   (interactive "*P")
   (when (thing-at-point-looking-at markdown-regex-hr)
@@ -2111,12 +2115,15 @@ header will be inserted."
   "Insert or replace header markup.
 The level and type of the header are determined automatically by
 the type and level of the previous header, unless a prefix
-argument is given.
+argument is given via ARG.
 With a numeric prefix valued 1 to 6, insert a header of the given
 level, with the type being determined automatically (note that
 only level 1 or 2 setext headers are possible).
-With C-u, insert a level-one setext header.
-With C-u C-u, insert a level two setext header.
+With \\[universal-argument], insert a level-one setext header.
+With \\[universal-argument] \\[universal-argument], insert a
+level two setext header.
+When SETEXT is non-nil, prefer setext-style headers when
+possible (levels one and two).
 
 When there is an active region, use it for the header text.  When
 the point is at an existing header, change the type and level
@@ -3284,7 +3291,7 @@ the link text, location, and line number."
   (unless reference
     (if (thing-at-point-looking-at markdown-regex-reference-definition)
         (setq reference (match-string-no-properties 1))
-      (error "No reference definition at point.")))
+      (error "No reference definition at point")))
   (let ((links (markdown-reference-find-links reference)))
     (cond ((= (length links) 1)
            (goto-char (cadr (car links))))
@@ -3646,7 +3653,9 @@ Calls `markdown-cycle' with argument t."
 
 (defun markdown-beginning-of-defun (&optional arg)
   "`beginning-of-defun-function' for Markdown.
-Move backward to the beginning of the current or previous section."
+Move backward to the beginning of the current or previous section.
+When ARG is non-nil, repeat that many times.  When ARG is negative,
+move forward to the ARG-th following section."
   (interactive "P")
   (or arg (setq arg 1))
   (or (re-search-backward markdown-regex-header nil t arg)
@@ -3654,7 +3663,9 @@ Move backward to the beginning of the current or previous section."
 
 (defun markdown-end-of-defun (&optional arg)
   "`end-of-defun-function' for Markdown.
-Move forward to the end of the current or following section."
+Move forward to the end of the current or following section.
+When ARG is non-nil, repeat that many times.  When ARG is negative,
+move back to the ARG-th preceding section."
   (interactive "P")
   (or arg (setq arg 1))
   (when (looking-at markdown-regex-header)
@@ -4176,7 +4187,7 @@ See `markdown-follow-link-at-point' and
         ((markdown-wiki-link-p)
          (markdown-follow-wiki-link-at-point arg))
         (t
-         (error "Nothing to follow at point."))))
+         (error "Nothing to follow at point"))))
 
 (defun markdown-jump ()
   "Jump to another location based on context at point.
@@ -4192,7 +4203,7 @@ markers and footnote text."
         ((thing-at-point-looking-at markdown-regex-reference-definition)
          (markdown-reference-goto-link (match-string-no-properties 1)))
         (t
-         (error "Nothing to jump to from context at point."))))
+         (error "Nothing to jump to from context at point"))))
 
 
 ;;; Miscellaneous =============================================================
