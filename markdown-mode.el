@@ -610,7 +610,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "1.9"
+(defconst markdown-mode-version "2.0-pre"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
@@ -2101,6 +2101,12 @@ inline image markup.  Otherwise, insert reference image markup."
     (when bounds
       (goto-char (- (cdr bounds) 1)))))
 
+(defun markdown-insert-reference-image ()
+  "Insert reference-style image markup using region or word as alt text.
+Calls `markdown-insert-image' with prefix argument."
+  (interactive)
+  (markdown-insert-image t))
+
 (defun markdown-remove-header ()
   "Remove header markup if point is at a header.
 Return bounds of remaining header text if a header was removed
@@ -2955,49 +2961,43 @@ Assumes match data is available for `markdown-regex-italic'."
 (defvar markdown-mode-map
   (let ((map (make-keymap)))
     ;; Element insertion
-    (define-key map "\C-c\C-al" 'markdown-insert-link)
-    (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
-    (define-key map "\C-c\C-aw" 'markdown-insert-wiki-link)
-    (define-key map "\C-c\C-au" 'markdown-insert-uri)
-    (define-key map "\C-c\C-ii" 'markdown-insert-image)
-    (define-key map "\C-c\C-t0" 'markdown-remove-header)
-    (define-key map "\C-c\C-t1" 'markdown-insert-header-atx-1)
-    (define-key map "\C-c\C-t2" 'markdown-insert-header-atx-2)
-    (define-key map "\C-c\C-t3" 'markdown-insert-header-atx-3)
-    (define-key map "\C-c\C-t4" 'markdown-insert-header-atx-4)
-    (define-key map "\C-c\C-t5" 'markdown-insert-header-atx-5)
-    (define-key map "\C-c\C-t6" 'markdown-insert-header-atx-6)
-    (define-key map "\C-c\C-th" 'markdown-insert-header-dwim)
-    (define-key map "\C-c\C-pb" 'markdown-insert-bold)
-    (define-key map "\C-c\C-ss" 'markdown-insert-bold)
-    (define-key map "\C-c\C-pi" 'markdown-insert-italic)
-    (define-key map "\C-c\C-se" 'markdown-insert-italic)
-    (define-key map "\C-c\C-pf" 'markdown-insert-code)
-    (define-key map "\C-c\C-sc" 'markdown-insert-code)
-    (define-key map "\C-c\C-sb" 'markdown-insert-blockquote)
-    (define-key map "\C-c\C-s\C-b" 'markdown-blockquote-region)
-    (define-key map "\C-c\C-sp" 'markdown-insert-pre)
-    (define-key map "\C-c\C-s\C-p" 'markdown-pre-region)
-    (define-key map "\C-c-" 'markdown-insert-hr)
-    (define-key map "\C-c\C-tt" 'markdown-insert-header-setext-1)
-    (define-key map "\C-c\C-ts" 'markdown-insert-header-setext-2)
+    (define-key map (kbd "C-c l") 'markdown-insert-link)
+    (define-key map (kbd "C-c L") 'markdown-insert-reference-link-dwim)
+    (define-key map (kbd "C-c u") 'markdown-insert-uri)
+    (define-key map (kbd "C-c w") 'markdown-insert-wiki-link)
+    (define-key map (kbd "C-c i") 'markdown-insert-image)
+    (define-key map (kbd "C-c I") 'markdown-insert-reference-image)
+    (define-key map (kbd "C-c 1") 'markdown-insert-header-atx-1)
+    (define-key map (kbd "C-c 2") 'markdown-insert-header-atx-2)
+    (define-key map (kbd "C-c 3") 'markdown-insert-header-atx-3)
+    (define-key map (kbd "C-c 4") 'markdown-insert-header-atx-4)
+    (define-key map (kbd "C-c 5") 'markdown-insert-header-atx-5)
+    (define-key map (kbd "C-c 6") 'markdown-insert-header-atx-6)
+    (define-key map (kbd "C-c !") 'markdown-insert-header-setext-1)
+    (define-key map (kbd "C-c @") 'markdown-insert-header-setext-2)
+    (define-key map (kbd "C-c h") 'markdown-insert-header-dwim)
+    (define-key map (kbd "C-c H") 'markdown-insert-header-setext-dwim)
+    (define-key map (kbd "C-c s") 'markdown-insert-bold)
+    (define-key map (kbd "C-c e") 'markdown-insert-italic)
+    (define-key map (kbd "C-c c") 'markdown-insert-code)
+    (define-key map (kbd "C-c b") 'markdown-insert-blockquote)
+    (define-key map (kbd "C-c B") 'markdown-blockquote-region)
+    (define-key map (kbd "C-c p") 'markdown-insert-pre)
+    (define-key map (kbd "C-c P") 'markdown-pre-region)
+    (define-key map (kbd "C-c -") 'markdown-insert-hr)
+    (define-key map (kbd "C-c f") 'markdown-footnote-new)
     ;; Element removal
     (define-key map (kbd "C-c C-k") 'markdown-kill-thing-at-point)
-    ;; Footnotes
-    (define-key map "\C-c\C-fn" 'markdown-footnote-new)
-    (define-key map "\C-c\C-fg" 'markdown-footnote-goto-text)
-    (define-key map "\C-c\C-fb" 'markdown-footnote-return)
-    (define-key map "\C-c\C-fk" 'markdown-footnote-kill)
     ;; Promotion, Demotion, Completion, and Cycling
+    (define-key map (kbd "C-c C--") 'markdown-promote)
+    (define-key map (kbd "C-c C-=") 'markdown-demote)
     (define-key map (kbd "M-<left>") 'markdown-promote)
     (define-key map (kbd "M-<right>") 'markdown-demote)
-    (define-key map (kbd "C-c C-l") 'markdown-promote)
-    (define-key map (kbd "C-c C-r") 'markdown-demote)
-    (define-key map (kbd "C-c C-=") 'markdown-complete-or-cycle)
-    (define-key map (kbd "C-c C-c =") 'markdown-complete-buffer)
+    (define-key map (kbd "C-c C-]") 'markdown-complete-or-cycle)
+    (define-key map (kbd "C-c C-[") (kbd "C-u C-c C-]"))
     ;; Following and Jumping
-    (define-key map "\C-c\C-o" 'markdown-follow-thing-at-point)
-    (define-key map "\C-c\C-j" 'markdown-jump)
+    (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
+    (define-key map (kbd "C-c C-j") 'markdown-jump)
     ;; Indentation
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "<backspace>") 'markdown-exdent-or-delete)
@@ -3009,22 +3009,22 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
     ;; Header navigation
-    (define-key map (kbd "C-M-n") 'outline-next-visible-heading)
-    (define-key map (kbd "C-M-p") 'outline-previous-visible-heading)
-    (define-key map (kbd "C-M-f") 'outline-forward-same-level)
-    (define-key map (kbd "C-M-b") 'outline-backward-same-level)
-    (define-key map (kbd "C-M-u") 'outline-up-heading)
-    ;; Markdown functions
-    (define-key map "\C-c\C-cm" 'markdown-other-window)
-    (define-key map "\C-c\C-cp" 'markdown-preview)
-    (define-key map "\C-c\C-ce" 'markdown-export)
-    (define-key map "\C-c\C-cv" 'markdown-export-and-preview)
-    (define-key map "\C-c\C-co" 'markdown-open)
-    (define-key map "\C-c\C-cw" 'markdown-kill-ring-save)
-    ;; References
-    (define-key map "\C-c\C-cc" 'markdown-check-refs)
-    ;; Lists
-    (define-key map "\C-c\C-cn" 'markdown-cleanup-list-numbers)
+    (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
+    (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
+    (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
+    (define-key map (kbd "C-c C-b") 'outline-backward-same-level)
+    (define-key map (kbd "C-c C-u") 'outline-up-heading)
+    ;; Buffer-wide commands
+    (define-key map (kbd "C-c C-c m") 'markdown-other-window)
+    (define-key map (kbd "C-c C-c p") 'markdown-preview)
+    (define-key map (kbd "C-c C-c e") 'markdown-export)
+    (define-key map (kbd "C-c C-c v") 'markdown-export-and-preview)
+    (define-key map (kbd "C-c C-c o") 'markdown-open)
+    (define-key map (kbd "C-c C-c w") 'markdown-kill-ring-save)
+    (define-key map (kbd "C-c C-c c") 'markdown-check-refs)
+    (define-key map (kbd "C-c C-c n") 'markdown-cleanup-list-numbers)
+    (define-key map (kbd "C-c C-c ]") 'markdown-complete-buffer)
+    ;; List editing
     (define-key map (kbd "M-<up>") 'markdown-move-up)
     (define-key map (kbd "M-<down>") 'markdown-move-down)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
