@@ -1390,6 +1390,19 @@ This file is not saved."
     social upheaval subClassOf"
    (markdown-test-range-has-face 160 190 nil)))
 
+(ert-deftest test-markdown-font-lock/atx-no-spaces ()
+  "Test font-lock for atx headers with no spaces."
+  (markdown-test-string "##abc##"
+   (markdown-test-range-has-face 1 2 markdown-header-delimiter-face)
+   (markdown-test-range-has-face 3 5 markdown-header-face-2)
+   (markdown-test-range-has-face 6 7 markdown-header-delimiter-face))
+  (markdown-test-string "##"
+   (markdown-test-range-has-face 1 1 markdown-header-delimiter-face)
+   (markdown-test-range-has-face 2 2 markdown-header-face-1))
+  (markdown-test-string "###"
+   (markdown-test-range-has-face 1 2 markdown-header-delimiter-face)
+   (markdown-test-range-has-face 3 3 markdown-header-face-2)))
+
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
   "An edge case for level-one setext headers."
   (markdown-test-string "a\n=\n"
