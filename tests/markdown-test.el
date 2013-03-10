@@ -1115,6 +1115,18 @@ This file is not saved."
 
 ;;; Completion and cycling:
 
+(ert-deftest test-markdown-complete-or-cycle/atx-header-incomplete ()
+  "Test `markdown-incomplete-atx-p' for headers with no text."
+  (markdown-test-string "###  ###"
+   (should (looking-at markdown-regex-header-atx))
+   (should-not (markdown-incomplete-atx-p)))
+  (markdown-test-string "###abc###"
+   (should (looking-at markdown-regex-header-atx))
+   (should (markdown-incomplete-atx-p)))
+  (markdown-test-string "###   ###"
+   (should (looking-at markdown-regex-header-atx))
+   (should (markdown-incomplete-atx-p))))
+
 (ert-deftest test-markdown-complete-or-cycle/atx-header ()
   "Test `markdown-complete-or-cycle' for atx headers."
   (markdown-test-string "##### test"

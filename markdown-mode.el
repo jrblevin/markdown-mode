@@ -2723,10 +2723,19 @@ Checks that the number of trailing hash marks equals the number of leading
 hash marks, that there is only a single space before and after the text,
 and that there is no extraneous whitespace in the text."
   (save-match-data
-    (or (not (= (length (match-string 1)) (length (match-string 3))))
-        (not (= (match-beginning 2) (1+ (match-end 1))))
-        (not (= (match-beginning 3) (1+ (match-end 2))))
-        (string-match "[ \t\n]\\{2\\}" (match-string 2)))))
+    (or
+     ;; Number of starting and ending hash marks differs
+     (not (= (length (match-string 1)) (length (match-string 3))))
+     ;; When the header text is not empty...
+     (and (> (length (match-string 2)) 0)
+          ;; ...if there are extra leading, trailing, or interior spaces
+          (or (not (= (match-beginning 2) (1+ (match-end 1))))
+              (not (= (match-beginning 3) (1+ (match-end 2))))
+              (string-match "[ \t\n]\\{2\\}" (match-string 2))))
+     ;; When the header text is empty...
+     (and (= (length (match-string 2)) 0)
+          ;; ...if there are too many or too few spaces
+          (not (= (match-beginning 3) (+ (match-end 1) 2)))))))
 
 (defun markdown-complete-atx ()
   "Complete and normalize ATX headers.
