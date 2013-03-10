@@ -637,6 +637,21 @@ This file is not saved."
    (markdown-insert-code)
    (should (string-equal (buffer-string) "`foo *bar* baz`"))))
 
+(ert-deftest test-markdown-insertion/hr-order ()
+  "Test inserting horizontal rules."
+  (dotimes (n (length markdown-hr-strings))
+    (markdown-test-string ""
+     (let ((current-prefix-arg n))
+       (call-interactively 'markdown-insert-hr))
+     (should (string-equal (buffer-string) (nth (1- n) markdown-hr-strings))))))
+
+(ert-deftest test-markdown-insertion/hr-prefix ()
+  "Test inserting horizontal rule with C-u prefix."
+  (markdown-test-string ""
+   (let ((current-prefix-arg '(4)))
+     (call-interactively 'markdown-insert-hr))
+   (should (string-equal (buffer-string) (car (last markdown-hr-strings))))))
+
 (ert-deftest test-markdown-insertion/hr-bob ()
   "Test inserting horizontal rule at beginning of buffer."
   (markdown-test-string "one line\n"
@@ -1082,17 +1097,17 @@ This file is not saved."
 
 (ert-deftest test-markdown-promote/hr ()
   "Test `markdown-promote' for horizontal rules."
-  (markdown-test-string (car markdown-hr-strings)
-    (dolist (n (number-sequence 1 5))
+  (markdown-test-string (car (reverse markdown-hr-strings))
+    (dolist (n (number-sequence 4 0 -1))
       (markdown-promote)
       (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
     (markdown-promote)
-    (should (string-equal (buffer-string) (nth 5 markdown-hr-strings)))))
+    (should (string-equal (buffer-string) (nth 0 markdown-hr-strings)))))
 
 (ert-deftest test-markdown-demote/hr ()
   "Test `markdown-demote' for horizontal rules."
-  (markdown-test-string (nth 5 markdown-hr-strings)
-    (dolist (n (number-sequence 4 0 -1))
+  (markdown-test-string (car markdown-hr-strings)
+    (dolist (n (number-sequence 1 5))
       (markdown-demote)
       (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
     (markdown-demote)
@@ -1130,12 +1145,10 @@ This file is not saved."
 
 (ert-deftest test-markdown-cycle/hr ()
   "Test cycling via `markdown-complete-or-cycle' for horizontal rules."
-  (markdown-test-string (nth 5 markdown-hr-strings)
-    (dolist (n (number-sequence 4 0 -1))
+  (markdown-test-string (car markdown-hr-strings)
+    (dolist (n (number-sequence 1 5))
       (call-interactively 'markdown-complete-or-cycle)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
-    (call-interactively 'markdown-complete-or-cycle)
-    (should (string-equal (buffer-string) (nth 5 markdown-hr-strings)))))
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
 
 (ert-deftest test-markdown-cycle/bold ()
   "Test cycling via `markdown-complete-or-cycle' for bold markup."

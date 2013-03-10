@@ -143,7 +143,11 @@
 ;;     utility at `/usr/local/bin/mark`.
 ;;
 ;;   * `markdown-hr-strings' - list of strings to use when inserting
-;;     horizontal rules, in decreasing order of priority.
+;;     horizontal rules.  Different strings will not be distinguished
+;;     when converted to HTML--they will all be converted to
+;;     `<hr/>`--but they may add visual distinction and style to plain
+;;     text documents.  To maintain some notion of promotion and
+;;     demotion, keep these sorted from largest to smallest.
 ;;
 ;;   * `markdown-bold-underscore' - set to a non-nil value to use two
 ;;     underscores for bold instead of two asterisks (default: `nil').
@@ -317,7 +321,11 @@
 ;;
 ;;   * Other elements:
 ;;
-;;     `C-c -` inserts a horizontal rule.
+;;     `C-c -` inserts a horizontal rule.  By default, insert the
+;;     first string in the list `markdown-hr-strings' (the most
+;;     prominent rule).  With a `C-u` prefix, insert the last string.
+;;     With a numeric prefix `N`, insert the string in position `N`
+;;     (counting from 1).
 ;;
 ;;   * Following Links:
 ;;
@@ -656,16 +664,17 @@ buffer."
   :type 'string)
 
 (defcustom markdown-hr-strings
-  '("* * * * *"
-    "---------"
-    "* * * * * * * * * * * * * * * * * * * *"
-    "---------------------------------------"
+  '("-------------------------------------------------------------------------------"
     "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
-    "-------------------------------------------------------------------------------")
+    "---------------------------------------"
+    "* * * * * * * * * * * * * * * * * * * *"
+    "---------"
+    "* * * * *")
   "Strings to use when inserting horizontal rules.
 The first string in the list will be the default when inserting a
-horizontal rule.  Strings should be listed in increasing order of
-prominence for use with promotion and demotion functions."
+horizontal rule.  Strings should be listed in decreasing order of
+prominence (as in headers from level one to six) for use with
+promotion and demotion functions."
   :group 'markdown
   :type 'list)
 
@@ -2864,11 +2873,11 @@ match data is available for `markdown-regex-header-setext'."
 
 (defun markdown-cycle-hr (arg &optional remove)
   "Cycle string used for horizontal rule from `markdown-hr-strings'.
-When ARG is 1, cycle forward (promote), and when ARG is -1, cycle
-backwards (demote).  When REMOVE is non-nil, remove the hr instead
+When ARG is 1, cycle forward (demote), and when ARG is -1, cycle
+backwards (promote).  When REMOVE is non-nil, remove the hr instead
 of cycling when the end of the list is reached.
 Assumes match data is available for `markdown-regex-hr'."
-  (let* ((strings (if (= arg 1)
+  (let* ((strings (if (= arg -1)
                       (reverse markdown-hr-strings)
                     markdown-hr-strings))
          (tail (member (match-string 0) strings))
