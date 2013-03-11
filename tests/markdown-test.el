@@ -1500,7 +1500,10 @@ Base Header Level: 2  "
    (markdown-test-range-has-face 49 66 markdown-metadata-value-face)
    (markdown-test-range-has-face 70 86 markdown-metadata-key-face)
    (markdown-test-range-has-face 87 87 nil)
-   (markdown-test-range-has-face 89 89 markdown-metadata-value-face)))
+   (markdown-test-range-has-face 89 89 markdown-metadata-value-face))
+  ;; Avoid triggering when a title contains a colon (e.g., Markdown: Syntax)
+  (markdown-test-file "syntax.text"
+   (markdown-test-range-has-face 1 16 markdown-header-face-1)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata-after-header ()
   "Ensure that similar lines are not matched after the header."
