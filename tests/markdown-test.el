@@ -1437,6 +1437,11 @@ This file is not saved."
    (markdown-test-range-has-face 951 957 markdown-link-title-face)
    (markdown-test-range-has-face 958 958 markdown-url-face)))
 
+(ert-deftest test-markdown-font-lock/pre-comment ()
+  "Test comments inside of a pre block."
+  (markdown-test-string "    <!-- pre, not comment -->"
+   (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-pre-face)))
+
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."
   (markdown-test-string "Harvard[^1] [tuition][]"
