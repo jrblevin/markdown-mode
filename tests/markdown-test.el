@@ -785,6 +785,20 @@ This file is not saved."
    (should (string-equal (buffer-string) "****"))
    (should (= (point) 3))))
 
+(ert-deftest test-markdown-insertion/uri ()
+  "Test `markdown-insert-uri'."
+  (markdown-test-string "http://jblevins.org/projects/markdown-mode/"
+   (call-interactively 'markdown-insert-uri)
+   (should (string-equal (buffer-string) "<http://jblevins.org/projects/markdown-mode/>"))
+   (should (= (point) 2))
+   (call-interactively 'markdown-insert-uri)
+   (should (string-equal (buffer-string) "http://jblevins.org/projects/markdown-mode/"))
+   (should (= (point) 1))
+   (erase-buffer)
+   (call-interactively 'markdown-insert-uri)
+   (should (string-equal (buffer-string) "<>"))
+   (should (= (point) 2))))
+
 (ert-deftest test-markdown-insertion/list-item ()
   "Test `markdown-insert-list-item' on several lists."
   ;; No existing list

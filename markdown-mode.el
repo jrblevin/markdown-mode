@@ -2045,6 +2045,24 @@ end of the current paragraph."
     (when bounds (delete-region (car bounds) (cdr bounds)))
     (markdown-insert-reference-link text label url title)))
 
+(defun markdown-insert-uri ()
+  "Insert markup for an inline URI.
+If there is an active region, use it as the URI.  If the point is
+at a URI, wrap it with angle brackets.  If the point is at an
+inline URI, remove the angle brackets.  Otherwise, simply insert
+angle brackets place the point between them."
+  (interactive)
+  (if (markdown-use-region-p)
+      ;; Active region
+      (let ((bounds (markdown-unwrap-things-in-region
+                     (region-beginning) (region-end)
+                     markdown-regex-angle-uri 0 2)))
+        (markdown-wrap-or-insert "<" ">" nil (car bounds) (cdr bounds)))
+    ;; Markup removal, URI at point, or empty markup insertion
+    (if (thing-at-point-looking-at markdown-regex-angle-uri)
+        (markdown-unwrap-thing-at-point nil 0 2)
+      (markdown-wrap-or-insert "<" ">" 'url nil nil))))
+
 (defun markdown-insert-wiki-link ()
   "Insert a wiki link of the form [[WikiLink]].
 If Transient Mark mode is on and a region is active, it is used
@@ -2925,6 +2943,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-al" 'markdown-insert-link)
     (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-aw" 'markdown-insert-wiki-link)
+    (define-key map "\C-c\C-au" 'markdown-insert-uri)
     (define-key map "\C-c\C-ii" 'markdown-insert-image)
     (define-key map "\C-c\C-t0" 'markdown-remove-header)
     (define-key map "\C-c\C-t1" 'markdown-insert-header-atx-1)
