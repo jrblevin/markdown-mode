@@ -764,14 +764,14 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "Position where new reference definitions are inserted in the document."
   :group 'markdown
   :type '(choice (const :tag "At the end of the document" end)
-                 (const :tag "Immediately after the paragraph" immediately)
+                 (const :tag "Immediately after the current block" immediately)
                  (const :tag "Before next header" header)))
 
 (defcustom markdown-footnote-location 'end
   "Position where new footnotes are inserted in the document."
   :group 'markdown
   :type '(choice (const :tag "At the end of the document" end)
-                 (const :tag "Immediately after the paragraph" immediately)
+                 (const :tag "Immediately after the current block" immediately)
                  (const :tag "Before next header" header)))
 
 
@@ -2010,7 +2010,7 @@ reference label is already defined)."
           (label (if (> (length label) 0) label text)))
       (cond
        ((eq markdown-reference-location 'end) (goto-char (point-max)))
-       ((eq markdown-reference-location 'immediately) (forward-paragraph))
+       ((eq markdown-reference-location 'immediately) (markdown-end-of-block))
        ((eq markdown-reference-location 'header) (markdown-end-of-defun)))
       (unless (markdown-cur-line-blank-p) (insert "\n"))
       (insert "\n[" label "]: " url)
@@ -2394,7 +2394,7 @@ automatically in order to have the correct markup."
   "Position the cursor at the proper location for a new footnote text."
   (cond
    ((eq markdown-footnote-location 'end) (goto-char (point-max)))
-   ((eq markdown-footnote-location 'immediately) (forward-paragraph))
+   ((eq markdown-footnote-location 'immediately) (markdown-end-of-block))
    ((eq markdown-footnote-location 'header) (markdown-end-of-defun))))
 
 (defun markdown-footnote-kill ()
