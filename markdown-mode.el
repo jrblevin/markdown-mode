@@ -1243,9 +1243,9 @@ Includes features which are overridden by some variants.")
    ;; Display mode equations with brackets: \[ \]
    (cons markdown-regex-math-display 'markdown-math-face)
    ;; Equation reference (eq:foo)
-   (cons "(eq:\\w+)" 'markdown-reference-face)
+   (cons "(eq:[[:alnum:]:_]+)" 'markdown-reference-face)
    ;; Equation reference \eqref{foo}
-   (cons "\\\\eqref{\\w+}" 'markdown-reference-face))
+   (cons "\\\\eqref{[[:alnum:]:_]+}" 'markdown-reference-face))
   "Syntax highlighting for LaTeX and itex fragments.")
 
 (defvar markdown-mode-font-lock-keywords nil
