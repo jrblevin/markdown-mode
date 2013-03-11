@@ -1074,6 +1074,15 @@ This file is not saved."
        (call-interactively 'markdown-kill-thing-at-point)
        (should (string-equal (current-kill 0) (cdr test)))))))
 
+(ert-deftest test-markdown-kill/footnote-text ()
+  "Test killing a footnote with point at footnote text."
+  (markdown-test-string "some text[^1]\n\n[^1]: footnote\n"
+   (end-of-line)
+   (markdown-footnote-goto-text)
+   (let (kill-ring)
+     (markdown-footnote-kill))
+   (should (string-equal (buffer-string) "some text\n"))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
