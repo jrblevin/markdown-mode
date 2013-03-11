@@ -876,6 +876,35 @@ This file is not saved."
    (should (string-equal (buffer-string) "[link][]"))
    (should (= (point) 9))))
 
+(ert-deftest test-markdown-insertion/reference-link-end ()
+  "Basic reference link insertion test for 'end location."
+  (let ((markdown-reference-location 'end))
+    (markdown-test-string "first para\n\nsecond para\n"
+     (end-of-line)
+     (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+     (should (= (point) 19))
+     (goto-line 5)
+     (should (looking-at "\\[link\\]: http://jblevins.org/")))))
+
+(ert-deftest test-markdown-insertion/reference-link-immediately ()
+  "Basic reference link insertion test for 'immediately location."
+  (let ((markdown-reference-location 'immediately))
+    (markdown-test-string "first para\n\nsecond para\n"
+     (end-of-line)
+     (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+     (should (= (point) 19))
+     (goto-line 3)
+     (should (looking-at "\\[link\\]: http://jblevins.org/")))))
+
+(ert-deftest test-markdown-insertion/reference-link-header ()
+  "Basic reference link insertion test for 'header location."
+  (let ((markdown-reference-location 'header))
+    (markdown-test-string "par one\n\npar two\n\n### header\n"
+     (end-of-line)
+     (markdown-insert-reference-link "link" "" "")
+     (should (= (point) 35))
+     (should (looking-back "\\[link\\]: ")))))
+
 (ert-deftest test-markdown-insertion/inline-link ()
   "Basic tests for `markdown-insert-link'."
    ;; Test empty markup insertion (leave point in square brackets)

@@ -760,6 +760,13 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type 'string)
 
+(defcustom markdown-reference-location 'header
+  "Position where new reference definitions are inserted in the document."
+  :group 'markdown
+  :type '(choice (const :tag "At the end of the document" end)
+                 (const :tag "Immediately after the paragraph" immediately)
+                 (const :tag "Before next header" header)))
+
 (defcustom markdown-footnote-location 'end
   "Position where new footnotes are inserted in the document."
   :group 'markdown
@@ -1997,13 +2004,16 @@ will be added to the end of the reference definition and will be
 used to populate the title attribute when converted to XHTML.  If
 URL is nil, insert only the link portion (for example, when a
 reference label is already defined)."
-  (let (end)
-    (insert (concat "[" text "][" label "]"))
-    (setq end (point))
-    (when url
-      (forward-paragraph)
+  (insert (concat "[" text "][" label "]"))
+  (when url
+    (let ((end (point))
+          (label (if (> (length label) 0) label text)))
+      (cond
+       ((eq markdown-reference-location 'end) (goto-char (point-max)))
+       ((eq markdown-reference-location 'immediately) (forward-paragraph))
+       ((eq markdown-reference-location 'header) (markdown-end-of-defun)))
       (unless (markdown-cur-line-blank-p) (insert "\n"))
-      (insert "\n[" (if (> (length label) 0) label text) "]: " url)
+      (insert "\n[" label "]: " url)
       (unless (> (length url) 0)
         (setq end (point)))
       (when (> (length title) 0)
@@ -2011,7 +2021,12 @@ reference label is already defined)."
       (insert "\n")
       (unless (or (eobp) (looking-at "\n"))
         (insert "\n"))
-      (goto-char end))))
+      (goto-char end)
+      (when (> (length url) 0)
+        (message
+         (substitute-command-keys
+          "Defined reference [%s], press \\[markdown-jump] to jump there")
+         (or label text))))))
 
 (defun markdown-insert-reference-link-dwim ()
   "Insert a reference link of the form [text][label] at point.
