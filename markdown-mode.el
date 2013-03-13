@@ -1133,8 +1133,11 @@ Underscores in words are not treated as special.")
   "Regular expression for matching wiki links.
 This matches typical bracketed [[WikiLinks]] as well as 'aliased'
 wiki links of the form [[PageName|link text]].  In this regular
-expression, #1 matches the page name and #3 matches the link
-text.")
+expression, group 1 matches the entire link, including square
+brackets, group 2 matches the first component of the wiki link
+and group 4 matches the second component, after the pipe, when
+present.  The meanings of the first and second components depend
+on the value of `markdown-wiki-link-alias-first'.")
 
 (defconst markdown-regex-uri
   (concat (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+")
@@ -2585,9 +2588,7 @@ text to kill ring), and list items."
       (delete-region (match-beginning 0) (match-end 0)))
      ;; Wiki link (add alias text to kill ring)
      ((thing-at-point-looking-at markdown-regex-wiki-link)
-      (kill-new (if markdown-wiki-link-alias-first
-                    (match-string-no-properties 2)
-                  (or (match-string-no-properties 2) (match-string-no-properties 4))))
+      (kill-new (markdown-wiki-link-alias))
       (delete-region (match-beginning 1) (match-end 1)))
      ;; Bold
      ((thing-at-point-looking-at markdown-regex-bold)
@@ -4106,6 +4107,14 @@ The location of the link component depends on the value of
   (if markdown-wiki-link-alias-first
       (or (match-string-no-properties 4) (match-string-no-properties 2))
     (match-string-no-properties 2)))
+
+(defun markdown-wiki-link-alias ()
+  "Return the alias or text part of the wiki link using current match data.
+The location of the alias component depends on the value of
+`markdown-wiki-link-alias-first'."
+  (if markdown-wiki-link-alias-first
+      (match-string-no-properties 2)
+    (or (match-string-no-properties 4) (match-string-no-properties 2))))
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
