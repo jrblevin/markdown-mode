@@ -2756,6 +2756,11 @@ See `markdown-indent-line' and `markdown-indent-line'."
     (indent-rigidly beg end (- next-pos leftmostcol))
     (setq deactivate-mark nil)))
 
+(defun markdown-exdent-region (beg end)
+  "Call `markdown-indent-region' on region from BEG to END with prefix."
+  (interactive "*r")
+  (markdown-indent-region (region-beginning) (region-end) t))
+
 
 ;;; Markup Completion =========================================================
 
@@ -3004,7 +3009,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-<left>") 'markdown-promote)
     (define-key map (kbd "M-<right>") 'markdown-demote)
     (define-key map (kbd "C-c C-]") 'markdown-complete-or-cycle)
-    (define-key map (kbd "C-c C-[") (kbd "C-u C-c C-]"))
+    (define-key map (kbd "C-c C-[") 'markdown-complete-or-reverse-cycle)
     ;; Following and Jumping
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
     (define-key map (kbd "C-c C-j") 'markdown-jump)
@@ -3012,7 +3017,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "<backspace>") 'markdown-exdent-or-delete)
     (define-key map (kbd "C-c >") 'markdown-indent-region)
-    (define-key map (kbd "C-c <") (kbd "C-u C-c >"))
+    (define-key map (kbd "C-c <") 'markdown-exdent-region)
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
@@ -3071,16 +3076,19 @@ See also `markdown-mode-map'.")
     ["Open" markdown-open]
     ["Kill ring save" markdown-kill-ring-save]
     "---"
-    ("Headers (setext)"
-     ["First level" markdown-insert-setext-header-1]
-     ["Second level" markdown-insert-setext-header-2])
-    ("Headers (atx)"
-     ["First level" markdown-insert-header-atx-1]
-     ["Second level" markdown-insert-header-atx-2]
-     ["Third level" markdown-insert-header-atx-3]
-     ["Fourth level" markdown-insert-header-atx-4]
-     ["Fifth level" markdown-insert-header-atx-5]
-     ["Sixth level" markdown-insert-header-atx-6])
+    ("Headings"
+     ["Automatic" markdown-insert-header-dwim]
+     ["Automatic (prefer setext)" markdown-insert-header-setext-dwim]
+     "---"
+     ["First level setext" markdown-insert-header-setext-1]
+     ["Second level setext" markdown-insert-header-setext-2]
+     "---"
+     ["First level atx" markdown-insert-header-atx-1]
+     ["Second level atx" markdown-insert-header-atx-2]
+     ["Third level atx" markdown-insert-header-atx-3]
+     ["Fourth level atx" markdown-insert-header-atx-4]
+     ["Fifth level atx" markdown-insert-header-atx-5]
+     ["Sixth level atx" markdown-insert-header-atx-6])
     "---"
     ["Bold" markdown-insert-bold]
     ["Italic" markdown-insert-italic]
@@ -3090,16 +3098,38 @@ See also `markdown-mode-map'.")
     "---"
     ["Insert inline link" markdown-insert-link]
     ["Insert reference link" markdown-insert-reference-link-dwim]
-    ["Insert image" markdown-insert-image]
+    ["Insert URL" markdown-insert-uri]
+    ["Insert inline image" markdown-insert-image]
+    ["Insert reference image" markdown-insert-reference-image]
+    ["Insert list item" markdown-insert-list-item]
     ["Insert horizontal rule" markdown-insert-hr]
+    ["Insert footnote" markdown-footnote-new]
+    ["Kill element" markdown-kill-thing-at-point]
     "---"
-    ("Footnotes"
-     ["Insert footnote" markdown-footnote-new]
-     ["Jump to footnote text" markdown-footnote-goto-text]
-     ["Return from footnote" markdown-footnote-return])
+    ["Jump" markdown-jump]
+    ["Follow link" markdown-follow-thing-at-point]
+    ("Outline"
+     ["Next visible heading" outline-next-visible-heading]
+     ["Previous visible heading" outline-previous-visible-heading]
+     ["Forward same level" outline-forward-same-level]
+     ["Backward same level" outline-backward-same-level]
+     ["Up to parent heading" outline-up-heading])
+    "---"
+    ("Completion and Cycling"
+     ["Complete or cycle" markdown-complete-or-cycle]
+     ["Complete or reverse cycle" markdown-complete-or-reverse-cycle]
+     ["Promote" markdown-promote]
+     ["Demote" markdown-demote])
+    ("List editing"
+     ["Indent list item" markdown-demote]
+     ["Exdent list item" markdown-promote])
+    ("Region shifting"
+     ["Indent region" markdown-indent-region]
+     ["Exdent region" markdown-exdent-region])
     "---"
     ["Check references" markdown-check-refs]
     ["Clean up list numbering" markdown-cleanup-list-numbers]
+    ["Complete markup" markdown-complete-buffer]
     "---"
     ["Version" markdown-show-version]
     ))
@@ -3889,6 +3919,10 @@ When ARG is non-nil, cycle backwards when cycling."
        ;; italic
        ((thing-at-point-looking-at markdown-regex-italic)
         (markdown-cycle-italic))))))
+
+(defun markdown-complete-or-reverse-cycle ()
+  "Call `markdown-complete-or-cycle' with prefix argument."
+  (markdown-complete-or-cycle t))
 
 
 ;;; Commands ==================================================================
