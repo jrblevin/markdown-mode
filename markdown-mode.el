@@ -1643,6 +1643,25 @@ intact additional processing."
           (add-to-list 'refs target t)))
       refs)))
 
+(defun markdown-code-at-point-p ()
+  "Return non-nil if the point is at an inline code fragment.
+Return nil otherwise.  Set match data according to
+`markdown-match-code' upon success.
+This function searches the block for a code fragment that
+contains the point using `markdown-match-code'.  We do this
+because `thing-at-point-looking-at' does not work reliably with
+`markdown-regex-code'."
+  (interactive)
+  (save-excursion
+    (let ((old-point (point))
+          (end-of-block (progn (markdown-end-of-block) (point))))
+      (markdown-beginning-of-block)
+      (while (and (markdown-match-code end-of-block)
+                  (< (match-end 0) old-point)))
+      (and (match-beginning 0) ; matched something
+           (<= (match-beginning 0) old-point) ; match contains old-point
+           (>= (match-end 0) old-point)))))
+
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
@@ -1662,7 +1681,8 @@ intact additional processing."
   (unless (bobp)
     (backward-char 1))
   (cond ((re-search-forward markdown-regex-code last t)
-         (set-match-data (list (match-beginning 2) (match-end 2)))
+         (set-match-data (list (match-beginning 2) (match-end 2)
+                               (match-beginning 4) (match-end 4)))
          (goto-char (match-end 0))
          t)
         (t (forward-char 2) nil)))
@@ -1983,8 +2003,8 @@ place the cursor in between them."
                      markdown-regex-code 2 4)))
         (markdown-wrap-or-insert "`" "`" nil (car bounds) (cdr bounds)))
     ;; Code markup removal, code markup for word, or empty markup insertion
-    (if (thing-at-point-looking-at markdown-regex-code)
-        (markdown-unwrap-thing-at-point nil 2 4)
+    (if (markdown-code-at-point-p)
+        (markdown-unwrap-thing-at-point nil 0 1)
       (markdown-wrap-or-insert "`" "`" 'word nil nil))))
 
 (defun markdown-insert-link ()
@@ -2563,9 +2583,9 @@ text to kill ring), and list items."
   (let (val tmp)
     (cond
      ;; Inline code
-     ((thing-at-point-looking-at markdown-regex-code)
-      (kill-new (match-string 4))
-      (delete-region (match-beginning 2) (match-end 2)))
+     ((markdown-code-at-point-p)
+      (kill-new (match-string 1))
+      (delete-region (match-beginning 0) (match-end 0)))
      ;; ATX header
      ((thing-at-point-looking-at markdown-regex-header-atx)
       (kill-new (match-string 2))

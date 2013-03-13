@@ -1125,6 +1125,14 @@ Test point position upon removal and insertion."
      (markdown-footnote-kill))
    (should (string-equal (buffer-string) "some text\n"))))
 
+(ert-deftest test-markdown-kill/code ()
+  "Test killing with code regex.."
+  (let ((kill-ring nil))
+   (markdown-test-string "Lorem `ipsum` dolor `sit` `amet`."
+    (goto-char 22) ; position point at s in `sit`
+    (call-interactively 'markdown-kill-thing-at-point)
+    (should (string-equal (current-kill 0) "sit")))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
@@ -1619,6 +1627,65 @@ body"
    (should (equal (markdown-get-defined-references) nil)))
   (markdown-test-file "wiki-links.text"
    (should (equal (markdown-get-defined-references) nil))))
+
+(ert-deftest test-markdown-parsing/code-at-point-inline ()
+  "Test `markdown-code-at-point'."
+
+  (defun test-region (beg end)
+    (goto-char (1- beg))
+    (should-not (markdown-code-at-point-p))
+    (goto-char (1+ end))
+    (should-not (markdown-code-at-point-p))
+    (dolist (loc (number-sequence beg end))
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-beginning 0) beg))
+      (should (equal (match-end 0) end))))
+
+  (markdown-test-file "inline.text"
+   (test-region 45 51) ; Regular code span
+   (test-region 61 90) ; Code containing backticks
+   (test-region 228 240) ; Backquotes at beginning
+   (test-region 341 352) ; Backquotes at end
+   (test-region 460 469) ; Backslash as final character
+   (test-region 657 667) ; A code span crossing lines
+   (test-region 749 758) ; Three backquotes on same line
+   (test-region 806 815) ; Three backquotes across lines
+   ))
+
+(ert-deftest test-markdown-parsing/code-at-point-one-space ()
+  "Test `markdown-code-at-point' with multiple code spans in a row."
+  (markdown-test-string "`foo` `bar` `baz`"
+    (dolist (loc (number-sequence 1 6))
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-data) (list 1 6 2 5))))
+    (dolist (loc (number-sequence 7 12))
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-data) (list 7 12 8 11))))
+    (dolist (loc (number-sequence 13 18))
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-data) (list 13 18 14 17))))))
+
+(ert-deftest test-markdown-parsing/code-at-point-no-space ()
+  "Test `markdown-code-at-point` with multiple code spans in a row."
+  (markdown-test-string "a`foo`b`bar`c`baz`d"
+    (goto-char 1)                       ; "a"
+    (should-not (markdown-code-at-point-p))
+    (dolist (loc (number-sequence 2 7)) ; "`foo`b"
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-data) (list 2 7 3 6))))
+    (dolist (loc (number-sequence 8 13)) ; "`bar`c"
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-data) (list 8 13 9 12))))
+    (dolist (loc (number-sequence 14 19)) ; "`baz`d"
+      (goto-char loc)
+      (should (markdown-code-at-point-p))
+      (should (equal (match-data) (list 14 19 15 18))))))
 
 ;;; Reference Checking:
 
