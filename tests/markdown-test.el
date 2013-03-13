@@ -359,6 +359,48 @@ This file is not saved."
    (should (string-equal (buffer-string) "one two `three`"))
    (should (= (point) 15))))
 
+(ert-deftest test-markdown-insertion/toggle-wiki-link-alias-first ()
+  "Test toggling of `markdown-insert-wiki-link' with alias first.
+Test point position upon removal and insertion."
+  (let ((markdown-wiki-link-alias-first t))
+    (markdown-test-string "[[text|page]]"
+     (goto-char 5) ; point in interior of alias text, at 'x'
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 3)) ; leave point at, at 'x'
+     (should (string-equal (buffer-string) "text"))
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 5)) ; leave point at, at 'x'
+     (should (string-equal (buffer-string) "[[text]]")))
+    (markdown-test-string "[[text|page]]"
+     (goto-char 10) ; point in interior of link text, at 'g'
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 5)) ; leave point at end of alias text
+     (should (string-equal (buffer-string) "text"))
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 7)) ; leave point at end of alias text
+     (should (string-equal (buffer-string) "[[text]]")))))
+
+(ert-deftest test-markdown-insertion/toggle-wiki-link-alias-last ()
+  "Test toggling of `markdown-insert-wiki-link' with alias last.
+Test point position upon removal and insertion."
+  (let ((markdown-wiki-link-alias-first nil))
+    (markdown-test-string "[[page|text]]"
+     (goto-char 10) ; point in interior of alias text, at 'x'
+     (call-interactively 'markdown-insert-wiki-link)
+     (goto-char 3) ; leave point at, at 'x'
+     (should (string-equal (buffer-string) "text"))
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 5)) ; leave point at, at 'x'
+     (should (string-equal (buffer-string) "[[text]]")))
+    (markdown-test-string "[[page|text]]"
+     (goto-char 3) ; point in interior of link text, at 'g'
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 1)) ; leave point at beginning of alias text
+     (should (string-equal (buffer-string) "text"))
+     (call-interactively 'markdown-insert-wiki-link)
+     (should (= (point) 3)) ; leave point at beginning of alias text
+     (should (string-equal (buffer-string) "[[text]]")))))
+
 (ert-deftest test-markdown-insertion/bold-region ()
   "Test region functionality of `markdown-insert-bold'."
   (markdown-test-string "one two three"

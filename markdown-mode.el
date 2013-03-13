@@ -2087,8 +2087,16 @@ angle brackets place the point between them."
 If Transient Mark mode is on and a region is active, it is used
 as the link text."
   (interactive)
-  (markdown-wrap-or-insert "[[" "]]")
-  (backward-char 2))
+  (if (markdown-use-region-p)
+      ;; Active region
+      (markdown-wrap-or-insert "[[" "]]" nil (region-beginning) (region-end))
+    ;; Markup removal, wiki link at at point, or empty markup insertion
+    (if (thing-at-point-looking-at markdown-regex-wiki-link)
+        (if (or markdown-wiki-link-alias-first
+                (null (match-string 4)))
+            (markdown-unwrap-thing-at-point nil 1 2)
+          (markdown-unwrap-thing-at-point nil 1 4))
+      (markdown-wrap-or-insert "[[" "]]"))))
 
 (defun markdown-insert-image (&optional arg)
   "Insert image markup using region or word as alt text if possible.
