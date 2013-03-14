@@ -96,12 +96,6 @@
 ;;
 ;;  [devel.el]: http://jblevins.org/git/markdown-mode.git/plain/markdown-mode.el
 
-;;; Dependencies:
-
-;; markdown-mode requires easymenu, a standard package since GNU Emacs
-;; 19 and XEmacs 19, which provides a uniform interface for creating
-;; menus in GNU Emacs and XEmacs.
-
 ;;; Installation:
 
 ;; Make sure to place `markdown-mode.el` somewhere in the load-path and add
@@ -115,6 +109,325 @@
 ;; There is no consensus on an official file extension so change `.text` to
 ;; `.mdwn`, `.md`, `.mdt`, or whatever you call your markdown files.
 
+;;; Usage:
+
+;; Keybindings for element insertion have the form `C-c [letter]`
+;; where `[letter]` has a mnemonic association to the element being
+;; inserted.  Movement and cycling commands tend to be associated with
+;; paired delimiters such as `M-[` and `M-]` or `C-c <` and `C-c >`.
+;; Outline navigation keybindings the same as in `org-mode'.  Finally,
+;; commands for running Markdown or doing maintenance on an open file
+;; are grouped under the `C-c C-c` prefix.  The most commonly used
+;; commands are described below.  You can obtain a list of all
+;; keybindings by pressing `C-c C-h`.
+;;
+;;   * Hyperlinks (`l`, `L`, `u`)
+;;
+;;     `C-c l` inserts an inline link of the form `[text](url)`.  The
+;;     link text is determined as follows.  First, if there is an
+;;     active region (i.e., when transient mark mode is on and the
+;;     mark is active), use it as the link text.  Second, if the point
+;;     is at a word, use that word as the link text.  In these two
+;;     cases, the original text will be replaced with the link and
+;;     point will be left at the position for inserting a URL.
+;;     Otherwise, insert empty link markup and place the point for
+;;     inserting the link text.
+;;
+;;     `C-c L` inserts a reference link of the form `[text][label]`
+;;     and, optionally, a corresponding reference label definition.
+;;     The link text is determined in the same way as with an inline
+;;     link (using the region, when active, or the word at the point),
+;;     but instead of inserting empty markup as a last resort, the
+;;     link text will be read from the minibuffer.  The reference
+;;     label will be read from the minibuffer in both cases, with
+;;     completion from the set of currently defined references.  To
+;;     create an implicit reference link, press `RET` to accept the
+;;     default, an empty label.  If the entered referenced label is
+;;     not defined, additionally prompt for the URL and (optional)
+;;     title.  If a URL is provided, a reference definition will be
+;;     inserted in accordance with `markdown-reference-location'.
+;;     If a title is given, it will be added to the end of the
+;;     reference definition and will be used to populate the title
+;;     attribute when converted to XHTML.
+;;
+;;     `C-c u` inserts a bare url, delimited by angle brackets.  When
+;;     there is an active region, the text in the region is used as the
+;;     URL.  If the point is at a URL, that url is used.  Otherwise,
+;;     insert angle brackets and position the point in between them
+;;     for inserting the URL.
+;;
+;;   * Images (`i` and `I`)
+;;
+;;     `C-c i` inserts markup for an inline image, using the
+;;     active region or the word at point, if any, as the alt text.
+;;     `C-c I` behaves similarly and inserts a reference-style image.
+;;
+;;   * Italic (`e`), Bold (`s`), and Inline Code (`c`)
+;;
+;;     `C-c e` inserts markup to make a region or word italic (`e` for
+;;     `<em>` or emphasis).  If there is an active region, make the
+;;     region italic.  If the point is at a non-italic word, make the
+;;     word italic.  If the point is at an italic word or phrase,
+;;     remove the italic markup.  Otherwise, simply insert italic
+;;     delimiters and place the cursor in between them.
+;;     Similarly, use `C-c s` for bold (`<strong>`) and `C-c c`
+;;     for inline code (`<code>`).
+;;
+;;   * Blockquotes (`b`, `B`) and Preformatted Code (`p`, `P`)
+;;
+;;     `C-c b` inserts a blockquote using the active region, if any,
+;;     or starts a new blockquote.  `C-c B` is a variation which
+;;     always operates on the region, regardless of whether it is
+;;     active or not.  The appropriate amount of indentation, if any,
+;;     is calculated automatically given the surrounding context, but
+;;     may be adjusted later using the region indentation commands.
+;;
+;;     `C-c p` behaves similarly for inserting preformatted code
+;;     blocks, with `C-c P` being the region-only counterpart.
+;;
+;;   * Headings (`h`, `H`, `1`, ..., `6`, `!`, `@`)
+;;
+;;     All heading insertion commands use the text in the active
+;;     region, if any, as the heading text.  Otherwise, if the current
+;;     line is not blank, they use the text on the current line.
+;;     Finally, the setext commands will prompt for heading text if
+;;     there is no active region and the current line is blank.
+;;     
+;;     `C-c h` inserts a heading with automatically chosen type and
+;;     level (both determined by the previous heading).  `C-c H`
+;;     behaves similarly, but uses setext (underlined) headings when
+;;     possible, still calculating the level automatically.
+;;     In cases where the automatically-determined level is not what
+;;     you intended, the level can be quickly promoted or demoted with
+;;     `C-[` or `C-]`.
+;;
+;;     To insert a heading of a specific level and type, use `C-c 1`
+;;     through `C-c 6` for atx (hash mark) headings and `C-c !` or
+;;     `C-c @` for setext headings of level one or two, respectively.
+;;     Note that `!` is `S-1` and `@` is `S-2`.
+;;
+;;     If the point is at a heading, these commands will replace the
+;;     existing markup in order to update the level and/or type of the
+;;     heading.  To remove the markup of the heading at the point,
+;;     press `C-c C-k` to kill the heading and press `C-y` to yank the
+;;     heading text back into the buffer.
+;;
+;;   * Horizontal rules (`-`)
+;;
+;;     `C-c -` inserts a horizontal rule.  By default, insert the
+;;     first string in the list `markdown-hr-strings' (the most
+;;     prominent rule).  With a `C-u` prefix, insert the last string.
+;;     With a numeric prefix `N`, insert the string in position `N`
+;;     (counting from 1).
+;;
+;;   * Footnotes (`f`)
+;;
+;;     `C-c f` inserts a footnote marker at the point, inserts a
+;;     footnote definition below, and positions the point for inserting
+;;     the footnote text.  Pressing `C-c C-j` moves the point between the
+;;     footnote marker and footnote text.  Press `C-c C-k` to kill the
+;;     footnote and add the text to the kill ring.
+;;
+;;   * Wiki links (`w`)
+;;
+;;     `C-c w` behaves much like the inline link insertion command and
+;;     inserts a wiki link of the form `[[WikiLink]]`.  If there is an
+;;     active region, use the region as the link text.  If the point
+;;     is at a word, use the word as the link text.  If there is no
+;;     active region and the point is not at word, simply insert link
+;;     markup.
+;;
+;;   * Markdown and Maintenance Commands (`C-c C-c [letter]`)
+;;
+;;     *Compile:* `C-c C-c m` will run Markdown on the current buffer
+;;     and show the output in another buffer.  *Preview*: `C-c C-c p`
+;;     runs Markdown on the current buffer and previews, stores the
+;;     output in a temporary file, and displays the file in a browser.
+;;     *Export:* `C-c C-c e` will run Markdown on the current buffer
+;;     and save the result in the file `basename.html`, where
+;;     `basename` is the name of the Markdown file with the extension
+;;     removed.  *Export and View:* press `C-c C-c v` to export the
+;;     file and view it in a browser.  **For both export commands, the
+;;     output file will be overwritten without notice.**
+;;     *Open:* `C-c C-c o` will open the Markdown source file directly
+;;     using `markdown-open-command'.
+;;
+;;     To summarize:
+;;
+;;       - `C-c C-c m`: `markdown-command' > `*markdown-output*` buffer.
+;;       - `C-c C-c p`: `markdown-command' > temporary file > browser.
+;;       - `C-c C-c e`: `markdown-command' > `basename.html`.
+;;       - `C-c C-c v`: `markdown-command' > `basename.html` > browser.
+;;       - `C-c C-c w`: `markdown-command' > kill ring.
+;;       - `C-c C-c o`: `markdown-open-command'.
+;;
+;;     `C-c C-c c` will check for undefined references.  If there are
+;;     any, a small buffer will open with a list of undefined
+;;     references and the line numbers on which they appear.  In Emacs
+;;     22 and greater, selecting a reference from this list and
+;;     pressing `RET` will insert an empty reference definition at the
+;;     end of the buffer.  Similarly, selecting the line number will
+;;     jump to the corresponding line.
+;;
+;;     `C-c C-c n` renumbers any ordered lists in the buffer that are
+;;     out of sequence.
+;;
+;;     `C-c C-c ]` completes all headings and normalizes all horizontal
+;;     rules in the buffer.
+;;
+;;   * Following Links (`C-c C-o`)
+;;
+;;     Press `C-c C-o` when the point is on an inline or reference
+;;     link to open the URL in a browser.  When the point is at a
+;;     wiki link, open it in another buffer (in the current window,
+;;     or in the other window with the `C-u` prefix).  Use `M-p` and
+;;     `M-n` to quickly jump to the previous or next link of any type.
+;;
+;;   * Jumping (`C-c C-j`)
+;;
+;;     Use `C-c C-j` to jump from the object at point to its counterpart
+;;     elsewhere in the text, when possible.  Jumps between reference
+;;     links and definitions; between footnote markers and footnote
+;;     text.  If more than one link uses the same reference name, a
+;;     new buffer will be created containing clickable buttons for jumping
+;;     to each link.  You may press `TAB` or `S-TAB` to jump between
+;;     buttons in this window.
+;;
+;;   * Promotion and Demotion (`C-c C--`, `C-c C-=`, `M-LEFT`, `M-RIGHT`)
+;;
+;;     Headings, horizontal rules, and list items can be promoted and
+;;     demoted.  For headings, "promotion" means *decreasing* the
+;;     level (i.e., moving from `<h2>` to `<h1>`) while "demotion"
+;;     means *increasing* the level.  For horizontal rules, promotion
+;;     and demotion means moving backward or forward through the list
+;;     of rule strings in `markdown-hr-strings'.  Press `C-c C--` or
+;;     `M-LEFT` to promote the element at the point if possible.
+;;
+;;     To remember these commands, note that `-` is for decreasing the
+;;     level (promoting), and `=` (on the same key as `+`) is for
+;;     increasing the level (demoting).  Similarly, the left and right
+;;     arrow keys indicate the direction that the atx heading markup
+;;     is moving in when promoting or demoting.
+;;
+;;   * Completion and Cycling (`C-c C-[`, `C-c C-]`)
+;;
+;;     Complete markup is in normalized form, which means, for
+;;     example, that the underline portion of a setext header is the
+;;     same length as the heading text, or that the number of leading
+;;     and trailing hash marks of an atx header are equal and that
+;;     there is no extra whitespace in the header text.
+;;     Cycling means promotion or demotion for most items, but the
+;;     markup of bold and italic text can also be cycled between
+;;     asterisks and underscore.
+;;
+;;     `C-c C-]` completes the markup at the markup at the point,
+;;     if it is determined to be incomplete, or cycles the markup
+;;     by promoting it.  Similarly, `C-c C-[` completes the markup
+;;     or cycles it in reverse.
+;;
+;;   * Editing lists (`M-RET`, `M-UP`, `M-DOWN`, `M-LEFT`, `M-RIGHT`)
+;;
+;;     New list items can be inserted with `M-RET`.  This command
+;;     determines the appropriate marker (one of the possible
+;;     unordered list markers or the next number in sequence for an
+;;     ordered list) and indentation level by examining nearby list
+;;     items.  If there is no list before or after the point, start a
+;;     new list.  Prefix this command by `C-u` to decrease the
+;;     indentation by one level.  Prefix this command by `C-u C-u` to
+;;     increase the indentation by one level.
+;;
+;;     Existing list items can be moved up or down with `M-UP` or
+;;     `M-DOWN` and indented or exdented with `M-RIGHT` or `M-LEFT`.
+;;
+;;   * Shifting the region (`C-c <`, `C-c >`)
+;;
+;;     Text in the region can be indented or exdented as a group using
+;;     `C-c >` to indent to the next indentation point (calculated in
+;;     the current context), and `C-c <` to exdent to the previous
+;;     indentation point.  These keybindings are the same as those for
+;;     similar commands in `python-mode'.
+;;
+;;   * Killing Elements (`C-c C-k`)
+;;
+;;     Press `C-c C-k` to kill the thing at point and add important
+;;     text, without markup, to the kill ring.  Possible things to
+;;     kill include (roughly in order of precedece): inline code,
+;;     headings, horizonal rules, links (add link text to kill ring),
+;;     images (add alt text to kill ring), angle URIs, email
+;;     addresses, bold, italics, reference definitions (add URI to
+;;     kill ring), footnote markers and text (kill both marker and
+;;     text, add text to kill ring), and list items.
+;;
+;;   * Outline Navigation (`C-c C-n`, `C-c C-p`, `C-c C-f`, `C-c C-b`, `C-c C-u`)
+;;
+;;     Navigation between headings is possible using `outline-mode'.
+;;     Use `C-c C-n` and `C-c C-p` to move between the next and previous
+;;     visible headings.  Similarly, `C-c C-f` and `C-c C-b` move to the
+;;     next and previous visible headings at the same level as the one
+;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
+;;     (higher precedence) visible heading.
+;;
+;;   * Movement by Block (`M-[`, `M-]`) and Paragraph (`M-{`, `M-}`)
+;;
+;;     markdown-mode supports the usual Emacs paragraph movement with
+;;     `M-{` and `M-}`.  These commands treat list items as
+;;     paragraphs, so they will stop at each line within a block of
+;;     list items.  Additionally, markdown-mode includes movement
+;;     commands, `M-[` and `M-]` for jumping to the beginning or end
+;;     of an entire block of text (with blocks being separated by at
+;;     least one blank line).
+;;
+;;   * Movement by Defun (`C-M-a`, `C-M-e`, `C-M-h`)
+;;
+;;     The usual Emacs commands can be used to move by defuns
+;;     (top-level major definitions).  In markdown-mode, a defun is a
+;;     section.  As usual, `C-M-a` will move the point to the
+;;     beginning of the current or preceding defun, `C-M-e` will move
+;;     to the end of the current or following defun, and `C-M-h` will
+;;     put the region around the entire defun.
+;;
+;; As noted, many of the commands above behave differently depending
+;; on whether Transient Mark mode is enabled or not.  When it makes
+;; sense, if Transient Mark mode is on and the region is active, the
+;; command applies to the text in the region (e.g., `C-c b` makes the
+;; region bold).  For users who prefer to work outside of Transient
+;; Mark mode, since Emacs 22 it can be enabled temporarily by pressing
+;; `C-SPC C-SPC`.  When this is not the case, many commands then
+;; proceed to look work with the word or line at the point.
+;;
+;; When applicable, commands that specifically act on the region even
+;; outside of Transient Mark mode have the same keybinding as their
+;; standard counterpart, but the letter is uppercase.  For example,
+;; `markdown-insert-blockquote' is bound to `C-c b` and only acts on
+;; the region in Transient Mark mode while `markdown-blockquote-region'
+;; is bound to `C-c B` and always applies to the region (when nonempty).
+;;
+;; Note that these region-specific functions are useful in many
+;; cases where it may not be obvious.  For example, yanking text from
+;; the kill ring sets the mark at the beginning of the yanked text
+;; and moves the point to the end.  Therefore, the (inactive) region
+;; contains the yanked text.  So, `C-y` followed by `C-c B` will yank
+;; text and turn it into a blockquote.
+;;
+;; markdown-mode attempts to be flexible in how it handles
+;; indentation.  When you press `TAB` repeatedly, the point will cycle
+;; through several possible indentation levels corresponding to things
+;; you might have in mind when you press `RET` at the end of a line or
+;; `TAB`.  For example, you may want to start a new list item,
+;; continue a list item with hanging indentation, indent for a nested
+;; pre block, and so on.  Exdention is handled similarly when backspace
+;; is pressed at the beginning of the non-whitespace portion of a line.
+;;
+;; markdown-mode supports outline-minor-mode as well as org-mode-style
+;; visibility cycling for atx- or hash-style headings.  There are two
+;; types of visibility cycling: Pressing `S-TAB` cycles globally between
+;; the table of contents view (headings only), outline view (top-level
+;; headings only), and the full document view.  Pressing `TAB` while the
+;; point is at a heading will cycle through levels of visibility for the
+;; subtree: completely folded, visible children, and fully visible.
+;; Note that mixing hash and underline style headings will give undesired
+;; results.
+
 ;;; Customization:
 
 ;; Although no configuration is *necessary* there are a few things
@@ -125,13 +438,13 @@
 ;;     `markdown`).  This variable may be customized to pass
 ;;     command-line options to your Markdown processor of choice.
 ;;
-;;   * `markdown-command-needs-filename' - by default, `markdown-mode'
-;;     will pass the Markdown content to `markdown-command' using
-;;     standard input (`stdin`).  If `markdown-command' does not
-;;     accept standard input, then `markdown-command-needs-filename'
-;;     should be set to non-nil, which instructs `markdown-mode' to
-;;     pass the name of the file as the final command-line argument.
-;;     Note that with this option, you will only be able to run
+;;   * `markdown-command-needs-filename' - set to `t' if
+;;     `markdown-command' does not accept standard input (default:
+;;     `nil').  When `nil', `markdown-mode' will pass the Markdown
+;;     content to `markdown-command' using standard input (`stdin`).
+;;     When set to `t', `markdown-mode' will pass the name of the file
+;;     as the final command-line argument to `markdown-command'.  Note
+;;     that in the latter case, you will only be able to run
 ;;     `markdown-command' from buffers which are visiting a file.
 ;;
 ;;   * `markdown-open-command' - the command used for calling a standalone
@@ -168,51 +481,58 @@
 ;;     (default: `t')
 ;;
 ;;   * `markdown-wiki-link-alias-first' - set to a non-nil value to
-;;     treat aliased wiki links like `[[link text|PageName]]`.
-;;     When set to nil, they will be treated as `[[PageName|link text]]'.
+;;     treat aliased wiki links like `[[link text|PageName]]`
+;;     (default: `t').  When set to nil, they will be treated as
+;;     `[[PageName|link text]]'.
 ;;
-;;   * `markdown-uri-types' - a list of protocols for URIs that
-;;     `markdown-mode' should highlight.
+;;   * `markdown-uri-types' - a list of protocol schemes (e.g., "http")
+;;     for URIs that `markdown-mode' should highlight.
 ;;
-;;   * `markdown-enable-math' - syntax highlighting for
-;;     LaTeX fragments (default: `nil').
+;;   * `markdown-enable-math' - syntax highlighting for LaTeX
+;;     fragments (default: `nil').  Set this to `t' to turn on math
+;;     support by default.  Math support can be toggled later using
+;;     the function `markdown-enable-math'."
 ;;
-;;   * `markdown-css-path' - CSS file to link to in XHTML output.
+;;   * `markdown-css-path' - CSS file to link to in XHTML output
+;;     (default: `""`).
 ;;
 ;;   * `markdown-content-type' - when set to a nonempty string, an
 ;;     `http-equiv` attribute will be included in the XHTML `<head>`
-;;     block.  If needed, the suggested values are
+;;     block (default: `""`).  If needed, the suggested values are
 ;;     `application/xhtml+xml` or `text/html`.
 ;;
 ;;   * `markdown-coding-system' - used for specifying the character
 ;;     set identifier in the `http-equiv` attribute (see
-;;     `markdown-content-type').  When set to `nil',
+;;     `markdown-content-type') (default: `nil').  When set to `nil',
 ;;     `buffer-file-coding-system' will be used (and falling back to
 ;;     `iso-8859-1' when unavailable).  Common settings are `utf-8'
 ;;     and `iso-latin-1'.
 ;;
 ;;   * `markdown-xhtml-header-content' - additional content to include
-;;     in the XHTML `<head>` block.
-;;
-;;   * `markdown-command-needs-filename' - set to non-nil if
-;;     `markdown-command' does not accept input from stdin (default: nil).
-;;      Instead, it will be passed a filename as the final command-line
-;;      argument.  As a result, you will only be able to run Markdown
-;;      from buffers which are visiting a file.
+;;     in the XHTML `<head>` block (default: `""`).
 ;;
 ;;   * `markdown-xhtml-standalone-regexp' - a regular expression which
 ;;     `markdown-mode' uses to determine whether the output of
 ;;     `markdown-command' is a standalone XHTML document or an XHTML
-;;     fragment (default: `"^\\(\<\\?xml\\|\<!DOCTYPE\\|\<html\\)"`).  If
+;;     fragment (default: `"^\\(<\\?xml\\|<!DOCTYPE\\|<html\\)"`).  If
 ;;     this regular expression not matched in the first five lines of
 ;;     output, `markdown-mode' assumes the output is a fragment and
 ;;     adds a header and footer.
 ;;
 ;;   * `markdown-link-space-sub-char' - a character to replace spaces
-;;     when mapping wiki links to filenames (default: `_`).
+;;     when mapping wiki links to filenames (default: `"_"`).
 ;;     For example, use an underscore for compatibility with the
-;;     Python Markdown WikiLinks extension or a hyphen for compatibility
-;;     with GitHub wiki links.
+;;     Python Markdown WikiLinks extension.  In `gfm-mode', this is
+;;     set to `"-"` to conform with GitHub wiki links.
+;;
+;;   * `markdown-reference-location' - where to insert reference
+;;     definitions (default: `header`).  The possible locations are
+;;     the end of the document (`end`), after the current block
+;;     (`immediately`), before the next header (`header`).
+;;
+;;   * `markdown-footnote-location' - where to insert footnote text
+;;     (default: `end`).  The set of location options is the same as
+;;     for `markdown-reference-location'.
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
@@ -220,210 +540,6 @@
 ;; customization screen.
 ;;
 ;; [Marked]: https://itunes.apple.com/us/app/marked/id448925439?ls=1&mt=12&partnerId=30&siteID=GpHp3Acs1Yo
-
-;;; Usage:
-
-;; Keybindings are grouped by prefixes based on their function.  For
-;; example, commands dealing with headers begin with `C-c C-t`.  The
-;; primary commands in each group will are described below.  You can
-;; obtain a list of all keybindings by pressing `C-c C-h`.
-;;
-;;   * Anchors: `C-c C-a`
-;;
-;;     `C-c C-a l` inserts inline links of the form `[text](url)`.
-;;     `C-c C-a r` inserts reference links of the form `[text][label]`.
-;;     The label definition will be placed at the end of the current
-;;     block. `C-c C-a w` acts similarly for wiki links of the form
-;;     `[[WikiLink]]`. In all cases, if there is an active region, the
-;;     text in the region is used as the link text.
-;;
-;;   * Commands: `C-c C-c`
-;;
-;;     *Compile:* `C-c C-c m` will run Markdown on the current buffer
-;;     and show the output in another buffer.  *Preview*: `C-c C-c p`
-;;     runs Markdown on the current buffer and previews, stores the
-;;     output in a temporary file, and displays the file in a browser.
-;;     *Export:* `C-c C-c e` will run Markdown on the current buffer
-;;     and save the result in the file `basename.html`, where
-;;     `basename` is the name of the Markdown file with the extension
-;;     removed.  *Export and View:* press `C-c C-c v` to export the
-;;     file and view it in a browser.  **For both export commands, the
-;;     output file will be overwritten without notice.**
-;;     *Open:* `C-c C-c o` will open the Markdown source file directly
-;;     using `markdown-open-command'.
-;;
-;;     To summarize:
-;;
-;;       - `C-c C-c m`: `markdown-command' > `*markdown-output*` buffer.
-;;       - `C-c C-c p`: `markdown-command' > temporary file > browser.
-;;       - `C-c C-c e`: `markdown-command' > `basename.html`.
-;;       - `C-c C-c v`: `markdown-command' > `basename.html` > browser.
-;;       - `C-c C-c w`: `markdown-command' > kill ring.
-;;       - `C-c C-c o`: `markdown-open-command'.
-;;
-;;     `C-c C-c c` will check for undefined references.  If there are
-;;     any, a small buffer will open with a list of undefined
-;;     references and the line numbers on which they appear.  In Emacs
-;;     22 and greater, selecting a reference from this list and
-;;     pressing `RET` will insert an empty reference definition at the
-;;     end of the buffer.  Similarly, selecting the line number will
-;;     jump to the corresponding line.
-;;
-;;     `C-c C-c n` will clean up the numbering of ordered lists.
-;;
-;;   * Images: `C-c C-i`
-;;
-;;     `C-c C-i i` inserts markup for an inline image, using the
-;;     active region (if any) or the word at point as the alt text.
-;;     To insert reference-style image markup, provide a `C-u` prefix.
-;;
-;;   * Physical styles: `C-c C-p`
-;;
-;;     These commands all act on text in the active region, if any,
-;;     and insert empty markup fragments otherwise.  `C-c C-p b` makes
-;;     the selected text bold, `C-c C-p f` formats the region as
-;;     fixed-width text, and `C-c C-p i` is used for italic text.
-;;
-;;   * Logical styles: `C-c C-s`
-;;
-;;     These commands all act on text in the active region, if any,
-;;     and insert empty markup fragments otherwise.  Logical styles
-;;     include blockquote (`C-c C-s b`), preformatted (`C-c C-s p`),
-;;     code (`C-c C-s c`), emphasis (`C-c C-s e`), and strong
-;;     (`C-c C-s s`).
-;;
-;;   * Headers: `C-c C-t`
-;;
-;;     All header commands use text in the active region, if any, as
-;;     the header text.  Otherwise, if the current line is not blank,
-;;     use the text on the current line.  Finally, prompt for header
-;;     text if there is no active region and the current line is
-;;     blank.  To insert an atx or hash style level-n
-;;     header, press `C-c C-t n` where n is between 1 and 6.  For a
-;;     top-level setext or underline style header press `C-c C-t t`
-;;     (mnemonic: title) and for a second-level underline-style header
-;;     press `C-c C-t s` (mnemonic: section).
-;;
-;;     If the point is at a header, these commands will replace the
-;;     existing markup in order to update the level and/or type of the
-;;     header.  To remove the markup of the header at the point, press
-;;     `C-c C-t 0`.
-;;
-;;   * Footnotes: `C-c C-f`
-;;
-;;     To create a new footnote at the point, press `C-c C-f n`.
-;;     Press `C-c C-f g` with the point at a footnote to jump to the
-;;     location where the footnote text is defined.  Then, press
-;;     `C-c C-f b` to return to the footnote marker in the main text.
-;;     When the point is at a footnote marker or in the body of a
-;;     footnote, press `C-c C-f k` to kill the footnote and add the
-;;     text to the kill ring.
-;;
-;;   * Other elements:
-;;
-;;     `C-c -` inserts a horizontal rule.  By default, insert the
-;;     first string in the list `markdown-hr-strings' (the most
-;;     prominent rule).  With a `C-u` prefix, insert the last string.
-;;     With a numeric prefix `N`, insert the string in position `N`
-;;     (counting from 1).
-;;
-;;   * Following Links:
-;;
-;;     Press `C-c C-o` when the point is on an inline or reference
-;;     link to open the URL in a browser.  When the point is at a
-;;     wiki link, open it in another buffer (in the current window,
-;;     or in the other window with the `C-u` prefix).
-;;     To move between links, use `M-p` and `M-n` to quickly jump
-;;     to the previous or next link of any type.
-;;
-;;   * Jumping:
-;;
-;;     Use `C-c C-j` to jump from the object at point to its counterpart
-;;     elsewhere in the text, when possible.  Jumps between reference
-;;     links and definitions; between footnote markers and footnote
-;;     text.  If more than one link uses the same reference name, a
-;;     new buffer will be created containing clickable buttons for jumping
-;;     to each link.  You may press `TAB` or `S-TAB` to jump between
-;;     buttons in this window.
-;;
-;;   * Killing Elements:
-;;
-;;     Press `C-c C-k` to kill the thing at point and add important
-;;     text, without markup, to the kill ring.  Possible things to
-;;     kill include (roughly in order of precedece): inline code,
-;;     headers, horizonal rules, links (add link text to kill ring),
-;;     images (add alt text to kill ring), angle URIs, email
-;;     addresses, bold, italics, reference definitions (add URI to
-;;     kill ring), footnote markers and text (kill both marker and
-;;     text, add text to kill ring), and list items.
-;;
-;;   * Outline Navigation:
-;;
-;;     Navigation between headings is possible using `outline-mode'.
-;;     Use `C-M-n` and `C-M-p` to move between the next and previous
-;;     visible headings.  Similarly, `C-M-f` and `C-M-b` move to the
-;;     next and previous visible headings at the same level as the one
-;;     at the point.  Finally, `C-M-u` will move up to a lower-level
-;;     (more inclusive) visible heading.
-;;
-;;   * Movement by Block:
-;;
-;;     markdown-mode supports the usual Emacs paragraph movement with
-;;     `M-{` and `M-}`.  These commands treat list items as
-;;     paragraphs, so they will stop at each line within a block of
-;;     list items.  Additionally, markdown-mode includes movement
-;;     commands, `M-[` and `M-]` for jumping to the beginning or end
-;;     of an entire block of text (with blocks being separated by at
-;;     least one blank line).
-;;
-;;   * Movement by Defun:
-;;
-;;     The usual Emacs commands can be used to move by defuns
-;;     (top-level major definitions).  In markdown-mode, a defun
-;;     is a section.  As usual, `C-M-a` will move the point to
-;;     the beginning of the current or preceding defun, `C-M-e`
-;;     will move to the end of the current or following defun,
-;;     and `C-M-h` will put the region around the entire defun.
-;;
-;; Many of the commands described above behave differently depending on
-;; whether Transient Mark mode is enabled or not.  When it makes sense,
-;; if Transient Mark mode is on and a region is active, the command
-;; applies to the text in the region (e.g., `C-c C-p b` makes the region
-;; bold).  For users who prefer to work outside of Transient Mark mode,
-;; in Emacs 22 it can be enabled temporarily by pressing `C-SPC C-SPC`.
-;;
-;; When applicable, commands that specifically act on the region even
-;; outside of Transient Mark mode have the same keybinding as the with
-;; the exception of an additional `C-` prefix.  For example,
-;; `markdown-insert-blockquote' is bound to `C-c C-s b` and only acts on
-;; the region in Transient Mark mode while `markdown-blockquote-region'
-;; is bound to `C-c C-s C-b` and always applies to the region (when
-;; nonempty).
-;;
-;; Note that these region-specific functions are useful in many
-;; cases where it may not be obvious.  For example, yanking text from
-;; the kill ring sets the mark at the beginning of the yanked text
-;; and moves the point to the end.  Therefore, the (inactive) region
-;; contains the yanked text.  So, `C-y` then `C-c C-s C-b` will yank
-;; text and make it a blockquote.
-;;
-;; markdown-mode attempts to be flexible in how it handles
-;; indentation.  When you press `TAB` repeatedly, the point will cycle
-;; through several possible indentation levels corresponding to things
-;; you might have in mind when you press `RET` at the end of a line or
-;; `TAB`.  For example, you may want to start a new list item,
-;; continue a list item with hanging indentation, indent for a nested
-;; pre block, and so on.
-;;
-;; markdown-mode supports outline-minor-mode as well as org-mode-style
-;; visibility cycling for atx- or hash-style headers.  There are two
-;; types of visibility cycling: Pressing `S-TAB` cycles globally between
-;; the table of contents view (headers only), outline view (top-level
-;; headers only), and the full document view.  Pressing `TAB` while the
-;; point is at a header will cycle through levels of visibility for the
-;; subtree: completely folded, visible children, and fully visible.
-;; Note that mixing hash and underline style headers will give undesired
-;; results.
 
 ;;; Extensions:
 
@@ -674,7 +790,7 @@ buffer."
   "Strings to use when inserting horizontal rules.
 The first string in the list will be the default when inserting a
 horizontal rule.  Strings should be listed in decreasing order of
-prominence (as in headers from level one to six) for use with
+prominence (as in headings from level one to six) for use with
 promotion and demotion functions."
   :group 'markdown
   :type 'list)
@@ -758,8 +874,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type 'regexp)
 
-(defcustom markdown-link-space-sub-char
-  "_"
+(defcustom markdown-link-space-sub-char "_"
   "Character to use instead of spaces when mapping wiki links to filenames."
   :group 'markdown
   :type 'string)
@@ -2023,11 +2138,11 @@ place the point in the position to enter link text."
   "Insert a reference link and, optionally, a reference definition.
 The link TEXT will be inserted followed by the optional LABEL.
 If a URL is given, also insert a definition for the reference
-LABEL after the end of the paragraph.  If a TITLE is given, it
-will be added to the end of the reference definition and will be
-used to populate the title attribute when converted to XHTML.  If
-URL is nil, insert only the link portion (for example, when a
-reference label is already defined)."
+LABEL according to `markdown-reference-location'.  If a TITLE is
+given, it will be added to the end of the reference definition
+and will be used to populate the title attribute when converted
+to XHTML.  If URL is nil, insert only the link portion (for
+example, when a reference label is already defined)."
   (insert (concat "[" text "][" label "]"))
   (when url
     (let ((end (point))
@@ -2063,7 +2178,7 @@ references.  To create an implicit reference link, press RET to
 accept the default, an empty label.  If the entered referenced
 label is not defined, additionally prompt for the URL
 and (optional) title.  The reference definition is placed at the
-end of the current paragraph."
+location determined by `markdown-reference-location'."
   (interactive)
   (let* ((defined-labels (mapcar (lambda (x) (substring x 1 -1))
                                  (markdown-get-defined-references)))
@@ -2104,8 +2219,10 @@ angle brackets place the point between them."
 
 (defun markdown-insert-wiki-link ()
   "Insert a wiki link of the form [[WikiLink]].
-If Transient Mark mode is on and a region is active, it is used
-as the link text."
+If there is an active region, use the region as the link text.
+If the point is at a word, use the word as the link text.  If
+there is no active region and the point is not at word, simply
+insert link markup."
   (interactive)
   (if (markdown-use-region-p)
       ;; Active region
