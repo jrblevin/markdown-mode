@@ -579,6 +579,12 @@
 ;;     (default: `end`).  The set of location options is the same as
 ;;     for `markdown-reference-location'.
 ;;
+;;   * `markdown-nested-imenu-heading-index' - Use nested imenu
+;;     heading instead of a flat index (default: `nil').  A nested
+;;     index may provide more natural browsing from the menu, but a
+;;     flat list may allow for faster keyboard navigation via tab
+;;     completion.
+;;
 ;;   * `comment-auto-fill-only-comments' - variable is made
 ;;     buffer-local and set to `nil' by default.  In programming
 ;;     language modes, when this variable is non-nil, only comments
@@ -1062,6 +1068,14 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "String inserted before unordered list items."
   :group 'markdown
   :type 'string)
+
+(defcustom markdown-nested-imenu-heading-index nil
+  "Use nested or flat imenu heading index.
+A nested index may provide more natural browsing from the menu,
+but a flat list may allow for faster keyboard navigation via tab
+completion."
+  :group 'markdown
+  :type 'boolean)
 
 (defcustom markdown-make-gfm-checkboxes-buttons t
   "When non-nil, make GFM checkboxes into buttons."
@@ -4210,8 +4224,8 @@ See also `markdown-mode-map'.")
 
 ;;; imenu =====================================================================
 
-(defun markdown-imenu-create-index ()
-  "Create and return an imenu index alist for the current buffer.
+(defun markdown-imenu-create-nested-index ()
+  "Create and return a nested imenu index alist for the current buffer.
 See `imenu-create-index-function' and `imenu--index-alist' for details."
   (let* ((root '(nil . nil))
          cur-alist
@@ -4257,6 +4271,25 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
                 (setq cur-alist alist))
               (setq cur-level level))))))
       (cdr root))))
+
+(defun markdown-imenu-create-flat-index ()
+  "Create and return a flat imenu index alist for the current buffer.
+See `imenu-create-index-function' and `imenu--index-alist' for details."
+  (let* ((empty-heading "-") index heading pos)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward markdown-regex-header (point-max) t)
+        (cond
+         ((setq heading (match-string-no-properties 1))
+          (setq pos (match-beginning 1)))
+         ((setq heading (match-string-no-properties 3))
+          (setq pos (match-beginning 3)))
+         ((setq heading (match-string-no-properties 6))
+          (setq pos (match-beginning 5))))
+        (or (> (length heading) 0)
+            (setq heading empty-heading))
+        (setq index (append index (list (cons heading pos)))))
+      index)))
 
 
 ;;; References ================================================================
@@ -5924,7 +5957,10 @@ before regenerating font-lock rules for extensions."
   ;; Add a buffer-local hook to reload after file-local variables are read
   (add-hook 'hack-local-variables-hook 'markdown-handle-local-variables nil t)
   ;; For imenu support
-  (setq imenu-create-index-function 'markdown-imenu-create-index)
+  (setq imenu-create-index-function
+        (if markdown-nested-imenu-heading-index
+            'markdown-imenu-create-nested-index
+          'markdown-imenu-create-flat-index))
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Defun movement

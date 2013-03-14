@@ -527,6 +527,12 @@ provides an interface to all of the possible customizations:
     (default: `end`).  The set of location options is the same as
     for `markdown-reference-location`.
 
+  * `markdown-nested-imenu-heading-index` - Use nested imenu
+    heading instead of a flat index (default: `nil`).  A nested
+    index may provide more natural browsing from the menu, but a
+    flat list may allow for faster keyboard navigation via tab
+    completion.
+
   * `comment-auto-fill-only-comments` - variable is made
     buffer-local and set to `nil` by default.  In programming
     language modes, when this variable is non-nil, only comments
