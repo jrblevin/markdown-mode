@@ -3941,7 +3941,9 @@ When ARG is non-nil, cycle backwards when cycling."
         (markdown-cycle-italic))))))
 
 (defun markdown-complete-or-reverse-cycle ()
-  "Call `markdown-complete-or-cycle' with prefix argument."
+  "Complete or reverse cycle markup at point or complete objects in region.
+Call `markdown-complete-or-cycle' with prefix argument."
+  (interactive)
   (markdown-complete-or-cycle t))
 
 
