@@ -2210,6 +2210,14 @@ See `paragraph-separate'."
    (should (string-equal (buffer-string)
                          "line 1\n\n```elisp\nline 2\n```\n\nline 3\n"))))
 
+(ert-deftest test-markdown-gfm/code-block-font-lock ()
+  "GFM code block font lock test."
+  (markdown-test-file-gfm "gfm.text"
+    (markdown-test-range-has-face 2639 2641 markdown-pre-face) ; ```
+    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
+    (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
+    (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
