@@ -2116,12 +2116,12 @@ See `paragraph-separate'."
                   (setq before-hook-run t)
                   (should (string-equal fname ofile)))))
      ;; Register function
-     (add-hook 'markdown-before-export-hooks func)
+     (add-hook 'markdown-before-export-hook func)
      ;; Export XHTML
      (markdown-export ofile)
      (should (eq before-hook-run t))
      ;; Clean
-     (remove-hook 'markdown-before-export-hooks func)
+     (remove-hook 'markdown-before-export-hook func)
      (kill-buffer (get-file-buffer ofile))
      (delete-file ofile))))
 
@@ -2134,12 +2134,12 @@ See `paragraph-separate'."
                   (setq after-hook-run t)
                   (should (string-equal fname ofile)))))
      ;; Register function
-     (add-hook 'markdown-after-export-hooks func)
+     (add-hook 'markdown-after-export-hook func)
      ;; Export XHTML
      (markdown-export ofile)
      (should (eq after-hook-run t))
      ;; Clean
-     (remove-hook 'markdown-after-export-hooks func)
+     (remove-hook 'markdown-after-export-hook func)
      (kill-buffer (get-file-buffer ofile))
      (delete-file ofile))))
 

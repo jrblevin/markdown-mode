@@ -745,11 +745,11 @@
 (defvar markdown-mode-hook nil
   "Hook run when entering Markdown mode.")
 
-(defvar markdown-before-export-hooks nil
+(defvar markdown-before-export-hook nil
   "Hook run before output XHTML.
 This hook is abnormal and registered functions are given an argument that is output filename.")
 
-(defvar markdown-after-export-hooks nil
+(defvar markdown-after-export-hook nil
   "Hook run after output XHTML.
 This hook is abnormal and registered functions are given an argument that is output filename.")
 
@@ -4197,11 +4197,11 @@ current filename, but with the extension removed and replaced with .html."
   (when output-file
     (let ((output-buffer-name))
       (setq output-buffer-name (buffer-name (find-file-noselect output-file)))
-      (run-hook-with-args 'markdown-before-export-hooks output-file)
+      (run-hook-with-args 'markdown-before-export-hook output-file)
       (markdown-standalone output-buffer-name)
       (with-current-buffer output-buffer-name
         (save-buffer))
-      (run-hook-with-args 'markdown-after-export-hooks output-file)
+      (run-hook-with-args 'markdown-after-export-hook output-file)
       output-file)))
 
 (defun markdown-export-and-preview ()
