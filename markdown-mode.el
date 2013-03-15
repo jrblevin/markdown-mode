@@ -593,7 +593,7 @@
 ;; file named `Wiki-link` with the same extension as the current file.
 ;;
 ;; GFM code blocks, with optional programming language keywords, will
-;; be highlighted.  They can be inserted with `C-c C-s l`.  If there
+;; be highlighted.  They can be inserted with `C-c C`.  If there
 ;; is an active region, the text in the region will be placed inside
 ;; the code block.  You will be prompted for the name of the language,
 ;; but may press enter to continue without naming a language.
@@ -3194,7 +3194,7 @@ Assumes match data is available for `markdown-regex-italic'."
 (defvar gfm-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map markdown-mode-map)
-    (define-key map "\C-c\C-sl" 'markdown-insert-gfm-code-block)
+    (define-key map (kbd "C-c C") 'markdown-insert-gfm-code-block)
     map)
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
