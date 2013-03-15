@@ -993,7 +993,7 @@ Test point position upon removal and insertion."
      (should (= markdown-footnote-counter 0))
      ;; footnote insertion
      (end-of-line)
-     (markdown-footnote-new)
+     (markdown-insert-footnote)
      (should (= (point) 35))
      (should (= markdown-footnote-counter 1))
      (should (looking-back "\\[^1\\]: "))
@@ -1007,7 +1007,7 @@ Test point position upon removal and insertion."
      ;; insertion, counter should increment
      (goto-char (point-min))
      (end-of-line)
-     (markdown-footnote-new)
+     (markdown-insert-footnote)
      (should (= (point) 35))
      (should (= markdown-footnote-counter 2))
      (should (looking-back "\\[^2\\]: "))
@@ -1031,7 +1031,7 @@ Test point position upon removal and insertion."
      (should (= markdown-footnote-counter 0))
      ;; footnote insertion
      (end-of-line)
-     (markdown-footnote-new)
+     (markdown-insert-footnote)
      (should (= (point) 28))
      (should (= markdown-footnote-counter 1))
      (should (looking-back "\\[^1\\]: "))
@@ -1052,7 +1052,7 @@ Test point position upon removal and insertion."
      (should (= markdown-footnote-counter 0))
      ;; footnote insertion
      (end-of-line)
-     (markdown-footnote-new)
+     (markdown-insert-footnote)
      (should (= (point) 29))
      (should (= markdown-footnote-counter 1))
      (should (looking-back "\\[^1\\]: "))
@@ -1067,7 +1067,7 @@ Test point position upon removal and insertion."
      ;; insertion, counter should increment
      (goto-char (point-min))
      (end-of-line)
-     (markdown-footnote-new)
+     (markdown-insert-footnote)
      (should (= (point) 29))
      (should (= markdown-footnote-counter 2))
      (should (looking-back "\\[^2\\]: "))

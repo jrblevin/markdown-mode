@@ -2536,7 +2536,7 @@ automatically in order to have the correct markup."
             (setq markdown-footnote-counter fn))))))
   (incf markdown-footnote-counter))
 
-(defun markdown-footnote-new ()
+(defun markdown-insert-footnote ()
   "Insert footnote with a new number and move point to footnote definition."
   (interactive)
   (let ((fn (markdown-footnote-counter-inc)))
@@ -3140,7 +3140,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c p") 'markdown-insert-pre)
     (define-key map (kbd "C-c P") 'markdown-pre-region)
     (define-key map (kbd "C-c -") 'markdown-insert-hr)
-    (define-key map (kbd "C-c f") 'markdown-footnote-new)
+    (define-key map (kbd "C-c f") 'markdown-insert-footnote)
     ;; Element removal
     (define-key map (kbd "C-c C-k") 'markdown-kill-thing-at-point)
     ;; Promotion, Demotion, Completion, and Cycling
@@ -3243,7 +3243,7 @@ See also `markdown-mode-map'.")
     ["Insert reference image" markdown-insert-reference-image]
     ["Insert list item" markdown-insert-list-item]
     ["Insert horizontal rule" markdown-insert-hr]
-    ["Insert footnote" markdown-footnote-new]
+    ["Insert footnote" markdown-insert-footnote]
     ["Kill element" markdown-kill-thing-at-point]
     "---"
     ["Jump" markdown-jump]
@@ -3715,7 +3715,7 @@ Optionally, BOUNDS of the current list item may be provided if available."
               (replace-match "" nil nil)
               (forward-line))))))))
 
-(defun markdown--cleanup-list-numbers-level (&optional pfx)
+(defun markdown-cleanup-list-numbers-level (&optional pfx)
   "Update the numbering for level PFX (as a string of spaces).
 
 Assume that the previously found match was for a numbered item in
@@ -3737,7 +3737,7 @@ a list."
           (setq sep nil))
          ;; indented a level
          ((string< pfx cpfx)
-          (setq sep (markdown--cleanup-list-numbers-level cpfx))
+          (setq sep (markdown-cleanup-list-numbers-level cpfx))
           (setq step nil))
          ;; exit the loop
          (t
@@ -3764,7 +3764,7 @@ a list."
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (markdown--cleanup-list-numbers-level "")))
+    (markdown-cleanup-list-numbers-level "")))
 
 
 ;;; Outline ===================================================================
