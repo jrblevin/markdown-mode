@@ -413,6 +413,7 @@ Test point position upon removal and insertion."
 (ert-deftest test-markdown-insertion/italic-region ()
   "Test region functionality of `markdown-insert-italic'."
   (markdown-test-string "one two three"
+   (transient-mark-mode)
    (push-mark (point) t t)
    (forward-word 2)
    (markdown-insert-italic)
@@ -422,6 +423,7 @@ Test point position upon removal and insertion."
 (ert-deftest test-markdown-insertion/code-region ()
   "Test region functionality of `markdown-insert-code'."
   (markdown-test-string "one two three"
+   (transient-mark-mode)
    (push-mark (point) t t)
    (forward-word 2)
    (markdown-insert-code)
@@ -963,6 +965,7 @@ Test point position upon removal and insertion."
    (should (= (point) 11)))
   ;; Test with region (leave point in parentheses)
   (markdown-test-string "abc def ghi"
+   (transient-mark-mode)
    (push-mark (point) t t)
    (forward-word 2)
    (call-interactively 'markdown-insert-link)
