@@ -59,6 +59,17 @@
          ,@body))))
 (def-edebug-spec markdown-test-file (form body))
 
+(defmacro markdown-test-string-gfm (string &rest body)
+  "Run body in a temporary buffer containing STRING in `gfm-mode'."
+  `(with-temp-buffer
+    (gfm-mode)
+    (setq-default indent-tabs-mode nil)
+    (insert ,string)
+    (goto-char (point-min))
+    (font-lock-fontify-buffer)
+    (prog1 ,@body (kill-buffer))))
+(def-edebug-spec markdown-test-string-gfm (form body))
+
 (defmacro markdown-test-file-gfm (file &rest body)
   "Open FILE from `markdown-test-dir' and execute body."
   `(let ((fn (concat markdown-test-dir ,file)))
@@ -2179,6 +2190,25 @@ See `paragraph-separate'."
   (markdown-test-file-gfm "gfm.text"
     (markdown-test-range-has-face 1483 1488 markdown-italic-face)
     (markdown-test-range-has-face 1729 1790 nil)))
+
+(ert-deftest test-markdown-gfm/insert-code-block ()
+  "GFM code block insertion test."
+  ;; Test empty markup insertion
+  (markdown-test-string-gfm "line 1\nline 2\n"
+   (end-of-line)
+   (markdown-insert-gfm-code-block "elisp")
+   (should (string-equal (buffer-string)
+                         "line 1\n\n```elisp\n\n```\n\nline 2\n")))
+  ;; Test with active region
+  (markdown-test-string-gfm "line 1\nline 2\nline 3\n"
+   (forward-line)
+   (transient-mark-mode)
+   (push-mark (point) t t)
+   (end-of-line)
+   (should (markdown-use-region-p))
+   (markdown-insert-gfm-code-block "elisp")
+   (should (string-equal (buffer-string)
+                         "line 1\n\n```elisp\nline 2\n```\n\nline 3\n"))))
 
 (provide 'markdown-test)
 

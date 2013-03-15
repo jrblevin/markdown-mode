@@ -2496,26 +2496,29 @@ If LANG is nil, the language will be queried from user.  If a
 region is active, wrap this region with the markup instead.  If
 the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
-  (interactive "sProgramming language: ")
+  (interactive "sProgramming language [none]: ")
   (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
+        (goto-char e)
+        ;; if we're on a blank line, don't newline, otherwise the ```
+        ;; should go on its own line
+        (unless (looking-back "\n")
+          (newline))
+        (insert "```")
+        (markdown-ensure-blank-line-after)
         (goto-char b)
         ;; if we're on a blank line, insert the quotes here, otherwise
         ;; add a new line first
         (unless (looking-at "\n")
           (newline)
-          (forward-line -1)
-          (setq e (1+ e)))
-        (insert "```" lang)
-        (goto-char (+ e 3 (length lang)))
-        ;; if we're on a blank line, don't newline, otherwise the ```
-        ;; should go on its own line
-        (unless (looking-back "\n")
-          (newline))
-        (insert "```"))
+          (forward-line -1))
+        (markdown-ensure-blank-line-before)
+        (insert "```" lang))
+    (markdown-ensure-blank-line-before)
     (insert "```" lang)
     (newline 2)
     (insert "```")
+    (markdown-ensure-blank-line-after)
     (forward-line -1)))
 
 
