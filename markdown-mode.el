@@ -746,12 +746,13 @@
   "Hook run when entering Markdown mode.")
 
 (defvar markdown-before-export-hook nil
-  "Hook run before output XHTML.
-This hook is abnormal and registered functions are given an argument that is output filename.")
+  "Hook run before running Markdown to export XHTML output.
+The hook may modify the buffer, which will be restored to it's
+original state after exporting is complete.")
 
 (defvar markdown-after-export-hook nil
-  "Hook run after output XHTML.
-This hook is abnormal and registered functions are given an argument that is output filename.")
+  "Hook run after XHTML output has been saved.
+Any changes to the output buffer made by this hook will be saved.")
 
 (defgroup markdown nil
   "Major mode for editing text files in Markdown format."
@@ -4195,13 +4196,22 @@ current filename, but with the extension removed and replaced with .html."
   (unless output-file
     (setq output-file (markdown-export-file-name ".html")))
   (when output-file
-    (let ((output-buffer-name))
-      (setq output-buffer-name (buffer-name (find-file-noselect output-file)))
-      (run-hook-with-args 'markdown-before-export-hook output-file)
+    (let* ((init-buf (current-buffer))
+           (init-point (point))
+           (init-buf-string (buffer-string))
+           (output-buffer (find-file-noselect output-file))
+           (output-buffer-name (buffer-name output-buffer)))
+      (run-hooks 'markdown-before-export-hook)
       (markdown-standalone output-buffer-name)
-      (with-current-buffer output-buffer-name
+      (with-current-buffer output-buffer
+        (run-hooks 'markdown-after-export-hook)
         (save-buffer))
-      (run-hook-with-args 'markdown-after-export-hook output-file)
+      ;; if modified, restore initial buffer
+      (when (buffer-modified-p init-buf)
+        (erase-buffer)
+        (insert init-buf-string)
+        (save-buffer)
+        (goto-char init-point))
       output-file)))
 
 (defun markdown-export-and-preview ()

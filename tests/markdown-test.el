@@ -2111,36 +2111,66 @@ See `paragraph-separate'."
   "Test hook run before export XHTML."
   (markdown-test-temp-file "lists.text"
    (let* ((before-hook-run nil)
-          (ofile (concat buffer-file-name ".html"))
-          (func (lambda (fname)
+          (orig-point (point))
+          (func (lambda ()
+                  ;; Change value of a variable
                   (setq before-hook-run t)
-                  (should (string-equal fname ofile)))))
-     ;; Register function
-     (add-hook 'markdown-before-export-hook func)
-     ;; Export XHTML
-     (markdown-export ofile)
+                  ;; Insert some text
+                  (goto-char (point-min))
+                  (insert "#")
+                  ;; Deliberately move the point
+                  (end-of-line)
+                  ;; Verify changes
+                  (should (looking-back "^## List Cases"))
+                  (should-not (= (point) orig-point))))
+          (ofile (progn
+                   ;; Register hook
+                   (add-hook 'markdown-before-export-hook func)
+                   ;; Export XHTML and return filename
+                   (markdown-export)))
+          (obuffer (get-file-buffer ofile)))
+     ;; Test side effects of hook
      (should (eq before-hook-run t))
+     ;; Test position of point
+     (should (= (point) orig-point))
+     ;; Test that buffer was restored to original state
+     (goto-char (point-min))
+     (should (looking-at "^# List Cases"))
      ;; Clean
      (remove-hook 'markdown-before-export-hook func)
-     (kill-buffer (get-file-buffer ofile))
+     (kill-buffer obuffer)
      (delete-file ofile))))
 
 (ert-deftest test-markdown-hook/after-export ()
   "Test hook run after export XHTML."
   (markdown-test-temp-file "lists.text"
    (let* ((after-hook-run nil)
-          (ofile (concat buffer-file-name ".html"))
-          (func (lambda (fname)
+          (func (lambda ()
+                  ;; Change variable value
                   (setq after-hook-run t)
-                  (should (string-equal fname ofile)))))
-     ;; Register function
-     (add-hook 'markdown-after-export-hook func)
-     ;; Export XHTML
-     (markdown-export ofile)
+                  ;; Add comment to output buffer
+                  (goto-char (point-min))
+                  (insert "<!-- after-export-hook -->\n")))
+          (ofile (progn
+                   ;; Register hook
+                   (add-hook 'markdown-after-export-hook func)
+                   ;; Export XHTML and return filename
+                   (markdown-export)))
+          (obuffer (get-file-buffer ofile)))
+     (message "obuffer = %S" obuffer)
+     ;; Test that variable was changed
      (should (eq after-hook-run t))
-     ;; Clean
+     ;; Test that output buffer remains open
+     (should (get-buffer obuffer))
+     ;; Test that output buffer modification remains
+     (with-current-buffer obuffer
+       (goto-char (point-min))
+       (should (looking-at "<!-- after-export-hook -->\n")))
+     ;; Test that buffer modification was saved
+     (should-not (buffer-modified-p obuffer))
+     ;; Clean up
      (remove-hook 'markdown-after-export-hook func)
-     (kill-buffer (get-file-buffer ofile))
+     (kill-buffer obuffer)
      (delete-file ofile))))
 
 ;;; Extension: math support
