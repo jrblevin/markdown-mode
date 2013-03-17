@@ -100,14 +100,17 @@
 
 ;; Make sure to place `markdown-mode.el` somewhere in the load-path and add
 ;; the following lines to your `.emacs` file to associate markdown-mode
-;; with `.text` files:
+;; with `.text`, `.markdown`, and `.md` files:
 ;;
 ;;     (autoload 'markdown-mode "markdown-mode"
 ;;        "Major mode for editing Markdown files" t)
 ;;     (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+;;     (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+;;     (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 ;;
-;; There is no consensus on an official file extension so change `.text` to
-;; `.mdwn`, `.md`, `.mdt`, or whatever you call your markdown files.
+;; There is no official Markdown file extension, nor is there even a
+;; _de facto_ standard, so you can easily add, change, or remove any
+;; of the file extensions above as needed.
 
 ;;; Usage:
 
