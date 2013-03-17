@@ -478,11 +478,6 @@
 ;;     automatically indent new lines when the enter key is pressed
 ;;     (default: `t')
 ;;
-;;   * `markdown-follow-wiki-link-on-enter' - set to a non-nil value
-;;     to automatically open a linked document in a new buffer if the
-;;     cursor is an wiki link
-;;     (default: `t')
-;;
 ;;   * `markdown-wiki-link-alias-first' - set to a non-nil value to
 ;;     treat aliased wiki links like `[[link text|PageName]]`
 ;;     (default: `t').  When set to nil, they will be treated as
@@ -547,16 +542,14 @@
 ;;; Extensions:
 
 ;; Besides supporting the basic Markdown syntax, markdown-mode also
-;; includes syntax highlighting for `[[Wiki Links]]` by default. Wiki
-;; links may be followed automatically by pressing the enter key when
-;; your curser is on a wiki link or by pressing `C-c C-o`. The
-;; auto-following on enter key may be controlled with the
-;; `markdown-follow-wiki-link-on-enter' customization.  Use `M-p` and
-;; `M-n` to quickly jump to the previous and next wiki links,
-;; respectively.  Aliased or piped wiki links of the form
-;; `[[link text|PageName]]` are also supported.  Since some wikis
-;; reverse these components, set `markdown-wiki-link-alias-first'
-;; to nil to treat them as `[[PageName|link text]]`.
+;; includes syntax highlighting for `[[Wiki Links]]` by default.  Wiki
+;; links may be followed by pressing `C-c C-o` when the point
+;; is at a wiki link.  Use `M-p` and `M-n` to quickly jump to the
+;; previous and next links (including links of other types).
+;; Aliased or piped wiki links of the form `[[link text|PageName]]`
+;; are also supported.  Since some wikis reverse these components, set
+;; `markdown-wiki-link-alias-first' to nil to treat them as
+;; `[[PageName|link text]]`.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command'.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -815,12 +808,11 @@ promotion and demotion functions."
   :type 'function)
 
 (defcustom markdown-indent-on-enter t
-  "Automatically indent new lines when enter key is pressed."
-  :group 'markdown
-  :type 'boolean)
-
-(defcustom markdown-follow-wiki-link-on-enter t
-  "Follow wiki link at point (if any) when the enter key is pressed."
+  "Automatically indent new lines when enter key is pressed.
+When this variable is set to t, pressing RET will call
+`newline-and-indent'.  When set to nil, define RET to call
+`newline' as usual.  In the latter case, you can still use
+auto-indentation by pressing \\[newline-and-indent]."
   :group 'markdown
   :type 'boolean)
 
@@ -2842,21 +2834,12 @@ duplicate positions, which are handled up by calling functions."
     ;; Return reversed list
     (reverse positions)))
 
-(defun markdown-do-normal-return ()
-  "Insert a newline and optionally indent the next line."
-  (newline)
-  (if markdown-indent-on-enter
-      (funcall indent-line-function)))
-
 (defun markdown-enter-key ()
-  "Handle RET according to context.
-If there is a wiki link at the point, follow it unless
-`markdown-follow-wiki-link-on-enter' is nil.  Otherwise, process
-it in the usual way."
+  "Handle RET according to to the value of `markdown-indent-on-enter'."
   (interactive)
-  (if (and markdown-follow-wiki-link-on-enter (markdown-wiki-link-p))
-      (markdown-follow-wiki-link-at-point)
-    (markdown-do-normal-return)))
+  (if markdown-indent-on-enter
+      (newline-and-indent)
+    (newline)))
 
 (defun markdown-exdent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
