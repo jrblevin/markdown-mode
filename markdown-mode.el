@@ -299,12 +299,15 @@
 ;;   * Promotion and Demotion (`C-c C--`, `C-c C-=`, `M-LEFT`, `M-RIGHT`)
 ;;
 ;;     Headings, horizontal rules, and list items can be promoted and
-;;     demoted.  For headings, "promotion" means *decreasing* the
-;;     level (i.e., moving from `<h2>` to `<h1>`) while "demotion"
-;;     means *increasing* the level.  For horizontal rules, promotion
-;;     and demotion means moving backward or forward through the list
-;;     of rule strings in `markdown-hr-strings'.  Press `C-c C--` or
-;;     `M-LEFT` to promote the element at the point if possible.
+;;     demoted, as well as bold and italic text.  For headings,
+;;     "promotion" means *decreasing* the level (i.e., moving from
+;;     `<h2>` to `<h1>`) while "demotion" means *increasing* the
+;;     level.  For horizontal rules, promotion and demotion means
+;;     moving backward or forward through the list of rule strings in
+;;     `markdown-hr-strings'.  For bold and italic text, promotion and
+;;     demotion means changing the markup from underscores to asterisks.
+;;     Press `C-c C--` or `M-LEFT` to promote the element at the point
+;;     if possible.
 ;;
 ;;     To remember these commands, note that `-` is for decreasing the
 ;;     level (promoting), and `=` (on the same key as `+`) is for
@@ -312,21 +315,15 @@
 ;;     arrow keys indicate the direction that the atx heading markup
 ;;     is moving in when promoting or demoting.
 ;;
-;;   * Completion and Cycling (`C-c C-[`, `C-c C-]`)
+;;   * Completion (`C-c C-]`)
 ;;
 ;;     Complete markup is in normalized form, which means, for
 ;;     example, that the underline portion of a setext header is the
 ;;     same length as the heading text, or that the number of leading
 ;;     and trailing hash marks of an atx header are equal and that
-;;     there is no extra whitespace in the header text.
-;;     Cycling means promotion or demotion for most items, but the
-;;     markup of bold and italic text can also be cycled between
-;;     asterisks and underscore.
-;;
-;;     `C-c C-]` completes the markup at the markup at the point,
-;;     if it is determined to be incomplete, or cycles the markup
-;;     by promoting it.  Similarly, `C-c C-[` completes the markup
-;;     or cycles it in reverse.
+;;     there is no extra whitespace in the header text.  `C-c C-]`
+;;     completes the markup at the point, if it is determined to be
+;;     incomplete.
 ;;
 ;;   * Editing lists (`M-RET`, `M-UP`, `M-DOWN`, `M-LEFT`, `M-RIGHT`)
 ;;
@@ -2923,7 +2920,8 @@ and that there is no extraneous whitespace in the text."
 Add or remove hash marks to the end of the header to match the
 beginning.  Ensure that there is only a single space between hash
 marks and header text.  Removes extraneous whitespace from header text.
-Assumes match data is available for `markdown-regex-header-atx'."
+Assumes match data is available for `markdown-regex-header-atx'.
+Return nil if markup was complete and non-nil if markup was completed."
   (when (markdown-incomplete-atx-p)
     (let* ((new-marker (make-marker))
            (new-marker (set-marker new-marker (match-end 2))))
@@ -2954,14 +2952,16 @@ extraneous whitespace in the text."
   "Complete and normalize setext headers.
 Add or remove underline characters to match length of header
 text.  Removes extraneous whitespace from header text.  Assumes
-match data is available for `markdown-regex-header-setext'."
+match data is available for `markdown-regex-header-setext'.
+Return nil if markup was complete and non-nil if markup was completed."
   (when (markdown-incomplete-setext-p)
     (let* ((text (markdown-compress-whitespace-string (match-string 1)))
            (char (char-after (match-beginning 2)))
            (level (if (char-equal char ?-) 2 1)))
       (goto-char (match-beginning 0))
       (delete-region (match-beginning 0) (match-end 0))
-      (markdown-insert-header level text t))))
+      (markdown-insert-header level text t)
+      t)))
 
 (defun markdown-incomplete-hr-p ()
   "Return non-nil if hr is not in `markdown-hr-strings' and nil otherwise.
@@ -2973,8 +2973,11 @@ Assumes match data is available for `markdown-regex-hr'."
 If horizontal rule string is a member of `markdown-hr-strings',
 do nothing.  Otherwise, replace with the car of
 `markdown-hr-strings'.
-Assumes match data is available for `markdown-regex-hr'."
-  (replace-match (car markdown-hr-strings)))
+Assumes match data is available for `markdown-regex-hr'.
+Return nil if markup was complete and non-nil if markup was completed."
+  (when (markdown-incomplete-hr-p)
+    (replace-match (car markdown-hr-strings))
+    t))
 
 (defun markdown-complete ()
   "Complete markup of object near point or in region when active.
@@ -2987,25 +2990,33 @@ See `markdown-complete-at-point' and `markdown-complete-region'."
 
 (defun markdown-complete-at-point ()
   "Complete markup of object near point.
-Handle all objects in `markdown-complete-alist', in
-order."
+Handle all elements of `markdown-complete-alist' in order."
   (interactive "*")
-  (loop for (regexp . function) in markdown-complete-alist
-        until (thing-at-point-looking-at (eval regexp))
-        finally (funcall function)))
+  (let ((list markdown-complete-alist) found changed)
+    (while list
+      (let ((regexp (eval (caar list)))
+            (function (cdar list)))
+        (setq list (cdr list))
+        (when (thing-at-point-looking-at regexp)
+          (setq found t)
+          (setq changed (funcall function))
+          (setq list nil))))
+    (if found
+        (or changed (error "Markup at point is complete"))
+      (error "Nothing to complete at point"))))
 
 (defun markdown-complete-region (beg end)
   "Complete markup of objects in region from BEG to END.
 Handle all objects in `markdown-complete-alist', in
 order."
   (interactive "*r")
-  (let* ((end-marker (make-marker))
-         (end-marker (set-marker end-marker end)))
-    (loop for (regexp . function) in markdown-complete-alist
-          do (save-excursion
-               (goto-char beg)
-               (while (re-search-forward (eval regexp) end-marker t)
-                 (funcall function))))))
+  (let ((end-marker (set-marker (make-marker) end)))
+    (dolist (element markdown-complete-alist)
+      (let ((regexp (eval (car element)))
+            (function (cdr element)))
+        (goto-char beg)
+        (while (re-search-forward regexp end-marker 'limit)
+          (save-excursion (funcall function)))))))
 
 (defun markdown-complete-buffer ()
   "Complete markup for all objects in the current buffer."
@@ -3135,8 +3146,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-=") 'markdown-demote)
     (define-key map (kbd "M-<left>") 'markdown-promote)
     (define-key map (kbd "M-<right>") 'markdown-demote)
-    (define-key map (kbd "C-c C-]") 'markdown-complete-or-cycle)
-    (define-key map (kbd "C-c C-[") 'markdown-complete-or-reverse-cycle)
+    (define-key map (kbd "C-c C-]") 'markdown-complete)
     ;; Following and Jumping
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
     (define-key map (kbd "C-c C-j") 'markdown-jump)
@@ -3243,8 +3253,7 @@ See also `markdown-mode-map'.")
      ["Up to parent heading" outline-up-heading])
     "---"
     ("Completion and Cycling"
-     ["Complete or cycle" markdown-complete-or-cycle]
-     ["Complete or reverse cycle" markdown-complete-or-reverse-cycle]
+     ["Complete" markdown-complete]
      ["Promote" markdown-promote]
      ["Demote" markdown-demote])
     ("List editing"
@@ -3972,22 +3981,30 @@ Calls `markdown-move-list-item-down'."
 (defun markdown-promote ()
   "Either promote header or list item at point or cycle markup.
 See `markdown-cycle-atx', `markdown-cycle-setext', and
-`markdown-demote-list-item'."
+`markdown-promote-list-item'."
   (interactive)
   (let (bounds)
     (cond
      ;; Promote atx header
      ((thing-at-point-looking-at markdown-regex-header-atx)
-      (markdown-cycle-atx -1 t))
+      (markdown-cycle-atx -1))
      ;; Promote setext header
      ((thing-at-point-looking-at markdown-regex-header-setext)
-      (markdown-cycle-setext -1 t))
+      (markdown-cycle-setext -1))
      ;; Promote horizonal rule
      ((thing-at-point-looking-at markdown-regex-hr)
-      (markdown-cycle-hr -1 t))
+      (markdown-cycle-hr -1))
      ;; Promote list item
      ((setq bounds (markdown-cur-list-item-bounds))
-      (markdown-promote-list-item)))))
+      (markdown-promote-list-item))
+     ;; Promote bold
+     ((thing-at-point-looking-at markdown-regex-bold)
+      (markdown-cycle-bold))
+     ;; Promote italic
+     ((thing-at-point-looking-at markdown-regex-italic)
+      (markdown-cycle-italic))
+     (t
+      (error "Nothing to promote at point")))))
 
 (defun markdown-demote ()
   "Either demote header or list item at point or cycle or remove markup.
@@ -3998,60 +4015,24 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
     (cond
      ;; Demote atx header
      ((thing-at-point-looking-at markdown-regex-header-atx)
-      (markdown-cycle-atx 1 t))
+      (markdown-cycle-atx 1))
      ;; Demote setext header
      ((thing-at-point-looking-at markdown-regex-header-setext)
-      (markdown-cycle-setext 1 t))
+      (markdown-cycle-setext 1))
      ;; Demote horizonal rule
      ((thing-at-point-looking-at markdown-regex-hr)
-      (markdown-cycle-hr 1 t))
-     ;; Promote list item
+      (markdown-cycle-hr 1))
+     ;; Demote list item
      ((setq bounds (markdown-cur-list-item-bounds))
       (markdown-demote-list-item))
-     ;; Create a new level one ATX header
+     ;; Demote bold
+     ((thing-at-point-looking-at markdown-regex-bold)
+      (markdown-cycle-bold))
+     ;; Demote italic
+     ((thing-at-point-looking-at markdown-regex-italic)
+      (markdown-cycle-italic))
      (t
-      (markdown-insert-header-atx-1)))))
-
-(defun markdown-complete-or-cycle (arg)
-  "Complete or cycle markup of object at point or complete objects in region.
-If there is an active region, complete markup in region.
-Otherwise, complete or cycle markup of object near point.
-When ARG is non-nil, cycle backwards when cycling."
-  (interactive "*P")
-  (if (markdown-use-region-p)
-      ;; Complete markup in region
-      (markdown-complete-region (region-beginning) (region-end))
-    ;; Complete or cycle markup at point
-    (let ((dir (if arg -1 1))
-          bounds)
-      (cond
-       ;; atx header
-       ((thing-at-point-looking-at markdown-regex-header-atx)
-        (if (markdown-incomplete-atx-p)
-            (markdown-complete-atx)
-          (markdown-cycle-atx dir)))
-       ;; setext header
-       ((thing-at-point-looking-at markdown-regex-header-setext)
-        (if (markdown-incomplete-setext-p)
-            (markdown-complete-setext)
-          (markdown-cycle-setext dir)))
-       ;; horizonal rule
-       ((thing-at-point-looking-at markdown-regex-hr)
-        (if (markdown-incomplete-hr-p)
-            (markdown-complete-hr)
-          (markdown-cycle-hr dir)))
-       ;; bold
-       ((thing-at-point-looking-at markdown-regex-bold)
-        (markdown-cycle-bold))
-       ;; italic
-       ((thing-at-point-looking-at markdown-regex-italic)
-        (markdown-cycle-italic))))))
-
-(defun markdown-complete-or-reverse-cycle ()
-  "Complete or reverse cycle markup at point or complete objects in region.
-Call `markdown-complete-or-cycle' with prefix argument."
-  (interactive)
-  (markdown-complete-or-cycle t))
+      (error "Nothing to demote at point")))))
 
 
 ;;; Commands ==================================================================

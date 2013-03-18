@@ -1147,6 +1147,58 @@ Test point position upon removal and insertion."
     (call-interactively 'markdown-kill-thing-at-point)
     (should (string-equal (current-kill 0) "sit")))))
 
+;;; Completion:
+
+(ert-deftest test-markdown-complete/atx-header-incomplete ()
+  "Test `markdown-incomplete-atx-p'."
+  (markdown-test-string "###  ###"
+   (should (looking-at markdown-regex-header-atx))
+   (should-not (markdown-incomplete-atx-p)))
+  (markdown-test-string "###abc###"
+   (should (looking-at markdown-regex-header-atx))
+   (should (markdown-incomplete-atx-p)))
+  (markdown-test-string "###   ###"
+   (should (looking-at markdown-regex-header-atx))
+   (should (markdown-incomplete-atx-p))))
+
+(ert-deftest test-markdown-complete/atx-header ()
+  "Test `markdown-complete' for atx headers."
+  (markdown-test-string "##### test"
+   (call-interactively 'markdown-complete)
+   (should (string-equal (buffer-string) "##### test #####"))))
+
+(ert-deftest test-markdown-complete/setext-header-incomplete ()
+  "Test `markdown-incomplete-setext-p'."
+  (markdown-test-string "abc\n===\n"
+   (should (looking-at markdown-regex-header-setext))
+   (should-not (markdown-incomplete-setext-p)))
+  (markdown-test-string "abc\n==\n"
+   (should (looking-at markdown-regex-header-setext))
+   (should (markdown-incomplete-setext-p)))
+  (markdown-test-string "abc\n====\n"
+   (should (looking-at markdown-regex-header-setext))
+   (should (markdown-incomplete-setext-p))))
+
+(ert-deftest test-markdown-complete/setext-header ()
+  "Test `markdown-complete' for setext headers."
+  (markdown-test-string " test  \n=="
+   (call-interactively 'markdown-complete)
+   (should (string-equal (buffer-string) "test\n===="))))
+
+(ert-deftest test-markdown-complete/hr-incomplete ()
+  "Test `markdown-incomplete-hr-p'."
+  (dolist (i (number-sequence 0 (1- (length markdown-hr-strings))))
+    (markdown-test-string (nth i markdown-hr-strings)
+     (should (looking-at markdown-regex-hr))
+     (should-not (markdown-incomplete-hr-p))
+     (should-error (call-interactively 'markdown-complete)))))
+
+(ert-deftest test-markdown-complete/hr ()
+  "Test completion via `markdown-complete' for horizontal rules."
+  (markdown-test-string "- - - - -"
+   (call-interactively 'markdown-complete)
+   (should (string-equal (buffer-string) (car markdown-hr-strings)))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
@@ -1161,17 +1213,11 @@ Test point position upon removal and insertion."
    (markdown-promote)
    (should (string-equal (buffer-string) "## test ##"))
    (markdown-promote)
-   (should (string-equal (buffer-string) "# test #"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "test"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "test"))))
+   (should (string-equal (buffer-string) "# test #"))))
 
 (ert-deftest test-markdown-demote/atx-header ()
   "Test `markdown-demote' for atx headers."
-  (markdown-test-string "test"
-   (markdown-demote)
-   (should (string-equal (buffer-string) "# test #"))
+  (markdown-test-string "# test #"
    (markdown-demote)
    (should (string-equal (buffer-string) "## test ##"))
    (markdown-demote)
@@ -1181,19 +1227,13 @@ Test point position upon removal and insertion."
    (markdown-demote)
    (should (string-equal (buffer-string) "##### test #####"))
    (markdown-demote)
-   (should (string-equal (buffer-string) "###### test ######"))
-   (markdown-demote)
    (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-promote/setext-header ()
   "Test `markdown-promote' for setext headers."
   (markdown-test-string "test\n----"
    (markdown-promote)
-   (should (string-equal (buffer-string) "test\n===="))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "test"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "test"))))
+   (should (string-equal (buffer-string) "test\n===="))))
 
 (ert-deftest test-markdown-demote/setext-header ()
   "Test `markdown-demote' for setext headers."
@@ -1207,8 +1247,6 @@ Test point position upon removal and insertion."
    (markdown-demote)
    (should (string-equal (buffer-string) "##### test #####"))
    (markdown-demote)
-   (should (string-equal (buffer-string) "###### test ######"))
-   (markdown-demote)
    (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-promote/hr ()
@@ -1216,82 +1254,98 @@ Test point position upon removal and insertion."
   (markdown-test-string (car (reverse markdown-hr-strings))
     (dolist (n (number-sequence 4 0 -1))
       (markdown-promote)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
-    (markdown-promote)
-    (should (string-equal (buffer-string) (nth 0 markdown-hr-strings)))))
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
 
 (ert-deftest test-markdown-demote/hr ()
   "Test `markdown-demote' for horizontal rules."
   (markdown-test-string (car markdown-hr-strings)
     (dolist (n (number-sequence 1 5))
       (markdown-demote)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
-    (markdown-demote)
-    (should (string-equal (buffer-string) ""))))
-
-;;; Completion and cycling:
-
-(ert-deftest test-markdown-complete-or-cycle/atx-header-incomplete ()
-  "Test `markdown-incomplete-atx-p' for headers with no text."
-  (markdown-test-string "###  ###"
-   (should (looking-at markdown-regex-header-atx))
-   (should-not (markdown-incomplete-atx-p)))
-  (markdown-test-string "###abc###"
-   (should (looking-at markdown-regex-header-atx))
-   (should (markdown-incomplete-atx-p)))
-  (markdown-test-string "###   ###"
-   (should (looking-at markdown-regex-header-atx))
-   (should (markdown-incomplete-atx-p))))
-
-(ert-deftest test-markdown-complete-or-cycle/atx-header ()
-  "Test `markdown-complete-or-cycle' for atx headers."
-  (markdown-test-string "##### test"
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "##### test #####"))
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "###### test ######"))
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "# test #"))
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "## test ##"))))
-
-(ert-deftest test-markdown-complete-or-cycle/setext-header ()
-  "Test `markdown-complete-or-cycle' for setext headers."
-  (markdown-test-string " test  \n=="
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "test\n===="))
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "test\n----"))
-   (call-interactively 'markdown-complete-or-cycle)
-   (should (string-equal (buffer-string) "### test ###"))))
-
-(ert-deftest test-markdown-complete/hr ()
-  "Test completion via `markdown-complete-or-cycle' for horizontal rules."
-  (markdown-test-string "- - - - -"
-  (call-interactively 'markdown-complete-or-cycle)
-  (should (string-equal (buffer-string) (car markdown-hr-strings)))))
-
-(ert-deftest test-markdown-cycle/hr ()
-  "Test cycling via `markdown-complete-or-cycle' for horizontal rules."
-  (markdown-test-string (car markdown-hr-strings)
-    (dolist (n (number-sequence 1 5))
-      (call-interactively 'markdown-complete-or-cycle)
       (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
 
-(ert-deftest test-markdown-cycle/bold ()
-  "Test cycling via `markdown-complete-or-cycle' for bold markup."
+(ert-deftest test-markdown-promote/bold ()
+  "Test `markdown-promote' for bold markup."
+  (markdown-test-string "__bold__"
+  (call-interactively 'markdown-promote)
+  (should (string-equal (buffer-string) "**bold**"))))
+
+(ert-deftest test-markdown-demote/bold ()
+  "Test `markdown-demote' for bold markup."
   (markdown-test-string "**bold**"
-  (call-interactively 'markdown-complete-or-cycle)
+  (call-interactively 'markdown-promote)
+  (should (string-equal (buffer-string) "__bold__"))))
+
+(ert-deftest test-markdown-promote/italic ()
+  "Test `markdown-promote' for italic markup."
+  (markdown-test-string "_italic_"
+  (call-interactively 'markdown-promote)
+  (should (string-equal (buffer-string) "*italic*"))))
+
+(ert-deftest test-markdown-demote/italic ()
+  "Test `markdown-demote' for italic markup."
+  (markdown-test-string "*italic*"
+  (call-interactively 'markdown-promote)
+  (should (string-equal (buffer-string) "_italic_"))))
+
+;;; Cycling:
+
+(ert-deftest test-markdown-cycle/atx-header ()
+  "Test `markdown-demote' cycling for atx headers."
+  (markdown-test-string "##### test"
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "###### test ######"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "# test #"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "## test ##"))))
+
+(ert-deftest test-markdown-cycle/setext-header ()
+  "Test `markdown-demote' cycling for setext headers."
+  (markdown-test-string "test\n===="
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "test\n----"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "### test ###"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "#### test ####"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "##### test #####"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "###### test ######"))
+   (call-interactively 'markdown-demote)
+   (should (string-equal (buffer-string) "# test #"))))
+
+(ert-deftest test-markdown-cycle/hr ()
+  "Test cycling of horizontal rules."
+  ;; Cycle using markdown-demote
+  (markdown-test-string (car markdown-hr-strings)
+    (dolist (n (number-sequence 1 5))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+    (call-interactively 'markdown-demote)
+    (should (string-equal (buffer-string) (car markdown-hr-strings))))
+  ;; Cycle using markdown-promote
+  (markdown-test-string (car (reverse markdown-hr-strings))
+    (dolist (n (number-sequence 4 0 -1))
+      (call-interactively 'markdown-promote)
+      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+    (call-interactively 'markdown-promote)
+    (should (string-equal (buffer-string) (car (reverse markdown-hr-strings))))))
+
+(ert-deftest test-markdown-cycle/bold ()
+  "Test cycling of bold markup."
+  (markdown-test-string "**bold**"
+  (call-interactively 'markdown-demote)
   (should (string-equal (buffer-string) "__bold__"))
-  (call-interactively 'markdown-complete-or-cycle)
+  (call-interactively 'markdown-demote)
   (should (string-equal (buffer-string) "**bold**"))))
 
 (ert-deftest test-markdown-cycle/italic ()
-  "Test cycling via `markdown-complete-or-cycle' for italic markup."
+  "Test cycling of italic markup."
   (markdown-test-string "*italic*"
-  (call-interactively 'markdown-complete-or-cycle)
+  (call-interactively 'markdown-demote)
   (should (string-equal (buffer-string) "_italic_"))
-  (call-interactively 'markdown-complete-or-cycle)
+  (call-interactively 'markdown-demote)
   (should (string-equal (buffer-string) "*italic*"))))
 
 ;;; Indentation tests:
