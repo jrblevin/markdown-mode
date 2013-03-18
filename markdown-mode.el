@@ -1762,11 +1762,13 @@ because `thing-at-point-looking-at' does not work reliably with
   (interactive)
   (save-excursion
     (let ((old-point (point))
-          (end-of-block (progn (markdown-end-of-block) (point))))
+          (end-of-block (progn (markdown-end-of-block) (point)))
+          found)
       (markdown-beginning-of-block)
       (while (and (markdown-match-code end-of-block)
+                  (setq found t)
                   (< (match-end 0) old-point)))
-      (and (match-beginning 0) ; matched something
+      (and found                              ; matched something
            (<= (match-beginning 0) old-point) ; match contains old-point
            (>= (match-end 0) old-point)))))
 

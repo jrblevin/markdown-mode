@@ -1697,7 +1697,7 @@ body"
    (should (equal (markdown-get-defined-references) nil))))
 
 (ert-deftest test-markdown-parsing/code-at-point-inline ()
-  "Test `markdown-code-at-point'."
+  "Test `markdown-code-at-point-p'."
 
   (defun test-region (beg end)
     (goto-char (1- beg))
@@ -1722,7 +1722,7 @@ body"
    ))
 
 (ert-deftest test-markdown-parsing/code-at-point-one-space ()
-  "Test `markdown-code-at-point' with multiple code spans in a row."
+  "Test `markdown-code-at-point-p' with multiple code spans in a row."
   (markdown-test-string "`foo` `bar` `baz`"
     (dolist (loc (number-sequence 1 6))
       (goto-char loc)
@@ -1738,7 +1738,7 @@ body"
       (should (equal (match-data) (list 13 18 14 17))))))
 
 (ert-deftest test-markdown-parsing/code-at-point-no-space ()
-  "Test `markdown-code-at-point` with multiple code spans in a row."
+  "Test `markdown-code-at-point-p' with multiple code spans in a row."
   (markdown-test-string "a`foo`b`bar`c`baz`d"
     (goto-char 1)                       ; "a"
     (should-not (markdown-code-at-point-p))
@@ -1754,6 +1754,16 @@ body"
       (goto-char loc)
       (should (markdown-code-at-point-p))
       (should (equal (match-data) (list 14 19 15 18))))))
+
+(ert-deftest test-markdown-parsing/code-at-point-blank-line ()
+  "Test `markdown-code-at-point-p' at beginning of block."
+  (markdown-test-string "----------\n\n## foo\n"
+   (should-not (markdown-code-at-point-p))
+   (forward-line)
+   (should-not (markdown-code-at-point-p))
+   (forward-line)
+   (should-not (markdown-code-at-point-p))))
+
 
 ;;; Reference Checking:
 
