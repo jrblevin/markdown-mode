@@ -1920,12 +1920,12 @@ This helps improve font locking for block constructs such as pre blocks."
   (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
   (save-excursion
     (goto-char font-lock-beg)
-    (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
-      (goto-char font-lock-end)
-      (when (re-search-forward "\n\n" nil t)
-        (beginning-of-line)
-        (setq font-lock-end (point))
-        (setq font-lock-beg found)))))
+    (unless (looking-back "\n\n")
+      (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
+        (goto-char font-lock-end)
+        (when (re-search-forward "\n\n" nil t)
+          (setq font-lock-end (match-beginning 0))
+          (setq font-lock-beg found))))))
 
 
 ;;; Syntax Table ==============================================================
