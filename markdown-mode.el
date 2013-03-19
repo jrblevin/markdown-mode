@@ -3947,7 +3947,7 @@ with ARG.  When called with \\[universal-argument], call
   (cond ((integerp arg)
          (forward-paragraph arg))
         ((equal arg '(4))
-         (markdown-end-of-block 1))))
+         (markdown-end-of-block))))
 
 (defun markdown-backward-paragraph (arg)
   "Move backward one or more paragraphs or by one block.
@@ -3959,7 +3959,7 @@ with ARG.  When called with \\[universal-argument], call
   (cond ((integerp arg)
          (backward-paragraph arg))
         ((equal arg '(4))
-         (markdown-beginning-of-block 1))))
+         (markdown-beginning-of-block))))
 
 (defun markdown-end-of-block-element ()
   "Move the point to the start of the next block unit.
