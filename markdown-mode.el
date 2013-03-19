@@ -122,7 +122,7 @@
 ;; titling).  The primary commands in each group will are described
 ;; below.  You can obtain a list of all keybindings by pressing `C-c
 ;; C-h`.  Movement and shifting commands tend to be associated with
-;; paired delimiters such as `M-[` and `M-]` or `C-c <` and `C-c >`.
+;; paired delimiters such as `M-{` and `M-}` or `C-c <` and `C-c >`.
 ;; Outline navigation keybindings the same as in `org-mode'.  Finally,
 ;; commands for running Markdown or doing maintenance on an open file
 ;; are grouped under the `C-c C-c` prefix.  The most commonly used
@@ -367,15 +367,16 @@
 ;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
-;;   * Movement by Block: `M-[` and `M-]`
+;;   * Movement by Paragraph or Block: `M-{` and `M-}`
 ;;
-;;     markdown-mode supports the usual Emacs paragraph movement with
-;;     `M-{` and `M-}`.  These commands treat list items as
-;;     paragraphs, so they will stop at each line within a block of
-;;     list items.  Additionally, markdown-mode includes movement
-;;     commands, `M-[` and `M-]` for jumping to the beginning or end
-;;     of an entire block of text (with blocks being separated by at
-;;     least one blank line).
+;;     The definition of a "paragraph" is slightly different in
+;;     markdown-mode than, say, text-mode, because markdown-mode
+;;     supports filling for list items and respects hard line breaks,
+;;     both of which break paragraphs.  So, markdown-mode overrides
+;;     the usual paragraph navigation commands `M-{` and `M-}` so that
+;;     with a `C-u` prefix, these commands jump to the beginning or
+;;     end of an entire block of text, respectively, where "blocks"
+;;     are separated by one or more lines.
 ;;
 ;;   * Movement by Defun: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
@@ -3187,8 +3188,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-<right>") 'markdown-demote)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
     ;; Movement
-    (define-key map (kbd "M-[") 'markdown-beginning-of-block)
-    (define-key map (kbd "M-]") 'markdown-end-of-block)
+    (define-key map (kbd "M-{") 'markdown-backward-paragraph)
+    (define-key map (kbd "M-}") 'markdown-forward-paragraph)
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Alternative keys (in case of problems with the arrow keys)
@@ -3935,6 +3936,30 @@ move back to the ARG-th preceding section."
     (goto-char (point-max)))
   (skip-syntax-backward "-")
   (forward-line))
+
+(defun markdown-forward-paragraph (arg)
+  "Move forward one or more paragraphs or by one block.
+When ARG is nil or a numeric prefix, call `forward-paragraph'
+with ARG.  When called with \\[universal-argument], call
+`markdown-end-of-block' instead."
+  (interactive "P")
+  (or arg (setq arg 1))
+  (cond ((integerp arg)
+         (forward-paragraph arg))
+        ((equal arg '(4))
+         (markdown-end-of-block 1))))
+
+(defun markdown-backward-paragraph (arg)
+  "Move backward one or more paragraphs or by one block.
+When ARG is nil or a numeric prefix, call `backward-paragraph'
+with ARG.  When called with \\[universal-argument], call
+`markdown-beginning-of-block' instead."
+  (interactive "P")
+  (or arg (setq arg 1))
+  (cond ((integerp arg)
+         (backward-paragraph arg))
+        ((equal arg '(4))
+         (markdown-beginning-of-block 1))))
 
 (defun markdown-end-of-block-element ()
   "Move the point to the start of the next block unit.
