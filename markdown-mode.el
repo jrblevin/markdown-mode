@@ -1924,8 +1924,8 @@ This helps improve font locking for block constructs such as pre blocks."
       (goto-char font-lock-end)
       (when (re-search-forward "\n\n" nil t)
         (beginning-of-line)
-        (setq font-lock-end (point)))
-      (setq font-lock-beg found))))
+        (setq font-lock-end (point))
+        (setq font-lock-beg found)))))
 
 
 ;;; Syntax Table ==============================================================
