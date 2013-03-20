@@ -719,6 +719,7 @@
 
 (require 'easymenu)
 (require 'outline)
+(require 'thingatpt)
 (eval-when-compile (require 'cl))
 
 
@@ -4246,8 +4247,6 @@ current filename, but with the extension removed and replaced with .html."
 
 
 ;;; Links =====================================================================
-
-(require 'thingatpt)
 
 (defun markdown-link-p ()
   "Return non-nil when `point' is at a non-wiki link.
