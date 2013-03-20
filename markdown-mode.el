@@ -495,12 +495,15 @@
 ;;   * `markdown-content-type' - when set to a nonempty string, an
 ;;     `http-equiv` attribute will be included in the XHTML `<head>`
 ;;     block (default: `""`).  If needed, the suggested values are
-;;     `application/xhtml+xml` or `text/html`.
+;;     `application/xhtml+xml` or `text/html`.  See also:
+;;     `markdown-coding-system'.
 ;;
 ;;   * `markdown-coding-system' - used for specifying the character
-;;     set identifier in the `http-equiv` attribute (see
-;;     `markdown-content-type') (default: `nil').  When set to `nil',
-;;     `buffer-file-coding-system' will be used (and falling back to
+;;     set identifier in the `http-equiv` attribute when included
+;;     (default: `nil').  See `markdown-content-type', which must
+;;     be set before this variable has any effect.  When set to `nil',
+;;     `buffer-file-coding-system' will be used to automatically
+;;     determine the coding system string (falling back to
 ;;     `iso-8859-1' when unavailable).  Common settings are `utf-8'
 ;;     and `iso-latin-1'.
 ;;
