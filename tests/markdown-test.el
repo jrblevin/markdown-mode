@@ -613,24 +613,27 @@ Test point position upon removal and insertion."
 
 (ert-deftest test-markdown-insertion/header-dwim-prefix ()
   "Test 'do what I mean' header insertion with prefix arguments."
-  (let ((tests (list '(nil . "# abc #")
+  (let ((tests (list '(nil . "## abc ##")
                      '(1 . "# abc #")
                      '(2 . "## abc ##")
                      '(3 . "### abc ###")
                      '(4 . "#### abc ####")
                      '(5 . "##### abc #####")
                      '(6 . "###### abc ######")
-                     '((4) . "abc\n===")
-                     '((16) . "abc\n---"))))
+                     '((4) . "# abc #")
+                     '((16) . "### abc ###"))))
     (dolist (test tests)
-      (markdown-test-string "abc"
+      (markdown-test-string "## atx\n\nabc"
+       (goto-char (point-max))
        (let ((current-prefix-arg (car test)))
          (call-interactively 'markdown-insert-header-dwim)
-         (should (string-equal (buffer-string) (cdr test))))))))
+         (should (string-equal
+                  (buffer-substring (line-beginning-position) (line-end-position))
+                  (cdr test))))))))
 
 (ert-deftest test-markdown-insertion/header-setext-dwim-prefix ()
   "Test 'do what I mean' header insertion with prefix arguments."
-  (let ((tests (list '(nil . "abc\n===")
+  (let ((tests (list '(nil . "abc\n---")
                      '(1 . "abc\n===")
                      '(2 . "abc\n---")
                      '(3 . "### abc ###")
@@ -638,12 +641,15 @@ Test point position upon removal and insertion."
                      '(5 . "##### abc #####")
                      '(6 . "###### abc ######")
                      '((4) . "abc\n===")
-                     '((16) . "abc\n---"))))
+                     '((16) . "### abc ###"))))
     (dolist (test tests)
-      (markdown-test-string "abc"
+      (markdown-test-string "atx\n---\n\nabc"
+       (goto-char (point-max))
        (let ((current-prefix-arg (car test)))
          (call-interactively 'markdown-insert-header-setext-dwim)
-         (should (string-equal (buffer-string) (cdr test))))))))
+         (should (string-equal
+                  (buffer-substring (line-beginning-position) (line-end-position 2))
+                  (cdr test))))))))
 
 (ert-deftest test-markdown-insertion/remove-header ()
   "Test ATX and setext header."

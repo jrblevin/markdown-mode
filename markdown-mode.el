@@ -219,7 +219,9 @@
 ;;     possible, still calculating the level automatically.
 ;;     In cases where the automatically-determined level is not what
 ;;     you intended, the level can be quickly promoted or demoted
-;;     (as described below).
+;;     (as described below).  Alternatively, a `C-u` prefix can be
+;;     given to insert a heading promoted by one level or a `C-u C-u`
+;;     prefix can be given to insert a heading demoted by one level.
 ;;
 ;;     To insert a heading of a specific level and type, use `C-c C-t 1`
 ;;     through `C-c C-t 6` for atx (hash mark) headings and `C-c C-t !` or
@@ -2316,9 +2318,11 @@ argument is given via ARG.
 With a numeric prefix valued 1 to 6, insert a header of the given
 level, with the type being determined automatically (note that
 only level 1 or 2 setext headers are possible).
-With \\[universal-argument], insert a level-one setext header.
-With \\[universal-argument] \\[universal-argument], insert a
-level two setext header.
+
+With a \\[universal-argument] prefix (i.e., when ARG is (4)),
+promote the heading by one level.
+With two \\[universal-argument] prefixes (i.e., when ARG is (16)),
+demote the heading by one level.
 When SETEXT is non-nil, prefer setext-style headers when
 possible (levels one and two).
 
@@ -2333,23 +2337,23 @@ See `markdown-insert-header' for more details about how the
 header text is determined."
   (interactive "*P")
   (let (level)
-    (cond ((equal arg '(4))             ; level-one setext with C-u
-           (setq setext t)
-           (setq level 1))
-          ((equal arg '(16))            ; level-two setext with C-u C-u
-           (setq setext t)
-           (setq level 2))
-          (t                            ; automatic with numeric override
-           (save-excursion
-             (when (re-search-backward markdown-regex-header nil t)
-               ;; level of previous header
-               (setq level (markdown-outline-level))
-               ;; match groups 1 and 2 indicate setext headers
-               (setq setext (or setext (match-end 1) (match-end 3)))))
-           ;; use prefix if given, or level of previous header
-           (setq level (if arg (prefix-numeric-value arg) level))
-           ;; setext headers must be level one or two
-           (and level (setq setext (and setext (<= level 2))))))
+    (save-excursion
+      (when (re-search-backward markdown-regex-header nil t)
+        ;; level of previous header
+        (setq level (markdown-outline-level))
+        ;; match groups 1 and 2 indicate setext headers
+        (setq setext (or setext (match-end 1) (match-end 3)))))
+    ;; check prefix argument
+    (cond
+     ((and (equal arg '(4)) (> level 1)) ;; C-u
+      (decf level))
+     ((and (equal arg '(16)) (< level 6)) ;; C-u C-u
+      (incf level))
+     (arg ;; numeric prefix
+      (setq level (prefix-numeric-value arg))))
+    ;; setext headers must be level one or two
+    (and level (setq setext (and setext (<= level 2))))
+    ;; insert the heading
     (markdown-insert-header level nil setext)))
 
 (defun markdown-insert-header-setext-dwim (&optional arg)
@@ -3588,10 +3592,10 @@ the point is inside ordered list, insert the next number followed
 by a period.  Use the previous list item to determine the amount
 of whitespace to place before and after list markers.
 
-With a \\[universal-argument] prefix (i.e., when ARG is 4),
+With a \\[universal-argument] prefix (i.e., when ARG is (4)),
 decrease the indentation by one level.
 
-With two \\[universal-argument] prefixes (i.e., when ARG is 16),
+With two \\[universal-argument] prefixes (i.e., when ARG is (16)),
 increase the indentation by one level."
   (interactive "p")
   (let (bounds item-indent marker indent new-indent new-loc)
