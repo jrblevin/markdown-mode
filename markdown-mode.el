@@ -26,7 +26,7 @@
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
-;; Version: 1.9
+;; Version: 2.0
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -55,15 +55,15 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest stable version is markdown-mode 1.9, released on January 25, 2013:
+;; The latest stable version is markdown-mode 2.0, released on March 24, 2013:
 ;;
 ;;    * [markdown-mode.el][]
 ;;    * [Screenshot][][^theme]
 ;;    * [Release notes][]
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
-;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20110812-001.png
-;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-1-9
+;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20130131-002.png
+;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-2-0
 ;;
 ;; [^theme]: The theme used in the screenshot is
 ;;   [color-theme-twilight](https://github.com/crafterm/twilight-emacs).
@@ -707,6 +707,7 @@
 ;;   * 2011-08-12: [Version 1.8][]
 ;;   * 2011-08-15: [Version 1.8.1][]
 ;;   * 2013-01-25: [Version 1.9][]
+;;   * 2013-03-18: [Version 2.0][]
 ;;
 ;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
 ;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
@@ -715,6 +716,7 @@
 ;; [Version 1.8]: http://jblevins.org/projects/markdown-mode/rev-1-8
 ;; [Version 1.8.1]: http://jblevins.org/projects/markdown-mode/rev-1-8-1
 ;; [Version 1.9]: http://jblevins.org/projects/markdown-mode/rev-1-9
+;; [Version 2.0]: http://jblevins.org/projects/markdown-mode/rev-2-0
 
 
 ;;; Code:
@@ -727,7 +729,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.0-pre"
+(defconst markdown-mode-version "2.0"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
