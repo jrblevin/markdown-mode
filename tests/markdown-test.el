@@ -2170,6 +2170,12 @@ See `paragraph-separate'."
      (fill-paragraph)
      (should (string-equal (buffer-string) "Lorem ipsum dolor sit amet,  \nconsectetur adipisicing elit, sed do eiusmod tempor incididunt ut\nlabore et dolore magna aliqua.")))))
 
+(ert-deftest test-markdown-filling/decimal-number-at-beginning ()
+  "Test filling when a number with a decimal appears at the beginning of a line."
+  (markdown-test-string "The circumference of a circle divided by it's radius is around\n3.14."
+   (fill-paragraph)
+   (should (string-equal (buffer-string) "The circumference of a circle divided by it's radius is around 3.14."))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
