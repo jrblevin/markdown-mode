@@ -1210,7 +1210,10 @@ Test point position upon removal and insertion."
   ;; Ensure markdown-complete-buffer doesn't mistake this for a horizontal rule
   (markdown-test-string "Subheading\n--\n"
    (call-interactively 'markdown-complete-buffer)
-   (should (string-equal (buffer-string) "Subheading\n----------\n\n"))))
+   (should (string-equal (buffer-string) "Subheading\n----------\n\n")))
+  (markdown-test-string "Abc\n--\n\nDef\n--\n"
+   (call-interactively 'markdown-complete-buffer)
+   (should (string-equal (buffer-string) "Abc\n---\n\nDef\n---\n\n"))))
 
 ;;; Promotion and demotion tests:
 

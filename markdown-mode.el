@@ -3040,8 +3040,8 @@ match."
                 (dolist (prev-regexp previous)
                   (or match (setq match (looking-back prev-regexp)))))
               (unless match
-                (save-excursion (funcall function))
-                (add-to-list 'previous regexp)))))))))
+                (save-excursion (funcall function))))))
+        (add-to-list 'previous regexp)))))
 
 (defun markdown-complete-buffer ()
   "Complete markup for all objects in the current buffer."
