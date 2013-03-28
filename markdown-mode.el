@@ -682,6 +682,7 @@
 ;;   * Michael Dwyer <mdwyer@ehtech.in> for `gfm-mode' underscore regexp.
 ;;   * Chris Lott <chris@chrislott.org> for suggesting reference label
 ;;     completion.
+;;   * Gunnar Franke <Gunnar.Franke@gmx.de> for a completion bug report.
 
 ;;; Bugs:
 
@@ -3020,16 +3021,27 @@ Handle all elements of `markdown-complete-alist' in order."
 
 (defun markdown-complete-region (beg end)
   "Complete markup of objects in region from BEG to END.
-Handle all objects in `markdown-complete-alist', in
-order."
+Handle all objects in `markdown-complete-alist', in order.  Each
+match is checked to ensure that a previous regexp does not also
+match."
   (interactive "*r")
-  (let ((end-marker (set-marker (make-marker) end)))
+  (let ((end-marker (set-marker (make-marker) end))
+        previous)
     (dolist (element markdown-complete-alist)
       (let ((regexp (eval (car element)))
             (function (cdr element)))
         (goto-char beg)
         (while (re-search-forward regexp end-marker 'limit)
-          (save-excursion (funcall function)))))))
+          (when (match-string 0)
+            ;; Make sure this is not a match for any of the preceding regexps.
+            ;; This prevents mistaking an HR for a Setext subheading.
+            (let (match)
+              (save-match-data
+                (dolist (prev-regexp previous)
+                  (or match (setq match (looking-back prev-regexp)))))
+              (unless match
+                (save-excursion (funcall function))
+                (add-to-list 'previous regexp)))))))))
 
 (defun markdown-complete-buffer ()
   "Complete markup for all objects in the current buffer."

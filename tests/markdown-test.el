@@ -1205,6 +1205,13 @@ Test point position upon removal and insertion."
    (call-interactively 'markdown-complete)
    (should (string-equal (buffer-string) (car markdown-hr-strings)))))
 
+(ert-deftest test-markdown-complete/buffer-setext-2 ()
+  "Test `markdown-complete-buffer' for level two setext heading."
+  ;; Ensure markdown-complete-buffer doesn't mistake this for a horizontal rule
+  (markdown-test-string "Subheading\n--\n"
+   (call-interactively 'markdown-complete-buffer)
+   (should (string-equal (buffer-string) "Subheading\n----------\n\n"))))
+
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
