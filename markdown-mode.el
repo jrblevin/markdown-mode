@@ -4641,6 +4641,9 @@ if ARG is omitted or nil."
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
 
+;;;###autoload(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+;;;###autoload(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
 ;;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
 
 
