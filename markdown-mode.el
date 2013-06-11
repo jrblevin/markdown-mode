@@ -4643,8 +4643,7 @@ if ARG is omitted or nil."
 
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 ;;;###autoload(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-;;(add-to-list 'auto-mode-alist '("\\.text$" . markdown-mode))
+;;;###autoload(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 
 
 ;;; GitHub Flavored Markdown Mode  ============================================
