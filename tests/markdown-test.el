@@ -2334,6 +2334,13 @@ See `paragraph-separate'."
     (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
     (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
 
+(ert-deftest test-markdown-gfm/code-block-font-lock-2 ()
+  "GFM code block font lock test without language identifier."
+  (markdown-test-string-gfm "Plain code block:\n\n```\nfoo\n```\n"
+    (markdown-test-range-has-face 20 22 markdown-pre-face)
+    (markdown-test-range-has-face 24 26 markdown-pre-face)
+    (markdown-test-range-has-face 28 30 markdown-pre-face)))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here

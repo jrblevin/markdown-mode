@@ -1870,7 +1870,7 @@ because `thing-at-point-looking-at' does not work reliably with
   "Match GFM quoted code blocks from point to LAST."
   (let (open lang body close all)
     (cond ((and (eq major-mode 'gfm-mode)
-                (search-forward-regexp "^\\(```\\)\\(\\w+\\)?$" last t))
+                (search-forward-regexp "^\\(```\\)\\([^[:space:]]+[[:space:]]*\\)?$" last t))
            (beginning-of-line)
            (setq open (list (match-beginning 1) (match-end 1))
                  lang (list (match-beginning 2) (match-end 2)))
@@ -4653,7 +4653,7 @@ if ARG is omitted or nil."
    ;; GFM features to match first
    (list
     (cons 'markdown-match-gfm-code-blocks '((1 markdown-pre-face)
-                                            (2 markdown-language-keyword-face)
+                                            (2 markdown-language-keyword-face t t)
                                             (3 markdown-pre-face)
                                             (4 markdown-pre-face))))
    ;; Basic Markdown features (excluding possibly overridden ones)
