@@ -72,7 +72,7 @@
 ;;
 ;;    * Debian and Ubuntu Linux: [emacs-goodies-el][]
 ;;    * RedHat and Fedora Linux: [emacs-goodies][]
-;;    * OpenBSD: [textproc/markdown-mode][]
+;;    * NetBSD: [textproc/markdown-mode][]
 ;;    * Arch Linux (AUR): [emacs-markdown-mode-git][]
 ;;    * MacPorts: [markdown-mode.el][macports-package] ([pending][macports-ticket])
 ;;    * FreeBSD: [textproc/markdown-mode.el][freebsd-port]
