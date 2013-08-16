@@ -495,8 +495,8 @@
 ;;     support by default.  Math support can be toggled later using
 ;;     the function `markdown-enable-math'."
 ;;
-;;   * `markdown-css-path' - CSS file to link to in XHTML output
-;;     (default: `""`).
+;;   * `markdown-css-paths' - CSS files to link to in XHTML output
+;;     (default: `nil`).
 ;;
 ;;   * `markdown-content-type' - when set to a nonempty string, an
 ;;     `http-equiv` attribute will be included in the XHTML `<head>`
@@ -709,6 +709,8 @@
 ;;     definitions, improved killing of footnotes, and numerous other
 ;;     tests and bug fixes.
 ;;   * Antonis Kanouras <antonis@metadosis.gr> for strike through support.
+;;   * Tim Visher <tim.visher@gmail.com> for multiple CSS files and other
+;;     general improvements.
 
 ;;; Bugs:
 
@@ -872,10 +874,10 @@ or \\[markdown-enable-math]."
   :type 'boolean
   :safe 'booleanp)
 
-(defcustom markdown-css-path ""
+(defcustom markdown-css-paths nil
   "URL of CSS file to link to in the output XHTML."
   :group 'markdown
-  :type 'string)
+  :type 'list)
 
 (defcustom markdown-content-type ""
   "Content type string for the http-equiv header in XHTML output.
@@ -4264,6 +4266,11 @@ Standalone XHTML output is identified by an occurrence of
    (save-excursion (goto-char (point-min)) (forward-line 4) (point))
    t))
 
+(defun markdown-stylesheet-link-string (stylesheet-path)
+  (concat "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
+          stylesheet-path
+          "\"  />"))
+
 (defun markdown-add-xhtml-header-and-footer (title)
   "Wrap XHTML header and footer with given TITLE around current buffer."
   (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
@@ -4286,10 +4293,8 @@ Standalone XHTML output is identified by an occurrence of
                (coding-system-get buffer-file-coding-system
                                   'mime-charset))
           "iso-8859-1"))))
-  (if (> (length markdown-css-path) 0)
-      (insert "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
-              markdown-css-path
-              "\"  />\n"))
+  (if (> (length markdown-css-paths) 0)
+      (insert (mapconcat 'markdown-stylesheet-link-string markdown-css-paths "\n")))
   (when (> (length markdown-xhtml-header-content) 0)
     (insert markdown-xhtml-header-content))
   (insert "\n</head>\n\n"

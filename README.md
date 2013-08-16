@@ -447,8 +447,8 @@ provides an interface to all of the possible customizations:
     support by default.  Math support can be toggled later using
     the function `markdown-enable-math`."
 
-  * `markdown-css-path` - CSS file to link to in XHTML output
-    (default: `""`).
+  * `markdown-css-paths` - CSS files to link to in XHTML output
+    (default: `nil`).
 
   * `markdown-content-type` - when set to a nonempty string, an
     `http-equiv` attribute will be included in the XHTML `<head>`
@@ -661,6 +661,8 @@ following people:
     definitions, improved killing of footnotes, and numerous other
     tests and bug fixes.
   * Antonis Kanouras for strike through support.
+  * Tim Visher for multiple CSS files and other
+    general improvements.
 
 ## Bugs
 
