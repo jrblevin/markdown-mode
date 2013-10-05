@@ -678,7 +678,8 @@
 ;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> for a bug fix
 ;;     related to `orgtbl-mode'.
 ;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
-;;     export hooks and unit test improvements.
+;;     export hooks, unit test improvements, and updates to support
+;;     wide characters.
 ;;   * Michael Dwyer <mdwyer@ehtech.in> for `gfm-mode' underscore regexp.
 ;;   * Chris Lott <chris@chrislott.org> for suggesting reference label
 ;;     completion.
@@ -2302,7 +2303,7 @@ header will be inserted."
   (markdown-ensure-blank-line-before)
   (let (hdr)
     (cond (setext
-           (setq hdr (make-string (length text) (if (= level 2) ?- ?=)))
+           (setq hdr (make-string (string-width text) (if (= level 2) ?- ?=)))
            (insert text "\n" hdr))
           (t
            (setq hdr (make-string level ?#))
@@ -2310,7 +2311,7 @@ header will be inserted."
   (markdown-ensure-blank-line-after)
   ;; Leave point at end of text
   (if setext
-      (backward-char (1+ (length text)))
+      (backward-char (1+ (string-width text)))
     (backward-char (1+ level))))
 
 (defun markdown-insert-header-dwim (&optional arg setext)
