@@ -4603,7 +4603,7 @@ if ARG is omitted or nil."
   (set (make-local-variable 'paragraph-start)
        "\f\\|[ \t]*$\\|[ \t]*[*+-] \\|[ \t]*[0-9]+\\.[ \t]\\|[ \t]*: ")
   (set (make-local-variable 'paragraph-separate)
-       "\\(?:[ \t\f]\\|.*  \\)*$")
+       "\\(?:[ \t\f]*\\|.*  \\)$")
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
        "\\`[ \t]*>[ \t]*?\\'")
   (set (make-local-variable 'adaptive-fill-function)
