@@ -684,6 +684,7 @@
 ;;   * Chris Lott <chris@chrislott.org> for suggesting reference label
 ;;     completion.
 ;;   * Gunnar Franke <Gunnar.Franke@gmx.de> for a completion bug report.
+;;   * David Glasser <glasser@meteor.com> for a `paragraph-separate' fix.
 
 ;;; Bugs:
 
