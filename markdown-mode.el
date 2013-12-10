@@ -4241,9 +4241,9 @@ Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (setq output-buffer-name (markdown output-buffer-name))
   (with-current-buffer output-buffer-name
     (set-buffer output-buffer-name)
-    (goto-char (point-min))
     (unless (markdown-output-standalone-p)
       (markdown-add-xhtml-header-and-footer output-buffer-name))
+    (goto-char (point-min))
     (html-mode))
   output-buffer-name)
 
@@ -4258,10 +4258,12 @@ that name."
   "Determine whether `markdown-command' output is standalone XHTML.
 Standalone XHTML output is identified by an occurrence of
 `markdown-xhtml-standalone-regexp' in the first five lines of output."
-  (re-search-forward
-   markdown-xhtml-standalone-regexp
-   (save-excursion (goto-char (point-min)) (forward-line 4) (point))
-   t))
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward
+     markdown-xhtml-standalone-regexp
+     (save-excursion (goto-char (point-min)) (forward-line 4) (point))
+     t)))
 
 (defun markdown-stylesheet-link-string (stylesheet-path)
   (concat "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
