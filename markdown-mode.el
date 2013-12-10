@@ -535,6 +535,15 @@
 ;;     (default: `end`).  The set of location options is the same as
 ;;     for `markdown-reference-location'.
 ;;
+;;   * `comment-auto-fill-only-comments' - variable is made
+;;     buffer-local and set to `nil' by default.  In programming
+;;     language modes, when this variable is non-nil, only comments
+;;     will be filled by auto-fill-mode.  However, comments in
+;;     Markdown documents are rare and the most users probably intend
+;;     for the actual content of the document to be filled.  Making
+;;     this variable buffer-local allows `markdown-mode' to override
+;;     the default behavior induced when the global variable is non-nil.
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
@@ -685,6 +694,7 @@
 ;;     completion.
 ;;   * Gunnar Franke <Gunnar.Franke@gmx.de> for a completion bug report.
 ;;   * David Glasser <glasser@meteor.com> for a `paragraph-separate' fix.
+;;   * Daniel Brotsky <dev@brotsky.com> for better auto-fill defaults.
 
 ;;; Bugs:
 
@@ -4583,6 +4593,7 @@ if ARG is omitted or nil."
   (setq comment-start-skip "<!--[ \t]*")
   (make-local-variable 'comment-column)
   (setq comment-column 0)
+  (set (make-local-variable 'comment-auto-fill-only-comments) nil)
   ;; Font lock.
   (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
   (set (make-local-variable 'font-lock-defaults) nil)
