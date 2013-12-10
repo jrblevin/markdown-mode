@@ -4308,7 +4308,7 @@ Standalone XHTML output is identified by an occurrence of
 When OUTPUT-BUFFER-NAME is given, insert the output in the buffer with
 that name."
   (interactive)
-  (browse-url-of-buffer (markdown markdown-output-buffer-name)))
+  (browse-url-of-buffer (markdown-standalone markdown-output-buffer-name)))
 
 (defun markdown-export-file-name (&optional extension)
   "Attempt to generate a filename for Markdown output.
