@@ -4314,12 +4314,18 @@ output filename based on that filename.  Otherwise, return nil."
   (when (buffer-file-name)
     (unless extension
       (setq extension ".html"))
-    (concat
-     (cond
-      ((buffer-file-name)
-       (file-name-sans-extension (buffer-file-name)))
-      (t (buffer-name)))
-     extension)))
+    (let ((candidate
+           (concat
+            (cond
+             ((buffer-file-name)
+              (file-name-sans-extension (buffer-file-name)))
+             (t (buffer-name)))
+            extension)))
+      (cond
+       ((equal candidate (buffer-file-name))
+        (concat candidate extension))
+       (t
+        candidate)))))
 
 (defun markdown-export (&optional output-file)
   "Run Markdown on the current buffer, save to file, and return the filename.
