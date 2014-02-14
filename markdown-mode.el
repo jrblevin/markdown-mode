@@ -3051,7 +3051,7 @@ header text is determined."
       (when (re-search-backward markdown-regex-header nil t)
         ;; level of previous header
         (setq level (markdown-outline-level))
-        ;; match groups 1 and 2 indicate setext headers
+        ;; match groups 1 and 3 indicate setext headers
         (setq setext (or setext (match-end 1) (match-end 3)))))
     ;; check prefix argument
     (cond
