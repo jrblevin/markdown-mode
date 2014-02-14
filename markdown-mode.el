@@ -3055,9 +3055,9 @@ header text is determined."
         (setq setext (or setext (match-end 1) (match-end 3)))))
     ;; check prefix argument
     (cond
-     ((and (equal arg '(4)) (> level 1)) ;; C-u
+     ((and (equal arg '(4)) level (> level 1)) ;; C-u
       (cl-decf level))
-     ((and (equal arg '(16)) (< level 6)) ;; C-u C-u
+     ((and (equal arg '(16)) level (< level 6)) ;; C-u C-u
       (cl-incf level))
      (arg ;; numeric prefix
       (setq level (prefix-numeric-value arg))))
