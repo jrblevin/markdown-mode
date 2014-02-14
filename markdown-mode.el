@@ -3048,8 +3048,9 @@ header text is determined."
   (interactive "*P")
   (let (level)
     (save-excursion
-      (when (re-search-backward markdown-regex-header nil t)
-        ;; level of previous header
+      (when (or (thing-at-point-looking-at markdown-regex-header)
+                (re-search-backward markdown-regex-header nil t))
+        ;; level of current or previous header
         (setq level (markdown-outline-level))
         ;; match groups 1 and 3 indicate setext headers
         (setq setext (or setext (match-end 1) (match-end 3)))))
