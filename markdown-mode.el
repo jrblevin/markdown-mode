@@ -4684,9 +4684,10 @@ if ARG is omitted or nil."
        '(gfm-font-lock-keywords))
   (auto-fill-mode 0)
   ;; Use visual-line-mode if available, fall back to longlines-mode:
-  (if (fboundp 'visual-line-mode)
-      (visual-line-mode 1)
-    (longlines-mode 1))
+  (cond ((fboundp 'visual-line-mode)
+         (visual-line-mode 1))
+        ((fboundp 'longlines-mode)
+         (longlines-mode 1)))
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
 
