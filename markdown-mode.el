@@ -4693,5 +4693,7 @@ if ARG is omitted or nil."
 
 
 (provide 'markdown-mode)
-
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; markdown-mode.el ends here
