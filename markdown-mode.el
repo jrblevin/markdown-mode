@@ -606,7 +606,7 @@
 ;; the code block.  You will be prompted for the name of the language,
 ;; but may press enter to continue without naming a language.
 ;;
-;; For a more complete GitHub-flavored markdown experience, consider
+;; For a more complete GitHub Flavored Markdown experience, consider
 ;; adding README.md to your `auto-mode-alist':
 ;;
 ;;     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
@@ -1247,7 +1247,7 @@ Group 4 matches the text inside the delimiters.")
 
 (defconst markdown-regex-gfm-italic
   "\\(^\\|\\s-\\)\\(\\([*_]\\)\\([^ \\]\\3\\|[^ ]\\(.\\|\n[^\n]\\)*?[^\\ ]\\3\\)\\)"
-  "Regular expression for matching italic text in GitHub-flavored Markdown.
+  "Regular expression for matching italic text in GitHub Flavored Markdown.
 Underscores in words are not treated as special.")
 
 (defconst markdown-regex-blockquote
@@ -4674,7 +4674,7 @@ if ARG is omitted or nil."
    ;; GFM features to match last
    (list
     (cons markdown-regex-gfm-italic '(2 markdown-italic-face))))
-  "Default highlighting expressions for GitHub-flavored Markdown mode.")
+  "Default highlighting expressions for GitHub Flavored Markdown mode.")
 
 ;;;###autoload
 (define-derived-mode gfm-mode markdown-mode "GFM"
