@@ -5730,7 +5730,15 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
           '(markdown-mode-font-lock-keywords
             nil nil nil nil
             (font-lock-syntactic-face-function . markdown-syntactic-face)))
-    (when (fboundp 'font-lock-refresh-defaults) (font-lock-refresh-defaults))))
+    (when (fboundp 'font-lock-refresh-defaults)
+      ;; font-lock-refresh-defaults can set font-lock-mode to t even
+      ;; if global-font-lock-mode and font-lock-global-modes are nil.
+      ;; So save the original value of font-lock-mode and set it back
+      ;; to nil if it was nil to begin with.
+      (let ((save-font-lock-mode font-lock-mode))
+        (font-lock-refresh-defaults)
+        (when (not save-font-lock-mode)
+          (font-lock-mode -1))))))
 
 (defun markdown-enable-math (&optional arg)
   "Toggle support for inline and display LaTeX math expressions.
