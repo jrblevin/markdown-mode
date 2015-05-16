@@ -22,6 +22,7 @@
 ;; Copyright (C) 2012 Zhenlei Jia <zhenlei.jia@gmail.com>
 ;; Copyright (C) 2012 Peter Jones <pjones@pmade.com>
 ;; Copyright (C) 2013 Matus Goljer <dota.keys@gmail.com>
+;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -697,6 +698,7 @@
 ;;   * Gunnar Franke <Gunnar.Franke@gmx.de> for a completion bug report.
 ;;   * David Glasser <glasser@meteor.com> for a `paragraph-separate' fix.
 ;;   * Daniel Brotsky <dev@brotsky.com> for better auto-fill defaults.
+;;   * Samuel Freilich <sfreilich@google.com> for improved list item filling.
 
 ;;; Bugs:
 
@@ -4542,6 +4544,20 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
    ;; No match
    (t nil)))
 
+(defun markdown-fill-forward-paragraph-function (&optional arg)
+  (let* ((arg (or arg 1))
+         (paragraphs-remaining (forward-paragraph arg))
+         (start (point)))
+    (when (< arg 0)
+      (while (and (not (eobp))
+                  (progn (move-to-left-margin) (not (eobp)))
+                  (looking-at paragraph-separate))
+        (forward-line 1))
+      (if (looking-at markdown-regex-list)
+          (forward-char (length (match-string 0)))
+        (goto-char start)))
+    paragraphs-remaining))
+
 
 ;;; Extensions ================================================================
 
@@ -4615,13 +4631,15 @@ if ARG is omitted or nil."
        'markdown-end-of-defun)
   ;; Paragraph filling
   (set (make-local-variable 'paragraph-start)
-       "\f\\|[ \t]*$\\|[ \t]*[*+-] \\|[ \t]*[0-9]+\\.[ \t]\\|[ \t]*: ")
+       "\f\\|[ \t]*$\\|[ \t]*[*+-][ \t]+\\|[ \t]*[0-9]+\\.[ \t]+\\|[ \t]*: ")
   (set (make-local-variable 'paragraph-separate)
        "\\(?:[ \t\f]*\\|.*  \\)$")
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
        "\\`[ \t]*>[ \t]*?\\'")
   (set (make-local-variable 'adaptive-fill-function)
        'markdown-adaptive-fill-function)
+  (set (make-local-variable 'fill-forward-paragraph-function)
+       'markdown-fill-forward-paragraph-function)
   ;; Outline mode
   (make-local-variable 'outline-regexp)
   (setq outline-regexp markdown-regex-header)

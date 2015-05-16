@@ -2,6 +2,7 @@
 
 ;; Copyright (C) 2013 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2013 Makoto Motohashi <mkt.motohashi@gmail.com>
+;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
 
 ;; This file is not part of GNU Emacs.
 
@@ -2147,6 +2148,27 @@ See `adaptive-fill-first-line-regexp'."
   (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
    (fill-paragraph)
    (should (string-equal (buffer-string) "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n> eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
+
+(ert-deftest test-markdown-filling/space-after-list-marker ()
+  "`fill-paragraph' should preserve more than one space after a list marker,
+since users may wish to indent their lists more than one space more than the
+width of the marker. The examples on the Markdown Syntax page have three
+spaces after the list marker for a total indentation of four."
+  (let ((str "\n\n*   List item indented four spaces.\n*   Also four spaces."))
+   (markdown-test-string str
+    (forward-line 2)
+    (fill-paragraph)
+    (should (string-equal (buffer-string) str)))))
+
+(ert-deftest test-markdown-filling/multi-line-list-with-more-space ()
+  "`fill-paragraph' should preserve more than one space after a list marker
+(see `test-preserve-space-after-list-marker')."
+  (let ((str "*   This list item is continued on\n    the next line"))
+   (markdown-test-string str
+    ;; The first line is exactly 35 columns
+    (let ((fill-column 35))
+      (fill-paragraph)
+      (should (string-equal (buffer-string) str))))))
 
 (ert-deftest test-markdown-filling/list-item-plus ()
   "Test filling of list items with plus sign markers.
