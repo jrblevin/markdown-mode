@@ -2198,6 +2198,14 @@ See `paragraph-separate'."
    (fill-paragraph)
    (should (string-equal (buffer-string) "The circumference of a circle divided by it's radius is around 3.14."))))
 
+(ert-deftest test-markdown-filling/no-break-link-reference ()
+  "Shouldn't break line between label and url, or combine two link references."
+  (let ((str "[label1]: http://long-url.example.com\n[label2]: http://another-long-url.example.com/"))
+    (markdown-test-string str
+     (let ((fill-column 15)) ; after end of label, before end of URL
+       (fill-paragraph)
+       (should (string-equal (buffer-string) str))))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()

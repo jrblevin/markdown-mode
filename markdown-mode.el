@@ -4523,10 +4523,15 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
       (forward-line 0)
       (1+ (count-lines start (point))))))
 
-(defun markdown-nobreak-p ()
-  "Return nil if it is acceptable to break the current line at the point."
-  ;; inside in square brackets (e.g., link anchor text)
+(defun markdown-inside-link-text-p ()
+  "Return nil if not currently within link anchor text."
   (looking-back "\\[[^]]*"))
+
+(defun markdown-line-is-reference-definition-p ()
+  "Return whether the current line is a reference defition."
+  (save-excursion
+    (move-beginning-of-line 1)
+    (looking-at markdown-regex-reference-definition)))
 
 (defun markdown-adaptive-fill-function ()
   "Return prefix for filling paragraph or nil if not determined."
@@ -4630,10 +4635,29 @@ if ARG is omitted or nil."
   (set (make-local-variable 'end-of-defun-function)
        'markdown-end-of-defun)
   ;; Paragraph filling
-  (set (make-local-variable 'paragraph-start)
-       "\f\\|[ \t]*$\\|[ \t]*[*+-][ \t]+\\|[ \t]*[0-9]+\\.[ \t]+\\|[ \t]*: ")
-  (set (make-local-variable 'paragraph-separate)
-       "\\(?:[ \t\f]*\\|.*  \\)$")
+  (set
+   ; Should match lines that start or seaprate paragraphs
+   (make-local-variable 'paragraph-start)
+       (mapconcat 'identity
+                  '(
+                    "\f" ; starts with a literal line-feed
+                    "[ \t\f]*$" ; space-only line
+                    "[ \t]*[*+-][ \t]+" ; unordered list item
+                    "[ \t]*[0-9]+\\.[ \t]+" ; ordered list item
+                    "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
+                    )
+                  "\\|"))
+  (set
+   ; Should match lines that separate paragraphs without being
+   ; part of any paragraph:
+   (make-local-variable 'paragraph-separate)
+   (mapconcat 'identity
+              '("[ \t\f]*$" ; space-only line
+                ; The following is not ideal, but the Fill customization
+                ; options really only handle paragraph-starting prefixes,
+                ; not paragraph-ending suffixes:
+                ".*  $") ; line ending in two spaces
+              "\\|"))
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
        "\\`[ \t]*>[ \t]*?\\'")
   (set (make-local-variable 'adaptive-fill-function)
@@ -4647,9 +4671,16 @@ if ARG is omitted or nil."
   (setq outline-level 'markdown-outline-level)
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
-  ;; Indentation and filling
-  (make-local-variable 'fill-nobreak-predicate)
-  (add-hook 'fill-nobreak-predicate 'markdown-nobreak-p)
+
+  ;; Inhibiting line-breaking:
+  ;; Separating out each condition into a separate function so that users can
+  ;; override if desired (with remove-hook)
+  (add-hook 'fill-nobreak-predicate
+            'markdown-inside-link-text-p :local t)
+  (add-hook 'fill-nobreak-predicate
+            'markdown-line-is-reference-definition-p :local t)
+
+  ;; Indentation
   (setq indent-line-function markdown-indent-function)
 
   ;; Prepare hooks for XEmacs compatibility

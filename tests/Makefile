@@ -11,7 +11,7 @@ TEST_HTML = $(TEST_SRCS:.text=.html)
 	$(MARKDOWN) < $< > $@
 
 test:
-	$(EMACS) -batch -l ert -l ../markdown-mode.el -l markdown-test.el \
+	$(EMACS) -Q -batch -l ert -l ../markdown-mode.el -l markdown-test.el \
 	    -f ert-run-tests-batch-and-exit
 
 html: $(TEST_HTML)
