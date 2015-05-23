@@ -1399,6 +1399,10 @@ extension support.")
   "[[:alnum:]-]"
   "Regular expression maching any character that is allowed in a footnote identifier.")
 
+(defconst markdown-regex-footnote-definition
+  (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
+  "Regular expression matching a footnote definition, capturing the label.")
+
 
 ;;; Compatibility =============================================================
 
@@ -2703,8 +2707,16 @@ NIL is returned instead."
                 (while (>= (markdown-next-line-indent) 4)
                   (backward-paragraph))
                 (forward-line)
-                (if (looking-at (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:"))
-                    (list (match-string 1) (point))))))
+                (let ((continue t)
+                      (result nil))
+                  (while (and continue (not result) (not (eobp)))
+                   (cond
+                    ((looking-at markdown-regex-footnote-definition)
+                     (setq result (list (match-string 1) (point))))
+                    ((looking-at paragraph-separate)
+                     (forward-line))
+                    (t (setq continue nil))))
+                  result))))
       (when fn
         (while (progn
                  (forward-paragraph)
@@ -4528,10 +4540,11 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (looking-back "\\[[^]]*"))
 
 (defun markdown-line-is-reference-definition-p ()
-  "Return whether the current line is a reference defition."
+  "Return whether the current line is a (non-footnote) reference defition."
   (save-excursion
     (move-beginning-of-line 1)
-    (looking-at markdown-regex-reference-definition)))
+    (and (looking-at-p markdown-regex-reference-definition)
+         (not (looking-at-p "[ \t]*\\[^")))))
 
 (defun markdown-adaptive-fill-function ()
   "Return prefix for filling paragraph or nil if not determined."
@@ -4546,6 +4559,8 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
    ;; List items
    ((looking-at markdown-regex-list)
     (match-string-no-properties 0))
+   ((looking-at markdown-regex-footnote-definition)
+    "    ") ; four spaces
    ;; No match
    (t nil)))
 
@@ -4636,7 +4651,7 @@ if ARG is omitted or nil."
        'markdown-end-of-defun)
   ;; Paragraph filling
   (set
-   ; Should match lines that start or seaprate paragraphs
+   ; Should match start of lines that start or seaprate paragraphs
    (make-local-variable 'paragraph-start)
        (mapconcat 'identity
                   '(
@@ -4656,7 +4671,8 @@ if ARG is omitted or nil."
                 ; The following is not ideal, but the Fill customization
                 ; options really only handle paragraph-starting prefixes,
                 ; not paragraph-ending suffixes:
-                ".*  $") ; line ending in two spaces
+                ".*  $" ; line ending in two spaces
+                "[ \t]*\\[\\^\\S-*\\]:[ \t]*$") ; just the start of a footnote def
               "\\|"))
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
        "\\`[ \t]*>[ \t]*?\\'")

@@ -2206,6 +2206,28 @@ See `paragraph-separate'."
        (fill-paragraph)
        (should (string-equal (buffer-string) str))))))
 
+(ert-deftest test-markdown-filling/preserve-next-line-footnote ()
+  "Footnote block can be after label"
+  (let ((str "[^label1]:\n    Footnote block\n    more footnote")) ; six spaces
+    (markdown-test-string str
+     (let ((fill-column 20)) ; could fit "footnote" after label, but shouldn't
+       (fill-paragraph)
+       (should (string-equal (buffer-string) str))))))
+
+(ert-deftest test-markdown-filling/wrap-same-line-footnote ()
+  "Additional lines must be indented one level (four spaces) when wrapped."
+  (markdown-test-string "[^label]: Long line should be wrapped"
+     (let ((fill-column 25)) ; wrap before end of "should"
+       (fill-paragraph)
+       (should (string-equal (buffer-string) "[^label]: Long line\n    should be wrapped")))))
+
+(ert-deftest test-markdown-filling/wrap-extra-hanging-indentation ()
+  "Additional lines must be indented one level (four spaces) when wrapped."
+  (markdown-test-string "[^label]: Long line\n      should be wrapped"
+     (let ((fill-column 25)) ; wrap before end of "should"
+       (fill-paragraph)
+       (should (string-equal (buffer-string) "[^label]: Long line\n      should be wrapped")))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
