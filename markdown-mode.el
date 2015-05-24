@@ -63,11 +63,11 @@
 ;;    * [Release notes][]
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
-;;  [screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20130131-002.png
-;;  [release notes]: http://jblevins.org/projects/markdown-mode/rev-2-0
+;;  [Screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20130131-002.png
+;;  [Release notes]: http://jblevins.org/projects/markdown-mode/rev-2-0
 ;;
 ;; [^theme]: The theme used in the screenshot is
-;;   [color-theme-twilight](https://github.com/crafterm/twilight-emacs).
+;;     [color-theme-twilight](https://github.com/crafterm/twilight-emacs).
 ;;
 ;; markdown-mode is also available in several package managers, including:
 ;;
@@ -215,7 +215,7 @@
 ;;     line is not blank, they use the text on the current line.
 ;;     Finally, the setext commands will prompt for heading text if
 ;;     there is no active region and the current line is blank.
-;;     
+;;
 ;;     `C-c C-t h` inserts a heading with automatically chosen type and
 ;;     level (both determined by the previous heading).  `C-c C-t H`
 ;;     behaves similarly, but uses setext (underlined) headings when
