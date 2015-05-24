@@ -30,8 +30,9 @@
 
 ;;; Code:
 
-(unless (featurep 'markdown-mode)
-  (require 'markdown-mode))
+(require 'markdown-mode)
+(require 'ert)
+(require 'cl)
 
 (defconst markdown-test-dir
    (expand-file-name (file-name-directory
@@ -945,7 +946,8 @@ Test point position upon removal and insertion."
      (end-of-line)
      (markdown-insert-reference-link "link" "" "http://jblevins.org/")
      (should (= (point) 19))
-     (goto-line 5)
+     (goto-char (point-min))
+     (forward-line 4)
      (should (looking-at "\\[link\\]: http://jblevins.org/")))))
 
 (ert-deftest test-markdown-insertion/reference-link-immediately ()
@@ -955,7 +957,8 @@ Test point position upon removal and insertion."
      (end-of-line)
      (markdown-insert-reference-link "link" "" "http://jblevins.org/")
      (should (= (point) 19))
-     (goto-line 3)
+     (goto-char (point-min))
+     (forward-line 2)
      (should (looking-at "\\[link\\]: http://jblevins.org/")))))
 
 (ert-deftest test-markdown-insertion/reference-link-header ()
@@ -1715,28 +1718,26 @@ body"
 
 (ert-deftest test-markdown-parsing/code-at-point-inline ()
   "Test `markdown-code-at-point-p'."
-
-  (defun test-region (beg end)
-    (goto-char (1- beg))
-    (should-not (markdown-code-at-point-p))
-    (goto-char (1+ end))
-    (should-not (markdown-code-at-point-p))
-    (dolist (loc (number-sequence beg end))
-      (goto-char loc)
-      (should (markdown-code-at-point-p))
-      (should (equal (match-beginning 0) beg))
-      (should (equal (match-end 0) end))))
-
-  (markdown-test-file "inline.text"
-   (test-region 45 51) ; Regular code span
-   (test-region 61 90) ; Code containing backticks
-   (test-region 228 240) ; Backquotes at beginning
-   (test-region 341 352) ; Backquotes at end
-   (test-region 460 469) ; Backslash as final character
-   (test-region 657 667) ; A code span crossing lines
-   (test-region 749 758) ; Three backquotes on same line
-   (test-region 806 815) ; Three backquotes across lines
-   ))
+  (cl-flet ((test-region (beg end)
+              (goto-char (1- beg))
+              (should-not (markdown-code-at-point-p))
+              (goto-char (1+ end))
+              (should-not (markdown-code-at-point-p))
+              (dolist (loc (number-sequence beg end))
+                (goto-char loc)
+                (should (markdown-code-at-point-p))
+                (should (equal (match-beginning 0) beg))
+                (should (equal (match-end 0) end)))))
+    (markdown-test-file "inline.text"
+                        (test-region 45 51) ; Regular code span
+                        (test-region 61 90) ; Code containing backticks
+                        (test-region 228 240) ; Backquotes at beginning
+                        (test-region 341 352) ; Backquotes at end
+                        (test-region 460 469) ; Backslash as final character
+                        (test-region 657 667) ; A code span crossing lines
+                        (test-region 749 758) ; Three backquotes on same line
+                        (test-region 806 815) ; Three backquotes across lines
+                        )))
 
 (ert-deftest test-markdown-parsing/code-at-point-one-space ()
   "Test `markdown-code-at-point-p' with multiple code spans in a row."
@@ -1909,7 +1910,8 @@ body"
         Four spaces past the marker
 
      Another paragraph of item 2"))
-    (goto-line 23)
+    (goto-char (point-min))
+    (forward-line 22)
     (should (looking-at "           - List level 3 item 1
 
                  Nested pre block"))
