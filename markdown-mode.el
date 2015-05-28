@@ -4692,9 +4692,9 @@ if ARG is omitted or nil."
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
   (add-hook 'fill-nobreak-predicate
-            'markdown-inside-link-text-p :local t)
+            'markdown-inside-link-text-p nil t)
   (add-hook 'fill-nobreak-predicate
-            'markdown-line-is-reference-definition-p :local t)
+            'markdown-line-is-reference-definition-p nil t)
 
   ;; Indentation
   (setq indent-line-function markdown-indent-function)
