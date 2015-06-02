@@ -32,7 +32,7 @@
 
 (require 'markdown-mode)
 (require 'ert)
-(require 'cl)
+(require 'cl-lib)
 
 (defconst markdown-test-dir
    (expand-file-name (file-name-directory
