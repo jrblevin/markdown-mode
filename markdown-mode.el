@@ -1462,9 +1462,11 @@ If we are at the last line, then consider the next line to be blank."
 (defun markdown-prev-line-indent-p ()
   "Return t if the previous line is indented and nil otherwise."
   (save-excursion
-    (forward-line -1)
-    (goto-char (line-beginning-position))
-    (if (re-search-forward "^\\s " (line-end-position) t) t)))
+    (if (= (line-beginning-position) (point-min))
+        nil
+      (forward-line -1)
+      (goto-char (line-beginning-position))
+      (if (re-search-forward "^\\s " (line-end-position) t) t))))
 
 (defun markdown-cur-line-indent ()
   "Return the number of leading whitespace characters in the current line."
@@ -1475,16 +1477,22 @@ If we are at the last line, then consider the next line to be blank."
       (current-column))))
 
 (defun markdown-prev-line-indent ()
-  "Return the number of leading whitespace characters in the previous line."
+  "Return the number of leading whitespace characters in the previous line.
+Return 0 if the current line is the first line in the buffer."
   (save-excursion
-    (forward-line -1)
-    (markdown-cur-line-indent)))
+    (if (= (line-beginning-position) (point-min))
+        0
+      (forward-line -1)
+      (markdown-cur-line-indent))))
 
 (defun markdown-next-line-indent ()
-  "Return the number of leading whitespace characters in the next line."
+  "Return the number of leading whitespace characters in the next line.
+Return 0 if line is the last line in the buffer."
   (save-excursion
-    (forward-line 1)
-    (markdown-cur-line-indent)))
+    (if (= (line-end-position) (point-max))
+        0
+      (forward-line 1)
+      (markdown-cur-line-indent))))
 
 (defun markdown-cur-non-list-indent ()
   "Return beginning position of list item text (not including the list marker).
@@ -2588,23 +2596,37 @@ The footnote text is killed (and added to the kill ring), the
 footnote marker is deleted.  Point has to be either at the
 footnote marker or in the footnote text."
   (interactive)
-  (let (return-pos)
-    (when (markdown-footnote-text-positions) ; if we're in a footnote text
-      (markdown-footnote-return) ; we first move to the marker
-      (setq return-pos 'text)) ; and remember our return position
-    (let ((marker (markdown-footnote-delete-marker)))
-      (unless marker
-        (error "Not at a footnote"))
-      (let ((text-pos (markdown-footnote-find-text (car marker))))
-        (unless text-pos
-          (error "No text for footnote `%s'" (car marker)))
-        (goto-char text-pos)
-        (let ((pos (markdown-footnote-kill-text)))
-          (setq return-pos
-                (if (and pos (eq return-pos 'text))
-                    pos
-                  (cadr marker))))))
-    (goto-char return-pos)))
+  (let ((marker-pos nil)
+        (skip-deleting-marker nil)
+        (starting-footnote-text-positions
+         (markdown-footnote-text-positions)))
+    (when starting-footnote-text-positions
+      ;; We're starting in footnote text, so mark our return position and jump
+      ;; to the marker if possible.
+      (let ((marker-pos (markdown-footnote-find-marker
+                         (first starting-footnote-text-positions))))
+            (if marker-pos
+                (goto-char (1- marker-pos))
+              ;; If there isn't a marker, we still want to kill the text.
+              (setq skip-deleting-marker t))))
+    ;; Either we didn't start in the text, or we started in the text and jumped
+    ;; to the marker. We want to assume we're at the marker now and error if
+    ;; we're not.
+    (unless skip-deleting-marker
+      (let ((marker (markdown-footnote-delete-marker)))
+        (unless marker
+          (error "Not at a footnote"))
+        ;; Even if we knew the text position before, it changed when we deleted
+        ;; the label.
+        (setq marker-pos (second marker))
+        (let ((new-text-pos (markdown-footnote-find-text (first marker))))
+          (unless new-text-pos
+            (error "No text for footnote `%s'" (first marker)))
+          (goto-char new-text-pos))))
+    (let ((pos (markdown-footnote-kill-text)))
+      (goto-char (if starting-footnote-text-positions
+                     pos
+                   marker-pos)))))
 
 (defun markdown-footnote-delete-marker ()
   "Delete a footnote marker at point.
@@ -2629,7 +2651,8 @@ number)."
         (string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
         (kill-new (match-string 1 text))
         (when (and (markdown-cur-line-blank-p)
-                   (markdown-prev-line-blank-p))
+                   (markdown-prev-line-blank-p)
+                   (not (bobp)))
           (delete-region (1- (point)) (point)))
         (second fn)))))
 
@@ -2701,27 +2724,32 @@ of the footnote id.  The end position is directly after the
 newline that ends the footnote.  If point is not in a footnote,
 NIL is returned instead."
   (save-excursion
-    (let ((fn (progn
-                (backward-paragraph)
-                ;; if we're in a multiparagraph footnote, we need to back up further
-                (while (>= (markdown-next-line-indent) 4)
-                  (backward-paragraph))
-                (forward-line)
-                (let ((continue t)
-                      (result nil))
-                  (while (and continue (not result) (not (eobp)))
-                   (cond
-                    ((looking-at markdown-regex-footnote-definition)
-                     (setq result (list (match-string 1) (point))))
-                    ((looking-at paragraph-separate)
-                     (forward-line))
-                    (t (setq continue nil))))
-                  result))))
-      (when fn
-        (while (progn
-                 (forward-paragraph)
-                 (>= (markdown-next-line-indent) 4)))
-        (append fn (list (point)))))))
+    (let (result)
+      (move-beginning-of-line 1)
+      ;; Try to find the label. If we haven't found the label and we're at a blank
+      ;; or indented line, back up if possible.
+      (while (and
+              (not (and (looking-at markdown-regex-footnote-definition)
+                        (setq result (list (match-string 1) (point)))))
+              (and (not (bobp))
+                   (or (markdown-cur-line-blank-p)
+                       (>= (markdown-cur-line-indent) 4))))
+        (forward-line -1))
+      (when result
+        ; Advance if there is a next line that is either blank or indented.
+        ; (Need to check if we're on the last line, because
+        ; markdown-next-line-blank-p returns true for last line in buffer.)
+        (while (and (/= (line-end-position) (point-max))
+                    (or (markdown-next-line-blank-p)
+                        (>= (markdown-next-line-indent) 4)))
+          (forward-line))
+        ; Move back while the current line is blank.
+        (while (markdown-cur-line-blank-p)
+          (forward-line -1))
+        ; Advance to capture this line and a single trailing newline (if there
+        ; is one).
+        (forward-line)
+        (append result (list (point)))))))
 
 
 ;;; Element Removal ===========================================================

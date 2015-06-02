@@ -1104,6 +1104,74 @@ Test point position upon removal and insertion."
      (markdown-footnote-kill))
    (should (string-equal (buffer-string) "no text\n"))))
 
+(ert-deftest test-markdown-footnote/kill-empty-after ()
+  "Test killing an empty footnote after one with text (previously killed the
+footnote with text above)."
+  (markdown-test-string "[^with-text][^no-text]\n\n[^with-text]: Text\n[^no-text]:"
+   (let (kill-ring)
+     (forward-line 3)
+     (should (looking-at "\\[\\^no-text\\]:$"))
+     (markdown-footnote-kill)
+     (should (string-equal (current-kill 0) "")))))
+
+(ert-deftest test-markdown-footnote/kill-hanging-paras ()
+  "Test killing a footnote where block text starts after the label (previously
+killed the footnote above)."
+  (markdown-test-string "[^1][^2]\n\n[^1]: Foo\n\n[^2]:\n    Text\n\n    More text\n\n\nNot indented"
+   (let (kill-ring)
+     (forward-line 4)
+     (should (looking-at "\\[\\^2\\]:$"))
+     (markdown-footnote-kill)
+     ;; We want to include the leading space on hanging footnote paragraphs,
+     ;; even if a hanging paragraph is the first item in the footnote.
+     (should (string-equal (current-kill 0) "Text\n\n    More text\n")))))
+
+(ert-deftest test-markdown-footnote/text-positions-buffer-top ()
+  "Test markdown-footnote-text-positions on footnote adjacent to buffer top
+(was infinite loop)."
+  (markdown-test-string "[^label]: text\n    more text"
+   (should (equal (markdown-footnote-text-positions) (list "^label" 1 29)))))
+
+(ert-deftest test-markdown-footnote/text-positions-buffer-top-one-line ()
+  "Test markdown-footnote-text-positions on one-line footnote adjacent to
+buffer top (failed to find positions)."
+  (markdown-test-string "[^label]: text\n"
+   (should (equal (markdown-footnote-text-positions) (list "^label" 1 16)))))
+
+(ert-deftest test-markdown-footnote/text-positions-buffer-top-not-footnote ()
+  "Test markdown-footnote-text-positions on plain paragraph adjacent to buffer
+top (was infinite loop)."
+  (markdown-test-string "text\n    more text\n"
+   (should (eq (markdown-footnote-text-positions) nil))))
+
+(ert-deftest test-markdown-footnote/text-positions-buffer-bottom ()
+  "Test markdown-footnote-text-positions on footnote adjacent to buffer bottom
+(was infinite loop)."
+  (markdown-test-string "\n[^label]: text\n    more text"
+   (forward-line 1)
+   (should (equal (markdown-footnote-text-positions) (list "^label" 2 30)))))
+
+(ert-deftest test-markdown-footnote/kill-adjacent-footnote ()
+  "Test killing a footnote adjacent to other one-line footnotes (previously
+killed the wrong one)."
+  (markdown-test-string "Text[^1] with[^2] footnotes[^3]\n\n[^1]: foo\n[^2]: bar\n[^3]: baz"
+   (let (kill-ring)
+     (forward-line 3)
+     (should (looking-at "\\[\\^2\\]: bar"))
+     (markdown-footnote-kill)
+     (should (string-equal (current-kill 0) "bar\n")))))
+
+(ert-deftest test-markdown-footnote/kill-adjacent-markers ()
+  "Test killing a footnote where the labels are adjacent (previously, the wrong
+footnote would be killed because the attempt to jump to the marker would jump to
+the opening bracket of [^2], and then subsequent functions would kill [^2])."
+  (markdown-test-string "Text with footnotes[^1][^2]\n\n[^1]: foo\n\n[^2]: bar\n"
+   (let (kill-ring)
+     (forward-line 2)
+     (should (looking-at "\\[\\^1\\]: foo"))
+     (markdown-footnote-kill)
+     (should (string-equal (current-kill 0) "foo\n")))))
+
 ;;; Element removal tests:
 
 (ert-deftest test-markdown-kill/simple ()
