@@ -658,6 +658,8 @@ following people:
   * Antonis Kanouras for strike through support.
   * Tim Visher for multiple CSS files and other
     general improvements.
+  * Matt McClure for a patch to prevent
+    overwriting source files with .html extensions upon export.
 
 ## Bugs
 

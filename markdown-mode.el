@@ -706,6 +706,8 @@
 ;;   * Antonis Kanouras <antonis@metadosis.gr> for strike through support.
 ;;   * Tim Visher <tim.visher@gmail.com> for multiple CSS files and other
 ;;     general improvements.
+;;   * Matt McClure <matthewlmcclure@gmail.com> for a patch to prevent
+;;     overwriting source files with .html extensions upon export.
 
 ;;; Bugs:
 
