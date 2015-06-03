@@ -2268,6 +2268,13 @@ See `paragraph-separate'."
    (fill-paragraph)
    (should (string-equal (buffer-string) "The circumference of a circle divided by it's radius is around 3.14."))))
 
+(ert-deftest test-markdown-filling/avoid-unintended-list-item ()
+  "Avoid breaking lines where it would result in an unintended list item."
+  (markdown-test-string "Lorem ipsum dolor sit 4. amet"
+   (let ((fill-column 22))
+     (fill-paragraph)
+     (should (string-equal (buffer-string) "Lorem ipsum dolor\nsit 4. amet")))))
+
 (ert-deftest test-markdown-filling/no-break-link-reference ()
   "Shouldn't break line between label and url, or combine two link references."
   (let ((str "[label1]: http://long-url.example.com\n[label2]: http://another-long-url.example.com/"))
