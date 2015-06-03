@@ -615,11 +615,6 @@
 ;; for the other style keybindings, the letter `d` coincides with the
 ;; HTML tag `<del>`.
 ;;
-;; For a more complete GitHub Flavored Markdown experience, consider
-;; adding README.md to your `auto-mode-alist':
-;;
-;;     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
-;;
 ;; For GFM preview can be powered by setting `markdown-command' to
 ;; use [Docter][].  This may also be configured to work with [Marked 2][]
 ;; for `markdown-open-command'.
@@ -4816,7 +4811,7 @@ if ARG is omitted or nil."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 
 ;;; GitHub Flavored Markdown Mode  ============================================
