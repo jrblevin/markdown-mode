@@ -1,6 +1,6 @@
 ;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files
 
-;; Copyright (C) 2007-2014 Jason R. Blevins <jrblevin@sdf.org>
+;; Copyright (C) 2007-2015 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
 ;; Copyright (C) 2007 Conal Elliott <conal@conal.net>
 ;; Copyright (C) 2008 Greg Bognar <greg_bognar@hms.harvard.edu>
@@ -457,9 +457,9 @@
 ;;     Markdown previewer which is capable of opening Markdown source files
 ;;     directly (default: `nil').  This command will be called
 ;;     with a single argument, the filename of the current buffer.
-;;     A representative program is the Mac app [Marked][], a
-;;     live-updating MultiMarkdown previewer which has a command line
-;;     utility at `/usr/local/bin/mark`.
+;;     A representative program is the Mac app [Marked 2][], a
+;;     live-updating Markdown previewer which can be [called from a
+;;     simple shell script](http://jblevins.org/log/marked-2-command).
 ;;
 ;;   * `markdown-hr-strings' - list of strings to use when inserting
 ;;     horizontal rules.  Different strings will not be distinguished
@@ -552,7 +552,7 @@
 ;; or by using the "Markdown Faces" link at the bottom of the mode
 ;; customization screen.
 ;;
-;; [Marked]: https://itunes.apple.com/us/app/marked/id448925439?ls=1&mt=12&partnerId=30&siteID=GpHp3Acs1Yo
+;; [Marked 2]: https://itunes.apple.com/us/app/marked-2/id890031187?mt=12&uo=4&at=11l5Vs&ct=mm
 
 ;;; Extensions:
 
@@ -609,13 +609,15 @@
 ;; the code block.  You will be prompted for the name of the language,
 ;; but may press enter to continue without naming a language.
 ;;
+;; Similarly, strike through text is supoorted in GFM mode.
+;;
 ;; For a more complete GitHub Flavored Markdown experience, consider
 ;; adding README.md to your `auto-mode-alist':
 ;;
 ;;     (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 ;;
 ;; For GFM preview can be powered by setting `markdown-command' to
-;; use [Docter][].  This may also be configured to work with [Marked][]
+;; use [Docter][].  This may also be configured to work with [Marked 2][]
 ;; for `markdown-open-command'.
 ;;
 ;; [GFM]: http://github.github.com/github-flavored-markdown/
