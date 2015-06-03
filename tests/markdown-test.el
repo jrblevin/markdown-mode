@@ -2305,6 +2305,16 @@ See `paragraph-separate'."
        (fill-paragraph)
        (should (string-equal (buffer-string) "[^label]: Long line\n      should be wrapped")))))
 
+(ert-deftest test-markdown-filling/full-justification ()
+  "Test paragraph detection with lines with lots of whitespace."
+  (markdown-test-string "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Dolor Sit Amet Consectetur http://very-long-url.lorem.ipsum.sic.dolor.sit.amet.com"
+     (setq default-justification 'full)
+     (fill-paragraph)
+     (should (string-equal (buffer-string) "Lorem  Ipsum Lorem  Ipsum Lorem  Ipsum Lorem  Ipsum Lorem  Ipsum Lorem\nDolor                Sit               Amet                Consectetur\nhttp://very-long-url.lorem.ipsum.sic.dolor.sit.amet.com"))
+     (backward-paragraph)
+     (forward-paragraph)
+     (should (= (point) 198))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
