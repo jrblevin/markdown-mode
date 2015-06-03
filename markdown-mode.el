@@ -704,7 +704,11 @@
 ;;   * Gunnar Franke <Gunnar.Franke@gmx.de> for a completion bug report.
 ;;   * David Glasser <glasser@meteor.com> for a `paragraph-separate' fix.
 ;;   * Daniel Brotsky <dev@brotsky.com> for better auto-fill defaults.
-;;   * Samuel Freilich <sfreilich@google.com> for improved list item filling.
+;;   * Samuel Freilich <sfreilich@google.com> for improved filling
+;;     behavior regarding list items, footnotes, and reference
+;;     definitions, improved killing of footnotes, and numerous other
+;;     tests and bug fixes.
+;;   * Antonis Kanouras <antonis@metadosis.gr> for strike through support.
 
 ;;; Bugs:
 

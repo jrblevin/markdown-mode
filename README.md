@@ -656,7 +656,11 @@ following people:
   * Gunnar Franke for a completion bug report.
   * David Glasser for a `paragraph-separate` fix.
   * Daniel Brotsky for better auto-fill defaults.
-  * Samuel Freilich for improved list item filling.
+  * Samuel Freilich for improved filling
+    behavior regarding list items, footnotes, and reference
+    definitions, improved killing of footnotes, and numerous other
+    tests and bug fixes.
+  * Antonis Kanouras for strike through support.
 
 ## Bugs
 
