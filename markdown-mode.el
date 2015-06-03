@@ -1338,8 +1338,8 @@ on the value of `markdown-wiki-link-alias-first'.")
 
 (defvar markdown-mode-font-lock-keywords-basic
   (list
-   (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
+   (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons markdown-regex-blockquote 'markdown-blockquote-face)
    (cons markdown-regex-header-1-setext '((1 markdown-header-face-1)
                                           (2 markdown-header-rule-face)))

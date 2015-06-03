@@ -1648,6 +1648,21 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
     social upheaval subClassOf"
    (markdown-test-range-has-face 160 190 nil)))
 
+(ert-deftest test-markdown-font-lock/fenced-1 ()
+  "Test fenced code blocks containing four-space indents."
+  (markdown-test-string "Fenced code block
+
+~~~
+if (x)
+    foo();
+
+if (y)
+    bar();
+~~~
+"
+   (markdown-test-range-has-face 1 19 nil)
+   (markdown-test-range-has-face 20 63 markdown-pre-face)))
+
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
   (markdown-test-string "##abc##"
