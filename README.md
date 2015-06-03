@@ -567,11 +567,6 @@ inserted (and toggled) using <kbd>C-c C-s d</kbd>. Following the mnemonics
 for the other style keybindings, the letter <kbd>d</kbd> coincides with the
 HTML tag `<del>`.
 
-For a more complete GitHub Flavored Markdown experience, consider
-adding README.md to your `auto-mode-alist`:
-
-    (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
-
 For GFM preview can be powered by setting `markdown-command` to
 use [Docter][].  This may also be configured to work with [Marked 2][]
 for `markdown-open-command`.
