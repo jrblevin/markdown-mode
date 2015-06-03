@@ -35,8 +35,8 @@ cat markdown-mode.el |\
     # Use <kbd> tags for TAB and RET keys
     sed -e 's/`TAB`/<kbd>TAB<\/kbd>/g' |\
     sed -e 's/`RET`/<kbd>RET<\/kbd>/g' |\
-    # Use <kbd> tags for keybindings prefixed by C, M, orS
+    # Use <kbd> tags for keybindings prefixed by C, M, or S
     sed -e 's/`\([CMS]-[^`]*\)`/<kbd>\1<\/kbd>/g' |\
     # Remove email addresses
-    sed -e 's/ <.*@.*> / /g' \
+    sed -e 's/ <[^>]*@[^<]*> / /g' \
     | tee -a README.md >> index.text

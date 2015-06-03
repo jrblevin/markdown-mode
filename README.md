@@ -181,8 +181,8 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 
     To insert a heading of a specific level and type, use <kbd>C-c C-t 1</kbd>
     through <kbd>C-c C-t 6</kbd> for atx (hash mark) headings and <kbd>C-c C-t !</kbd> or
-    for setext headings of level one or two, respectively.
-    Note that is <kbd>S-2</kbd>.
+    <kbd>C-c C-t @</kbd> for setext headings of level one or two, respectively.
+    Note that <kbd>!</kbd> is <kbd>S-1</kbd> and <kbd>@</kbd> is <kbd>S-2</kbd>.
 
     If the point is at a heading, these commands will replace the
     existing markup in order to update the level and/or type of the
