@@ -562,7 +562,10 @@ is an active region, the text in the region will be placed inside
 the code block.  You will be prompted for the name of the language,
 but may press enter to continue without naming a language.
 
-Similarly, strike through text is supoorted in GFM mode.
+Similarly, strike through text is supoorted in GFM mode and can be
+inserted (and toggled) using <kbd>C-c C-s d</kbd>. Following the mnemonics
+for the other style keybindings, the letter <kbd>d</kbd> coincides with the
+HTML tag `<del>`.
 
 For a more complete GitHub Flavored Markdown experience, consider
 adding README.md to your `auto-mode-alist`:

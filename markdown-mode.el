@@ -23,6 +23,7 @@
 ;; Copyright (C) 2012 Peter Jones <pjones@pmade.com>
 ;; Copyright (C) 2013 Matus Goljer <dota.keys@gmail.com>
 ;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
+;; Copyright (C) 2015 Antonis Kanouras <antonis@metadosis.gr>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -609,7 +610,10 @@
 ;; the code block.  You will be prompted for the name of the language,
 ;; but may press enter to continue without naming a language.
 ;;
-;; Similarly, strike through text is supoorted in GFM mode.
+;; Similarly, strike through text is supoorted in GFM mode and can be
+;; inserted (and toggled) using `C-c C-s d`. Following the mnemonics
+;; for the other style keybindings, the letter `d` coincides with the
+;; HTML tag `<del>`.
 ;;
 ;; For a more complete GitHub Flavored Markdown experience, consider
 ;; adding README.md to your `auto-mode-alist':
@@ -925,6 +929,9 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defvar markdown-bold-face 'markdown-bold-face
   "Face name to use for bold text.")
 
+(defvar markdown-strike-through-face 'markdown-strike-through-face
+  "Face name to use for strike-through text.")
+
 (defvar markdown-header-delimiter-face 'markdown-header-delimiter-face
   "Face name to use as a base for header delimiters.")
 
@@ -1013,6 +1020,11 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
 (defface markdown-bold-face
   '((t (:inherit font-lock-variable-name-face :weight bold)))
   "Face for bold text."
+  :group 'markdown-faces)
+
+(defface markdown-strike-through-face
+  '((t (:inherit font-lock-variable-name-face :strike-through t)))
+  "Face for strike-through text."
   :group 'markdown-faces)
 
 (defface markdown-header-rule-face
@@ -1247,6 +1259,15 @@ Group 4 matches the text inside the delimiters.")
   "Regular expression for matching italic text.
 Group 1 matches the character before the opening asterisk or
 underscore, if any, ensuring that it is not a backslash escape.
+Group 2 matches the entire expression, including delimiters.
+Groups 3 and 5 matches the opening and closing delimiters.
+Group 4 matches the text inside the delimiters.")
+
+(defconst markdown-regex-strike-through
+  "\\(^\\|[^\\]\\)\\(\\(~~\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(~~\\)\\)"
+  "Regular expression for matching strike-through text.
+Group 1 matches the character before the opening tilde, if any,
+ensuring that it is not a backslash escape.
 Group 2 matches the entire expression, including delimiters.
 Groups 3 and 5 matches the opening and closing delimiters.
 Group 4 matches the text inside the delimiters.")
@@ -2139,6 +2160,25 @@ insert italic delimiters and place the cursor in between them."
           (markdown-unwrap-thing-at-point nil 2 4)
         (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
+(defun markdown-insert-strike-through ()
+  "Insert markup to make a region or word strike-through.
+If there is an active region, make the region strike-through.  If the point
+is at a non-bold word, make the word strike-through.  If the point is at a
+strike-through word or phrase, remove the strike-through markup.  Otherwise,
+simply insert bold delimiters and place the cursor in between them."
+  (interactive)
+  (let ((delim "~~"))
+    (if (markdown-use-region-p)
+        ;; Active region
+        (let ((bounds (markdown-unwrap-things-in-region
+                       (region-beginning) (region-end)
+                       markdown-regex-strike-through 2 4)))
+          (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
+      ;; Strike-through markup removal, strike-through word at point, or empty markup insertion
+      (if (thing-at-point-looking-at markdown-regex-strike-through)
+          (markdown-unwrap-thing-at-point nil 2 4)
+        (markdown-wrap-or-insert delim delim 'word nil nil)))))
+
 (defun markdown-insert-code ()
   "Insert markup to make a region or word an inline code fragment.
 If there is an active region, make the region an inline code
@@ -2811,6 +2851,10 @@ text to kill ring), and list items."
      ((thing-at-point-looking-at markdown-regex-italic)
       (kill-new (match-string 4))
       (delete-region (match-beginning 2) (match-end 2)))
+     ;; Strike-through
+     ((thing-at-point-looking-at markdown-regex-strike-through)
+      (kill-new (match-string 4))
+      (delete-region (match-beginning 2) (match-end 2)))
      ;; Footnote marker (add footnote text to kill ring)
      ((thing-at-point-looking-at markdown-regex-footnote)
       (markdown-footnote-kill))
@@ -3285,6 +3329,7 @@ Assumes match data is available for `markdown-regex-italic'."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map markdown-mode-map)
     (define-key map (kbd "C-c C-s P") 'markdown-insert-gfm-code-block)
+    (define-key map (kbd "C-c C-s d") 'markdown-insert-strike-through)
     map)
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
@@ -3322,6 +3367,7 @@ See also `markdown-mode-map'.")
     "---"
     ["Bold" markdown-insert-bold]
     ["Italic" markdown-insert-italic]
+    ["Strike-through" markdown-insert-strike-through]
     ["Blockquote" markdown-insert-blockquote]
     ["Preformatted" markdown-insert-pre]
     ["Code" markdown-insert-code]
@@ -4768,7 +4814,8 @@ if ARG is omitted or nil."
     (cons 'markdown-match-gfm-code-blocks '((1 markdown-pre-face)
                                             (2 markdown-language-keyword-face t t)
                                             (3 markdown-pre-face)
-                                            (4 markdown-pre-face))))
+                                            (4 markdown-pre-face)))
+    (cons markdown-regex-strike-through '(2 markdown-strike-through-face)))
    ;; Basic Markdown features (excluding possibly overridden ones)
    markdown-mode-font-lock-keywords-basic
    ;; GFM features to match last

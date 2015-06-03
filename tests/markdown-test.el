@@ -1,6 +1,6 @@
 ;;;; markdown-test.el --- Tests for markdown-mode
 
-;; Copyright (C) 2013 Jason R. Blevins <jrblevin@sdf.org>
+;; Copyright (C) 2013-2015 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2013 Makoto Motohashi <mkt.motohashi@gmail.com>
 ;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
 
@@ -2428,6 +2428,25 @@ See `paragraph-separate'."
   (markdown-test-file-gfm "gfm.text"
     (markdown-test-range-has-face 1483 1488 markdown-italic-face)
     (markdown-test-range-has-face 1729 1790 nil)))
+
+(ert-deftest test-markdown-gfm/strike-through-1 ()
+  "GFM strike through font lock test."
+  (markdown-test-string-gfm "one ~~two~~ three"
+    (markdown-test-range-has-face 1 4 nil)
+    (markdown-test-range-has-face 5 11 markdown-strike-through-face)
+    (markdown-test-range-has-face 12 17 nil)))
+
+(ert-deftest test-markdown-gfm/toggle-strike-through ()
+  "Test toggling functionality of `markdown-insert-strike-through'."
+  (markdown-test-string-gfm "one ~~two~~ three"
+   (forward-word 2)
+   (markdown-insert-strike-through)
+   (should (string-equal (buffer-string) "one two three"))
+   (should (= (point) 8))
+   (forward-word)
+   (markdown-insert-strike-through)
+   (should (= (point) 16))
+   (should (string-equal (buffer-string) "one two ~~three~~"))))
 
 (ert-deftest test-markdown-gfm/insert-code-block ()
   "GFM code block insertion test."
