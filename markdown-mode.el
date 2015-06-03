@@ -4784,6 +4784,11 @@ if ARG is omitted or nil."
   ;; Indentation
   (setq indent-line-function markdown-indent-function)
 
+  ;; Backwards compatibility with markdown-css-path
+  (when (boundp 'markdown-css-path)
+    (warn "markdown-css-path is deprecated, see markdown-css-paths.")
+    (add-to-list 'markdown-css-paths markdown-css-path))
+
   ;; Prepare hooks for XEmacs compatibility
   (when (featurep 'xemacs)
     (make-local-hook 'after-change-functions)
