@@ -708,6 +708,7 @@
 ;;     general improvements.
 ;;   * Matt McClure <matthewlmcclure@gmail.com> for a patch to prevent
 ;;     overwriting source files with .html extensions upon export.
+;;   * Roger Bolsius <roger.bolsius@gmail.com> for ordered list improvements.
 
 ;;; Bugs:
 
@@ -3778,11 +3779,13 @@ increase the indentation by one level."
             ;; the argument was nil, "new-indent = item-indent" is the same,
             ;; so we don't need special treatment. Neat.
             (save-excursion
-              (while (not (looking-at (concat new-indent "\\([0-9]+\\)\\.")))
-                (forward-line -1)))
-            (insert (concat new-indent
-                            (int-to-string (1+ (string-to-number (match-string 1))))
-                            ". "))))
+              (while (and (not (looking-at (concat new-indent "\\([0-9]+\\)\\(\\.[ ]*\\)")))
+                          (>= (forward-line -1) 0))))
+            (let ((list-item-prefix (if (match-string 1)
+                                        (int-to-string (1+ (string-to-number (match-string 1))))
+                                      "1"))
+                  (list-item-spacing (or (match-string 2) ". ")))
+              (insert (concat new-indent list-item-prefix list-item-spacing)))))
          ;; Unordered list
          ((string-match "[\\*\\+-]" marker)
           (insert new-indent marker)))))))

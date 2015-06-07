@@ -914,7 +914,17 @@ Test point position upon removal and insertion."
   (markdown-test-string "6. foo\n    1. bar"
    (goto-char (point-max))
    (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. "))))
+   (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. ")))
+  ;; Preceding an ordered list item
+  (markdown-test-string "\n1. foo\n2. bar"
+   (goto-char (point-min))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string) "1. \n1. foo\n2. bar")))
+  ;; Preserve previous spacing in ordered list
+  (markdown-test-string "1.        foo"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string)  "1.        foo\n2.        "))))
 
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."

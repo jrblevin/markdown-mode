@@ -660,6 +660,7 @@ following people:
     general improvements.
   * Matt McClure for a patch to prevent
     overwriting source files with .html extensions upon export.
+  * Roger Bolsius for ordered list improvements.
 
 ## Bugs
 
