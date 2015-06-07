@@ -2981,7 +2981,7 @@ Otherwise, do normal delete by repeating
       (while (< (point) end)
         (back-to-indentation)
         (unless (looking-at "[ \t]*$")
-	  (setq mincol (min mincol (current-column))))
+          (setq mincol (min mincol (current-column))))
         (forward-line 1)
         ))
     mincol))
