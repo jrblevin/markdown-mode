@@ -868,8 +868,8 @@ Test point position upon removal and insertion."
   (markdown-test-string "abc"
    (goto-char (point-max))
    (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "abc\n* "))
-   (should (= (point) 7)))
+   (should (string-equal (buffer-string) "abc\n  * "))
+   (should (= (point) 9)))
   ;; Following a list item, on the same line
   (markdown-test-string "  * foo"
    (goto-char (point-max))

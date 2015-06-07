@@ -921,6 +921,11 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
                  (const :tag "Immediately after the current block" immediately)
                  (const :tag "Before next header" header)))
 
+(defcustom markdown-unordered-list-item-prefix "  * "
+  "String inserted before unordered list items."
+  :group 'markdown
+  :type 'string)
+
 
 ;;; Font Lock =================================================================
 
@@ -3754,7 +3759,7 @@ increase the indentation by one level."
           (progn
             (unless (markdown-cur-line-blank-p)
               (insert "\n"))
-            (insert "* "))
+            (insert markdown-unordered-list-item-prefix))
         ;; Compute indentation for a new list item
         (setq item-indent (nth 2 bounds))
         (setq marker (nth 4 bounds))
