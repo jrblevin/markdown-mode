@@ -924,7 +924,22 @@ Test point position upon removal and insertion."
   (markdown-test-string "1.        foo"
    (goto-char (point-max))
    (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string)  "1.        foo\n2.        "))))
+   (should (string-equal (buffer-string)  "1.        foo\n2.        ")))
+  ;; Adjust spacing for number width changes (e.g., 9 -> 10)
+  (markdown-test-string "9.  foo"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string)  "9.  foo\n10. ")))
+  ;; Don't adjust spacing for number width changes if no extra whitespace
+  (markdown-test-string "99. foo"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string)  "99. foo\n100. ")))
+  ;; Don't adjust spacing if tabs are used as whitespace
+  (markdown-test-string "9.\tfoo"
+   (goto-char (point-max))
+   (call-interactively 'markdown-insert-list-item)
+   (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
 
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."

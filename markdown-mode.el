@@ -3779,13 +3779,21 @@ increase the indentation by one level."
             ;; the argument was nil, "new-indent = item-indent" is the same,
             ;; so we don't need special treatment. Neat.
             (save-excursion
-              (while (and (not (looking-at (concat new-indent "\\([0-9]+\\)\\(\\.[ ]*\\)")))
+              (while (and (not (looking-at (concat new-indent "\\([0-9]+\\)\\(\\.[ \t]*\\)")))
                           (>= (forward-line -1) 0))))
-            (let ((list-item-prefix (if (match-string 1)
-                                        (int-to-string (1+ (string-to-number (match-string 1))))
-                                      "1"))
-                  (list-item-spacing (or (match-string 2) ". ")))
-              (insert (concat new-indent list-item-prefix list-item-spacing)))))
+            (let* ((old-prefix (match-string 1))
+                   (old-spacing (match-string 2))
+                   (new-prefix (if old-prefix
+                                   (int-to-string (1+ (string-to-number old-prefix)))
+                                 "1"))
+                   (space-adjust (- (length old-prefix) (length new-prefix)))
+                   (new-spacing (if (and (match-string 2)
+                                         (not (string-match "\t" old-spacing))
+                                         (< space-adjust 0)
+                                         (> space-adjust (- 1 (length (match-string 2)))))
+                                    (substring (match-string 2) 0 space-adjust)
+                                  (or old-spacing ". "))))
+              (insert (concat new-indent new-prefix new-spacing)))))
          ;; Unordered list
          ((string-match "[\\*\\+-]" marker)
           (insert new-indent marker)))))))
