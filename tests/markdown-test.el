@@ -38,50 +38,49 @@
    (expand-file-name (file-name-directory
                       (or load-file-name buffer-file-name))))
 
-(defmacro markdown-test-string (string &rest body)
-  "Run body in a temporary buffer containing STRING."
-  `(with-temp-buffer
-    (markdown-mode)
-    (setq-default indent-tabs-mode nil)
-    (insert ,string)
-    (goto-char (point-min))
-    (font-lock-fontify-buffer)
-    (prog1 ,@body (kill-buffer))))
-(def-edebug-spec markdown-test-string (form body))
+(defmacro markdown-test-string-mode (mode string &rest body)
+  "Run BODY in a temporary buffer containing STRING in MODE."
+  `(let ((win (selected-window)))
+     (unwind-protect
+         (with-temp-buffer
+           (set-window-buffer win (current-buffer) t)
+           (erase-buffer)
+           (funcall ,mode)
+           (setq-default indent-tabs-mode nil)
+           (insert ,string)
+           (goto-char (point-min))
+           (font-lock-fontify-buffer)
+           (prog1 ,@body (kill-buffer))))))
 
-(defmacro markdown-test-file (file &rest body)
-  "Open FILE from `markdown-test-dir' and execute body."
+(defmacro markdown-test-file-mode (mode file &rest body)
+  "Open FILE from `markdown-test-dir' in MODE and execute BODY."
   `(let ((fn (concat markdown-test-dir ,file)))
      (save-window-excursion
        (with-temp-buffer
          (insert-file-contents fn)
-         (markdown-mode)
+         (funcall ,mode)
          (goto-char (point-min))
          (font-lock-fontify-buffer)
          ,@body))))
+
+(defmacro markdown-test-string (string &rest body)
+  "Run body in a temporary buffer containing STRING in `markdown-mode'."
+  `(markdown-test-string-mode 'markdown-mode ,string ,@body))
+(def-edebug-spec markdown-test-string (form body))
+
+(defmacro markdown-test-file (file &rest body)
+  "Open FILE from `markdown-test-dir' in `markdown-mode' and execute BODY."
+  `(markdown-test-file-mode 'markdown-mode ,file ,@body))
 (def-edebug-spec markdown-test-file (form body))
 
 (defmacro markdown-test-string-gfm (string &rest body)
   "Run body in a temporary buffer containing STRING in `gfm-mode'."
-  `(with-temp-buffer
-    (gfm-mode)
-    (setq-default indent-tabs-mode nil)
-    (insert ,string)
-    (goto-char (point-min))
-    (font-lock-fontify-buffer)
-    (prog1 ,@body (kill-buffer))))
+  `(markdown-test-string-mode 'gfm-mode ,string ,@body))
 (def-edebug-spec markdown-test-string-gfm (form body))
 
 (defmacro markdown-test-file-gfm (file &rest body)
-  "Open FILE from `markdown-test-dir' and execute body."
-  `(let ((fn (concat markdown-test-dir ,file)))
-     (save-window-excursion
-       (with-temp-buffer
-         (insert-file-contents fn)
-         (gfm-mode)
-         (goto-char (point-min))
-         (font-lock-fontify-buffer)
-         ,@body))))
+  "Open FILE from `markdown-test-dir' in `gfm-mode' and execute BODY."
+  `(markdown-test-file-mode 'gfm-mode ,file ,@body))
 (def-edebug-spec markdown-test-file-gfm (form body))
 
 (defmacro markdown-test-temp-file (file &rest body)
