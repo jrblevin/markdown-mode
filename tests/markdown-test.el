@@ -994,6 +994,12 @@ Test point position upon removal and insertion."
      (should (= (point) 35))
      (should (looking-back "\\[link\\]: ")))))
 
+(ert-deftest test-markdown-insertion/inline-to-reference-link ()
+  "Inline link to reference link conversion."
+  (markdown-test-string "[text](http://jblevins.org/ \"title\")"
+   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
+   (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n"))))
+
 (ert-deftest test-markdown-insertion/inline-link ()
   "Basic tests for `markdown-insert-link'."
    ;; Test empty markup insertion (leave point in square brackets)
