@@ -2288,7 +2288,9 @@ location determined by `markdown-reference-location'."
                     (t (read-string "Link URL: "))))
          (title (cond
                  ((= (length url) 0) nil)
-                 (switch (substring (match-string 6) 1 -1))
+                 (switch (if (> (length (match-string 6)) 2)
+                             (substring (match-string 6) 1 -1)
+                           nil))
                  (t (read-string "Link Title (optional): ")))))
     (when bounds (delete-region (car bounds) (cdr bounds)))
     (markdown-insert-reference-link text label url title)))
