@@ -998,7 +998,10 @@ Test point position upon removal and insertion."
   "Inline link to reference link conversion."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")"
    (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-   (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n"))))
+   (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n")))
+  (markdown-test-string "[text](http://jblevins.org/)"
+   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
+   (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/\n"))))
 
 (ert-deftest test-markdown-insertion/inline-link ()
   "Basic tests for `markdown-insert-link'."
@@ -1790,6 +1793,14 @@ body"
   (markdown-test-string "    \nasdf  \n"
    (markdown-test-range-has-face 1 9 nil)
    (markdown-test-range-has-face 10 11 markdown-line-break-face)))
+
+(ert-deftest test-markdown-font-lock/gfm-code-block-font-lock ()
+  "GFM code block font lock test. Now in base markdown-mode as well!"
+  (markdown-test-file "gfm.text"
+    (markdown-test-range-has-face 2639 2641 markdown-pre-face) ; ```
+    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
+    (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
+    (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
 
 ;;; Markdown Parsing Functions:
 
