@@ -1794,6 +1794,14 @@ body"
    (markdown-test-range-has-face 1 9 nil)
    (markdown-test-range-has-face 10 11 markdown-line-break-face)))
 
+(ert-deftest test-markdown-font-lock/gfm-code-block-font-lock ()
+  "GFM code block font lock test. Now in base markdown-mode as well!"
+  (markdown-test-file "gfm.text"
+    (markdown-test-range-has-face 2639 2641 markdown-pre-face) ; ```
+    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
+    (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
+    (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/reference-definition-basic ()
