@@ -661,6 +661,8 @@ following people:
   * Matt McClure for a patch to prevent
     overwriting source files with .html extensions upon export.
   * Roger Bolsius for ordered list improvements.
+  * Google's Open Source Programs Office for recognizing the project with
+    a monetary contribution in June 2015.
 
 ## Bugs
 
