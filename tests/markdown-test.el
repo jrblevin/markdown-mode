@@ -1696,6 +1696,23 @@ if (y)
    (markdown-test-range-has-face 1 19 nil)
    (markdown-test-range-has-face 20 63 markdown-pre-face)))
 
+(ert-deftest test-markdown-font-lock/gfm-fenced ()
+  "Test GFM-style fenced code blocks."
+  (markdown-test-string "```ruby
+require 'redcarpet'
+markdown = Redcarpet.new('Hello World!')
+puts markdown.to_html
+```"
+   (markdown-test-range-has-face 1 3 markdown-pre-face) ; ```
+   (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
+   (markdown-test-range-has-face 9 90 markdown-pre-face) ; code
+   (markdown-test-range-has-face 92 94 markdown-pre-face)) ; ```
+  (markdown-test-string "```{r sum}\n2+2\n```"
+   (markdown-test-range-has-face 1 3 markdown-pre-face) ; ```
+   (markdown-test-range-has-face 4 10 markdown-language-keyword-face) ; {r sum}
+   (markdown-test-range-has-face 12 14 markdown-pre-face) ; 2+2
+   (markdown-test-range-has-face 16 18 markdown-pre-face))) ; ```
+
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
   (markdown-test-string "##abc##"
