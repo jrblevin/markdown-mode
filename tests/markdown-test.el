@@ -35,8 +35,8 @@
 (require 'cl-lib)
 
 (defconst markdown-test-dir
-   (expand-file-name (file-name-directory
-                      (or load-file-name buffer-file-name))))
+  (expand-file-name (file-name-directory
+                     (or load-file-name buffer-file-name))))
 
 (defmacro markdown-test-string-mode (mode string &rest body)
   "Run BODY in a temporary buffer containing STRING in MODE."
@@ -131,486 +131,486 @@ This file is not saved."
 (ert-deftest test-markdown-example/string ()
   "An example string test using the `ert' framework."
   (markdown-test-string "foo *bar* baz"
-   (goto-char 5)
-   (delete-char 1)
-   (should (looking-at "bar"))))
+                        (goto-char 5)
+                        (delete-char 1)
+                        (should (looking-at "bar"))))
 
 (ert-deftest test-markdown-example/file ()
   "An example file test using the `ert' framework."
   (markdown-test-file "inline.text"
-   (goto-char 9)
-   (should (looking-at "\*"))))
+                      (goto-char 9)
+                      (should (looking-at "\*"))))
 
 ;;; Basic mode tests:
 
 (ert-deftest test-markdown-mode/variables ()
   "Test `markdown-mode' variables."
   (markdown-test-file "inline.text"
-   (should (= tab-width 4))
-   (should (eq font-lock-multiline t))
-   (should (eq major-mode 'markdown-mode))))
+                      (should (= tab-width 4))
+                      (should (eq font-lock-multiline t))
+                      (should (eq major-mode 'markdown-mode))))
 
 ;;; Element insertion tests:
 
 (ert-deftest test-markdown-insertion/blank-line-before-1 ()
   "Test function `markdown-ensure-blank-line-before' at beginning of line."
   (markdown-test-file "syntax.text"
-   (search-forward "as plain text")
-   (should (= (point) 1556))
-   (beginning-of-line)
-   (should (= (point) 1505))
-   (should (looking-back "A Markdown-formatted\n"))
-   (should (not (markdown-prev-line-blank-p)))
-   (markdown-ensure-blank-line-before)
-   (should (looking-back "A Markdown-formatted\n\n"))
-   (should (markdown-prev-line-blank-p))))
+                      (search-forward "as plain text")
+                      (should (= (point) 1556))
+                      (beginning-of-line)
+                      (should (= (point) 1505))
+                      (should (looking-back "A Markdown-formatted\n"))
+                      (should (not (markdown-prev-line-blank-p)))
+                      (markdown-ensure-blank-line-before)
+                      (should (looking-back "A Markdown-formatted\n\n"))
+                      (should (markdown-prev-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/blank-line-before-2 ()
   "Test function `markdown-ensure-blank-line-before' in middle of line."
   (markdown-test-file "syntax.text"
-   (search-forward "as plain text")
-   (should (= (point) 1556))
-   (should (looking-back "as plain text"))
-   (should (not (markdown-prev-line-blank-p)))
-   (markdown-ensure-blank-line-before)
-   (should (looking-back "as plain text\n\n"))
-   (should (markdown-prev-line-blank-p))))
+                      (search-forward "as plain text")
+                      (should (= (point) 1556))
+                      (should (looking-back "as plain text"))
+                      (should (not (markdown-prev-line-blank-p)))
+                      (markdown-ensure-blank-line-before)
+                      (should (looking-back "as plain text\n\n"))
+                      (should (markdown-prev-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/blank-line-before-3 ()
   "Test function `markdown-ensure-blank-line-before' with blank line before."
   (markdown-test-file "syntax.text"
-   (search-forward "web.\n\nMarkdown is not a replacement for HTML")
-   (beginning-of-line)
-   (should (= (point) 2704))
-   (should (looking-back "web.\n\n"))
-   (should (markdown-prev-line-blank-p))
-   (markdown-ensure-blank-line-before)
-   (should (= (point) 2704))
-   (should (looking-back "web.\n\n"))
-   (should (markdown-prev-line-blank-p))))
+                      (search-forward "web.\n\nMarkdown is not a replacement for HTML")
+                      (beginning-of-line)
+                      (should (= (point) 2704))
+                      (should (looking-back "web.\n\n"))
+                      (should (markdown-prev-line-blank-p))
+                      (markdown-ensure-blank-line-before)
+                      (should (= (point) 2704))
+                      (should (looking-back "web.\n\n"))
+                      (should (markdown-prev-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/blank-line-before-4 ()
   "Test function `markdown-ensure-blank-line-before' at beginning of buffer."
   (markdown-test-string "first line"
-   (beginning-of-line)
-   (should (bobp))
-   (should (= (point-max) 11))
-   (markdown-ensure-blank-line-before)
-   (should (= (point-max) 11))
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "first line"))
-   (forward-word)
-   (markdown-ensure-blank-line-before)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "first\n\n line"))))
+                        (beginning-of-line)
+                        (should (bobp))
+                        (should (= (point-max) 11))
+                        (markdown-ensure-blank-line-before)
+                        (should (= (point-max) 11))
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "first line"))
+                        (forward-word)
+                        (markdown-ensure-blank-line-before)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "first\n\n line"))))
 
 (ert-deftest test-markdown-insertion/blank-line-after-1 ()
   "Test function `markdown-ensure-blank-line-after' at end of line."
   (markdown-test-file "syntax.text"
-   (search-forward "as plain text")
-   (should (= (point) 1556))
-   (end-of-line)
-   (should (= (point) 1573))
-   (should (looking-at "\nlike it's been"))
-   (should (not (markdown-next-line-blank-p)))
-   (markdown-ensure-blank-line-after)
-   (should (looking-at "\n\nlike it's been"))
-   (should (markdown-next-line-blank-p))))
+                      (search-forward "as plain text")
+                      (should (= (point) 1556))
+                      (end-of-line)
+                      (should (= (point) 1573))
+                      (should (looking-at "\nlike it's been"))
+                      (should (not (markdown-next-line-blank-p)))
+                      (markdown-ensure-blank-line-after)
+                      (should (looking-at "\n\nlike it's been"))
+                      (should (markdown-next-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/blank-line-after-2 ()
   "Test function `markdown-ensure-blank-line-after' in middle of line."
   (markdown-test-file "syntax.text"
-   (search-forward "as plain text")
-   (should (= (point) 1556))
-   (should (looking-at ", without looking"))
-   (should (not (markdown-next-line-blank-p)))
-   (markdown-ensure-blank-line-after)
-   (should (looking-at "\n\n, without looking"))
-   (should (markdown-next-line-blank-p))))
+                      (search-forward "as plain text")
+                      (should (= (point) 1556))
+                      (should (looking-at ", without looking"))
+                      (should (not (markdown-next-line-blank-p)))
+                      (markdown-ensure-blank-line-after)
+                      (should (looking-at "\n\n, without looking"))
+                      (should (markdown-next-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/blank-line-after-3 ()
   "Test function `markdown-ensure-blank-line-after' with blank line after."
   (markdown-test-file "syntax.text"
-   (search-forward "*writing* for the web.")
-   (should (= (point) 2702))
-   (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
-   (should (markdown-next-line-blank-p))
-   (markdown-ensure-blank-line-after)
-   (should (= (point) 2702))
-   (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
-   (should (markdown-next-line-blank-p))))
+                      (search-forward "*writing* for the web.")
+                      (should (= (point) 2702))
+                      (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
+                      (should (markdown-next-line-blank-p))
+                      (markdown-ensure-blank-line-after)
+                      (should (= (point) 2702))
+                      (should (looking-at "\n\nMarkdown is not a replacement for HTML"))
+                      (should (markdown-next-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/blank-line-after-4 ()
   "Test function `markdown-ensure-blank-line-after' at end of buffer."
   (markdown-test-string "last line"
-   (end-of-line)
-   (should (eobp))
-   (should (= (point-max) 10))
-   (markdown-ensure-blank-line-after)
-   (should (= (point-max) 10))
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "last line"))
-   (backward-word)
-   (markdown-ensure-blank-line-after)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "last \n\nline"))))
+                        (end-of-line)
+                        (should (eobp))
+                        (should (= (point-max) 10))
+                        (markdown-ensure-blank-line-after)
+                        (should (= (point-max) 10))
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "last line"))
+                        (backward-word)
+                        (markdown-ensure-blank-line-after)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "last \n\nline"))))
 
 (ert-deftest test-markdown-insertion/point-after-unwrap ()
   "Test new point position calculations after unwrap operations."
   (markdown-test-string "line **one**\n"
-   (let ((prefix (cons 6 8)) (suffix (cons 11 13)))
-     ;; Prefix
-     (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
-     (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
-     ;; Word
-     (should (eq (markdown-point-after-unwrap 8 prefix suffix) 6))
-     (should (eq (markdown-point-after-unwrap 9 prefix suffix) 7))
-     (should (eq (markdown-point-after-unwrap 10 prefix suffix) 8))
-     ;; Suffix
-     (should (eq (markdown-point-after-unwrap 11 prefix suffix) 9))
-     (should (eq (markdown-point-after-unwrap 12 prefix suffix) 9))
-     ;; Immediately after
-     (should (eq (markdown-point-after-unwrap 13 prefix suffix) 9))))
+                        (let ((prefix (cons 6 8)) (suffix (cons 11 13)))
+                          ;; Prefix
+                          (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
+                          (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
+                          ;; Word
+                          (should (eq (markdown-point-after-unwrap 8 prefix suffix) 6))
+                          (should (eq (markdown-point-after-unwrap 9 prefix suffix) 7))
+                          (should (eq (markdown-point-after-unwrap 10 prefix suffix) 8))
+                          ;; Suffix
+                          (should (eq (markdown-point-after-unwrap 11 prefix suffix) 9))
+                          (should (eq (markdown-point-after-unwrap 12 prefix suffix) 9))
+                          ;; Immediately after
+                          (should (eq (markdown-point-after-unwrap 13 prefix suffix) 9))))
   (markdown-test-string "line _one_\n"
-   (let ((prefix (cons 6 7)) (suffix (cons 10 11)))
-     ;; Prefix
-     (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
-     ;; Word
-     (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
-     (should (eq (markdown-point-after-unwrap 8 prefix suffix) 7))
-     (should (eq (markdown-point-after-unwrap 9 prefix suffix) 8))
-     ;; Suffix
-     (should (eq (markdown-point-after-unwrap 10 prefix suffix) 9))
-     ;; Immediately after
-     (should (eq (markdown-point-after-unwrap 10 prefix suffix) 9)))))
+                        (let ((prefix (cons 6 7)) (suffix (cons 10 11)))
+                          ;; Prefix
+                          (should (eq (markdown-point-after-unwrap 6 prefix suffix) 6))
+                          ;; Word
+                          (should (eq (markdown-point-after-unwrap 7 prefix suffix) 6))
+                          (should (eq (markdown-point-after-unwrap 8 prefix suffix) 7))
+                          (should (eq (markdown-point-after-unwrap 9 prefix suffix) 8))
+                          ;; Suffix
+                          (should (eq (markdown-point-after-unwrap 10 prefix suffix) 9))
+                          ;; Immediately after
+                          (should (eq (markdown-point-after-unwrap 10 prefix suffix) 9)))))
 
 (ert-deftest test-markdown-insertion/unwrap-thing-at-point-italic ()
   "Test function `markdown-unwrap-thing-at-point' on italics."
   (markdown-test-file "syntax.text"
-   ;; Unwrap *not*
-   (goto-char 2859)
-   (should (thing-at-point-looking-at markdown-regex-italic))
-   (should (equal (markdown-unwrap-thing-at-point
-                   markdown-regex-italic 2 4)
-                  (cons 2859 2862)))
-   (should (= (point) 2859))
-   ;; Unwrap *publishing*
-   (goto-char 3064)
-   (should (thing-at-point-looking-at markdown-regex-italic))
-   (should (equal (markdown-unwrap-thing-at-point
-                   markdown-regex-italic 2 4)
-                  (cons 3060 3070)))
-   (should (= (point) 3063))
-   ;; Unwrap *writing*
-   (goto-char 3101)
-   (should (thing-at-point-looking-at markdown-regex-italic))
-   (should (equal (markdown-unwrap-thing-at-point
-                   markdown-regex-italic 2 4)
-                  (cons 3093 3100)))
-   (should (= (point) 3100))))
+                      ;; Unwrap *not*
+                      (goto-char 2859)
+                      (should (thing-at-point-looking-at markdown-regex-italic))
+                      (should (equal (markdown-unwrap-thing-at-point
+                                      markdown-regex-italic 1 3)
+                                     (cons 2859 2862)))
+                      (should (= (point) 2859))
+                      ;; Unwrap *publishing*
+                      (goto-char 3064)
+                      (should (thing-at-point-looking-at markdown-regex-italic))
+                      (should (equal (markdown-unwrap-thing-at-point
+                                      markdown-regex-italic 1 3)
+                                     (cons 3060 3070)))
+                      (should (= (point) 3063))
+                      ;; Unwrap *writing*
+                      (goto-char 3101)
+                      (should (thing-at-point-looking-at markdown-regex-italic))
+                      (should (equal (markdown-unwrap-thing-at-point
+                                      markdown-regex-italic 1 3)
+                                     (cons 3093 3100)))
+                      (should (= (point) 3100))))
 
 (ert-deftest test-markdown-insertion/unwrap-things-in-region-italic ()
   "Test function `markdown-unwrap-things-in-region' on italics."
   (markdown-test-file "syntax.text"
-   (should (equal (markdown-unwrap-things-in-region
-                   2704 3207 markdown-regex-italic 2 4)
-                  (cons 2704 3201)))))
+                      (should (equal (markdown-unwrap-things-in-region
+                                      2704 3207 markdown-regex-italic 1 3)
+                                     (cons 2704 3201)))))
 
 (ert-deftest test-markdown-insertion/unwrap-things-in-region-bound ()
   "Ensure that `markdown-unwrap-things-in-region' respects end bound"
   (markdown-test-string "**a** **b** **c** **d** **e** **f**"
-   ;; Set region to unrwap a, b, c, and d only.  If endpoint is not
-   ;; respected (i.e, not adjusted for character removal), the
-   ;; function will unwrap e and f also.
-   (should (equal (markdown-unwrap-things-in-region
-                   1 24 markdown-regex-bold 2 4)
-                  (cons 1 8)))
-   (should (string-equal (buffer-string) "a b c d **e** **f**"))))
+                        ;; Set region to unrwap a, b, c, and d only.  If endpoint is not
+                        ;; respected (i.e, not adjusted for character removal), the
+                        ;; function will unwrap e and f also.
+                        (should (equal (markdown-unwrap-things-in-region
+                                        1 24 markdown-regex-bold 2 4)
+                                       (cons 1 8)))
+                        (should (string-equal (buffer-string) "a b c d **e** **f**"))))
 
 (ert-deftest test-markdown-insertion/unwrap-things-in-region-links ()
   "Test function `markdown-unwrap-things-in-region' on inline links."
   (markdown-test-string "a [link](http://jblevins.org/) or [two](/).\n"
-   (should (equal (markdown-unwrap-things-in-region
-                   (point-min) (point-max) markdown-regex-link-inline 0 3)
-                  (cons 1 16)))
-   (should (string-equal (buffer-string) "a link or two.\n"))))
+                        (should (equal (markdown-unwrap-things-in-region
+                                        (point-min) (point-max) markdown-regex-link-inline 0 3)
+                                       (cons 1 16)))
+                        (should (string-equal (buffer-string) "a link or two.\n"))))
 
 (ert-deftest test-markdown-insertion/toggle-bold ()
   "Test toggling functionality of `markdown-insert-bold'."
   (markdown-test-string "one **two** three"
-   (forward-word 2)
-   (markdown-insert-bold)
-   (should (string-equal (buffer-string) "one two three"))
-   (should (= (point) 8))
-   (forward-word)
-   (markdown-insert-bold)
-   (should (= (point) 16))
-   (should (string-equal (buffer-string) "one two **three**"))))
+                        (forward-word 2)
+                        (markdown-insert-bold)
+                        (should (string-equal (buffer-string) "one two three"))
+                        (should (= (point) 8))
+                        (forward-word)
+                        (markdown-insert-bold)
+                        (should (= (point) 16))
+                        (should (string-equal (buffer-string) "one two **three**"))))
 
 (ert-deftest test-markdown-insertion/toggle-italic ()
   "Test toggling functionality of `markdown-insert-italic'."
   (markdown-test-string "one *two* three"
-   (forward-word 2)
-   (markdown-insert-italic)
-   (should (string-equal (buffer-string) "one two three"))
-   (should (= (point) 8))
-   (forward-word)
-   (markdown-insert-italic)
-   (should (string-equal (buffer-string) "one two *three*"))
-   (should (= (point) 15))))
+                        (forward-word 2)
+                        (markdown-insert-italic)
+                        (should (string-equal (buffer-string) "one two three"))
+                        (should (= (point) 8))
+                        (forward-word)
+                        (markdown-insert-italic)
+                        (should (string-equal (buffer-string) "one two *three*"))
+                        (should (= (point) 15))))
 
 (ert-deftest test-markdown-insertion/toggle-code ()
   "Test toggling functionality of `markdown-insert-code'."
   (markdown-test-string "one `two` three"
-   (forward-word 2)
-   (markdown-insert-code)
-   (should (string-equal (buffer-string) "one two three"))
-   (should (= (point) 8))
-   (forward-word)
-   (markdown-insert-code)
-   (should (string-equal (buffer-string) "one two `three`"))
-   (should (= (point) 15))))
+                        (forward-word 2)
+                        (markdown-insert-code)
+                        (should (string-equal (buffer-string) "one two three"))
+                        (should (= (point) 8))
+                        (forward-word)
+                        (markdown-insert-code)
+                        (should (string-equal (buffer-string) "one two `three`"))
+                        (should (= (point) 15))))
 
 (ert-deftest test-markdown-insertion/toggle-wiki-link-alias-first ()
   "Test toggling of `markdown-insert-wiki-link' with alias first.
 Test point position upon removal and insertion."
   (let ((markdown-wiki-link-alias-first t))
     (markdown-test-string "[[text|page]]"
-     (goto-char 5) ; point in interior of alias text, at 'x'
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 3)) ; leave point at, at 'x'
-     (should (string-equal (buffer-string) "text"))
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 5)) ; leave point at, at 'x'
-     (should (string-equal (buffer-string) "[[text]]")))
+                          (goto-char 5) ; point in interior of alias text, at 'x'
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 3)) ; leave point at, at 'x'
+                          (should (string-equal (buffer-string) "text"))
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 5)) ; leave point at, at 'x'
+                          (should (string-equal (buffer-string) "[[text]]")))
     (markdown-test-string "[[text|page]]"
-     (goto-char 10) ; point in interior of link text, at 'g'
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 5)) ; leave point at end of alias text
-     (should (string-equal (buffer-string) "text"))
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 7)) ; leave point at end of alias text
-     (should (string-equal (buffer-string) "[[text]]")))))
+                          (goto-char 10) ; point in interior of link text, at 'g'
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 5)) ; leave point at end of alias text
+                          (should (string-equal (buffer-string) "text"))
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 7)) ; leave point at end of alias text
+                          (should (string-equal (buffer-string) "[[text]]")))))
 
 (ert-deftest test-markdown-insertion/toggle-wiki-link-alias-last ()
   "Test toggling of `markdown-insert-wiki-link' with alias last.
 Test point position upon removal and insertion."
   (let ((markdown-wiki-link-alias-first nil))
     (markdown-test-string "[[page|text]]"
-     (goto-char 10) ; point in interior of alias text, at 'x'
-     (call-interactively 'markdown-insert-wiki-link)
-     (goto-char 3) ; leave point at, at 'x'
-     (should (string-equal (buffer-string) "text"))
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 5)) ; leave point at, at 'x'
-     (should (string-equal (buffer-string) "[[text]]")))
+                          (goto-char 10) ; point in interior of alias text, at 'x'
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (goto-char 3) ; leave point at, at 'x'
+                          (should (string-equal (buffer-string) "text"))
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 5)) ; leave point at, at 'x'
+                          (should (string-equal (buffer-string) "[[text]]")))
     (markdown-test-string "[[page|text]]"
-     (goto-char 3) ; point in interior of link text, at 'g'
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 1)) ; leave point at beginning of alias text
-     (should (string-equal (buffer-string) "text"))
-     (call-interactively 'markdown-insert-wiki-link)
-     (should (= (point) 3)) ; leave point at beginning of alias text
-     (should (string-equal (buffer-string) "[[text]]")))))
+                          (goto-char 3) ; point in interior of link text, at 'g'
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 1)) ; leave point at beginning of alias text
+                          (should (string-equal (buffer-string) "text"))
+                          (call-interactively 'markdown-insert-wiki-link)
+                          (should (= (point) 3)) ; leave point at beginning of alias text
+                          (should (string-equal (buffer-string) "[[text]]")))))
 
 (ert-deftest test-markdown-insertion/bold-region ()
   "Test region functionality of `markdown-insert-bold'."
   (markdown-test-string "one two three"
-   (push-mark (point) t t)
-   (forward-word 2)
-   (markdown-insert-bold)
-   (should (string-equal (buffer-string) "**one two** three"))
-   (should (= (point) 10))))
+                        (push-mark (point) t t)
+                        (forward-word 2)
+                        (markdown-insert-bold)
+                        (should (string-equal (buffer-string) "**one two** three"))
+                        (should (= (point) 10))))
 
 (ert-deftest test-markdown-insertion/italic-region ()
   "Test region functionality of `markdown-insert-italic'."
   (markdown-test-string "one two three"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (forward-word 2)
-   (markdown-insert-italic)
-   (should (string-equal (buffer-string) "*one two* three"))
-   (should (= (point) 9))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (forward-word 2)
+                        (markdown-insert-italic)
+                        (should (string-equal (buffer-string) "*one two* three"))
+                        (should (= (point) 9))))
 
 (ert-deftest test-markdown-insertion/code-region ()
   "Test region functionality of `markdown-insert-code'."
   (markdown-test-string "one two three"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (forward-word 2)
-   (markdown-insert-code)
-   (should (string-equal (buffer-string) "`one two` three"))
-   (should (= (point) 9))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (forward-word 2)
+                        (markdown-insert-code)
+                        (should (string-equal (buffer-string) "`one two` three"))
+                        (should (= (point) 9))))
 
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."
   (markdown-test-string "line one\nline two\n"
-   (forward-word)
-   (markdown-insert-header-atx-1)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "# line one #\n\nline two\n"))
-   (forward-line 2)
-   (markdown-insert-header-atx-2)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "# line one #\n\n## line two ##\n\n"))))
+                        (forward-word)
+                        (markdown-insert-header-atx-1)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "# line one #\n\nline two\n"))
+                        (forward-line 2)
+                        (markdown-insert-header-atx-2)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "# line one #\n\n## line two ##\n\n"))))
 
 (ert-deftest test-markdown-insertion/atx-region ()
   "Test ATX header insertion with region."
   (markdown-test-string "line one\nline two\n"
-   (transient-mark-mode)
-   (forward-char 5)
-   (push-mark (point) t t)
-   (forward-word)
-   (should (string-equal (buffer-substring (region-beginning) (region-end))
-                         "one"))
-   (markdown-insert-header-atx-4)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line \n\n#### one ####\n\nline two\n"))))
+                        (transient-mark-mode)
+                        (forward-char 5)
+                        (push-mark (point) t t)
+                        (forward-word)
+                        (should (string-equal (buffer-substring (region-beginning) (region-end))
+                                              "one"))
+                        (markdown-insert-header-atx-4)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line \n\n#### one ####\n\nline two\n"))))
 
 (ert-deftest test-markdown-insertion/atx-blank ()
   "Test ATX header insertion on blank line."
   (markdown-test-string "line one\n\nline two\n"
-   (forward-line)
-   (markdown-insert-header-atx-3)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line one\n\n###  ###\n\nline two\n"))
-   (should (= (point) 15))
-   (should (looking-at " ###\n"))))
+                        (forward-line)
+                        (markdown-insert-header-atx-3)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line one\n\n###  ###\n\nline two\n"))
+                        (should (= (point) 15))
+                        (should (looking-at " ###\n"))))
 
 (ert-deftest test-markdown-insertion/atx-region-whitespace ()
   "Test ATX header insertion using a region with whitespace."
   (markdown-test-string "  line one\n\nline two\n  \n"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (goto-char (point-max))
-   (markdown-insert-header-atx-2)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "## line one line two ##"))
-   (should (= (point) 21))
-   (should (looking-at " ##"))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (goto-char (point-max))
+                        (markdown-insert-header-atx-2)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "## line one line two ##"))
+                        (should (= (point) 21))
+                        (should (looking-at " ##"))))
 
 (ert-deftest test-markdown-insertion/atx-line-whitespace ()
   "Test ATX header insertion using current line with whitespace."
   (markdown-test-string "  line one  \n\nline two\n"
-   (goto-char (line-end-position))
-   (markdown-insert-header-atx-3)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "### line one ###\n\nline two\n"))
-   (should (= (point) 13))
-   (should (looking-at " ###\n"))))
+                        (goto-char (line-end-position))
+                        (markdown-insert-header-atx-3)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "### line one ###\n\nline two\n"))
+                        (should (= (point) 13))
+                        (should (looking-at " ###\n"))))
 
 (ert-deftest test-markdown-insertion/atx-replace-atx ()
   "Test ATX header insertion when replacing an existing ATX header."
   (markdown-test-string "## replace ##\n"
-   (markdown-insert-header-atx-4)
-   (should (string-equal (buffer-string) "#### replace ####\n\n"))
-   (should (looking-at " ####\n"))))
+                        (markdown-insert-header-atx-4)
+                        (should (string-equal (buffer-string) "#### replace ####\n\n"))
+                        (should (looking-at " ####\n"))))
 
 (ert-deftest test-markdown-insertion/atx-replace-setext-1 ()
   "Test ATX header insertion when replacing an existing setext header."
   (markdown-test-string "replace\n=======\n"
-   (markdown-insert-header-atx-2)
-   (should (string-equal (buffer-string) "## replace ##\n\n"))
-   (should (looking-at " ##\n"))))
+                        (markdown-insert-header-atx-2)
+                        (should (string-equal (buffer-string) "## replace ##\n\n"))
+                        (should (looking-at " ##\n"))))
 
 (ert-deftest test-markdown-insertion/atx-replace-setext-2 ()
   "Test ATX header insertion when replacing an existing setext header."
   (markdown-test-string "replace\n-------\n"
-   (markdown-insert-header-atx-5)
-   (should (string-equal (buffer-string) "##### replace #####\n\n"))
-   (should (looking-at " #####\n"))))
+                        (markdown-insert-header-atx-5)
+                        (should (string-equal (buffer-string) "##### replace #####\n\n"))
+                        (should (looking-at " #####\n"))))
 
 (ert-deftest test-markdown-insertion/setext-line ()
   "Test setext header insertion without region."
   (markdown-test-string "line one\nline two\n"
-   (forward-word)
-   (markdown-insert-header-setext-1)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line one\n========\n\nline two\n"))
-   (forward-line 3)
-   (markdown-insert-header-setext-2)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line one\n========\n\nline two\n--------\n\n"))))
+                        (forward-word)
+                        (markdown-insert-header-setext-1)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line one\n========\n\nline two\n"))
+                        (forward-line 3)
+                        (markdown-insert-header-setext-2)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line one\n========\n\nline two\n--------\n\n"))))
 
 (ert-deftest test-markdown-insertion/setext-region ()
   "Test setext header insertion with region."
   (markdown-test-string "line one\nline two\n"
-   (transient-mark-mode)
-   (forward-char 5)
-   (push-mark (point) t t)
-   (forward-word)
-   (should (string-equal (buffer-substring (region-beginning) (region-end))
-                         "one"))
-   (markdown-insert-header-setext-1)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line \n\none\n===\n\nline two\n"))))
+                        (transient-mark-mode)
+                        (forward-char 5)
+                        (push-mark (point) t t)
+                        (forward-word)
+                        (should (string-equal (buffer-substring (region-beginning) (region-end))
+                                              "one"))
+                        (markdown-insert-header-setext-1)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line \n\none\n===\n\nline two\n"))))
 
 (ert-deftest test-markdown-insertion/setext-blank ()
   "Test setext header insertion on blank line."
   (markdown-test-string "line one\n\nline two\n"
-   (forward-line)
-   (markdown-insert-header 2 "foo" t)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line one\n\nfoo\n---\n\nline two\n"))
-   (should (= (point) 14))
-   (should (looking-at "\n---"))))
+                        (forward-line)
+                        (markdown-insert-header 2 "foo" t)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line one\n\nfoo\n---\n\nline two\n"))
+                        (should (= (point) 14))
+                        (should (looking-at "\n---"))))
 
 (ert-deftest test-markdown-insertion/setext-region-whitespace ()
   "Test setext header insertion using a region with whitespace."
   (markdown-test-string "  line one\n\nline two\n  \n"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (goto-char (point-max))
-   (markdown-insert-header-setext-1)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line one line two\n================="))
-   (should (= (point) 18))
-   (should (looking-at "\n===="))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (goto-char (point-max))
+                        (markdown-insert-header-setext-1)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line one line two\n================="))
+                        (should (= (point) 18))
+                        (should (looking-at "\n===="))))
 
 (ert-deftest test-markdown-insertion/setext-line-whitespace ()
   "Test setext header insertion using current line with whitespace."
   (markdown-test-string "  line one  \n\nline two\n"
-   (goto-char (line-end-position))
-   (markdown-insert-header-setext-2)
-   (should (string-equal (buffer-substring (point-min) (point-max))
-                         "line one\n--------\n\nline two\n"))
-   (should (= (point) 9))
-   (should (looking-at "\n---"))))
+                        (goto-char (line-end-position))
+                        (markdown-insert-header-setext-2)
+                        (should (string-equal (buffer-substring (point-min) (point-max))
+                                              "line one\n--------\n\nline two\n"))
+                        (should (= (point) 9))
+                        (should (looking-at "\n---"))))
 
 (ert-deftest test-markdown-insertion/setext-replace-atx ()
   "Test setext header insertion when replacing an existing ATX header."
   (markdown-test-string "## replace ##\n"
-   (markdown-insert-header-setext-1)
-   (should (string-equal (buffer-string) "replace\n=======\n\n"))
-   (should (looking-at "\n==="))))
+                        (markdown-insert-header-setext-1)
+                        (should (string-equal (buffer-string) "replace\n=======\n\n"))
+                        (should (looking-at "\n==="))))
 
 (ert-deftest test-markdown-insertion/setext-replace-setext-1 ()
   "Test setext header insertion when replacing an existing setext title."
   (markdown-test-string "replace\n=======\n"
-   (markdown-insert-header-setext-2)
-   (should (string-equal (buffer-string) "replace\n-------\n\n"))
-   (should (looking-at "\n---"))))
+                        (markdown-insert-header-setext-2)
+                        (should (string-equal (buffer-string) "replace\n-------\n\n"))
+                        (should (looking-at "\n---"))))
 
 (ert-deftest test-markdown-insertion/setext-replace-setext-2 ()
   "Test setext header insertion when replacing an existing setext section."
   (markdown-test-string "replace\n-------\n"
-   (markdown-insert-header-setext-1)
-   (should (string-equal (buffer-string) "replace\n=======\n\n"))
-   (should (looking-at "\n==="))))
+                        (markdown-insert-header-setext-1)
+                        (should (string-equal (buffer-string) "replace\n=======\n\n"))
+                        (should (looking-at "\n==="))))
 
 (ert-deftest test-markdown-insertion/header-dwim ()
   "Test 'do what I mean' header insertion."
   (markdown-test-file "outline.text"
-   (call-interactively 'markdown-insert-header-dwim)
-   (should (looking-at " #$"))
-   (end-of-defun 2)
-   (call-interactively 'markdown-insert-header-dwim)
-   (beginning-of-line)
-   (should (looking-at "^#  #$"))
-   (end-of-defun 3)
-   (call-interactively 'markdown-insert-header-dwim)
-   (beginning-of-line)
-   (should (looking-at "^###  ###$"))))
+                      (call-interactively 'markdown-insert-header-dwim)
+                      (should (looking-at " #$"))
+                      (end-of-defun 2)
+                      (call-interactively 'markdown-insert-header-dwim)
+                      (beginning-of-line)
+                      (should (looking-at "^#  #$"))
+                      (end-of-defun 3)
+                      (call-interactively 'markdown-insert-header-dwim)
+                      (beginning-of-line)
+                      (should (looking-at "^###  ###$"))))
 
 (ert-deftest test-markdown-insertion/header-dwim-prefix ()
   "Test 'do what I mean' header insertion with prefix arguments."
@@ -625,12 +625,12 @@ Test point position upon removal and insertion."
                      '((16) . "### abc ###"))))
     (dolist (test tests)
       (markdown-test-string "## atx\n\nabc"
-       (goto-char (point-max))
-       (let ((current-prefix-arg (car test)))
-         (call-interactively 'markdown-insert-header-dwim)
-         (should (string-equal
-                  (buffer-substring (line-beginning-position) (line-end-position))
-                  (cdr test))))))))
+                            (goto-char (point-max))
+                            (let ((current-prefix-arg (car test)))
+                              (call-interactively 'markdown-insert-header-dwim)
+                              (should (string-equal
+                                       (buffer-substring (line-beginning-position) (line-end-position))
+                                       (cdr test))))))))
 
 (ert-deftest test-markdown-insertion/header-setext-dwim-prefix ()
   "Test 'do what I mean' header insertion with prefix arguments."
@@ -645,12 +645,12 @@ Test point position upon removal and insertion."
                      '((16) . "### abc ###"))))
     (dolist (test tests)
       (markdown-test-string "atx\n---\n\nabc"
-       (goto-char (point-max))
-       (let ((current-prefix-arg (car test)))
-         (call-interactively 'markdown-insert-header-setext-dwim)
-         (should (string-equal
-                  (buffer-substring (line-beginning-position) (line-end-position 2))
-                  (cdr test))))))))
+                            (goto-char (point-max))
+                            (let ((current-prefix-arg (car test)))
+                              (call-interactively 'markdown-insert-header-setext-dwim)
+                              (should (string-equal
+                                       (buffer-substring (line-beginning-position) (line-end-position 2))
+                                       (cdr test))))))))
 
 (ert-deftest test-markdown-insertion/remove-header ()
   "Test ATX and setext header."
@@ -675,356 +675,356 @@ Test point position upon removal and insertion."
 (ert-deftest test-markdown-insertion/italic-unwrap-region ()
   "A test of inserting italics with italic text in the region."
   (markdown-test-string "*foo* bar *baz*"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (end-of-line)
-   (markdown-insert-italic)
-   (should (string-equal (buffer-string) "*foo bar baz*"))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (end-of-line)
+                        (markdown-insert-italic)
+                        (should (string-equal (buffer-string) "*foo bar baz*"))))
 
 (ert-deftest test-markdown-insertion/bold-unwrap-region ()
   "A test of inserting bold with italic text in the region."
   (markdown-test-string "*foo* **bar** *baz*"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (end-of-line)
-   (markdown-insert-bold)
-   (should (string-equal (buffer-string) "***foo* bar *baz***"))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (end-of-line)
+                        (markdown-insert-bold)
+                        (should (string-equal (buffer-string) "***foo* bar *baz***"))))
 
 (ert-deftest test-markdown-insertion/code-unwrap-region ()
   "A test of inserting code with code already in the region."
   (markdown-test-string "`foo` *bar* `baz`"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (end-of-line)
-   (markdown-insert-code)
-   (should (string-equal (buffer-string) "`foo *bar* baz`"))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (end-of-line)
+                        (markdown-insert-code)
+                        (should (string-equal (buffer-string) "`foo *bar* baz`"))))
 
 (ert-deftest test-markdown-insertion/hr-order ()
   "Test inserting horizontal rules."
   (dotimes (n (length markdown-hr-strings))
     (markdown-test-string ""
-     (let ((current-prefix-arg n))
-       (call-interactively 'markdown-insert-hr))
-     (should (string-equal (buffer-string) (nth (1- n) markdown-hr-strings))))))
+                          (let ((current-prefix-arg n))
+                            (call-interactively 'markdown-insert-hr))
+                          (should (string-equal (buffer-string) (nth (1- n) markdown-hr-strings))))))
 
 (ert-deftest test-markdown-insertion/hr-prefix ()
   "Test inserting horizontal rule with C-u prefix."
   (markdown-test-string ""
-   (let ((current-prefix-arg '(4)))
-     (call-interactively 'markdown-insert-hr))
-   (should (string-equal (buffer-string) (car (last markdown-hr-strings))))))
+                        (let ((current-prefix-arg '(4)))
+                          (call-interactively 'markdown-insert-hr))
+                        (should (string-equal (buffer-string) (car (last markdown-hr-strings))))))
 
 (ert-deftest test-markdown-insertion/hr-bob ()
   "Test inserting horizontal rule at beginning of buffer."
   (markdown-test-string "one line\n"
-   (call-interactively 'markdown-insert-hr)
-   (should (string-equal (buffer-string)
-                         (concat (car markdown-hr-strings)
-                                 "\n\none line\n")))))
+                        (call-interactively 'markdown-insert-hr)
+                        (should (string-equal (buffer-string)
+                                              (concat (car markdown-hr-strings)
+                                                      "\n\none line\n")))))
 
 (ert-deftest test-markdown-insertion/hr-eob ()
   "Test inserting horizontal rule at end of buffer."
   (markdown-test-string "one line\n"
-   (forward-line)
-   (call-interactively 'markdown-insert-hr)
-   (should (string-equal (buffer-string)
-                         (concat "one line\n\n" (car markdown-hr-strings))))))
+                        (forward-line)
+                        (call-interactively 'markdown-insert-hr)
+                        (should (string-equal (buffer-string)
+                                              (concat "one line\n\n" (car markdown-hr-strings))))))
 
 (ert-deftest test-markdown-insertion/hr-mob ()
   "Test inserting horizontal rule in middle of buffer."
   (markdown-test-string "one line\n"
-   (forward-word)
-   (let ((markdown-hr-strings '("----------")))
-     (call-interactively 'markdown-insert-hr)
-     (should (string-equal (buffer-string)
-                           (concat "one\n\n" (car markdown-hr-strings)
-                                   "\n\n line\n"))))))
+                        (forward-word)
+                        (let ((markdown-hr-strings '("----------")))
+                          (call-interactively 'markdown-insert-hr)
+                          (should (string-equal (buffer-string)
+                                                (concat "one\n\n" (car markdown-hr-strings)
+                                                        "\n\n line\n"))))))
 
 (ert-deftest test-markdown-insertion/pre-region-1 ()
   "Test `markdown-pre-region'."
   ;; Simple test as non-interactive command
   (markdown-test-string "line one\nline two\n"
-   (markdown-pre-region (line-beginning-position) (line-end-position))
-   (should (string-equal (buffer-string) "    line one\n\nline two\n")))
+                        (markdown-pre-region (line-beginning-position) (line-end-position))
+                        (should (string-equal (buffer-string) "    line one\n\nline two\n")))
   ;; Test removal of whitespace before and after region
   (markdown-test-string "line one abc\nline two\n"
-   (markdown-pre-region 6 9)
-   (should (string-equal (buffer-string) "line\n\n    one\n\nabc\nline two\n")))
+                        (markdown-pre-region 6 9)
+                        (should (string-equal (buffer-string) "line\n\n    one\n\nabc\nline two\n")))
   ;; Simple test as interactive command
   (markdown-test-string "line one\nline two\n"
-   (push-mark (point) t t)
-   (forward-line 2)
-   (call-interactively 'markdown-pre-region)
-   (should (string-equal (buffer-string) "    line one\n    line two\n\n"))))
+                        (push-mark (point) t t)
+                        (forward-line 2)
+                        (call-interactively 'markdown-pre-region)
+                        (should (string-equal (buffer-string) "    line one\n    line two\n\n"))))
 
 (ert-deftest test-markdown-insertion/blockquote-region-1 ()
   "Test `markdown-blockquote-region'."
   ;; Simple test as non-interactive command
   (markdown-test-string "line one\nline two\n"
-   (markdown-blockquote-region (line-beginning-position) (line-end-position))
-   (should (string-equal (buffer-string) "> line one\n\nline two\n")))
+                        (markdown-blockquote-region (line-beginning-position) (line-end-position))
+                        (should (string-equal (buffer-string) "> line one\n\nline two\n")))
   ;; Test removal of whitespace before and after region
   (markdown-test-string "line one abc\nline two\n"
-   (markdown-blockquote-region 6 9)
-   (should (string-equal (buffer-string) "line\n\n> one\n\nabc\nline two\n")))
+                        (markdown-blockquote-region 6 9)
+                        (should (string-equal (buffer-string) "line\n\n> one\n\nabc\nline two\n")))
   ;; Simple test as interactive command
   (markdown-test-string "line one\nline two\n"
-   (push-mark (point) t t)
-   (forward-line 2)
-   (call-interactively 'markdown-blockquote-region)
-   (should (string-equal (buffer-string) "> line one\n> line two\n\n"))))
+                        (push-mark (point) t t)
+                        (forward-line 2)
+                        (call-interactively 'markdown-blockquote-region)
+                        (should (string-equal (buffer-string) "> line one\n> line two\n\n"))))
 
 (ert-deftest test-markdown-insertion/pre-nested-lists ()
   "Test `markdown-pre-indentation' and `markdown-insert-pre' with nested list."
   (markdown-test-string "* item\n    * item\n"
-   ;; before the first item
-   (should (string-equal (markdown-pre-indentation (point)) "    "))
-   (markdown-insert-pre)
-   (beginning-of-line)
-   (should (markdown-prev-line-blank-p))
-   (should (looking-at "^    $"))
-   (should (markdown-next-line-blank-p))
-   ;; before the second item
-   (forward-line 3)
-   (should (string-equal (markdown-pre-indentation (point)) "        "))
-   (markdown-insert-pre)
-   (beginning-of-line)
-   (should (markdown-prev-line-blank-p))
-   (should (looking-at "^        $"))
-   (should (markdown-next-line-blank-p))
-   ;; after the second item
-   (forward-line 3)
-   (should (string-equal (markdown-pre-indentation (point)) "            "))
-   (markdown-insert-pre)
-   (beginning-of-line)
-   (should (markdown-prev-line-blank-p))
-   (should (looking-at "^            $"))
-   (should (markdown-next-line-blank-p))))
+                        ;; before the first item
+                        (should (string-equal (markdown-pre-indentation (point)) "    "))
+                        (markdown-insert-pre)
+                        (beginning-of-line)
+                        (should (markdown-prev-line-blank-p))
+                        (should (looking-at "^    $"))
+                        (should (markdown-next-line-blank-p))
+                        ;; before the second item
+                        (forward-line 3)
+                        (should (string-equal (markdown-pre-indentation (point)) "        "))
+                        (markdown-insert-pre)
+                        (beginning-of-line)
+                        (should (markdown-prev-line-blank-p))
+                        (should (looking-at "^        $"))
+                        (should (markdown-next-line-blank-p))
+                        ;; after the second item
+                        (forward-line 3)
+                        (should (string-equal (markdown-pre-indentation (point)) "            "))
+                        (markdown-insert-pre)
+                        (beginning-of-line)
+                        (should (markdown-prev-line-blank-p))
+                        (should (looking-at "^            $"))
+                        (should (markdown-next-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/pre-faux-list ()
   "Test `markdown-pre-indentation' following a list-marker in a pre block."
   (markdown-test-string "    * pre block, not a list item\n"
-   (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
+                        (should (string-equal (markdown-pre-indentation (point-max)) "    "))))
 
 (ert-deftest test-markdown-insertion/blockquote-nested-lists ()
   "Test blockquote insertion in a nested list context."
   (markdown-test-string "* item\n    * item\n"
-   ;; before the first item
-   (should (string-equal (markdown-blockquote-indentation (point)) ""))
-   (markdown-insert-blockquote)
-   (beginning-of-line)
-   (should (markdown-prev-line-blank-p))
-   (should (looking-at "^> $"))
-   (should (markdown-next-line-blank-p))
-   ;; before the second item
-   (forward-line 3)
-   (should (string-equal (markdown-blockquote-indentation (point)) "    "))
-   (markdown-insert-blockquote)
-   (beginning-of-line)
-   (should (markdown-prev-line-blank-p))
-   (should (looking-at "^    > $"))
-   (should (markdown-next-line-blank-p))
-   ;; after the second item
-   (forward-line 3)
-   (should (string-equal (markdown-blockquote-indentation (point)) "        "))
-   (markdown-insert-blockquote)
-   (beginning-of-line)
-   (should (markdown-prev-line-blank-p))
-   (should (looking-at "^        > $"))
-   (should (markdown-next-line-blank-p))))
+                        ;; before the first item
+                        (should (string-equal (markdown-blockquote-indentation (point)) ""))
+                        (markdown-insert-blockquote)
+                        (beginning-of-line)
+                        (should (markdown-prev-line-blank-p))
+                        (should (looking-at "^> $"))
+                        (should (markdown-next-line-blank-p))
+                        ;; before the second item
+                        (forward-line 3)
+                        (should (string-equal (markdown-blockquote-indentation (point)) "    "))
+                        (markdown-insert-blockquote)
+                        (beginning-of-line)
+                        (should (markdown-prev-line-blank-p))
+                        (should (looking-at "^    > $"))
+                        (should (markdown-next-line-blank-p))
+                        ;; after the second item
+                        (forward-line 3)
+                        (should (string-equal (markdown-blockquote-indentation (point)) "        "))
+                        (markdown-insert-blockquote)
+                        (beginning-of-line)
+                        (should (markdown-prev-line-blank-p))
+                        (should (looking-at "^        > $"))
+                        (should (markdown-next-line-blank-p))))
 
 (ert-deftest test-markdown-insertion/empty-italic ()
   "Test `markdown-insert-italic' with no word at point and no region."
   (markdown-test-string ""
-   (call-interactively 'markdown-insert-italic)
-   (should (string-equal (buffer-string) "**"))
-   (should (= (point) 2))))
+                        (call-interactively 'markdown-insert-italic)
+                        (should (string-equal (buffer-string) "**"))
+                        (should (= (point) 2))))
 
 (ert-deftest test-markdown-insertion/empty-bold ()
   "Test `markdown-insert-bold' with no word at point and no region."
   (markdown-test-string ""
-   (call-interactively 'markdown-insert-bold)
-   (should (string-equal (buffer-string) "****"))
-   (should (= (point) 3))))
+                        (call-interactively 'markdown-insert-bold)
+                        (should (string-equal (buffer-string) "****"))
+                        (should (= (point) 3))))
 
 (ert-deftest test-markdown-insertion/uri ()
   "Test `markdown-insert-uri'."
   (markdown-test-string "http://jblevins.org/projects/markdown-mode/"
-   (call-interactively 'markdown-insert-uri)
-   (should (string-equal (buffer-string) "<http://jblevins.org/projects/markdown-mode/>"))
-   (should (= (point) 2))
-   (call-interactively 'markdown-insert-uri)
-   (should (string-equal (buffer-string) "http://jblevins.org/projects/markdown-mode/"))
-   (should (= (point) 1))
-   (erase-buffer)
-   (call-interactively 'markdown-insert-uri)
-   (should (string-equal (buffer-string) "<>"))
-   (should (= (point) 2))))
+                        (call-interactively 'markdown-insert-uri)
+                        (should (string-equal (buffer-string) "<http://jblevins.org/projects/markdown-mode/>"))
+                        (should (= (point) 2))
+                        (call-interactively 'markdown-insert-uri)
+                        (should (string-equal (buffer-string) "http://jblevins.org/projects/markdown-mode/"))
+                        (should (= (point) 1))
+                        (erase-buffer)
+                        (call-interactively 'markdown-insert-uri)
+                        (should (string-equal (buffer-string) "<>"))
+                        (should (= (point) 2))))
 
 (ert-deftest test-markdown-insertion/list-item ()
   "Test `markdown-insert-list-item' on several lists."
   ;; No existing list
   (markdown-test-string "abc"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "abc\n  * "))
-   (should (= (point) 9)))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "abc\n  * "))
+                        (should (= (point) 9)))
   ;; Following a list item, on the same line
   (markdown-test-string "  * foo"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "  * foo\n  * ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "  * foo\n  * ")))
   ;; Following a list item, on the next line
   (markdown-test-string "- foo\n"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "- foo\n- ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "- foo\n- ")))
   ;; Following a list item, after a blank line
   (markdown-test-string "- foo\n\n"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "- foo\n\n- ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "- foo\n\n- ")))
   ;; Preceding a list item
   (markdown-test-string "- foo\n"
-   (goto-char (point-min))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "- \n- foo\n")))
+                        (goto-char (point-min))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "- \n- foo\n")))
   ;; Preceding a list item and a blank line
   (markdown-test-string "\n\n- foo\n"
-   (goto-char (point-min))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "- \n\n- foo\n")))
+                        (goto-char (point-min))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "- \n\n- foo\n")))
   ;; In the middle of a list item
   (markdown-test-string "- foo bar\n"
-   (forward-word)
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "- foo\n-  bar\n")))
+                        (forward-word)
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "- foo\n-  bar\n")))
   ;; Before a list marker, but not at beginning of line
   (markdown-test-string "   - foo\n"
-   (forward-char 2)
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "   - \n   - foo\n")))
+                        (forward-char 2)
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "   - \n   - foo\n")))
   ;; Following an ordered list item
   (markdown-test-string "6. foo"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "6. foo\n7. ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "6. foo\n7. ")))
   ;; Following a nested ordered list item
   (markdown-test-string "6. foo\n    1. bar"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. ")))
   ;; Preceding an ordered list item
   (markdown-test-string "\n1. foo\n2. bar"
-   (goto-char (point-min))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string) "1. \n1. foo\n2. bar")))
+                        (goto-char (point-min))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "1. \n1. foo\n2. bar")))
   ;; Preserve previous spacing in ordered list
   (markdown-test-string "1.        foo"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string)  "1.        foo\n2.        ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string)  "1.        foo\n2.        ")))
   ;; Adjust spacing for number width changes (e.g., 9 -> 10)
   (markdown-test-string "9.  foo"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string)  "9.  foo\n10. ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string)  "9.  foo\n10. ")))
   ;; Don't adjust spacing for number width changes if no extra whitespace
   (markdown-test-string "99. foo"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string)  "99. foo\n100. ")))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string)  "99. foo\n100. ")))
   ;; Don't adjust spacing if tabs are used as whitespace
   (markdown-test-string "9.\tfoo"
-   (goto-char (point-max))
-   (call-interactively 'markdown-insert-list-item)
-   (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
 
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."
-   ;; Test optional parameters (leave point after link)
+  ;; Test optional parameters (leave point after link)
   (markdown-test-string ""
-   (markdown-insert-reference-link "abc" "1")
-   (should (string-equal (buffer-string) "[abc][1]"))
-   (should (= (point) 9)))
-   ;; Full link without title (leave point after link)
+                        (markdown-insert-reference-link "abc" "1")
+                        (should (string-equal (buffer-string) "[abc][1]"))
+                        (should (= (point) 9)))
+  ;; Full link without title (leave point after link)
   (markdown-test-string ""
-   (markdown-insert-reference-link "link" "label" "http://jblevins.org/")
-   (should (string-equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/\n"))
-   (should (= (point) 14)))
-   ;; Full link without label or title (leave point after link)
+                        (markdown-insert-reference-link "link" "label" "http://jblevins.org/")
+                        (should (string-equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/\n"))
+                        (should (= (point) 14)))
+  ;; Full link without label or title (leave point after link)
   (markdown-test-string ""
-   (markdown-insert-reference-link "link" "" "http://jblevins.org/")
-   (should (string-equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/\n"))
-   (should (= (point) 9)))
-   ;; Link only with no label, URL, or title (leave point after link)
+                        (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+                        (should (string-equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/\n"))
+                        (should (= (point) 9)))
+  ;; Link only with no label, URL, or title (leave point after link)
   (markdown-test-string ""
-   (markdown-insert-reference-link "link" "")
-   (should (string-equal (buffer-string) "[link][]"))
-   (should (= (point) 9))))
+                        (markdown-insert-reference-link "link" "")
+                        (should (string-equal (buffer-string) "[link][]"))
+                        (should (= (point) 9))))
 
 (ert-deftest test-markdown-insertion/reference-link-end ()
   "Basic reference link insertion test for 'end location."
   (let ((markdown-reference-location 'end))
     (markdown-test-string "first para\n\nsecond para\n"
-     (end-of-line)
-     (markdown-insert-reference-link "link" "" "http://jblevins.org/")
-     (should (= (point) 19))
-     (goto-char (point-min))
-     (forward-line 4)
-     (should (looking-at "\\[link\\]: http://jblevins.org/")))))
+                          (end-of-line)
+                          (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+                          (should (= (point) 19))
+                          (goto-char (point-min))
+                          (forward-line 4)
+                          (should (looking-at "\\[link\\]: http://jblevins.org/")))))
 
 (ert-deftest test-markdown-insertion/reference-link-immediately ()
   "Basic reference link insertion test for 'immediately location."
   (let ((markdown-reference-location 'immediately))
     (markdown-test-string "first para\n\nsecond para\n"
-     (end-of-line)
-     (markdown-insert-reference-link "link" "" "http://jblevins.org/")
-     (should (= (point) 19))
-     (goto-char (point-min))
-     (forward-line 2)
-     (should (looking-at "\\[link\\]: http://jblevins.org/")))))
+                          (end-of-line)
+                          (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+                          (should (= (point) 19))
+                          (goto-char (point-min))
+                          (forward-line 2)
+                          (should (looking-at "\\[link\\]: http://jblevins.org/")))))
 
 (ert-deftest test-markdown-insertion/reference-link-header ()
   "Basic reference link insertion test for 'header location."
   (let ((markdown-reference-location 'header))
     (markdown-test-string "par one\n\npar two\n\n### header\n"
-     (end-of-line)
-     (markdown-insert-reference-link "link" "" "")
-     (should (= (point) 35))
-     (should (looking-back "\\[link\\]: ")))))
+                          (end-of-line)
+                          (markdown-insert-reference-link "link" "" "")
+                          (should (= (point) 35))
+                          (should (looking-back "\\[link\\]: ")))))
 
 (ert-deftest test-markdown-insertion/inline-to-reference-link ()
   "Inline link to reference link conversion."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")"
-   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-   (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n")))
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
+                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n")))
   (markdown-test-string "[text](http://jblevins.org/)"
-   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-   (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/\n"))))
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
+                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/\n"))))
 
 (ert-deftest test-markdown-insertion/inline-link ()
   "Basic tests for `markdown-insert-link'."
-   ;; Test empty markup insertion (leave point in square brackets)
+  ;; Test empty markup insertion (leave point in square brackets)
   (markdown-test-string "abc "
-   (end-of-line)
-   (call-interactively 'markdown-insert-link)
-   (should (string-equal (buffer-string) "abc []()"))
-   (should (= (point) 6)))
+                        (end-of-line)
+                        (call-interactively 'markdown-insert-link)
+                        (should (string-equal (buffer-string) "abc []()"))
+                        (should (= (point) 6)))
   ;; Test with word at point (leave point in parentheses)
   (markdown-test-string "abc def ghi"
-   (forward-word 2)
-   (call-interactively 'markdown-insert-link)
-   (should (string-equal (buffer-string) "abc [def]() ghi"))
-   (should (= (point) 11)))
+                        (forward-word 2)
+                        (call-interactively 'markdown-insert-link)
+                        (should (string-equal (buffer-string) "abc [def]() ghi"))
+                        (should (= (point) 11)))
   ;; Test with region (leave point in parentheses)
   (markdown-test-string "abc def ghi"
-   (transient-mark-mode)
-   (push-mark (point) t t)
-   (forward-word 2)
-   (call-interactively 'markdown-insert-link)
-   (should (string-equal (buffer-string) "[abc def]() ghi"))
-   (should (= (point) 11))))
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (forward-word 2)
+                        (call-interactively 'markdown-insert-link)
+                        (should (string-equal (buffer-string) "[abc def]() ghi"))
+                        (should (= (point) 11))))
 
 ;;; Footnote tests:
 
@@ -1032,132 +1032,132 @@ Test point position upon removal and insertion."
   "Basic footnote insertion and deletion tests for 'end location."
   (let ((markdown-footnote-location 'end))
     (markdown-test-string "first line\nsecond line\n"
-     ;; new buffer with no footnotes
-     (should (= markdown-footnote-counter 0))
-     ;; footnote insertion
-     (end-of-line)
-     (markdown-insert-footnote)
-     (should (= (point) 35))
-     (should (= markdown-footnote-counter 1))
-     (should (looking-back "\\[^1\\]: "))
-     ;; kill with point in footnote definition
-     (insert "footnote text")
-     (let (kill-ring)
-       (markdown-footnote-kill))
-     (should (= (point) 24))
-     (should (bolp))
-     (should (string-equal (buffer-string) "first line\nsecond line\n"))
-     ;; insertion, counter should increment
-     (goto-char (point-min))
-     (end-of-line)
-     (markdown-insert-footnote)
-     (should (= (point) 35))
-     (should (= markdown-footnote-counter 2))
-     (should (looking-back "\\[^2\\]: "))
-     (insert "footnote text")
-     ;; return to marker
-     (markdown-footnote-return)
-     (should (= (point) 15))
-     (should (looking-back "\\[^2\\]"))
-     ;; kill with point at marker
-     (let (kill-ring)
-       (markdown-footnote-kill))
-     (should (= (point) 11))
-     (should (eolp))
-     (should (string-equal (buffer-string) "first line\nsecond line\n")))))
+                          ;; new buffer with no footnotes
+                          (should (= markdown-footnote-counter 0))
+                          ;; footnote insertion
+                          (end-of-line)
+                          (markdown-insert-footnote)
+                          (should (= (point) 35))
+                          (should (= markdown-footnote-counter 1))
+                          (should (looking-back "\\[^1\\]: "))
+                          ;; kill with point in footnote definition
+                          (insert "footnote text")
+                          (let (kill-ring)
+                            (markdown-footnote-kill))
+                          (should (= (point) 24))
+                          (should (bolp))
+                          (should (string-equal (buffer-string) "first line\nsecond line\n"))
+                          ;; insertion, counter should increment
+                          (goto-char (point-min))
+                          (end-of-line)
+                          (markdown-insert-footnote)
+                          (should (= (point) 35))
+                          (should (= markdown-footnote-counter 2))
+                          (should (looking-back "\\[^2\\]: "))
+                          (insert "footnote text")
+                          ;; return to marker
+                          (markdown-footnote-return)
+                          (should (= (point) 15))
+                          (should (looking-back "\\[^2\\]"))
+                          ;; kill with point at marker
+                          (let (kill-ring)
+                            (markdown-footnote-kill))
+                          (should (= (point) 11))
+                          (should (eolp))
+                          (should (string-equal (buffer-string) "first line\nsecond line\n")))))
 
 (ert-deftest test-markdown-footnote/basic-immediately ()
   "Basic footnote insertion and deletion tests for 'immediately location."
   (let ((markdown-footnote-location 'immediately))
     (markdown-test-string "first paragraph\n\nsecond paragraph\n"
-     ;; new buffer with no footnotes
-     (should (= markdown-footnote-counter 0))
-     ;; footnote insertion
-     (end-of-line)
-     (markdown-insert-footnote)
-     (should (= (point) 28))
-     (should (= markdown-footnote-counter 1))
-     (should (looking-back "\\[^1\\]: "))
-     ;; kill with point in footnote definition
-     (insert "footnote text")
-     (let (kill-ring)
-       (markdown-footnote-kill))
-     (should (= (point) 18))
-     (should (bolp))
-     (should (string-equal (buffer-string)
-                           "first paragraph\n\nsecond paragraph\n")))))
+                          ;; new buffer with no footnotes
+                          (should (= markdown-footnote-counter 0))
+                          ;; footnote insertion
+                          (end-of-line)
+                          (markdown-insert-footnote)
+                          (should (= (point) 28))
+                          (should (= markdown-footnote-counter 1))
+                          (should (looking-back "\\[^1\\]: "))
+                          ;; kill with point in footnote definition
+                          (insert "footnote text")
+                          (let (kill-ring)
+                            (markdown-footnote-kill))
+                          (should (= (point) 18))
+                          (should (bolp))
+                          (should (string-equal (buffer-string)
+                                                "first paragraph\n\nsecond paragraph\n")))))
 
 (ert-deftest test-markdown-footnote/basic-header ()
   "Basic footnote insertion and deletion tests for 'header location."
   (let ((markdown-footnote-location 'header))
     (markdown-test-string "par one\n\npar two\n\n### header\n"
-     ;; new buffer with no footnotes
-     (should (= markdown-footnote-counter 0))
-     ;; footnote insertion
-     (end-of-line)
-     (markdown-insert-footnote)
-     (should (= (point) 29))
-     (should (= markdown-footnote-counter 1))
-     (should (looking-back "\\[^1\\]: "))
-     ;; kill with point in footnote definition
-     (insert "footnote text")
-     (let (kill-ring)
-       (markdown-footnote-kill))
-     (should (= (point) 19))
-     (should (bolp))
-     (should (string-equal (buffer-string)
-                           "par one\n\npar two\n\n### header\n"))
-     ;; insertion, counter should increment
-     (goto-char (point-min))
-     (end-of-line)
-     (markdown-insert-footnote)
-     (should (= (point) 29))
-     (should (= markdown-footnote-counter 2))
-     (should (looking-back "\\[^2\\]: "))
-     (insert "footnote text")
-     ;; return to marker
-     (markdown-footnote-return)
-     (should (= (point) 12))
-     (should (looking-back "\\[^2\\]"))
-     ;; kill with point at marker
-     (let (kill-ring)
-       (markdown-footnote-kill))
-     (should (= (point) 8))
-     (should (eolp))
-     (should (string-equal (buffer-string)
-                           "par one\n\npar two\n\n### header\n")))))
+                          ;; new buffer with no footnotes
+                          (should (= markdown-footnote-counter 0))
+                          ;; footnote insertion
+                          (end-of-line)
+                          (markdown-insert-footnote)
+                          (should (= (point) 29))
+                          (should (= markdown-footnote-counter 1))
+                          (should (looking-back "\\[^1\\]: "))
+                          ;; kill with point in footnote definition
+                          (insert "footnote text")
+                          (let (kill-ring)
+                            (markdown-footnote-kill))
+                          (should (= (point) 19))
+                          (should (bolp))
+                          (should (string-equal (buffer-string)
+                                                "par one\n\npar two\n\n### header\n"))
+                          ;; insertion, counter should increment
+                          (goto-char (point-min))
+                          (end-of-line)
+                          (markdown-insert-footnote)
+                          (should (= (point) 29))
+                          (should (= markdown-footnote-counter 2))
+                          (should (looking-back "\\[^2\\]: "))
+                          (insert "footnote text")
+                          ;; return to marker
+                          (markdown-footnote-return)
+                          (should (= (point) 12))
+                          (should (looking-back "\\[^2\\]"))
+                          ;; kill with point at marker
+                          (let (kill-ring)
+                            (markdown-footnote-kill))
+                          (should (= (point) 8))
+                          (should (eolp))
+                          (should (string-equal (buffer-string)
+                                                "par one\n\npar two\n\n### header\n")))))
 
 (ert-deftest test-markdown-footnote/kill-empty-text ()
   "Test killing a footnote with marker but no text."
   (markdown-test-string "no text[^1]\n\n[^1]: \n"
-   (end-of-line)
-   (markdown-footnote-goto-text)
-   (should (looking-back "\\[^1\\]: "))
-   (let (kill-ring)
-     (markdown-footnote-kill))
-   (should (string-equal (buffer-string) "no text\n"))))
+                        (end-of-line)
+                        (markdown-footnote-goto-text)
+                        (should (looking-back "\\[^1\\]: "))
+                        (let (kill-ring)
+                          (markdown-footnote-kill))
+                        (should (string-equal (buffer-string) "no text\n"))))
 
 (ert-deftest test-markdown-footnote/kill-empty-after ()
   "Test killing an empty footnote after one with text (previously killed the
 footnote with text above)."
   (markdown-test-string "[^with-text][^no-text]\n\n[^with-text]: Text\n[^no-text]:"
-   (let (kill-ring)
-     (forward-line 3)
-     (should (looking-at "\\[\\^no-text\\]:$"))
-     (markdown-footnote-kill)
-     (should (string-equal (current-kill 0) "")))))
+                        (let (kill-ring)
+                          (forward-line 3)
+                          (should (looking-at "\\[\\^no-text\\]:$"))
+                          (markdown-footnote-kill)
+                          (should (string-equal (current-kill 0) "")))))
 
 (ert-deftest test-markdown-footnote/kill-hanging-paras ()
   "Test killing a footnote where block text starts after the label (previously
 killed the footnote above)."
   (markdown-test-string "[^1][^2]\n\n[^1]: Foo\n\n[^2]:\n    Text\n\n    More text\n\n\nNot indented"
-   (let (kill-ring)
-     (forward-line 4)
-     (should (looking-at "\\[\\^2\\]:$"))
-     (markdown-footnote-kill)
-     ;; We want to include the leading space on hanging footnote paragraphs,
-     ;; even if a hanging paragraph is the first item in the footnote.
-     (should (string-equal (current-kill 0) "Text\n\n    More text\n")))))
+                        (let (kill-ring)
+                          (forward-line 4)
+                          (should (looking-at "\\[\\^2\\]:$"))
+                          (markdown-footnote-kill)
+                          ;; We want to include the leading space on hanging footnote paragraphs,
+                          ;; even if a hanging paragraph is the first item in the footnote.
+                          (should (string-equal (current-kill 0) "Text\n\n    More text\n")))))
 
 (ert-deftest test-markdown-footnote/text-positions-buffer-top ()
   "Test markdown-footnote-text-positions on footnote adjacent to buffer top
@@ -1169,13 +1169,13 @@ killed the footnote above)."
   "Test markdown-footnote-text-positions on one-line footnote adjacent to
 buffer top (failed to find positions)."
   (markdown-test-string "[^label]: text\n"
-   (should (equal (markdown-footnote-text-positions) (list "^label" 1 16)))))
+                        (should (equal (markdown-footnote-text-positions) (list "^label" 1 16)))))
 
 (ert-deftest test-markdown-footnote/text-positions-buffer-top-not-footnote ()
   "Test markdown-footnote-text-positions on plain paragraph adjacent to buffer
 top (was infinite loop)."
   (markdown-test-string "text\n    more text\n"
-   (should (eq (markdown-footnote-text-positions) nil))))
+                        (should (eq (markdown-footnote-text-positions) nil))))
 
 (ert-deftest test-markdown-footnote/text-positions-buffer-bottom ()
   "Test markdown-footnote-text-positions on footnote adjacent to buffer bottom
@@ -1188,22 +1188,22 @@ top (was infinite loop)."
   "Test killing a footnote adjacent to other one-line footnotes (previously
 killed the wrong one)."
   (markdown-test-string "Text[^1] with[^2] footnotes[^3]\n\n[^1]: foo\n[^2]: bar\n[^3]: baz"
-   (let (kill-ring)
-     (forward-line 3)
-     (should (looking-at "\\[\\^2\\]: bar"))
-     (markdown-footnote-kill)
-     (should (string-equal (current-kill 0) "bar\n")))))
+                        (let (kill-ring)
+                          (forward-line 3)
+                          (should (looking-at "\\[\\^2\\]: bar"))
+                          (markdown-footnote-kill)
+                          (should (string-equal (current-kill 0) "bar\n")))))
 
 (ert-deftest test-markdown-footnote/kill-adjacent-markers ()
   "Test killing a footnote where the labels are adjacent (previously, the wrong
 footnote would be killed because the attempt to jump to the marker would jump to
 the opening bracket of [^2], and then subsequent functions would kill [^2])."
   (markdown-test-string "Text with footnotes[^1][^2]\n\n[^1]: foo\n\n[^2]: bar\n"
-   (let (kill-ring)
-     (forward-line 2)
-     (should (looking-at "\\[\\^1\\]: foo"))
-     (markdown-footnote-kill)
-     (should (string-equal (current-kill 0) "foo\n")))))
+                        (let (kill-ring)
+                          (forward-line 2)
+                          (should (looking-at "\\[\\^1\\]: foo"))
+                          (markdown-footnote-kill)
+                          (should (string-equal (current-kill 0) "foo\n")))))
 
 (ert-deftest test-markdown-footnote-reference/jump ()
   "Test `markdown-jump' for footnotes and reference links."
@@ -1221,10 +1221,10 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-next-link) ; beginning of [link 1][]
    (markdown-jump)
    (should (looking-at "https://duckduckgo.com/"))
-   (should (equal (markdown-reference-find-links "[ref]")
+   (should (equal (markdown-reference-find-links "ref")
                   (list (list "link 2" 26 2) (list "link 1" 11 1))))
    (markdown-jump) ; opens a reference link buffer
-   (should (string= (buffer-string) "Links using reference [ref]:\n\nlink 1 (line 1)\nlink 2 (line 2)\n"))
+   (should (string= (buffer-string) "Links using reference ref:\n\nlink 1 (line 1)\nlink 2 (line 2)\n"))
    (should (looking-at "link 1")) ; in reference link popop buffer
    (execute-kbd-macro (read-kbd-macro "RET")) ; jump to "link 1"
    (should (looking-at "\\[link 1\\]")) ; back in main buffer
@@ -1262,176 +1262,176 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
       ;; Load test string (the car), move to end of first line, kill
       ;; thing at point, and then verify that the kill ring contains cdr.
       (markdown-test-string (car test)
-       (end-of-line)
-       (call-interactively 'markdown-kill-thing-at-point)
-       (should (string-equal (current-kill 0) (cdr test)))))))
+                            (end-of-line)
+                            (call-interactively 'markdown-kill-thing-at-point)
+                            (should (string-equal (current-kill 0) (cdr test)))))))
 
 (ert-deftest test-markdown-kill/footnote-text ()
   "Test killing a footnote with point at footnote text."
   (markdown-test-string "some text[^1]\n\n[^1]: footnote\n"
-   (end-of-line)
-   (markdown-footnote-goto-text)
-   (let (kill-ring)
-     (markdown-footnote-kill))
-   (should (string-equal (buffer-string) "some text\n"))))
+                        (end-of-line)
+                        (markdown-footnote-goto-text)
+                        (let (kill-ring)
+                          (markdown-footnote-kill))
+                        (should (string-equal (buffer-string) "some text\n"))))
 
 (ert-deftest test-markdown-kill/code ()
   "Test killing with code regex.."
   (let ((kill-ring nil))
-   (markdown-test-string "Lorem `ipsum` dolor `sit` `amet`."
-    (goto-char 22) ; position point at s in `sit`
-    (call-interactively 'markdown-kill-thing-at-point)
-    (should (string-equal (current-kill 0) "sit")))))
+    (markdown-test-string "Lorem `ipsum` dolor `sit` `amet`."
+                          (goto-char 22) ; position point at s in `sit`
+                          (call-interactively 'markdown-kill-thing-at-point)
+                          (should (string-equal (current-kill 0) "sit")))))
 
 ;;; Completion:
 
 (ert-deftest test-markdown-complete/atx-header-incomplete ()
   "Test `markdown-incomplete-atx-p'."
   (markdown-test-string "###  ###"
-   (should (looking-at markdown-regex-header-atx))
-   (should-not (markdown-incomplete-atx-p)))
+                        (should (looking-at markdown-regex-header-atx))
+                        (should-not (markdown-incomplete-atx-p)))
   (markdown-test-string "###abc###"
-   (should (looking-at markdown-regex-header-atx))
-   (should (markdown-incomplete-atx-p)))
+                        (should (looking-at markdown-regex-header-atx))
+                        (should (markdown-incomplete-atx-p)))
   (markdown-test-string "###   ###"
-   (should (looking-at markdown-regex-header-atx))
-   (should (markdown-incomplete-atx-p))))
+                        (should (looking-at markdown-regex-header-atx))
+                        (should (markdown-incomplete-atx-p))))
 
 (ert-deftest test-markdown-complete/atx-header ()
   "Test `markdown-complete' for atx headers."
   (markdown-test-string "##### test"
-   (call-interactively 'markdown-complete)
-   (should (string-equal (buffer-string) "##### test #####"))))
+                        (call-interactively 'markdown-complete)
+                        (should (string-equal (buffer-string) "##### test #####"))))
 
 (ert-deftest test-markdown-complete/setext-header-incomplete ()
   "Test `markdown-incomplete-setext-p'."
   (markdown-test-string "abc\n===\n"
-   (should (looking-at markdown-regex-header-setext))
-   (should-not (markdown-incomplete-setext-p)))
+                        (should (looking-at markdown-regex-header-setext))
+                        (should-not (markdown-incomplete-setext-p)))
   (markdown-test-string "abc\n==\n"
-   (should (looking-at markdown-regex-header-setext))
-   (should (markdown-incomplete-setext-p)))
+                        (should (looking-at markdown-regex-header-setext))
+                        (should (markdown-incomplete-setext-p)))
   (markdown-test-string "abc\n====\n"
-   (should (looking-at markdown-regex-header-setext))
-   (should (markdown-incomplete-setext-p))))
+                        (should (looking-at markdown-regex-header-setext))
+                        (should (markdown-incomplete-setext-p))))
 
 (ert-deftest test-markdown-complete/setext-header ()
   "Test `markdown-complete' for setext headers."
   (markdown-test-string " test  \n=="
-   (call-interactively 'markdown-complete)
-   (should (string-equal (buffer-string) "test\n===="))))
+                        (call-interactively 'markdown-complete)
+                        (should (string-equal (buffer-string) "test\n===="))))
 
 (ert-deftest test-markdown-complete/hr-incomplete ()
   "Test `markdown-incomplete-hr-p'."
   (dolist (i (number-sequence 0 (1- (length markdown-hr-strings))))
     (markdown-test-string (nth i markdown-hr-strings)
-     (should (looking-at markdown-regex-hr))
-     (should-not (markdown-incomplete-hr-p))
-     (should-error (call-interactively 'markdown-complete)))))
+                          (should (looking-at markdown-regex-hr))
+                          (should-not (markdown-incomplete-hr-p))
+                          (should-error (call-interactively 'markdown-complete)))))
 
 (ert-deftest test-markdown-complete/hr ()
   "Test completion via `markdown-complete' for horizontal rules."
   (markdown-test-string "- - - - -"
-   (call-interactively 'markdown-complete)
-   (should (string-equal (buffer-string) (car markdown-hr-strings)))))
+                        (call-interactively 'markdown-complete)
+                        (should (string-equal (buffer-string) (car markdown-hr-strings)))))
 
 (ert-deftest test-markdown-complete/buffer-setext-2 ()
   "Test `markdown-complete-buffer' for level two setext heading."
   ;; Ensure markdown-complete-buffer doesn't mistake this for a horizontal rule
   (markdown-test-string "Subheading\n--\n"
-   (call-interactively 'markdown-complete-buffer)
-   (should (string-equal (buffer-string) "Subheading\n----------\n\n")))
+                        (call-interactively 'markdown-complete-buffer)
+                        (should (string-equal (buffer-string) "Subheading\n----------\n\n")))
   (markdown-test-string "Abc\n--\n\nDef\n--\n"
-   (call-interactively 'markdown-complete-buffer)
-   (should (string-equal (buffer-string) "Abc\n---\n\nDef\n---\n\n"))))
+                        (call-interactively 'markdown-complete-buffer)
+                        (should (string-equal (buffer-string) "Abc\n---\n\nDef\n---\n\n"))))
 
 ;;; Promotion and demotion tests:
 
 (ert-deftest test-markdown-promote/atx-header ()
   "Test `markdown-promote' for atx headers."
   (markdown-test-string "###### test ######"
-   (markdown-promote)
-   (should (string-equal (buffer-string) "##### test #####"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "#### test ####"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "### test ###"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "## test ##"))
-   (markdown-promote)
-   (should (string-equal (buffer-string) "# test #"))))
+                        (markdown-promote)
+                        (should (string-equal (buffer-string) "##### test #####"))
+                        (markdown-promote)
+                        (should (string-equal (buffer-string) "#### test ####"))
+                        (markdown-promote)
+                        (should (string-equal (buffer-string) "### test ###"))
+                        (markdown-promote)
+                        (should (string-equal (buffer-string) "## test ##"))
+                        (markdown-promote)
+                        (should (string-equal (buffer-string) "# test #"))))
 
 (ert-deftest test-markdown-demote/atx-header ()
   "Test `markdown-demote' for atx headers."
   (markdown-test-string "# test #"
-   (markdown-demote)
-   (should (string-equal (buffer-string) "## test ##"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "### test ###"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "#### test ####"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "##### test #####"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "###### test ######"))))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "## test ##"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "### test ###"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "#### test ####"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "##### test #####"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-promote/setext-header ()
   "Test `markdown-promote' for setext headers."
   (markdown-test-string "test\n----"
-   (markdown-promote)
-   (should (string-equal (buffer-string) "test\n===="))))
+                        (markdown-promote)
+                        (should (string-equal (buffer-string) "test\n===="))))
 
 (ert-deftest test-markdown-demote/setext-header ()
   "Test `markdown-demote' for setext headers."
   (markdown-test-string "test\n===="
-   (markdown-demote)
-   (should (string-equal (buffer-string) "test\n----"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "### test ###"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "#### test ####"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "##### test #####"))
-   (markdown-demote)
-   (should (string-equal (buffer-string) "###### test ######"))))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "test\n----"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "### test ###"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "#### test ####"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "##### test #####"))
+                        (markdown-demote)
+                        (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-promote/hr ()
   "Test `markdown-promote' for horizontal rules."
   (markdown-test-string (car (reverse markdown-hr-strings))
-    (dolist (n (number-sequence 4 0 -1))
-      (markdown-promote)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
+                        (dolist (n (number-sequence 4 0 -1))
+                          (markdown-promote)
+                          (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
 
 (ert-deftest test-markdown-demote/hr ()
   "Test `markdown-demote' for horizontal rules."
   (markdown-test-string (car markdown-hr-strings)
-    (dolist (n (number-sequence 1 5))
-      (markdown-demote)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
+                        (dolist (n (number-sequence 1 5))
+                          (markdown-demote)
+                          (should (string-equal (buffer-string) (nth n markdown-hr-strings))))))
 
 (ert-deftest test-markdown-promote/bold ()
   "Test `markdown-promote' for bold markup."
   (markdown-test-string "__bold__"
-  (call-interactively 'markdown-promote)
-  (should (string-equal (buffer-string) "**bold**"))))
+                        (call-interactively 'markdown-promote)
+                        (should (string-equal (buffer-string) "**bold**"))))
 
 (ert-deftest test-markdown-demote/bold ()
   "Test `markdown-demote' for bold markup."
   (markdown-test-string "**bold**"
-  (call-interactively 'markdown-promote)
-  (should (string-equal (buffer-string) "__bold__"))))
+                        (call-interactively 'markdown-promote)
+                        (should (string-equal (buffer-string) "__bold__"))))
 
 (ert-deftest test-markdown-promote/italic ()
   "Test `markdown-promote' for italic markup."
   (markdown-test-string "_italic_"
-  (call-interactively 'markdown-promote)
-  (should (string-equal (buffer-string) "*italic*"))))
+                        (call-interactively 'markdown-promote)
+                        (should (string-equal (buffer-string) "*italic*"))))
 
 (ert-deftest test-markdown-demote/italic ()
   "Test `markdown-demote' for italic markup."
   (markdown-test-string "*italic*"
-  (call-interactively 'markdown-promote)
-  (should (string-equal (buffer-string) "_italic_"))))
+                        (call-interactively 'markdown-promote)
+                        (should (string-equal (buffer-string) "_italic_"))))
 
 ;;; Subtree editing tests:
 
@@ -1502,109 +1502,111 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-cycle/atx-header ()
   "Test `markdown-demote' cycling for atx headers."
   (markdown-test-string "##### test"
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "###### test ######"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "# test #"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "## test ##"))))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "###### test ######"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "# test #"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "## test ##"))))
 
 (ert-deftest test-markdown-cycle/setext-header ()
   "Test `markdown-demote' cycling for setext headers."
   (markdown-test-string "test\n===="
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "test\n----"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "### test ###"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "#### test ####"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "##### test #####"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "###### test ######"))
-   (call-interactively 'markdown-demote)
-   (should (string-equal (buffer-string) "# test #"))))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "test\n----"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "### test ###"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "#### test ####"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "##### test #####"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "###### test ######"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "# test #"))))
 
 (ert-deftest test-markdown-cycle/hr ()
   "Test cycling of horizontal rules."
   ;; Cycle using markdown-demote
   (markdown-test-string (car markdown-hr-strings)
-    (dolist (n (number-sequence 1 5))
-      (call-interactively 'markdown-demote)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) (car markdown-hr-strings))))
+                        (dolist (n (number-sequence 1 5))
+                          (call-interactively 'markdown-demote)
+                          (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) (car markdown-hr-strings))))
   ;; Cycle using markdown-promote
   (markdown-test-string (car (reverse markdown-hr-strings))
-    (dolist (n (number-sequence 4 0 -1))
-      (call-interactively 'markdown-promote)
-      (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
-    (call-interactively 'markdown-promote)
-    (should (string-equal (buffer-string) (car (reverse markdown-hr-strings))))))
+                        (dolist (n (number-sequence 4 0 -1))
+                          (call-interactively 'markdown-promote)
+                          (should (string-equal (buffer-string) (nth n markdown-hr-strings))))
+                        (call-interactively 'markdown-promote)
+                        (should (string-equal (buffer-string) (car (reverse markdown-hr-strings))))))
 
 (ert-deftest test-markdown-cycle/bold ()
   "Test cycling of bold markup."
   (markdown-test-string "**bold**"
-  (call-interactively 'markdown-demote)
-  (should (string-equal (buffer-string) "__bold__"))
-  (call-interactively 'markdown-demote)
-  (should (string-equal (buffer-string) "**bold**"))))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "__bold__"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "**bold**"))))
 
 (ert-deftest test-markdown-cycle/italic ()
   "Test cycling of italic markup."
   (markdown-test-string "*italic*"
-  (call-interactively 'markdown-demote)
-  (should (string-equal (buffer-string) "_italic_"))
-  (call-interactively 'markdown-demote)
-  (should (string-equal (buffer-string) "*italic*"))))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "_italic_"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "*italic*"))))
 
 ;;; Indentation tests:
 
 (ert-deftest test-markdown-indentation/calc-indents ()
   "Test `markdown-calc-indents' a nested list context."
   (markdown-test-file "nested-list.text"
-   (goto-char (point-max))
-   (let ((indents (markdown-calc-indents)))
-     (should (= (car indents) 17)) ; indentation of previous line first
-     (should (equal (sort indents '<)
-                    (list
-                     0 ; beginning of line
-                     3 ; first-level list marker
-                     7 ; second-level list marker
-                     11 ; third-level list marker
-                     13 ; previous list item text
-                     16 ; pre-block indentation
-                     17 ; indentation of previous line
-                     21 ; previous line plus tab-width
-                     ))))))
+                      (goto-char (point-max))
+                      (let ((indents (markdown-calc-indents)))
+                        (should (= (car indents) 17)) ; indentation of previous line first
+                        (should (equal (sort indents '<)
+                                       (list
+                                        0 ; beginning of line
+                                        3 ; first-level list marker
+                                        7 ; second-level list marker
+                                        11 ; third-level list marker
+                                        13 ; previous list item text
+                                        16 ; pre-block indentation
+                                        17 ; indentation of previous line
+                                        21 ; previous line plus tab-width
+                                        ))))))
 
 (ert-deftest test-markdown-indentation/indent-region ()
   "Test `markdown-indent-region'."
   ;; Basic test with multiple lines
   (markdown-test-string "abc\ndef\nghi\n"
-    (markdown-indent-region (point-min) (point-max) nil)
-    (should (string-equal (buffer-string) "    abc\n    def\n    ghi\n")))
+                        (markdown-indent-region (point-min) (point-max) nil)
+                        (should (string-equal (buffer-string) "    abc\n    def\n    ghi\n")))
   ;; Following a list item
   (markdown-test-string "  * abc\ndef\n"
-    (forward-line)
-    (markdown-indent-region (line-beginning-position) (line-end-position) nil)
-    (should (string-equal (buffer-string) "  * abc\n  def\n"))
-    (markdown-indent-region (line-beginning-position) (line-end-position) nil)
-    (should (string-equal (buffer-string) "  * abc\n    def\n"))))
+                        (forward-line)
+                        (markdown-indent-region (line-beginning-position) (line-end-position) nil)
+                        (should (string-equal (buffer-string) "  * abc\n  def\n"))
+                        (markdown-indent-region (line-beginning-position) (line-end-position) nil)
+                        (should (string-equal (buffer-string) "  * abc\n    def\n"))))
 
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
   "A simple italics test."
   (markdown-test-file "inline.text"
-   (goto-char 9)
-   (should (looking-at "\*"))
-   ;; Check face of char before leading asterisk
-   (markdown-test-range-has-face 8 8 nil)
-   ;; Check face of italic range
-   (markdown-test-range-has-face 9 17 markdown-italic-face)
-   ;; Check face of point past leading asterisk
-   (markdown-test-range-has-face 18 18 nil)))
+                      (goto-char 9)
+                      (should (looking-at "\*"))
+                      ;; Check face of char before leading asterisk
+                      (markdown-test-range-has-face 8 8 nil)
+                      ;; Check face of italic range
+                      (markdown-test-range-has-face 9 9 markdown-markup-face)
+                      (markdown-test-range-has-face 10 16 markdown-italic-face)
+                      (markdown-test-range-has-face 17 17 markdown-markup-face)
+                      ;; Check face of point past leading asterisk
+                      (markdown-test-range-has-face 18 18 nil)))
 
 (ert-deftest test-markdown-font-lock/italics-2 ()
   "Test space after leading asterisk or underscore."
@@ -1623,59 +1625,80 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
   (markdown-test-string
    "italic **\\**"
    (markdown-test-range-has-face 1 7 nil)
-   (markdown-test-range-has-face 8 12 markdown-italic-face)))
+   (markdown-test-range-has-face 8 8 markdown-markup-face)
+   (markdown-test-range-has-face 9 11 markdown-italic-face)
+   (markdown-test-range-has-face 12 12 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-5 ()
   "Test italic single letter."
   (markdown-test-string
    "*a*"
-   (markdown-test-range-has-face 1 3 markdown-italic-face)))
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 2 markdown-italic-face)
+   (markdown-test-range-has-face 3 3 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n*italic*\n"
-   (markdown-test-range-has-face 1 5 markdown-header-face)
-   (markdown-test-range-has-face 8 15 markdown-italic-face)))
+                        (markdown-test-range-has-face 1 5 markdown-header-delimiter-face)
+                        (markdown-test-range-has-face 8 8 markdown-markup-face)
+                        (markdown-test-range-has-face 9 14 markdown-italic-face)
+                        (markdown-test-range-has-face 15 15 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
-   (goto-char 27)
-   (should (looking-at "\*\*"))
-   ;; Check face of char before leading asterisk
-   (markdown-test-range-has-face 26 26 nil)
-   ;; Check face of bold range
-   (markdown-test-range-has-face 27 35 markdown-bold-face)
-   ;; Check face of point past leading asterisk
-   (markdown-test-range-has-face 36 36 nil)))
+                      (goto-char 27)
+                      (should (looking-at "\*\*"))
+                      ;; Check face of char before leading asterisk
+                      (markdown-test-range-has-face 26 26 nil)
+                      ;; Check face of opening asterisks
+                      (markdown-test-range-has-face 27 28 markdown-markup-face)
+                      ;; Check face of bold range
+                      (markdown-test-range-has-face 29 33 markdown-bold-face)
+                      ;; Check face of closing asterisks
+                      (markdown-test-range-has-face 34 35 markdown-markup-face)
+                      ;; Check face of point past leading asterisk
+                      (markdown-test-range-has-face 36 36 nil)))
 
 (ert-deftest test-markdown-font-lock/bold-2 ()
   "Test space after leading asterisks or underscores."
   (markdown-test-string
    "This is ** not bold**, nor __ is this__ (but they match italics)."
    (markdown-test-range-has-face 1 8 nil)
-   (markdown-test-range-has-face 9 20 markdown-italic-face)
+   (markdown-test-range-has-face 9 9 markdown-markup-face)
+   (markdown-test-range-has-face 10 19 markdown-italic-face)
+   (markdown-test-range-has-face 20 20 markdown-markup-face)
    (markdown-test-range-has-face 21 27 nil)
-   (markdown-test-range-has-face 28 38 markdown-italic-face)
+   (markdown-test-range-has-face 28 28 markdown-markup-face)
+   (markdown-test-range-has-face 29 37 markdown-italic-face)
+   (markdown-test-range-has-face 38 38 markdown-markup-face)
    (markdown-test-range-has-face 39 (point-max) nil)))
 
 (ert-deftest test-markdown-font-lock/bold-3 ()
   "Test escaped asterisk inside bold."
   (markdown-test-string
    "bold **\\***"
-   (markdown-test-range-has-face 6 11 markdown-bold-face)))
+   (markdown-test-range-has-face 1 5 nil)
+   (markdown-test-range-has-face 6 7 markdown-markup-face)
+   (markdown-test-range-has-face 8 9 markdown-bold-face)
+   (markdown-test-range-has-face 10 11 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-4 ()
   "Test bold single letter."
   (markdown-test-string
    "**a**"
-   (markdown-test-range-has-face 1 5 markdown-bold-face)))
+   (markdown-test-range-has-face 1 2 markdown-markup-face)
+   (markdown-test-range-has-face 3 3 markdown-bold-face)
+   (markdown-test-range-has-face 4 5 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-after-hr ()
   "Test bold after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n**bold**\n"
-   (markdown-test-range-has-face 1 5 markdown-header-face)
-   (markdown-test-range-has-face 8 15 markdown-bold-face)))
+   (markdown-test-range-has-face 1 5 markdown-header-delimiter-face)
+   (markdown-test-range-has-face 8 9 markdown-markup-face)
+   (markdown-test-range-has-face 10 13 markdown-bold-face)
+   (markdown-test-range-has-face 14 15 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
@@ -1683,61 +1706,99 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (goto-char 45)
    (should (looking-at "`"))
    ;; Regular code span
-   (markdown-test-range-has-face 45 50 markdown-inline-code-face)
+   (markdown-test-range-has-face 45 45 markdown-markup-face)
+   (markdown-test-range-has-face 46 49 markdown-inline-code-face)
+   (markdown-test-range-has-face 50 50 markdown-markup-face)
    ;; Code containing backticks
-   (markdown-test-range-has-face 61 89 markdown-inline-code-face)
+   (markdown-test-range-has-face 61 62 markdown-markup-face)
+   (markdown-test-range-has-face 63 87 markdown-inline-code-face)
+   (markdown-test-range-has-face 88 89 markdown-markup-face)
    ;; Seven backquotes in a row
    (markdown-test-range-has-face 119 125 nil)
    ;; Backquotes at beginning or end
-   (markdown-test-range-has-face 228 239 markdown-inline-code-face)
-   (markdown-test-range-has-face 341 351 markdown-inline-code-face)
+   (markdown-test-range-has-face 228 229 markdown-markup-face)
+   (markdown-test-range-has-face 230 237 markdown-inline-code-face)
+   (markdown-test-range-has-face 238 239 markdown-markup-face)
+   (markdown-test-range-has-face 341 342 markdown-markup-face)
+   (markdown-test-range-has-face 343 349 markdown-inline-code-face)
+   (markdown-test-range-has-face 350 351 markdown-markup-face)
    ;; Backslash as final character
-   (markdown-test-range-has-face 460 468 markdown-inline-code-face)
+   (markdown-test-range-has-face 460 460 markdown-markup-face)
+   (markdown-test-range-has-face 461 467 markdown-inline-code-face)
+   (markdown-test-range-has-face 468 468 markdown-markup-face)
    ;; Escaping of leading backquotes
    (markdown-test-range-has-face 586 592 nil)
    (markdown-test-range-has-face 597 603 nil)
    ;; A code span crossing lines
    (markdown-test-range-has-face 652 656 nil)
-   (markdown-test-range-has-face 657 666 markdown-inline-code-face)
+   (markdown-test-range-has-face 657 657 markdown-markup-face)
+   (markdown-test-range-has-face 658 665 markdown-inline-code-face)
+   (markdown-test-range-has-face 666 666 markdown-markup-face)
    ;; Three backquotes: same line, across lines, not across blocks
    (markdown-test-range-has-face 695 748 nil)
-   (markdown-test-range-has-face 749 757 markdown-inline-code-face)
+   (markdown-test-range-has-face 749 750 markdown-markup-face)
+   (markdown-test-range-has-face 751 755 markdown-inline-code-face)
+   (markdown-test-range-has-face 756 757 markdown-markup-face)
    (markdown-test-range-has-face 758 805 nil)
-   (markdown-test-range-has-face 806 814 markdown-inline-code-face)
+   (markdown-test-range-has-face 806 807 markdown-markup-face)
+   (markdown-test-range-has-face 808 812 markdown-inline-code-face)
+   (markdown-test-range-has-face 813 814 markdown-markup-face)
    (markdown-test-range-has-face 815 891 nil)
    ))
 
 (ert-deftest test-markdown-font-lock/code-2 ()
   "Multiple code spans in a row and on different lines."
   (markdown-test-string "`foo` `bar` `baz`"
-   (markdown-test-range-has-face 1 5 markdown-inline-code-face)
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 4 markdown-inline-code-face)
+   (markdown-test-range-has-face 5 5 markdown-markup-face)
    (markdown-test-range-has-face 6 6 nil)
-   (markdown-test-range-has-face 7 11 markdown-inline-code-face)
+   (markdown-test-range-has-face 7 7 markdown-markup-face)
+   (markdown-test-range-has-face 8 10 markdown-inline-code-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)
    (markdown-test-range-has-face 12 12 nil)
-   (markdown-test-range-has-face 13 17 markdown-inline-code-face))
+   (markdown-test-range-has-face 13 13 markdown-markup-face)
+   (markdown-test-range-has-face 14 16 markdown-inline-code-face)
+   (markdown-test-range-has-face 17 17 markdown-markup-face))
   (markdown-test-string "`a`\n`b`\n`c`\n"
-   (markdown-test-range-has-face 1 3 markdown-inline-code-face)
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 2 markdown-inline-code-face)
+   (markdown-test-range-has-face 3 3 markdown-markup-face)
    (markdown-test-range-has-face 4 4 nil)
-   (markdown-test-range-has-face 5 7 markdown-inline-code-face)
+   (markdown-test-range-has-face 5 5 markdown-markup-face)
+   (markdown-test-range-has-face 6 6 markdown-inline-code-face)
+   (markdown-test-range-has-face 7 7 markdown-markup-face)
    (markdown-test-range-has-face 8 8 nil)
-   (markdown-test-range-has-face 9 11 markdown-inline-code-face)
+   (markdown-test-range-has-face 9 9 markdown-markup-face)
+   (markdown-test-range-has-face 10 10 markdown-inline-code-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)
    (markdown-test-range-has-face 12 12 nil))
   (markdown-test-string "a`foo`b`bar`c`baz`d"
    (markdown-test-range-has-face 1 1 nil)
-   (markdown-test-range-has-face 2 6 markdown-inline-code-face)
+   (markdown-test-range-has-face 2 2 markdown-markup-face)
+   (markdown-test-range-has-face 3 5 markdown-inline-code-face)
+   (markdown-test-range-has-face 6 6 markdown-markup-face)
    (markdown-test-range-has-face 7 7 nil)
-   (markdown-test-range-has-face 8 12 markdown-inline-code-face)
+   (markdown-test-range-has-face 8 8 markdown-markup-face)
+   (markdown-test-range-has-face 9 11 markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 markdown-markup-face)
    (markdown-test-range-has-face 13 13 nil)
-   (markdown-test-range-has-face 14 18 markdown-inline-code-face)
+   (markdown-test-range-has-face 14 14 markdown-markup-face)
+   (markdown-test-range-has-face 15 17 markdown-inline-code-face)
+   (markdown-test-range-has-face 18 18 markdown-markup-face)
    (markdown-test-range-has-face 19 19 nil)))
 
 (ert-deftest test-markdown-font-lock/kbd ()
   "Test font lock for <kbd> tags."
   (markdown-test-string "<kbd>C-c <</kbd>"
-   (markdown-test-range-has-face 1 16 markdown-inline-code-face))
+   (markdown-test-range-has-face 1 5 markdown-markup-face)
+   (markdown-test-range-has-face 6 10 markdown-inline-code-face)
+   (markdown-test-range-has-face 11 16 markdown-markup-face))
   (markdown-test-string "To quit Emacs, press <kbd>C-x C-c</kbd>."
    (markdown-test-range-has-face 1 21 nil)
-   (markdown-test-range-has-face 22 39 markdown-inline-code-face)
+   (markdown-test-range-has-face 22 26 markdown-markup-face)
+   (markdown-test-range-has-face 27 33 markdown-inline-code-face)
+   (markdown-test-range-has-face 34 39 markdown-markup-face)
    (markdown-test-range-has-face 40 40 nil)))
 
 (ert-deftest test-markdown-font-lock/lists-1 ()
@@ -1810,15 +1871,15 @@ require 'redcarpet'
 markdown = Redcarpet.new('Hello World!')
 puts markdown.to_html
 ```"
-   (markdown-test-range-has-face 1 3 markdown-pre-face) ; ```
+   (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
    (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
    (markdown-test-range-has-face 9 90 markdown-pre-face) ; code
-   (markdown-test-range-has-face 92 94 markdown-pre-face)) ; ```
+   (markdown-test-range-has-face 92 94 markdown-markup-face)) ; ```
   (markdown-test-string "```{r sum}\n2+2\n```"
-   (markdown-test-range-has-face 1 3 markdown-pre-face) ; ```
+   (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
    (markdown-test-range-has-face 4 10 markdown-language-keyword-face) ; {r sum}
    (markdown-test-range-has-face 12 14 markdown-pre-face) ; 2+2
-   (markdown-test-range-has-face 16 18 markdown-pre-face))) ; ```
+   (markdown-test-range-has-face 16 18 markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
   "GFM-style code blocks must be preceded by a blank line."
@@ -1829,7 +1890,9 @@ for (var i = 0; i < 10; i++) {
 }
 ```"
     (markdown-test-range-has-face 1 10 nil)
-    (markdown-test-range-has-face 11 72 markdown-inline-code-face)))
+    (markdown-test-range-has-face 11 13 markdown-markup-face)
+    (markdown-test-range-has-face 14 69 markdown-inline-code-face)
+    (markdown-test-range-has-face 70 72 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
@@ -1859,10 +1922,12 @@ for (var i = 0; i < 10; i++) {
 (ert-deftest test-markdown-font-lock/inline-links ()
   "Test font lock for inline links."
   (markdown-test-file "inline.text"
-   (markdown-test-range-has-face 925 930 markdown-link-face)
-   (markdown-test-range-has-face 931 950 markdown-url-face)
+   (markdown-test-range-has-face 925 925 markdown-markup-face)
+   (markdown-test-range-has-face 926 929 markdown-link-face)
+   (markdown-test-range-has-face 930 931 markdown-markup-face)
+   (markdown-test-range-has-face 932 949 markdown-url-face)
    (markdown-test-range-has-face 951 957 markdown-link-title-face)
-   (markdown-test-range-has-face 958 958 markdown-url-face)))
+   (markdown-test-range-has-face 958 958 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
@@ -1877,9 +1942,15 @@ for (var i = 0; i < 10; i++) {
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."
   (markdown-test-string "Harvard[^1] [tuition][]"
-   (markdown-test-range-has-face 8 11 markdown-footnote-face)
-   (markdown-test-range-has-face 13 21 markdown-link-face)
-   (markdown-test-range-has-face 22 23 markdown-reference-face)))
+   (markdown-test-range-has-face 1 7 nil)
+   (markdown-test-range-has-face 8 8 markdown-markup-face)
+   (markdown-test-range-has-face 10 10 markdown-footnote-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)
+   (markdown-test-range-has-face 12 12 nil)
+   (markdown-test-range-has-face 13 13 markdown-markup-face)
+   (markdown-test-range-has-face 14 20 markdown-link-face)
+   (markdown-test-range-has-face 21 21 markdown-markup-face)
+   (markdown-test-range-has-face 22 23 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata ()
   "Basic MultMarkdown metadata tests."
@@ -1887,13 +1958,13 @@ for (var i = 0; i < 10; i++) {
 Author: Fletcher T. Penney  
 Base Header Level: 2  "
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
-   (markdown-test-range-has-face 6 6 nil)
+   (markdown-test-range-has-face 6 6 markdown-markup-face)
    (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
    (markdown-test-range-has-face 41 46 markdown-metadata-key-face)
-   (markdown-test-range-has-face 47 47 nil)
+   (markdown-test-range-has-face 47 47 markdown-markup-face)
    (markdown-test-range-has-face 49 66 markdown-metadata-value-face)
    (markdown-test-range-has-face 70 86 markdown-metadata-key-face)
-   (markdown-test-range-has-face 87 87 nil)
+   (markdown-test-range-has-face 87 87 markdown-markup-face)
    (markdown-test-range-has-face 89 89 markdown-metadata-value-face))
   ;; Avoid triggering when a title contains a colon (e.g., Markdown: Syntax)
   (markdown-test-file "syntax.text"
@@ -1906,7 +1977,7 @@ Base Header Level: 2  "
 Author: Fletcher T. Penney  
 Base Header Level: 2  "
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
-   (markdown-test-range-has-face 6 6 nil)
+   (markdown-test-range-has-face 6 6 markdown-markup-face)
    (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
    (markdown-test-range-has-face 40 67 nil)
    (markdown-test-range-has-face 71 90 nil)))
@@ -1920,11 +1991,11 @@ Base Header Level: 2  "
 % date
 
 body"
-   (markdown-test-range-has-face 1 1 markdown-comment-face)
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
    (markdown-test-range-has-face 3 24 markdown-metadata-value-face)
-   (markdown-test-range-has-face 26 26 markdown-comment-face)
+   (markdown-test-range-has-face 26 26 markdown-markup-face)
    (markdown-test-range-has-face 28 56 markdown-metadata-value-face)
-   (markdown-test-range-has-face 58 58 markdown-comment-face)
+   (markdown-test-range-has-face 58 58 markdown-markup-face)
    (markdown-test-range-has-face 60 63 markdown-metadata-value-face)
    (markdown-test-range-has-face 64 69 nil)))
 
@@ -1937,10 +2008,10 @@ body"
 (ert-deftest test-markdown-font-lock/gfm-code-block-font-lock ()
   "GFM code block font lock test. Now in base markdown-mode as well!"
   (markdown-test-file "gfm.text"
-    (markdown-test-range-has-face 2639 2641 markdown-pre-face) ; ```
+    (markdown-test-range-has-face 2639 2641 markdown-markup-face) ; ```
     (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
     (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
-    (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
+    (markdown-test-range-has-face 2730 2732 markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-font-lock/reference-definition ()
   "Reference definitions should not include ]."
@@ -1962,33 +2033,33 @@ body"
   "Test reference definition function."
   (markdown-test-file "syntax.text"
    ;; Test accuracy of returned text and bounds
-   (should (equal (markdown-reference-definition "[1]")
+   (should (equal (markdown-reference-definition "1")
                   (list "http://docutils.sourceforge.net/mirror/setext.html" 1942 1992)))
-   (should (equal (markdown-reference-definition "[2]")
+   (should (equal (markdown-reference-definition "2")
                   (list "http://www.aaronsw.com/2002/atx/" 2000 2032)))
    ;; Test that match data remains intact
-   (should (string-equal (match-string 2) "http://www.aaronsw.com/2002/atx/"))
+   (should (string-equal (match-string 5) "http://www.aaronsw.com/2002/atx/"))
    ;; Test anchor-only relative URL
-   (should (equal (markdown-reference-definition "[bq]")
+   (should (equal (markdown-reference-definition "bq")
                   (list "#blockquote" 7536 7547)))
    ;; Example references that appear in pre blocks in the text
-   (should (not (markdown-reference-definition "[]")))
-   (should (not (markdown-reference-definition "[id]")))
-   (should (not (markdown-reference-definition "[foo]")))
-   (should (not (markdown-reference-definition "[A]")))
-   (should (not (markdown-reference-definition "[Google]")))
+   (should (not (markdown-reference-definition "")))
+   (should (not (markdown-reference-definition "id")))
+   (should (not (markdown-reference-definition "foo")))
+   (should (not (markdown-reference-definition "A")))
+   (should (not (markdown-reference-definition "Google")))
    ;; Test that we don't pick up other text in square brackets
-   (should (not (markdown-reference-definition "[blockquoting]")))
-   (should (not (markdown-reference-definition "[square brackets]")))
+   (should (not (markdown-reference-definition "blockquoting")))
+   (should (not (markdown-reference-definition "square brackets")))
    ;; Test case insensitivity
-   (should (equal (markdown-reference-definition "[SRC]")
+   (should (equal (markdown-reference-definition "SRC")
                   (list "/projects/markdown/syntax.text" 1245 1275)))))
 
 (ert-deftest test-markdown-parsing/get-defined-references ()
   "Test `markdown-get-defined-references'."
   (markdown-test-file "syntax.text"
    (should (equal (markdown-get-defined-references)
-                  '("[src]" "[1]" "[2]" "[3]" "[4]" "[5]" "[6]" "[bq]" "[l]"))))
+                  '("src" "1" "2" "3" "4" "5" "6" "bq" "l"))))
   (markdown-test-file "outline.text"
    (should (equal (markdown-get-defined-references) nil)))
   (markdown-test-file "wiki-links.text"
@@ -2023,15 +2094,15 @@ body"
     (dolist (loc (number-sequence 1 6))
       (goto-char loc)
       (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 1 6 2 5))))
+      (should (equal (match-data) (list 1 6 1 2 2 5 5 6))))
     (dolist (loc (number-sequence 7 12))
       (goto-char loc)
       (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 7 12 8 11))))
+      (should (equal (match-data) (list 7 12 7 8 8 11 11 12))))
     (dolist (loc (number-sequence 13 18))
       (goto-char loc)
       (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 13 18 14 17))))))
+      (should (equal (match-data) (list 13 18 13 14 14 17 17 18))))))
 
 (ert-deftest test-markdown-parsing/code-at-point-no-space ()
   "Test `markdown-code-at-point-p' with multiple code spans in a row."
@@ -2041,15 +2112,15 @@ body"
     (dolist (loc (number-sequence 2 7)) ; "`foo`b"
       (goto-char loc)
       (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 2 7 3 6))))
+      (should (equal (match-data) (list 2 7 2 3 3 6 6 7))))
     (dolist (loc (number-sequence 8 13)) ; "`bar`c"
       (goto-char loc)
       (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 8 13 9 12))))
+      (should (equal (match-data) (list 8 13 8 9 9 12 12 13))))
     (dolist (loc (number-sequence 14 19)) ; "`baz`d"
       (goto-char loc)
       (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 14 19 15 18))))))
+      (should (equal (match-data) (list 14 19 14 15 15 18 18 19))))))
 
 (ert-deftest test-markdown-parsing/code-at-point-blank-line ()
   "Test `markdown-code-at-point-p' at beginning of block."
@@ -2648,7 +2719,9 @@ indented the same amount."
     ;; Flag should be set to t
     (should markdown-enable-math)
     ;; Font-lock keywords should be updated
-    (should (member (cons markdown-regex-math-display 'markdown-math-face)
+    (should (member (cons markdown-regex-math-display '((1 markdown-markup-face)
+                                                        (2 markdown-math-face)
+                                                        (3 markdown-markup-face)))
                     markdown-mode-font-lock-keywords))))
 
 (ert-deftest test-markdown-math/font-lock ()
@@ -2657,11 +2730,17 @@ indented the same amount."
    (markdown-enable-math t)
    (font-lock-fontify-buffer)
    (markdown-test-range-has-face 1 32 nil)
-   (markdown-test-range-has-face 33 46 markdown-math-face)
+   (markdown-test-range-has-face 33 33 markdown-markup-face)
+   (markdown-test-range-has-face 34 45 markdown-math-face)
+   (markdown-test-range-has-face 46 46 markdown-markup-face)
    (markdown-test-range-has-face 47 49 nil)
-   (markdown-test-range-has-face 50 65 markdown-math-face)
+   (markdown-test-range-has-face 50 51 markdown-markup-face)
+   (markdown-test-range-has-face 52 63 markdown-math-face)
+   (markdown-test-range-has-face 64 65 markdown-markup-face)
    (markdown-test-range-has-face 66 98 nil)
-   (markdown-test-range-has-face 99 114 markdown-math-face)))
+   (markdown-test-range-has-face 99 100 markdown-markup-face)
+   (markdown-test-range-has-face 101 112 markdown-math-face)
+   (markdown-test-range-has-face 113 114 markdown-markup-face)))
 
 ;;; gfm-mode tests:
 
@@ -2669,22 +2748,26 @@ indented the same amount."
   "GFM pre block font lock test."
   (markdown-test-file-gfm "gfm.text"
     (markdown-test-range-has-face 2626 2637 nil)
-    (markdown-test-range-has-face 2639 2641 markdown-pre-face)
+    (markdown-test-range-has-face 2639 2641 markdown-markup-face)
     (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face)
     (markdown-test-range-has-face 2647 2728 markdown-pre-face)
-    (markdown-test-range-has-face 2730 2732 markdown-pre-face)))
+    (markdown-test-range-has-face 2730 2732 markdown-markup-face)))
 
 (ert-deftest test-markdown-gfm/italic-1 ()
   "GFM italic font lock test."
   (markdown-test-file-gfm "gfm.text"
-    (markdown-test-range-has-face 1483 1488 markdown-italic-face)
+    (markdown-test-range-has-face 1483 1483 markdown-markup-face)
+    (markdown-test-range-has-face 1484 1487 markdown-italic-face)
+    (markdown-test-range-has-face 1488 1488 markdown-markup-face)
     (markdown-test-range-has-face 1729 1790 nil)))
 
 (ert-deftest test-markdown-gfm/strike-through-1 ()
   "GFM strike through font lock test."
   (markdown-test-string-gfm "one ~~two~~ three"
     (markdown-test-range-has-face 1 4 nil)
-    (markdown-test-range-has-face 5 11 markdown-strike-through-face)
+    (markdown-test-range-has-face 5 6 markdown-markup-face)
+    (markdown-test-range-has-face 7 9 markdown-strike-through-face)
+    (markdown-test-range-has-face 10 11 markdown-markup-face)
     (markdown-test-range-has-face 12 17 nil)))
 
 (ert-deftest test-markdown-gfm/toggle-strike-through ()
@@ -2721,17 +2804,17 @@ indented the same amount."
 (ert-deftest test-markdown-gfm/code-block-font-lock ()
   "GFM code block font lock test."
   (markdown-test-file-gfm "gfm.text"
-    (markdown-test-range-has-face 2639 2641 markdown-pre-face) ; ```
+    (markdown-test-range-has-face 2639 2641 markdown-markup-face) ; ```
     (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
     (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
-    (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
+    (markdown-test-range-has-face 2730 2732 markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-gfm/code-block-font-lock-2 ()
   "GFM code block font lock test without language identifier."
   (markdown-test-string-gfm "Plain code block:\n\n```\nfoo\n```\n"
-    (markdown-test-range-has-face 20 22 markdown-pre-face)
+    (markdown-test-range-has-face 20 22 markdown-markup-face)
     (markdown-test-range-has-face 24 26 markdown-pre-face)
-    (markdown-test-range-has-face 28 30 markdown-pre-face)))
+    (markdown-test-range-has-face 28 30 markdown-markup-face)))
 
 ;;; Tests for other extensions:
 
