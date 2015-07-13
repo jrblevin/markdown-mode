@@ -1802,6 +1802,20 @@ body"
     (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
     (markdown-test-range-has-face 2730 2732 markdown-pre-face))) ; ```
 
+(ert-deftest test-markdown-font-lock/reference-definition ()
+  "Reference definitions should not include ]."
+  (markdown-test-string "[1]: http://daringfireball.net/ \"title\""
+    (markdown-test-range-has-face 2 2 markdown-reference-face) ; 1
+    (markdown-test-range-has-face 6 31 markdown-url-face) ; URL
+    (markdown-test-range-has-face 34 38 markdown-link-title-face)) ; title
+  (markdown-test-string "[foo][1] and [bar][2]: not a reference definition"
+    (markdown-test-range-has-face 2 4 markdown-link-face) ; foo
+    (markdown-test-range-has-face 7 7 markdown-reference-face) ; 1
+    (markdown-test-range-has-face 9 13 nil) ; [ ]and[ ]
+    (markdown-test-range-has-face 15 17 markdown-link-face) ; bar
+    (markdown-test-range-has-face 20 20 markdown-reference-face) ; 2
+    (markdown-test-range-has-face 22 49 nil))) ; [ ]and[ ]
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/reference-definition-basic ()
