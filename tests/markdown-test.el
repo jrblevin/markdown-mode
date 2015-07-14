@@ -1642,6 +1642,13 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 14 18 markdown-inline-code-face)
    (markdown-test-range-has-face 19 19 nil)))
 
+(ert-deftest test-markdown-font-lock/kbd ()
+  "Test font lock for <kbd> tags."
+  (markdown-test-string "To quit Emacs, press <kbd>C-x C-c</kbd>."
+   (markdown-test-range-has-face 1 21 nil)
+   (markdown-test-range-has-face 22 39 markdown-inline-code-face)
+   (markdown-test-range-has-face 40 40 nil)))
+
 (ert-deftest test-markdown-font-lock/lists-1 ()
   "A simple list marker font lock test."
   (markdown-test-file "lists.text"

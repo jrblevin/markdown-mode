@@ -1248,6 +1248,12 @@ character, including newlines, but not two newlines in a row.
 The final group requires that the character following the code
 fragment is not a backquote.")
 
+(defconst markdown-regex-kbd
+  "\\(<kbd>\\)\\([^<]+\\)\\(</kbd>\\)"
+  "Regular expression for matching <kbd> tags.
+Groups 1 and 3 match the opening and closing tags.
+Group 2 matches the key sequence.")
+
 (defconst markdown-regex-pre
   "^\\(    \\|\t\\).*$"
   "Regular expression for matching preformatted text sections.")
@@ -1384,6 +1390,7 @@ on the value of `markdown-wiki-link-alias-first'.")
    (cons markdown-regex-hr 'markdown-header-face)
    (cons 'markdown-match-comments '((0 markdown-comment-face)))
    (cons 'markdown-match-code '((0 markdown-inline-code-face)))
+   (cons markdown-regex-kbd 'markdown-inline-code-face)
    (cons markdown-regex-angle-uri 'markdown-link-face)
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
