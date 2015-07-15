@@ -1195,7 +1195,7 @@ Group 5 matches the reference label.")
   "Regexp identifying Markdown headers.")
 
 (defconst markdown-regex-header-1-atx
-  "^\\(#\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "^\\(#[^\\.]\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
   "Regular expression for level 1 atx-style (hash mark) headers.")
 
 (defconst markdown-regex-header-2-atx
@@ -1259,7 +1259,7 @@ Group 2 matches the key sequence.")
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  "^\\([ \t]*\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
+  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
