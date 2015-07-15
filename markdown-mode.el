@@ -1195,7 +1195,7 @@ Group 5 matches the reference label.")
   "Regexp identifying Markdown headers.")
 
 (defconst markdown-regex-header-1-atx
-  "^\\(#\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "^\\(#\\)[ \t]*\\([^\\.].*?\\)[ \t]*\\(#*\\)$"
   "Regular expression for level 1 atx-style (hash mark) headers.")
 
 (defconst markdown-regex-header-2-atx
@@ -1259,7 +1259,7 @@ Group 2 matches the key sequence.")
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  "^\\([ \t]*\\)\\([0-9]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
+  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
@@ -4681,7 +4681,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   "Return prefix for filling paragraph or nil if not determined."
   (cond
    ;; List item inside blockquote
-   ((looking-at "^[ \t]*>[ \t]*\\([0-9]+\\.\\|[*+-]\\)[ \t]+")
+   ((looking-at "^[ \t]*>[ \t]*\\(\\(?:[0-9]+\\|#\\)\\.\\|[*+-]\\)[ \t]+")
     (replace-regexp-in-string
      "[0-9\\.*+-]" " " (match-string-no-properties 0)))
    ;; Blockquote
@@ -4789,7 +4789,7 @@ if ARG is omitted or nil."
                     "\f" ; starts with a literal line-feed
                     "[ \t\f]*$" ; space-only line
                     "[ \t]*[*+-][ \t]+" ; unordered list item
-                    "[ \t]*[0-9]+\\.[ \t]+" ; ordered list item
+                    "[ \t]*\\(?:[0-9]+\\|#\\)\\.[ \t]+" ; ordered list item
                     "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
                     )
                   "\\|"))

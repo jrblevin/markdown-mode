@@ -2593,6 +2593,22 @@ See `paragraph-separate'."
     (markdown-test-range-has-face 24 26 markdown-pre-face)
     (markdown-test-range-has-face 28 30 markdown-pre-face)))
 
+;;; Tests for other extensions:
+
+(ert-deftest test-markdown-ext/pandoc-fancy-lists ()
+  "Test basic support for font lock and filling of Pandoc 'fancy lists'."
+  (markdown-test-string " #. abc\ndef\n"
+    ;; font lock
+    (markdown-test-range-has-face 1 1 nil)
+    (markdown-test-range-has-face 2 3 markdown-list-face)
+    (markdown-test-range-has-face 4 11 nil)
+    ;; filling
+    (forward-line)
+    (markdown-indent-region (line-beginning-position) (line-end-position) nil)
+    (should (string-equal (buffer-string) " #. abc\n def\n"))
+    (markdown-indent-region (line-beginning-position) (line-end-position) nil)
+    (should (string-equal (buffer-string) " #. abc\n    def\n"))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
