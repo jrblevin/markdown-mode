@@ -491,6 +491,15 @@ provides an interface to all of the possible customizations:
     (default: `end`).  The set of location options is the same as
     for `markdown-reference-location`.
 
+  * `markdown-font-lock-support-mode` - the variable
+    `font-lock-support-mode` is made buffer-local and set to
+    `markdown-font-lock-support-mode`, which is `nil` by
+    default. This leads to more aggressive fontification, which
+    helps detect multi-line constructs such as preformatted text
+    (code) blocks, nested lists, and so on, which are common in
+    Markdown documents. If you find that the performance is poor on
+    large files, try `jit-lock-mode` instead.
+
   * `comment-auto-fill-only-comments` - variable is made
     buffer-local and set to `nil` by default.  In programming
     language modes, when this variable is non-nil, only comments
