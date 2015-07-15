@@ -1205,6 +1205,31 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
      (markdown-footnote-kill)
      (should (string-equal (current-kill 0) "foo\n")))))
 
+(ert-deftest test-markdown-footnote-reference/jump ()
+  "Test `markdown-jump' for footnotes and reference links."
+  (markdown-test-string "body[^1], [link 1][ref],
+[link 2][ref]
+
+[^1]: footnote
+
+[ref]: https://duckduckgo.com/"
+   (goto-char 5) ; start of [^1]
+   (markdown-jump) ; markdown-footnote-goto-text
+   (should (looking-at "footnote"))
+   (markdown-jump) ; markdown-footnote-return
+   (should (= (point) 9)) ; just after [^1]
+   (markdown-next-link) ; beginning of [link 1][]
+   (markdown-jump)
+   (should (looking-at "https://duckduckgo.com/"))
+   (should (equal (markdown-reference-find-links "[ref]")
+                  (list (list "link 2" 26 2) (list "link 1" 11 1))))
+   (markdown-jump) ; opens a reference link buffer
+   (should (string= (buffer-string) "Links using reference [ref]:\n\nlink 1 (line 1)\nlink 2 (line 2)\n"))
+   (should (looking-at "link 1")) ; in reference link popop buffer
+   (execute-kbd-macro (read-kbd-macro "RET")) ; jump to "link 1"
+   (should (looking-at "\\[link 1\\]")) ; back in main buffer
+   (should (= (point) 11))))
+
 ;;; Element removal tests:
 
 (ert-deftest test-markdown-kill/simple ()
