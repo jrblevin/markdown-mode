@@ -1249,7 +1249,7 @@ The final group requires that the character following the code
 fragment is not a backquote.")
 
 (defconst markdown-regex-kbd
-  "\\(<kbd>\\)\\([^<]+\\)\\(</kbd>\\)"
+  "\\(<kbd>\\)\\(\\(?:.\\|\n[^\n]\\)*?\\)\\(</kbd>\\)"
   "Regular expression for matching <kbd> tags.
 Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
