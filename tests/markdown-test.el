@@ -1676,7 +1676,8 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-font-lock/pre-2 ()
   (markdown-test-string "* item\n\nreset baseline\n\n    pre block\n"
-   (markdown-test-range-has-face 2 24 nil)
+   (markdown-test-range-has-face 1 1 markdown-list-face)
+   (markdown-test-range-has-face 2 23 nil)
    (markdown-test-range-has-face 29 37 markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/pre-3 ()
@@ -1687,6 +1688,14 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
     social upheaval subClassOf"
    (markdown-test-range-has-face 160 190 nil)))
+
+(ert-deftest test-markdown-font-lock/pre-4 ()
+  "Pre blocks must be preceded by a blank line"
+  (markdown-test-string "Paragraph
+    for (var i = 0; i < 10; i++) {
+        console.log(i);
+    }"
+    (markdown-test-range-has-face (point-min) (point-max) nil)))
 
 (ert-deftest test-markdown-font-lock/fenced-1 ()
   "Test fenced code blocks containing four-space indents."
@@ -1719,6 +1728,17 @@ puts markdown.to_html
    (markdown-test-range-has-face 4 10 markdown-language-keyword-face) ; {r sum}
    (markdown-test-range-has-face 12 14 markdown-pre-face) ; 2+2
    (markdown-test-range-has-face 16 18 markdown-pre-face))) ; ```
+
+(ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
+  "GFM-style code blocks must be preceded by a blank line."
+  (markdown-test-string "Paragraph
+```js
+for (var i = 0; i < 10; i++) {
+    console.log(i);
+}
+```"
+    (markdown-test-range-has-face 1 10 nil)
+    (markdown-test-range-has-face 11 72 markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
@@ -1757,6 +1777,11 @@ puts markdown.to_html
   "Test comments inside of a pre block."
   (markdown-test-string "    <!-- pre, not comment -->"
    (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-pre-face)))
+
+(ert-deftest test-markdown-font-lock/comment-hanging-indent ()
+  "Test comments with hanging indentation."
+  (markdown-test-string "<!-- This comment has\n    hanging indentation -->"
+   (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."

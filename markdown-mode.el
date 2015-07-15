@@ -1900,7 +1900,9 @@ because `thing-at-point-looking-at' does not work reliably with
        ;; At headers and horizontal rules, reset levels
        ((markdown-new-baseline-p) (forward-line) (setq levels nil))
        ;; If the current line has sufficient indentation, mark out pre block
-       ((looking-at pre-regexp)
+       ;; The opening should be preceded by a blank line.
+       ((and (looking-at pre-regexp)
+             (markdown-prev-line-blank-p))
         (setq begin (match-beginning 0))
         (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
                     (not (eobp)))
@@ -1942,21 +1944,24 @@ because `thing-at-point-looking-at' does not work reliably with
 (defun markdown-match-gfm-code-blocks (last)
   "Match GFM quoted code blocks from point to LAST."
   (let (open lang body close all)
-    (cond ((search-forward-regexp
-            "^\\(```\\)\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" last t)
-           (beginning-of-line)
-           (setq open (list (match-beginning 1) (match-end 1))
-                 lang (list (match-beginning 2) (match-end 2)))
-           (forward-line)
-           (setq body (list (point)))
-           (cond ((search-forward-regexp "^```$" last t)
-                  (setq body (reverse (cons (1- (match-beginning 0)) body))
-                        close (list (match-beginning 0) (match-end 0))
-                        all (list (car open) (match-end 0)))
-                  (set-match-data (append all open lang body close))
-                  t)
-                 (t nil)))
-          (t nil))))
+    (if (search-forward-regexp
+         "\\(?:\\`\\|[\n\r]+\\s *[\n\r]\\)\\(```\\)\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" last t)
+        (progn
+          (beginning-of-line)
+          (setq open (list (match-beginning 1) (match-end 1))
+                lang (list (match-beginning 2) (match-end 2)))
+          (if (markdown-prev-line-blank-p)
+              (progn
+                (forward-line)
+                (setq body (list (point)))
+                (if (search-forward-regexp "^```$" last t)
+                    (progn
+                      (setq body (reverse (cons (1- (match-beginning 0)) body))
+                            close (list (match-beginning 0) (match-end 0))
+                            all (list (car open) (match-end 0)))
+                      (set-match-data (append all open lang body close))
+                      t)))))
+      nil)))
 
 (defun markdown-match-generic-metadata (regexp last)
   "Match generic metadata specified by REGEXP from the point to LAST."
