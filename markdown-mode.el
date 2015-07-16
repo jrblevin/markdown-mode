@@ -4795,10 +4795,14 @@ if ARG is omitted or nil."
   (set (make-local-variable 'font-lock-multiline) t)
   (set (make-local-variable 'font-lock-support-mode)
        markdown-font-lock-support-mode)
-  (markdown-reload-extensions)
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
-  (add-hook 'hack-local-variables-hook 'markdown-reload-extensions)
+  ;; Reload extensions
+  (if (and enable-local-variables buffer-file-name)
+      ;; Add a buffer-local hook to reload after file-local variables are read
+      (add-hook 'hack-local-variables-hook 'markdown-reload-extensions nil t)
+    ;; File local variables disabled or not visiting a file, reload now
+    (markdown-reload-extensions))
   ;; For imenu support
   (setq imenu-create-index-function 'markdown-imenu-create-index)
   ;; For menu support in XEmacs
