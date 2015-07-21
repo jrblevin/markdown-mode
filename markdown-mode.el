@@ -207,8 +207,9 @@
 ;;     the word italic.  If the point is at an italic word or phrase,
 ;;     remove the italic markup.  Otherwise, simply insert italic
 ;;     delimiters and place the cursor in between them.  Similarly,
-;;     use `C-c C-s s` for bold (`<strong>`) and `C-c C-s c` for
-;;     inline code (`<code>`).
+;;     use `C-c C-s s` for bold (`<strong>`), `C-c C-s c` for
+;;     inline code (`<code>`), and `C-c C-s k` for inserting `<kbd>`
+;;     tags.
 ;;
 ;;     `C-c C-s b` inserts a blockquote using the active region, if any,
 ;;     or starts a new blockquote.  `C-c C-s C-b` is a variation which
@@ -2827,6 +2828,23 @@ place the cursor in between them."
         (markdown-unwrap-thing-at-point nil 0 2)
       (markdown-wrap-or-insert "`" "`" 'word nil nil))))
 
+(defun markdown-insert-kbd ()
+  "Insert markup to wrap region or word in <kbd> tags.
+If there is an active region, use the region.  If the point is at
+a word, use the word.  Otherwise, simply insert <kbd> tags and
+place the cursor in between them."
+  (interactive)
+  (if (markdown-use-region-p)
+      ;; Active region
+      (let ((bounds (markdown-unwrap-things-in-region
+                     (region-beginning) (region-end)
+                     markdown-regex-kbd 0 2)))
+        (markdown-wrap-or-insert "<kbd>" "</kbd>" nil (car bounds) (cdr bounds)))
+    ;; Markup removal, markup for word, or empty markup insertion
+    (if (thing-at-point-looking-at markdown-regex-kbd)
+        (markdown-unwrap-thing-at-point nil 0 2)
+      (markdown-wrap-or-insert "<kbd>" "</kbd>" 'word nil nil))))
+
 (defun markdown-insert-link ()
   "Insert an inline link, using region or word as link text if possible.
 If there is an active region, use the region as the link text.  If the
@@ -4022,6 +4040,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-se" 'markdown-insert-italic)
     (define-key map "\C-c\C-sc" 'markdown-insert-code)
     (define-key map "\C-c\C-sb" 'markdown-insert-blockquote)
+    (define-key map "\C-c\C-sk" 'markdown-insert-kbd)
     (define-key map "\C-c\C-s\C-b" 'markdown-blockquote-region)
     (define-key map "\C-c\C-sp" 'markdown-insert-pre)
     (define-key map "\C-c\C-s\C-p" 'markdown-pre-region)

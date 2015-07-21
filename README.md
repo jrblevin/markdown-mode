@@ -155,8 +155,9 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     the word italic.  If the point is at an italic word or phrase,
     remove the italic markup.  Otherwise, simply insert italic
     delimiters and place the cursor in between them.  Similarly,
-    use <kbd>C-c C-s s</kbd> for bold (`<strong>`) and <kbd>C-c C-s c</kbd> for
-    inline code (`<code>`).
+    use <kbd>C-c C-s s</kbd> for bold (`<strong>`), <kbd>C-c C-s c</kbd> for
+    inline code (`<code>`), and <kbd>C-c C-s k</kbd> for inserting `<kbd>`
+    tags.
 
     <kbd>C-c C-s b</kbd> inserts a blockquote using the active region, if any,
     or starts a new blockquote.  <kbd>C-c C-s C-b</kbd> is a variation which

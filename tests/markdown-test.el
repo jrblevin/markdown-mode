@@ -418,6 +418,18 @@ This file is not saved."
                         (should (string-equal (buffer-string) "one two `three`"))
                         (should (= (point) 15))))
 
+(ert-deftest test-markdown-insertion/toggle-kbd ()
+  "Test toggling functionality of `markdown-insert-code'."
+  (markdown-test-string "test <kbd>C-c C-s k</kbd> toggle"
+                        (forward-word 2)
+                        (markdown-insert-kbd)
+                        (should (string-equal (buffer-string) "test C-c C-s k toggle"))
+                        (should (= (point) 6))
+                        (backward-word)
+                        (markdown-insert-kbd)
+                        (should (string-equal (buffer-string) "<kbd>test</kbd> C-c C-s k toggle"))
+                        (should (= (point) 6))))
+
 (ert-deftest test-markdown-insertion/toggle-wiki-link-alias-first ()
   "Test toggling of `markdown-insert-wiki-link' with alias first.
 Test point position upon removal and insertion."
@@ -488,6 +500,16 @@ Test point position upon removal and insertion."
                         (markdown-insert-code)
                         (should (string-equal (buffer-string) "`one two` three"))
                         (should (= (point) 9))))
+
+(ert-deftest test-markdown-insertion/kbd-region ()
+  "Test region functionality of `markdown-insert-kbd'."
+  (markdown-test-string "one two three"
+                        (transient-mark-mode)
+                        (push-mark (point) t t)
+                        (forward-word 2)
+                        (markdown-insert-kbd)
+                        (should (string-equal (buffer-string) "<kbd>one two</kbd> three"))
+                        (should (= (point) 13))))
 
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."
