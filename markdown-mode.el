@@ -541,12 +541,12 @@
 ;;
 ;;   * `markdown-font-lock-support-mode' - the variable
 ;;     `font-lock-support-mode' is made buffer-local and set to
-;;     `markdown-font-lock-support-mode', which is `nil' by
-;;     default. This leads to more aggressive fontification, which
-;;     helps detect multi-line constructs such as preformatted text
-;;     (code) blocks, nested lists, and so on, which are common in
-;;     Markdown documents. If you find that the performance is poor on
-;;     large files, try `jit-lock-mode' instead.
+;;     `markdown-font-lock-support-mode', which is `jit-mode' by
+;;     default. This is currently the default support mode in Emacs as
+;;     well.  However, if fontification of multi-line constructs such
+;;     as preformatted code blocks, nested lists, and so on is
+;;     inaccurate, setting this to `nil' will allow more aggressive
+;;     fontification at the expense of some performance.
 ;;
 ;;   * `comment-auto-fill-only-comments' - variable is made
 ;;     buffer-local and set to `nil' by default.  In programming
@@ -938,13 +938,12 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type 'string)
 
-(defcustom markdown-font-lock-support-mode nil
+(defcustom markdown-font-lock-support-mode 'jit-lock-mode
   "Support modes speed up Font Lock by being selective about when
 fontification occurs. Because Markdown has many multline
 constructions by nature, `markdown-mode' is aggressive about Font
-Lock by default. If fontification is too slow, try setting this
-to `jit-lock-mode' instead. See `font-lock-support-mode' for more
-details."
+Lock by default. If fontification is inaccurate, try setting this
+to `nil' instead. See `font-lock-support-mode' for more details."
   :type '(choice (const :tag "none" nil)
 		 (const :tag "fast lock" fast-lock-mode)
 		 (const :tag "lazy lock" lazy-lock-mode)

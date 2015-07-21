@@ -493,12 +493,12 @@ provides an interface to all of the possible customizations:
 
   * `markdown-font-lock-support-mode` - the variable
     `font-lock-support-mode` is made buffer-local and set to
-    `markdown-font-lock-support-mode`, which is `nil` by
-    default. This leads to more aggressive fontification, which
-    helps detect multi-line constructs such as preformatted text
-    (code) blocks, nested lists, and so on, which are common in
-    Markdown documents. If you find that the performance is poor on
-    large files, try `jit-lock-mode` instead.
+    `markdown-font-lock-support-mode`, which is `jit-mode` by
+    default. This is currently the default support mode in Emacs as
+    well.  However, if fontification of multi-line constructs such
+    as preformatted code blocks, nested lists, and so on is
+    inaccurate, setting this to `nil` will allow more aggressive
+    fontification at the expense of some performance.
 
   * `comment-auto-fill-only-comments` - variable is made
     buffer-local and set to `nil` by default.  In programming
