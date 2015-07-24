@@ -297,6 +297,19 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     Existing list items can be moved up or down with <kbd>M-UP</kbd> or
     <kbd>M-DOWN</kbd> and indented or exdented with <kbd>M-RIGHT</kbd> or <kbd>M-LEFT</kbd>.
 
+  * Subtree Promotion and Demotion: <kbd>M-S-LEFT</kbd> and <kbd>M-S-RIGHT</kbd>
+
+    Entire subtrees of ATX headings can be promoted and demoted
+    with <kbd>M-S-LEFT</kbd> and <kbd>M-S-RIGHT</kbd>, which mirror the bindings
+    for promotion and demotion of list items.
+
+    Please note the following "boundary" behavior.  Any level-six
+    headings will not be demoted further (i.e., they remain at
+    level six, since Markdown and HTML define only six levels) and
+    any level-one headings will promoted away entirely (i.e.,
+    heading markup will be removed, since a level-zero heading is
+    not defined).
+
   * Shifting the Region: <kbd>C-c <</kbd> and <kbd>C-c ></kbd>
 
     Text in the region can be indented or exdented as a group using

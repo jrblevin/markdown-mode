@@ -1433,6 +1433,39 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
   (call-interactively 'markdown-promote)
   (should (string-equal (buffer-string) "_italic_"))))
 
+(ert-deftest test-markdown-promote/subtree ()
+  "Test `markdown-promote-subtree'."
+  (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
+                        ;; The first h1 should get promoted away.
+                        ;; The second h1 should not be promoted.
+                        (markdown-promote-subtree)
+                        (should (string-equal (buffer-string) "h1\n\n# h2 #\n\n## h3 ##\n\n# h2 #\n\n# h1 #\n"))
+                        ;; Second call should do nothing since point is no longer at a heading.
+                        (markdown-promote-subtree)
+                        (should (string-equal (buffer-string) "h1\n\n# h2 #\n\n## h3 ##\n\n# h2 #\n\n# h1 #\n"))
+                        ;; Move to h2 and promote again.
+                        (forward-line 2)
+                        (markdown-promote-subtree)
+                        (should (string-equal (buffer-string) "h1\n\nh2\n\n# h3 #\n\n# h2 #\n\n# h1 #\n"))))
+
+(ert-deftest test-markdown-demote/subtree ()
+  "Test `markdown-demote-subtree'."
+  (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
+                        ;; The second h1 should not be demoted
+                        (markdown-demote-subtree)
+                        (should (string-equal (buffer-string) "## h1 ##\n\n### h2 ###\n\n#### h3 ####\n\n### h2 ###\n\n# h1 #\n"))
+                        (markdown-demote-subtree)
+                        (should (string-equal (buffer-string) "### h1 ###\n\n#### h2 ####\n\n##### h3 #####\n\n#### h2 ####\n\n# h1 #\n"))
+                        (markdown-demote-subtree)
+                        (should (string-equal (buffer-string) "#### h1 ####\n\n##### h2 #####\n\n###### h3 ######\n\n##### h2 #####\n\n# h1 #\n"))
+                        ;; Stop demoting at level six
+                        (markdown-demote-subtree)
+                        (should (string-equal (buffer-string) "##### h1 #####\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))
+                        (markdown-demote-subtree)
+                        (should (string-equal (buffer-string) "###### h1 ######\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))
+))
+
+
 ;;; Cycling:
 
 (ert-deftest test-markdown-cycle/atx-header ()
