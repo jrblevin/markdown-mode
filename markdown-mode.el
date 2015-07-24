@@ -345,18 +345,19 @@
 ;;     Existing list items can be moved up or down with `M-UP` or
 ;;     `M-DOWN` and indented or exdented with `M-RIGHT` or `M-LEFT`.
 ;;
-;;   * Subtree Promotion and Demotion: `M-S-LEFT` and `M-S-RIGHT`
+;;   * Editing Subtrees: `M-S-UP`, `M-S-DOWN`, `M-S-LEFT`, and `M-S-RIGHT`
 ;;
 ;;     Entire subtrees of ATX headings can be promoted and demoted
 ;;     with `M-S-LEFT` and `M-S-RIGHT`, which mirror the bindings
-;;     for promotion and demotion of list items.
+;;     for promotion and demotion of list items. Similarly, subtrees
+;;     can be moved up and down with `M-S-UP` and `M-S-DOWN`.
 ;;
-;;     Please note the following "boundary" behavior.  Any level-six
-;;     headings will not be demoted further (i.e., they remain at
-;;     level six, since Markdown and HTML define only six levels) and
-;;     any level-one headings will promoted away entirely (i.e.,
-;;     heading markup will be removed, since a level-zero heading is
-;;     not defined).
+;;     Please note the following "boundary" behavior for promotion and
+;;     demotion.  Any level-six headings will not be demoted further
+;;     (i.e., they remain at level six, since Markdown and HTML define
+;;     only six levels) and any level-one headings will promoted away
+;;     entirely (i.e., heading markup will be removed, since a
+;;     level-zero heading is not defined).
 ;;
 ;;   * Shifting the Region: `C-c <` and `C-c >`
 ;;
@@ -3384,6 +3385,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-<right>") 'markdown-demote)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
     ;; Subtree editing
+    (define-key map (kbd "M-S-<up>") 'markdown-move-subtree-up)
+    (define-key map (kbd "M-S-<down>") 'markdown-move-subtree-down)
     (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
     (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
     ;; Movement
@@ -4124,6 +4127,16 @@ and therefore level-six headings will not be promoted further."
   "Demote the current subtree of ATX headings."
   (interactive)
   (markdown-promote-subtree t))
+
+(defun markdown-move-subtree-up ()
+  "Move the current subtree of ATX headings up."
+  (interactive)
+  (outline-move-subtree-up 1))
+
+(defun markdown-move-subtree-down ()
+  "Move the current subtree of ATX headings down."
+  (interactive)
+  (outline-move-subtree-down 1))
 
 
 ;;; Movement ==================================================================

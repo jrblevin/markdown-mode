@@ -1433,7 +1433,9 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
   (call-interactively 'markdown-promote)
   (should (string-equal (buffer-string) "_italic_"))))
 
-(ert-deftest test-markdown-promote/subtree ()
+;;; Subtree editing tests:
+
+(ert-deftest test-markdown-subtree/promote ()
   "Test `markdown-promote-subtree'."
   (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
                         ;; The first h1 should get promoted away.
@@ -1448,7 +1450,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         (markdown-promote-subtree)
                         (should (string-equal (buffer-string) "h1\n\nh2\n\n# h3 #\n\n# h2 #\n\n# h1 #\n"))))
 
-(ert-deftest test-markdown-demote/subtree ()
+(ert-deftest test-markdown-subtree/demote ()
   "Test `markdown-demote-subtree'."
   (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
                         ;; The second h1 should not be demoted
@@ -1462,9 +1464,25 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         (markdown-demote-subtree)
                         (should (string-equal (buffer-string) "##### h1 #####\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))
                         (markdown-demote-subtree)
-                        (should (string-equal (buffer-string) "###### h1 ######\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))
-))
+                        (should (string-equal (buffer-string) "###### h1 ######\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))))
 
+(ert-deftest test-markdown-subtree/move-up ()
+  "Test `markdown-move-subtree-up'."
+  (markdown-test-string "# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n# 2 #\n"
+                        (re-search-forward "^# 2")
+                        (markdown-move-subtree-up)
+                        (should (string-equal (buffer-string) "# 2 #\n# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n"))
+                        ;; Second attempt should fail, leaving buffer unchanged
+                        (should-error (markdown-move-subtree-up) :type 'user-error)))
+
+(ert-deftest test-markdown-subtree/move-down ()
+  "Test `markdown-move-subtree-down'."
+  (markdown-test-string "# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n# 2 #\n"
+                        (re-search-forward "^## 1\.1")
+                        (markdown-move-subtree-down)
+                        (should (string-equal (buffer-string) "# 1 #\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n# 2 #\n"))))
+
+;(ert-deftest test-markdown-subtree/move-down ()
 
 ;;; Cycling:
 
