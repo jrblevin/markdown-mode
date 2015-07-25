@@ -742,7 +742,9 @@
 ;; priority.
 ;;
 ;; If you find any bugs in markdown-mode, please construct a test case
-;; or a patch and email me at <jrblevin@sdf.org>.
+;; or a patch and open a ticket on the [GitHub issue tracker][issues].
+;;
+;;  [issues]: https://github.com/jrblevin/markdown-mode/issues
 
 ;;; History:
 
