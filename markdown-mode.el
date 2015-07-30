@@ -4630,10 +4630,20 @@ and [[test test]] both map to Test-test.ext."
     (when (eq major-mode 'gfm-mode)
       (setq basename (concat (upcase (substring basename 0 1))
                              (downcase (substring basename 1 nil)))))
-    (concat basename
-            (if (buffer-file-name)
-                (concat "."
-                        (file-name-extension (buffer-file-name)))))))
+    (let* ((default
+            (concat basename
+                    (if (buffer-file-name)
+                        (concat "."
+                                (file-name-extension (buffer-file-name))))))
+           (current default))
+      (catch 'done
+        (loop
+         (if (file-exists-p current)
+             (throw 'done current))
+         (if (string-equal (expand-file-name current)
+                           (concat "/" default))
+             (throw 'done default))
+         (setq current (concat "../" current)))))))
 
 (defun markdown-follow-wiki-link (name &optional other)
   "Follow the wiki link NAME.
@@ -4643,7 +4653,8 @@ window when OTHER is non-nil."
   (let ((filename (markdown-convert-wiki-link-to-filename name))
         (wp (file-name-directory buffer-file-name)))
     (when other (other-window 1))
-    (find-file (concat wp filename)))
+    (let ((default-directory wp))
+      (find-file filename)))
   (when (not (eq major-mode 'markdown-mode))
     (markdown-mode)))
 
