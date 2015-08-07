@@ -2642,6 +2642,17 @@ Arguments BEG and END specify the beginning and end of the region."
   (let ((indent (markdown-pre-indentation (max (point-min) (1- beg)))))
     (markdown-block-region beg end indent)))
 
+(defun markdown-electric-backquote (arg)
+  "Insert a backquote.
+The numeric prefix argument ARG says how many times to repeat the insertion.
+Call `markdown-insert-gfm-code-block' interactively
+if three backquotes inserted at the beginning of line."
+  (interactive "*P")
+  (self-insert-command (prefix-numeric-value arg))
+  (when (looking-back "^```")
+    (replace-match "")
+    (call-interactively #'markdown-insert-gfm-code-block)))
+
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
@@ -3410,6 +3421,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (set-keymap-parent map markdown-mode-map)
     (define-key map (kbd "C-c C-s P") 'markdown-insert-gfm-code-block)
     (define-key map (kbd "C-c C-s d") 'markdown-insert-strike-through)
+    (define-key map "`" 'markdown-electric-backquote)
     map)
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
