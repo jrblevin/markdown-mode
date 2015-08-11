@@ -1468,12 +1468,25 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-subtree/move-up ()
   "Test `markdown-move-subtree-up'."
-  (markdown-test-string "# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n# 2 #\n"
+  ;; Note that prior to Emacs 24.5, this does not work for the last subtree in
+  ;; the buffer due to Emacs bug #19102:
+  ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=19102
+  ;; https://github.com/emacs-mirror/emacs/commit/b3910f
+  ;; That also corrects the type of the "Cannot move pase superior level" error
+  ;; from 'error to 'user-error.
+  (markdown-test-string "# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n# 2 #\n# Extra\n"
                         (re-search-forward "^# 2")
                         (markdown-move-subtree-up)
-                        (should (string-equal (buffer-string) "# 2 #\n# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n"))
-                        ;; Second attempt should fail, leaving buffer unchanged
-                        (should-error (markdown-move-subtree-up) :type 'user-error)))
+                        (should (string-equal (buffer-string) "# 2 #\n# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n# Extra\n"))
+                        ;; Second attempt should fail, leaving buffer unchanged.
+                        ;; (This way of asserting the contents of the error
+                        ;; message is a bit convoluted and more fragile than
+                        ;; ideal. But prior to Emacs 24.5, the type of this
+                        ;; error is just 'error, and a bare "should-error" is
+                        ;; really overly broad.)
+                        (should (string-equal
+                                 "Cannot move past superior level"
+                                 (second (should-error (markdown-move-subtree-up)))))))
 
 (ert-deftest test-markdown-subtree/move-down ()
   "Test `markdown-move-subtree-down'."
