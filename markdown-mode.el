@@ -594,7 +594,10 @@
 ;; Aliased or piped wiki links of the form `[[link text|PageName]]`
 ;; are also supported.  Since some wikis reverse these components, set
 ;; `markdown-wiki-link-alias-first' to nil to treat them as
-;; `[[PageName|link text]]`.
+;; `[[PageName|link text]]`. By default, Markdown Mode searches for
+;; target files in the current directory and then sequentially in parent
+;; directories (like Ikiwiki). Parent directory search can be disabled
+;; by setting `markdown-wiki-link-search-parent-directories' to nil.
 ;;
 ;; [SmartyPants][] support is possible by customizing `markdown-command'.
 ;; If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -887,6 +890,12 @@ auto-indentation by pressing \\[newline-and-indent]."
 (defcustom markdown-wiki-link-alias-first t
   "When non-nil, treat aliased wiki links like [[alias text|PageName]].
 Otherwise, they will be treated as [[PageName|alias text]]."
+  :group 'markdown
+  :type 'boolean)
+
+(defcustom markdown-wiki-link-search-parent-directories t
+  "When non-nil, search for wiki link targets in parent directories.
+This is the default search behavior of Ikiwiki."
   :group 'markdown
   :type 'boolean)
 
@@ -4638,7 +4647,8 @@ and [[test test]] both map to Test-test.ext."
            (current default))
       (catch 'done
         (loop
-         (if (file-exists-p current)
+         (if (or (file-exists-p current)
+                 (not markdown-wiki-link-search-parent-directories))
              (throw 'done current))
          (if (string-equal (expand-file-name current)
                            (concat "/" default))
