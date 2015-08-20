@@ -2493,6 +2493,30 @@ See `paragraph-separate'."
        (fill-paragraph)
        (should (string-equal (buffer-string) str))))))
 
+(ert-deftest test-markdown-filling/no-break-before-list-item ()
+  "There's no point in putting the first item of a list on the next line,
+indented the same amount."
+  :expected-result :failed
+  (let ((str "*   [Link](http://way-too-long.example.com)\n"))
+    (markdown-test-string str
+      (auto-fill-mode 1)
+      (let ((fill-column 10))
+        (end-of-line)
+        (funcall auto-fill-function)
+        (should (string-equal (buffer-string) str))))))
+
+(ert-deftest test-markdown-filling/break-within-list-item ()
+  "This doesn't suppress auto-fill within a multi-word list item."
+  :expected-result :failed
+  (markdown-test-string "*   [Link](http://example.com/) more text"
+    (auto-fill-mode 1)
+    (let ((fill-column 10))
+      (end-of-line)
+      (funcall auto-fill-function)
+      (should (string-equal
+               (buffer-string)
+               "*   [Link](http://example.com/)\n    more text")))))
+
 (ert-deftest test-markdown-filling/preserve-next-line-footnote ()
   "Footnote block can be after label"
   (let ((str "[^label1]:\n    Footnote block\n    more footnote")) ; six spaces
