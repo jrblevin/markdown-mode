@@ -4544,6 +4544,7 @@ Standalone XHTML output is identified by an occurrence of
 
 (defun markdown-add-xhtml-header-and-footer (title)
   "Wrap XHTML header and footer with given TITLE around current buffer."
+  (goto-char (point-min))
   (insert "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
           "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
           "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\n"
