@@ -523,6 +523,11 @@ provides an interface to all of the possible customizations:
     this variable buffer-local allows `markdown-mode` to override
     the default behavior induced when the global variable is non-nil.
 
+  * `markdown-make-gfm-checkboxes-buttons` - Whether GitHub Flavored
+    Markdown style checkboxes should be turned into buttons that can
+    be toggled with mouse-1 or RET. If non-nil buttons are enabled, the
+    default is t. This works in `markdown-mode` as well as `gfm-mode`.
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode
@@ -540,7 +545,12 @@ previous and next links (including links of other types).
 Aliased or piped wiki links of the form `[[link text|PageName]]`
 are also supported.  Since some wikis reverse these components, set
 `markdown-wiki-link-alias-first` to nil to treat them as
-`[[PageName|link text]]`.
+`[[PageName|link text]]`.  By default, Markdown Mode only searches
+for target files in the current directory.  Sequential parent
+directory search (as in [Ikiwiki][]) can be enabled by setting
+`markdown-wiki-link-search-parent-directories` to a non-nil value.
+
+[Ikiwiki]: https://ikiwiki.info
 
 [SmartyPants][] support is possible by customizing `markdown-command`.
 If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,
@@ -686,6 +696,8 @@ following people:
   * Roger Bolsius for ordered list improvements.
   * Google's Open Source Programs Office for recognizing the project with
     a monetary contribution in June 2015.
+  * Howard Melman for supporting GFM checkboxes
+    as buttons.
 
 ## Bugs
 
