@@ -5090,6 +5090,7 @@ before regenerating font-lock rules for extensions."
                     "[ \t]*[*+-][ \t]+" ; unordered list item
                     "[ \t]*\\(?:[0-9]+\\|#\\)\\.[ \t]+" ; ordered list item
                     "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
+                    "[ \t]*:[ \t]+" ; definition
                     )
                   "\\|"))
   (set
