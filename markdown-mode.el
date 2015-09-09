@@ -5081,7 +5081,7 @@ before regenerating font-lock rules for extensions."
        'markdown-end-of-defun)
   ;; Paragraph filling
   (set
-   ; Should match start of lines that start or seaprate paragraphs
+   ; Should match start of lines that start or separate paragraphs
    (make-local-variable 'paragraph-start)
        (mapconcat 'identity
                   '(
