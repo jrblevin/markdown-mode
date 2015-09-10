@@ -2832,6 +2832,27 @@ indented the same amount."
     (markdown-indent-region (line-beginning-position) (line-end-position) nil)
     (should (string-equal (buffer-string) " #. abc\n    def\n"))))
 
+(ert-deftest test-markdown-ext/ikiwiki ()
+  (let ((markdown-wiki-link-search-parent-directories t))
+    (progn
+      (find-file "ikiwiki/root")
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            ;; font lock
+            (markdown-test-range-has-property 1 11 'font-lock-face markdown-link-face)
+            (markdown-test-range-has-property 14 33 'font-lock-face markdown-missing-link-face))
+        (kill-buffer)))
+    (progn
+      (find-file "ikiwiki/sub/foo")
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            ;; font lock
+            (markdown-test-range-has-property 1 16 'font-lock-face markdown-missing-link-face)
+            (markdown-test-range-has-property 19 26 'font-lock-face markdown-link-face))
+        (kill-buffer)))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
