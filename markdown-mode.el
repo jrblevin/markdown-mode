@@ -4739,7 +4739,8 @@ and [[test test]] both map to Test-test.ext."
                              (downcase (substring basename 1 nil)))))
     (let* ((default
             (concat basename
-                    (if (buffer-file-name)
+                    (if (and (buffer-file-name)
+                             (file-name-extension (buffer-file-name)))
                         (concat "."
                                 (file-name-extension (buffer-file-name))))))
            (current default))
