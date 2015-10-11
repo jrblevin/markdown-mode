@@ -441,6 +441,10 @@ provides an interface to all of the possible customizations:
   * `markdown-italic-underscore` - set to a non-nil value to use
     underscores for italic instead of asterisks (default: `nil`).
 
+  * `markdown-asymmetric-header` - set to a non-nil value to use
+    asymmetric header styling, placing header characters only on
+    the left of headers (default: `nil`).
+
   * `markdown-indent-function` - the function to use for automatic
     indentation (default: `markdown-indent-line`).
 
