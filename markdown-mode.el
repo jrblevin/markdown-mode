@@ -4316,6 +4316,7 @@ When ARG is non-nil, repeat that many times.  When ARG is negative,
 move forward to the ARG-th following section."
   (interactive "P")
   (or arg (setq arg 1))
+  (forward-char 1)
   (or (re-search-backward markdown-regex-header nil t arg)
       (goto-char (point-min))))
 
