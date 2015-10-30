@@ -1941,7 +1941,7 @@ If the point is not in a list item, do nothing."
       (setq indent (markdown-cur-line-indent)))
     ;; Don't skip over whitespace for empty list items (marker and
     ;; whitespace only), just move to end of whitespace.
-    (if (looking-back (concat markdown-regex-list "\\s-*"))
+    (if (looking-back (concat markdown-regex-list "\\s-*") nil)
           (goto-char (match-end 3))
       (skip-syntax-backward "-"))))
 
@@ -2197,7 +2197,7 @@ This helps improve font locking for block constructs such as pre blocks."
   (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
   (save-excursion
     (goto-char font-lock-beg)
-    (unless (looking-back "\n\n")
+    (unless (looking-back "\n\n" nil)
       (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
         (goto-char font-lock-end)
         (when (re-search-forward "\n\n" nil t)
@@ -2219,7 +2219,7 @@ This helps improve font locking for block constructs such as pre blocks."
 (defun markdown-ensure-blank-line-before ()
   "If previous line is not already blank, insert a blank line before point."
   (unless (bolp) (insert "\n"))
-  (unless (or (bobp) (looking-back "\n\\s-*\n")) (insert "\n")))
+  (unless (or (bobp) (looking-back "\n\\s-*\n" nil)) (insert "\n")))
 
 (defun markdown-ensure-blank-line-after ()
   "If following line is not already blank, insert a blank line after point.
@@ -2804,7 +2804,7 @@ Call `markdown-insert-gfm-code-block' interactively
 if three backquotes inserted at the beginning of line."
   (interactive "*P")
   (self-insert-command (prefix-numeric-value arg))
-  (when (looking-back "^```")
+  (when (looking-back "^```" nil)
     (replace-match "")
     (call-interactively #'markdown-insert-gfm-code-block)))
 
@@ -2820,7 +2820,7 @@ automatically in order to have the correct markup."
         (goto-char e)
         ;; if we're on a blank line, don't newline, otherwise the ```
         ;; should go on its own line
-        (unless (looking-back "\n")
+        (unless (looking-back "\n" nil)
           (newline))
         (insert "```")
         (markdown-ensure-blank-line-after)
@@ -3381,7 +3381,7 @@ match."
             (let (match)
               (save-match-data
                 (dolist (prev-regexp previous)
-                  (or match (setq match (looking-back prev-regexp)))))
+                  (or match (setq match (looking-back prev-regexp nil)))))
               (unless match
                 (save-excursion (funcall function))))))
         (add-to-list 'previous regexp)))))
@@ -4930,7 +4930,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 (defun markdown-inside-link-text-p ()
   "Return nil if not currently within link anchor text."
-  (looking-back "\\[[^]]*"))
+  (looking-back "\\[[^]]*" nil))
 
 (defun markdown-line-is-reference-definition-p ()
   "Return whether the current line is a (non-footnote) reference defition."
