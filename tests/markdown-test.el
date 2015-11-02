@@ -2366,7 +2366,15 @@ body"
    (should (looking-at "# A top-level header"))
    (beginning-of-defun)
    ;; beginning-of-defun should move up to point-min
-   (should (= (point) (point-min)))))
+   (should (= (point) (point-min)))
+   ;; (beginning-of-defun -1)  should move to the start of the next header
+   (forward-line 2)
+   (beginning-of-defun -1)
+   (should (looking-at "## A second-level header"))
+   (beginning-of-defun -1)
+   (should (looking-at "### Third level ###"))
+   (beginning-of-defun -1)
+   (should (looking-at "### Third level number two ###"))))
 
 (ert-deftest test-markdown-movement/block ()
   "Test block movement."
