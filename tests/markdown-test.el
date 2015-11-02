@@ -2797,7 +2797,7 @@ indented the same amount."
    (end-of-line)
    (markdown-insert-gfm-code-block "elisp")
    (should (string-equal (buffer-string)
-                         "line 1\n\n```elisp\n\n```\n\nline 2\n")))
+                         "line 1\n\n``` elisp\n\n```\n\nline 2\n")))
   ;; Test with active region
   (markdown-test-string-gfm "line 1\nline 2\nline 3\n"
    (forward-line)
@@ -2807,7 +2807,7 @@ indented the same amount."
    (should (markdown-use-region-p))
    (markdown-insert-gfm-code-block "elisp")
    (should (string-equal (buffer-string)
-                         "line 1\n\n```elisp\nline 2\n```\n\nline 3\n"))))
+                         "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n"))))
 
 (ert-deftest test-markdown-gfm/code-block-font-lock ()
   "GFM code block font lock test."

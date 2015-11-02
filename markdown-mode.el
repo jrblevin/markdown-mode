@@ -2132,7 +2132,7 @@ Group 3 matches the closing backticks."
   "Match GFM quoted code blocks from point to LAST."
   (let (open lang body close all)
     (if (search-forward-regexp
-         "\\(?:\\`\\|[\n\r]+\\s *[\n\r]\\)\\(```\\)\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" last t)
+         "\\(?:\\`\\|[\n\r]+\\s *[\n\r]\\)\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" last t)
         (progn
           (beginning-of-line)
           (setq open (list (match-beginning 1) (match-end 1))
@@ -2815,6 +2815,7 @@ region is active, wrap this region with the markup instead.  If
 the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
   (interactive "sProgramming language [none]: ")
+  (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
         (goto-char e)
