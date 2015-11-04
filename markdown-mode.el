@@ -1003,6 +1003,15 @@ to `nil' instead. See `font-lock-support-mode' for more details."
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-preview-window-function 'eww-open-file
+  "Function to display preview of markdown output within emacs. Function must
+emulate the behavior of `eww-open-file' in that it must create a new buffer
+containing the preview of the html file, and then call `switch-to-buffer' to
+that buffer so that upon completion, `selected-window' displays the buffer
+previewing the exported html."
+  :group 'markdown
+  :type 'function)
+
 
 ;;; Font Lock =================================================================
 
@@ -4654,6 +4663,29 @@ current filename, but with the extension removed and replaced with .html."
   "Export to XHTML using `markdown-export' and browse the resulting file."
   (interactive)
   (browse-url-of-file (markdown-export)))
+
+(defvar-local markdown-preview-buffer nil
+  "Buffer used to preview markdown output in `markdown-export-native-preview'.")
+
+(defun markdown-export-native-preview (arg)
+  "Export to XHTML using `markdown-export' and browse the resulting file within
+emacs using `markdown-preview-window-function'."
+  (interactive "P")
+  (let ((preview-windows (when (buffer-live-p markdown-preview-buffer)
+                           (get-buffer-window-list markdown-preview-buffer))))
+    (funcall markdown-preview-window-function (markdown-export))
+    (let ((preview-buf (current-buffer)))
+      (quit-window)
+      (if (not preview-windows) (unless arg (display-buffer preview-buf))
+        (mapc
+         (lambda (window-and-point)
+           (set-window-buffer (car window-pair) preview-buf)
+           (set-window-point win (cdr window-pair)))
+         (mapcar (lambda (window) (cons window (window-point window)))
+                 preview-windows)))
+      (when (buffer-live-p markdown-preview-buffer)
+        (kill-buffer markdown-preview-buffer))
+      (setq markdown-preview-buffer preview-buf))))
 
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
