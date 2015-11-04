@@ -1012,6 +1012,12 @@ previewing the exported html."
   :group 'markdown
   :type 'function)
 
+(defcustom markdown-native-preview-delete-export t
+  "When non-nil, deleted exported html file when using
+`markdown-export-native-preview'."
+  :group 'markdown
+  :type 'boolean)
+
 
 ;;; Font Lock =================================================================
 
@@ -4668,13 +4674,15 @@ current filename, but with the extension removed and replaced with .html."
 (defvar-local markdown-preview-buffer nil
   "Buffer used to preview markdown output in `markdown-export-native-preview'.")
 
-(defun markdown-export-native-preview (arg)
+(defun markdown-export-native-preview (&optional arg)
   "Export to XHTML using `markdown-export' and browse the resulting file within
 emacs using `markdown-preview-window-function'."
   (interactive "P")
   (let ((preview-windows (when (buffer-live-p markdown-preview-buffer)
-                           (get-buffer-window-list markdown-preview-buffer))))
-    (funcall markdown-preview-window-function (markdown-export))
+                           (get-buffer-window-list markdown-preview-buffer)))
+        export-file)
+    (funcall markdown-preview-window-function
+             (setq export-file (markdown-export)))
     (let ((preview-buf (current-buffer)))
       (quit-window)
       (if (not preview-windows) (unless arg (display-buffer preview-buf))
@@ -4686,7 +4694,21 @@ emacs using `markdown-preview-window-function'."
                  preview-windows)))
       (when (buffer-live-p markdown-preview-buffer)
         (kill-buffer markdown-preview-buffer))
-      (setq markdown-preview-buffer preview-buf))))
+      (setq markdown-preview-buffer preview-buf)
+      (when (and markdown-native-preview-delete-export
+                 export-file
+                 (file-exists-p export-file))
+        (delete-file export-file)))))
+
+(defun markdown-remove-native-preview ()
+  (when (buffer-live-p markdown-preview-buffer)
+    (kill-buffer markdown-preview-buffer))
+  (setq markdown-preview-buffer nil))
+
+(defun markdown-native-preview-if-markdown ()
+  (when (and (derived-mode-p 'markdown-mode)
+             markdown-native-preview-mode)
+    (markdown-export-native-preview)))
 
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
@@ -5253,6 +5275,16 @@ before regenerating font-lock rules for extensions."
          (longlines-mode 1)))
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
+
+
+;;; Native Preview Mode  ============================================
+(define-minor-mode markdown-native-preview-mode
+  "Toggle native previewing on save for a specific markdown file."
+  :lighter "MD-Preview"
+  (if markdown-native-preview-mode (markdown-export-native-preview)
+    (markdown-remove-native-preview)))
+
+(add-hook 'after-save-hook #'markdown-native-preview-if-markdown)
 
 
 (provide 'markdown-mode)
