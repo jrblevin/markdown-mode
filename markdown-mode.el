@@ -4680,8 +4680,8 @@ emacs using `markdown-preview-window-function'."
       (if (not preview-windows) (unless arg (display-buffer preview-buf))
         (mapc
          (lambda (window-and-point)
-           (set-window-buffer (car window-pair) preview-buf)
-           (set-window-point win (cdr window-pair)))
+           (set-window-buffer (car window-and-point) preview-buf)
+           (set-window-point (car window-and-point) (cdr window-and-point)))
          (mapcar (lambda (window) (cons window (window-point window)))
                  preview-windows)))
       (when (buffer-live-p markdown-preview-buffer)
