@@ -4683,7 +4683,7 @@ current filename, but with the extension removed and replaced with .html."
 
 (defun markdown-window-redisplay-preview (buf display-args)
   "Redisplay a window previewing the exported output of a markdown
-buffer. DISPLAY-ARGS is a list with 4 elements of the form
+buffer BUF. DISPLAY-ARGS is a list with 4 elements of the form
 (window point start)."
   (destructuring-bind (window point start) display-args
     (set-window-buffer window buf)
