@@ -4657,7 +4657,6 @@ current filename, but with the extension removed and replaced with .html."
       (with-current-buffer output-buffer
         (run-hooks 'markdown-after-export-hook)
         (save-buffer))
-      (kill-buffer output-buffer)
       ;; if modified, restore initial buffer
       (when (buffer-modified-p init-buf)
         (erase-buffer)
@@ -4698,7 +4697,9 @@ emacs using `markdown-preview-window-function'."
       (when (and markdown-native-preview-delete-export
                  export-file
                  (file-exists-p export-file))
-        (delete-file export-file)))))
+        (delete-file export-file)
+        (let ((buf (get-file-buffer export-file)))
+          (when buf (kill-buffer buf)))))))
 
 (defun markdown-remove-native-preview ()
   (when (buffer-live-p markdown-preview-buffer)
