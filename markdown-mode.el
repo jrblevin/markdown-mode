@@ -257,10 +257,14 @@
 ;;     and save the result in the file `basename.html`, where
 ;;     `basename` is the name of the Markdown file with the extension
 ;;     removed.  *Export and View:* press `C-c C-c v` to export the
-;;     file and view it in a browser.  **For both export commands, the
-;;     output file will be overwritten without notice.**
-;;     *Open:* `C-c C-c o` will open the Markdown source file directly
-;;     using `markdown-open-command'.
+;;     file and view it in a browser.  *Open:* `C-c C-c o` will open
+;;     the Markdown source file directly using `markdown-open-command'.
+;;     *Live Export*: Press `C-c C-c l` to turn on
+;;     `markdown-live-preview-mode' to view the exported output
+;;     side-by-side with the source Markdown. **For all export commands,
+;;     the output file will be overwritten without notice.**
+;;     `markdown-live-preview-window-function' can be customized to open
+;;     in a browser other than `eww'.
 ;;
 ;;     To summarize:
 ;;
@@ -270,6 +274,7 @@
 ;;       - `C-c C-c v`: `markdown-command' > `basename.html` > browser.
 ;;       - `C-c C-c w`: `markdown-command' > kill ring.
 ;;       - `C-c C-c o`: `markdown-open-command'.
+;;       - `C-c C-c l`: `markdown-live-preview-mode' > `*eww*` buffer.
 ;;
 ;;     `C-c C-c c` will check for undefined references.  If there are
 ;;     any, a small buffer will open with a list of undefined
@@ -1003,7 +1008,7 @@ to `nil' instead. See `font-lock-support-mode' for more details."
   :group 'markdown
   :type 'boolean)
 
-(defcustom markdown-preview-window-function 'eww-open-file
+(defcustom markdown-live-preview-window-function 'eww-open-file
   "Function to display preview of markdown output within emacs. Function must
 emulate the behavior of `eww-open-file' in that it must create a new buffer
 containing the preview of the html file, and then call `switch-to-buffer' to
@@ -1012,9 +1017,9 @@ previewing the exported html."
   :group 'markdown
   :type 'function)
 
-(defcustom markdown-native-preview-delete-export t
+(defcustom markdown-live-preview-delete-export t
   "When non-nil, deleted exported html file when using
-`markdown-native-preview-export'."
+`markdown-live-preview-export'."
   :group 'markdown
   :type 'boolean)
 
@@ -3558,6 +3563,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-c e") 'markdown-export)
     (define-key map (kbd "C-c C-c v") 'markdown-export-and-preview)
     (define-key map (kbd "C-c C-c o") 'markdown-open)
+    (define-key map (kbd "C-c C-c l") 'markdown-live-preview-mode)
     (define-key map (kbd "C-c C-c w") 'markdown-kill-ring-save)
     (define-key map (kbd "C-c C-c c") 'markdown-check-refs)
     (define-key map (kbd "C-c C-c n") 'markdown-cleanup-list-numbers)
@@ -3612,6 +3618,8 @@ See also `markdown-mode-map'.")
     ["Export" markdown-export]
     ["Export & View" markdown-export-and-preview]
     ["Open" markdown-open]
+    ["Live Export" markdown-live-preview-mode
+     :style toggle :selected markdown-live-preview-mode]
     ["Kill ring save" markdown-kill-ring-save]
     "---"
     ("Headings"
@@ -4671,7 +4679,7 @@ current filename, but with the extension removed and replaced with .html."
   (browse-url-of-file (markdown-export)))
 
 (defvar-local markdown-preview-buffer nil
-  "Buffer used to preview markdown output in `markdown-native-preview-export'.")
+  "Buffer used to preview markdown output in `markdown-live-preview-export'.")
 
 (defun markdown-window-redisplay-preview (buf display-args)
   "Redisplay a window previewing the exported output of a markdown
@@ -4682,9 +4690,9 @@ buffer. DISPLAY-ARGS is a list with 4 elements of the form
     (set-window-point window point)
     (set-window-start window start)))
 
-(defun markdown-native-preview-export (&optional arg)
+(defun markdown-live-preview-export (&optional arg)
   "Export to XHTML using `markdown-export' and browse the resulting file within
-emacs using `markdown-preview-window-function'."
+emacs using `markdown-live-preview-window-function'."
   (interactive "P")
   (let* ((preview-windows (when (buffer-live-p markdown-preview-buffer)
                             (get-buffer-window-list markdown-preview-buffer)))
@@ -4693,7 +4701,7 @@ emacs using `markdown-preview-window-function'."
                                  (window-start window)))
                          preview-windows))
          (export-file (markdown-export)))
-    (funcall markdown-preview-window-function export-file)
+    (funcall markdown-live-preview-window-function export-file)
     (let ((preview-buf (current-buffer)))
       (quit-window)
       (if (not preview-windows) (unless arg (display-buffer preview-buf))
@@ -4704,22 +4712,22 @@ emacs using `markdown-preview-window-function'."
                  (not (eq markdown-preview-buffer preview-buf)))
         (kill-buffer markdown-preview-buffer))
       (setq markdown-preview-buffer preview-buf)
-      (when (and markdown-native-preview-delete-export
+      (when (and markdown-live-preview-delete-export
                  export-file
                  (file-exists-p export-file))
         (delete-file export-file)
         (let ((buf (get-file-buffer export-file)))
           (when buf (kill-buffer buf)))))))
 
-(defun markdown-native-preview-remove ()
+(defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-preview-buffer)
     (kill-buffer markdown-preview-buffer))
   (setq markdown-preview-buffer nil))
 
-(defun markdown-native-preview-if-markdown ()
+(defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
-             markdown-native-preview-mode)
-    (markdown-native-preview-export)))
+             markdown-live-preview-mode)
+    (markdown-live-preview-export)))
 
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
@@ -5289,13 +5297,13 @@ before regenerating font-lock rules for extensions."
 
 
 ;;; Native Preview Mode  ============================================
-(define-minor-mode markdown-native-preview-mode
+(define-minor-mode markdown-live-preview-mode
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
-  (if markdown-native-preview-mode (markdown-native-preview-export)
-    (markdown-native-preview-remove)))
+  (if markdown-live-preview-mode (markdown-live-preview-export)
+    (markdown-live-preview-remove)))
 
-(add-hook 'after-save-hook #'markdown-native-preview-if-markdown)
+(add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
 
 
 (provide 'markdown-mode)

@@ -208,10 +208,14 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     and save the result in the file `basename.html`, where
     `basename` is the name of the Markdown file with the extension
     removed.  *Export and View:* press <kbd>C-c C-c v</kbd> to export the
-    file and view it in a browser.  **For both export commands, the
-    output file will be overwritten without notice.**
-    *Open:* <kbd>C-c C-c o</kbd> will open the Markdown source file directly
-    using `markdown-open-command`.
+    file and view it in a browser.  *Open:* <kbd>C-c C-c o</kbd> will open
+    the Markdown source file directly using `markdown-open-command`.
+    *Live Export*: Press <kbd>C-c C-c l</kbd> to turn on
+    `markdown-live-preview-mode` to view the exported output
+    side-by-side with the source Markdown. **For all export commands,
+    the output file will be overwritten without notice.**
+    `markdown-live-preview-window-function` can be customized to open
+    in a browser other than `eww`.
 
     To summarize:
 
@@ -221,6 +225,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
       - <kbd>C-c C-c v</kbd>: `markdown-command` > `basename.html` > browser.
       - <kbd>C-c C-c w</kbd>: `markdown-command` > kill ring.
       - <kbd>C-c C-c o</kbd>: `markdown-open-command`.
+      - <kbd>C-c C-c l</kbd>: `markdown-live-preview-mode` > `*eww*` buffer.
 
     <kbd>C-c C-c c</kbd> will check for undefined references.  If there are
     any, a small buffer will open with a list of undefined
