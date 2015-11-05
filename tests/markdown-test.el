@@ -38,6 +38,9 @@
   (expand-file-name (file-name-directory
                      (or load-file-name buffer-file-name))))
 
+(defconst markdown-test-font-lock-function
+  (if noninteractive #'font-lock-ensure #'font-lock-fontify-buffer))
+
 (defmacro markdown-test-string-mode (mode string &rest body)
   "Run BODY in a temporary buffer containing STRING in MODE."
   `(let ((win (selected-window)))
@@ -49,7 +52,7 @@
            (setq-default indent-tabs-mode nil)
            (insert ,string)
            (goto-char (point-min))
-           (font-lock-fontify-buffer)
+           (funcall markdown-test-font-lock-function)
            (prog1 ,@body (kill-buffer))))))
 
 (defmacro markdown-test-file-mode (mode file &rest body)
@@ -60,7 +63,7 @@
          (insert-file-contents fn)
          (funcall ,mode)
          (goto-char (point-min))
-         (font-lock-fontify-buffer)
+         (funcall markdown-test-font-lock-function)
          ,@body))))
 
 (defmacro markdown-test-string (string &rest body)
@@ -94,7 +97,7 @@ This file is not saved."
        (insert-file-contents fn)
        (markdown-mode)
        (goto-char (point-min))
-       (font-lock-fontify-buffer)
+       (funcall markdown-test-font-lock-function)
        ,@body
        (set-buffer-modified-p nil)
        (kill-buffer buf)
@@ -2736,7 +2739,7 @@ indented the same amount."
   "Test markdown math mode."
   (markdown-test-file "math.text"
    (markdown-enable-math t)
-   (font-lock-fontify-buffer)
+   (funcall markdown-test-font-lock-function)
    (markdown-test-range-has-face 1 32 nil)
    (markdown-test-range-has-face 33 33 markdown-markup-face)
    (markdown-test-range-has-face 34 45 markdown-math-face)
