@@ -4681,22 +4681,47 @@ current filename, but with the extension removed and replaced with .html."
 (defun markdown-live-preview-window-eww (file)
   "A `markdown-live-preview-window-function' for previewing with eww."
   (eww-open-file file)
-  (switch-to-buffer-other-window "*eww*"))
+  (get-buffer "*eww*"))
+
+(defun markdown-live-preview-window-data (buf)
+  "Get window point and scroll data for all windows displaying BUF if BUF is
+non-nil."
+  (when buf
+    (mapcar (lambda (win) (list win (window-point win) (window-start win)))
+            (get-buffer-window-list buf))))
 
 (defun markdown-live-preview-export ()
   "Export to XHTML using `markdown-export' and browse the resulting file within
 Emacs using `markdown-live-preview-window-function'."
   (interactive)
-  (let* ((export-file (markdown-export)))
+  (let ((export-file (markdown-export))
+        ;; get positions in all windows currently displaying output buffer
+        (window-data
+         (markdown-live-preview-window-data markdown-live-preview-buffer))
+        (cur-buf (current-buffer)))
     (save-window-excursion
-      (setq markdown-live-preview-buffer
-            (funcall markdown-live-preview-window-function export-file)))
+      ;; protect against `markdown-live-preview-window-function' changing
+      ;; `current-buffer'
+      (let ((output-buffer
+             (funcall markdown-live-preview-window-function export-file)))
+        (with-current-buffer cur-buf
+          (setq markdown-live-preview-buffer output-buffer))))
+    ;; reset all windows displaying output buffer to where they were, now with
+    ;; the new output
+    (mapc
+     (lambda (window-posns)
+       (destructuring-bind (win pt start) window-posns
+         (set-window-buffer win markdown-live-preview-buffer)
+         (set-window-point win pt)
+         (set-window-start win start)))
+     window-data)
     (when (and markdown-live-preview-delete-export
                export-file
                (file-exists-p export-file))
       (delete-file export-file)
       (let ((buf (get-file-buffer export-file)))
-        (when buf (kill-buffer buf))))))
+        (when buf (kill-buffer buf))))
+    markdown-live-preview-buffer))
 
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
@@ -4707,6 +4732,11 @@ Emacs using `markdown-live-preview-window-function'."
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
     (markdown-live-preview-export)))
+
+(defun markdown-live-preview-remove-on-kill ()
+  (when (and (derived-mode-p 'markdown-mode)
+             markdown-live-preview-mode)
+    (markdown-live-preview-remove)))
 
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
@@ -5280,12 +5310,12 @@ before regenerating font-lock rules for extensions."
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
   (cond (markdown-live-preview-mode
-         (markdown-live-preview-export)
-         (switch-to-buffer-other-window markdown-live-preview-buffer))
-        (t
-         (markdown-live-preview-remove))))
+         (switch-to-buffer-other-window (markdown-live-preview-export)))
+        (t (markdown-live-preview-remove))))
 
 (add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
+(add-hook 'after-revert-hook #'markdown-live-preview-if-markdown)
+(add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill)
 
 
 (provide 'markdown-mode)
