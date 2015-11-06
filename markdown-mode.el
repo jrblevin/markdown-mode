@@ -5316,7 +5316,6 @@ before regenerating font-lock rules for extensions."
         (t (markdown-live-preview-remove))))
 
 (add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
-(add-hook 'after-revert-hook #'markdown-live-preview-if-markdown)
 (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill)
 
 
