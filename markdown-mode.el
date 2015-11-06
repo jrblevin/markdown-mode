@@ -5305,7 +5305,7 @@ before regenerating font-lock rules for extensions."
   (markdown-fontify-buffer-wiki-links))
 
 
-;;; Native Preview Mode  ============================================
+;;; Live Preview Mode  ============================================
 (define-minor-mode markdown-live-preview-mode
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
