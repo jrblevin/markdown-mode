@@ -4683,12 +4683,20 @@ current filename, but with the extension removed and replaced with .html."
   (eww-open-file file)
   (get-buffer "*eww*"))
 
-(defun markdown-live-preview-window-data (buf)
+(defun markdown-live-preview-window-serialize (buf)
   "Get window point and scroll data for all windows displaying BUF if BUF is
 non-nil."
   (when buf
     (mapcar (lambda (win) (list win (window-point win) (window-start win)))
             (get-buffer-window-list buf))))
+
+(defun markdown-live-preview-window-deserialize (window-posns)
+  "Apply window point and scroll data from WINDOW-POSNS, given by
+`markdown-live-preview-window-serialize'."
+  (destructuring-bind (win pt start) window-posns
+    (set-window-buffer win markdown-live-preview-buffer)
+    (set-window-point win pt)
+    (set-window-start win start)))
 
 (defun markdown-live-preview-export ()
   "Export to XHTML using `markdown-export' and browse the resulting file within
@@ -4697,7 +4705,7 @@ Emacs using `markdown-live-preview-window-function'."
   (let ((export-file (markdown-export))
         ;; get positions in all windows currently displaying output buffer
         (window-data
-         (markdown-live-preview-window-data markdown-live-preview-buffer))
+         (markdown-live-preview-window-serialize markdown-live-preview-buffer))
         (cur-buf (current-buffer)))
     (save-window-excursion
       ;; protect against `markdown-live-preview-window-function' changing
@@ -4708,13 +4716,7 @@ Emacs using `markdown-live-preview-window-function'."
           (setq markdown-live-preview-buffer output-buffer))))
     ;; reset all windows displaying output buffer to where they were, now with
     ;; the new output
-    (mapc
-     (lambda (window-posns)
-       (destructuring-bind (win pt start) window-posns
-         (set-window-buffer win markdown-live-preview-buffer)
-         (set-window-point win pt)
-         (set-window-start win start)))
-     window-data)
+    (mapc #'markdown-live-preview-window-deserialize window-data)
     (when (and markdown-live-preview-delete-export
                export-file
                (file-exists-p export-file))
