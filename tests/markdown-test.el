@@ -39,7 +39,8 @@
                      (or load-file-name buffer-file-name))))
 
 (defconst markdown-test-font-lock-function
-  (if noninteractive #'font-lock-ensure #'font-lock-fontify-buffer))
+  (if (and noninteractive (fboundp 'font-lock-ensure))
+      #'font-lock-ensure #'font-lock-fontify-buffer))
 
 (defmacro markdown-test-string-mode (mode string &rest body)
   "Run BODY in a temporary buffer containing STRING in MODE."
