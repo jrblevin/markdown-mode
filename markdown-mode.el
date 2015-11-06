@@ -1010,7 +1010,7 @@ to `nil' instead. See `font-lock-support-mode' for more details."
 
 (defcustom markdown-live-preview-window-function 'markdown-live-preview-window-eww
   "Function to display preview of Markdown output within Emacs. Function must
-update the buffer containing the preview and return the buffer name."
+update the buffer containing the preview and return the buffer."
   :group 'markdown
   :type 'function)
 
