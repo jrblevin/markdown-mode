@@ -4694,9 +4694,10 @@ non-nil."
   "Apply window point and scroll data from WINDOW-POSNS, given by
 `markdown-live-preview-window-serialize'."
   (destructuring-bind (win pt start) window-posns
-    (set-window-buffer win markdown-live-preview-buffer)
-    (set-window-point win pt)
-    (set-window-start win start)))
+    (when (window-live-p win)
+      (set-window-buffer win markdown-live-preview-buffer)
+      (set-window-point win pt)
+      (set-window-start win start))))
 
 (defun markdown-live-preview-export ()
   "Export to XHTML using `markdown-export' and browse the resulting file within
