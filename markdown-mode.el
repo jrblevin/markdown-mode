@@ -4701,7 +4701,8 @@ non-nil."
 
 (defun markdown-live-preview-export ()
   "Export to XHTML using `markdown-export' and browse the resulting file within
-Emacs using `markdown-live-preview-window-function'."
+Emacs using `markdown-live-preview-window-function' Return the buffer displaying
+the rendered output."
   (interactive)
   (let ((export-file (markdown-export))
         ;; get positions in all windows currently displaying output buffer
@@ -4719,11 +4720,9 @@ Emacs using `markdown-live-preview-window-function'."
     ;; the new output
     (mapc #'markdown-live-preview-window-deserialize window-data)
     (when (and markdown-live-preview-delete-export
-               export-file
-               (file-exists-p export-file))
+               export-file (file-exists-p export-file))
       (delete-file export-file)
-      (let ((buf (get-file-buffer export-file)))
-        (when buf (kill-buffer buf))))
+      (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf))))
     markdown-live-preview-buffer))
 
 (defun markdown-live-preview-remove ()
