@@ -707,6 +707,7 @@ following people:
     a monetary contribution in June 2015.
   * Howard Melman for supporting GFM checkboxes
     as buttons.
+  * Danny McClanahan for live preview mode.
 
 ## Bugs
 
