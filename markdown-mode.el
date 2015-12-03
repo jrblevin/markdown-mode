@@ -3682,6 +3682,23 @@ See also `markdown-mode-map'.")
 
 ;;; imenu =====================================================================
 
+(defun markdown-collect-gfm-code-blocks ()
+  (save-excursion
+    (goto-char (point-min))
+    (let (blocks)
+      (while (re-search-forward "\\(?:\\`\\|[\n\r]+\\s *[\n\r]\\)\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" nil t)
+        (goto-char (line-beginning-position))
+        (let ((start (point)))
+          (when (markdown-prev-line-blank-p)
+            (forward-line +1)
+            (when (re-search-forward "^```$" nil t)
+              (push (cons start (point)) blocks)))))
+      (nreverse blocks))))
+
+(defun markdown-gfm-code-block-p (blocks pos)
+  (loop for (start . end) in blocks
+        thereis (<= start pos end)))
+
 (defun markdown-imenu-create-index ()
   "Create and return an imenu index alist for the current buffer.
 See `imenu-create-index-function' and `imenu--index-alist' for details."
@@ -3690,43 +3707,45 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
          (cur-level 0)
          (empty-heading "-")
          (self-heading ".")
+         (blocks (markdown-collect-gfm-code-blocks))
          hashes pos level heading)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (cond
-         ((setq heading (match-string-no-properties 1))
-          (setq pos (match-beginning 1)
-                level 1))
-         ((setq heading (match-string-no-properties 3))
-          (setq pos (match-beginning 3)
-                level 2))
-         ((setq hashes (match-string-no-properties 5))
-          (setq heading (match-string-no-properties 6)
-                pos (match-beginning 5)
-                level (length hashes))))
-        (let ((alist (list (cons heading pos))))
+        (unless (markdown-gfm-code-block-p blocks (point))
           (cond
-           ((= cur-level level)         ; new sibling
-            (setcdr cur-alist alist)
-            (setq cur-alist alist))
-           ((< cur-level level)         ; first child
-            (dotimes (i (- level cur-level 1))
-              (setq alist (list (cons empty-heading alist))))
-            (if cur-alist
-                (let* ((parent (car cur-alist))
-                       (self-pos (cdr parent)))
-                  (setcdr parent (cons (cons self-heading self-pos) alist)))
-              (setcdr root alist))      ; primogenitor
-            (setq cur-alist alist)
-            (setq cur-level level))
-           (t                           ; new sibling of an ancestor
-            (let ((sibling-alist (last (cdr root))))
-              (dotimes (i (1- level))
-                (setq sibling-alist (last (cdar sibling-alist))))
-              (setcdr sibling-alist alist)
+           ((setq heading (match-string-no-properties 1))
+            (setq pos (match-beginning 1)
+                  level 1))
+           ((setq heading (match-string-no-properties 3))
+            (setq pos (match-beginning 3)
+                  level 2))
+           ((setq hashes (match-string-no-properties 5))
+            (setq heading (match-string-no-properties 6)
+                  pos (match-beginning 5)
+                  level (length hashes))))
+          (let ((alist (list (cons heading pos))))
+            (cond
+             ((= cur-level level)       ; new sibling
+              (setcdr cur-alist alist)
               (setq cur-alist alist))
-            (setq cur-level level)))))
+             ((< cur-level level)       ; first child
+              (dotimes (i (- level cur-level 1))
+                (setq alist (list (cons empty-heading alist))))
+              (if cur-alist
+                  (let* ((parent (car cur-alist))
+                         (self-pos (cdr parent)))
+                    (setcdr parent (cons (cons self-heading self-pos) alist)))
+                (setcdr root alist))    ; primogenitor
+              (setq cur-alist alist)
+              (setq cur-level level))
+             (t                         ; new sibling of an ancestor
+              (let ((sibling-alist (last (cdr root))))
+                (dotimes (i (1- level))
+                  (setq sibling-alist (last (cdar sibling-alist))))
+                (setcdr sibling-alist alist)
+                (setq cur-alist alist))
+              (setq cur-level level))))))
       (cdr root))))
 
 
