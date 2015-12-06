@@ -819,6 +819,9 @@
 (defvar markdown-reference-label-history nil
   "History of used reference labels.")
 
+(defvar markdown-live-preview-mode nil
+  "Sentinel variable for `markdown-live-preview-mode'.")
+
 
 ;;; Customizable Variables ====================================================
 
