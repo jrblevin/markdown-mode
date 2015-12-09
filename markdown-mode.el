@@ -3554,8 +3554,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
     ;; Header navigation
-    (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
-    (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
+    (define-key map (kbd "C-c C-n") 'markdown-next-visible-heading)
+    (define-key map (kbd "C-c C-p") 'markdown-previous-visible-heading)
     (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
     (define-key map (kbd "C-c C-b") 'outline-backward-same-level)
     (define-key map (kbd "C-c C-u") 'outline-up-heading)
@@ -4310,12 +4310,30 @@ Calls `markdown-cycle' with argument t."
   (interactive)
   (markdown-cycle t))
 
+(defun markdown-move-visible-header-common (move-fn arg)
+  (let ((blocks (markdown-collect-gfm-code-blocks)))
+    (funcall move-fn arg)
+    (while (markdown-gfm-code-block-p blocks (point))
+      (funcall move-fn arg))))
+
+(defun markdown-next-visible-heading (arg)
+  (interactive "p")
+  (markdown-move-visible-header-common #'outline-next-visible-heading arg))
+
+(defun markdown-previous-visible-heading (arg)
+  (interactive "p")
+  (markdown-move-visible-header-common #'outline-previous-visible-heading arg))
+
 (defun markdown-outline-level ()
   "Return the depth to which a statement is nested in the outline."
-  (cond
-   ((match-end 1) 1)
-   ((match-end 3) 2)
-   ((- (match-end 5) (match-beginning 5)))))
+  (let ((blocks (save-match-data
+                  (markdown-collect-gfm-code-blocks))))
+    (if (markdown-gfm-code-block-p blocks (point))
+        7
+      (cond
+       ((match-end 1) 1)
+       ((match-end 3) 2)
+       ((- (match-end 5) (match-beginning 5)))))))
 
 (defun markdown-promote-subtree (&optional arg)
   "Promote the current subtree of ATX headings.
