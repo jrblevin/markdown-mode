@@ -1681,6 +1681,37 @@ in XEmacs 21."
   "Determine whether this Emacs supports buttons."
   (or (featurep 'button) (locate-library "button")))
 
+;; Use new names for outline-mode functions in Emacs 25 and later.
+(eval-and-compile
+  (defalias 'markdown-hide-sublevels
+    (if (fboundp 'outline-hide-sublevels)
+        'outline-hide-sublevels
+      'hide-sublevels))
+  (defalias 'markdown-show-all
+    (if (fboundp 'outline-show-all)
+        'outline-show-all
+      'show-all))
+  (defalias 'markdown-hide-body
+    (if (fboundp 'outline-hide-body)
+        'outline-hide-body
+      'hide-body))
+  (defalias 'markdown-show-entry
+    (if (fboundp 'outline-show-entry)
+        'outline-show-entry
+      'show-entry))
+  (defalias 'markdown-show-children
+    (if (fboundp 'outline-show-children)
+        'outline-show-children
+      'show-children))
+  (defalias 'markdown-show-subtree
+    (if (fboundp 'outline-show-subtree)
+        'outline-show-subtree
+      'show-subtree))
+  (defalias 'markdown-hide-subtree
+    (if (fboundp 'outline-hide-subtree)
+        'outline-hide-subtree
+      'hide-subtree)))
+
 
 ;;; Markdown Parsing Functions ================================================
 
@@ -4243,20 +4274,20 @@ Derived from `org-cycle'."
      ((and (eq last-command this-command)
            (eq markdown-cycle-global-status 2))
       ;; Move from overview to contents
-      (hide-sublevels 1)
+      (markdown-hide-sublevels 1)
       (message "CONTENTS")
       (setq markdown-cycle-global-status 3))
 
      ((and (eq last-command this-command)
            (eq markdown-cycle-global-status 3))
       ;; Move from contents to all
-      (show-all)
+      (markdown-show-all)
       (message "SHOW ALL")
       (setq markdown-cycle-global-status 1))
 
      (t
       ;; Defaults to overview
-      (hide-body)
+      (markdown-hide-body)
       (message "OVERVIEW")
       (setq markdown-cycle-global-status 2))))
 
@@ -4285,19 +4316,19 @@ Derived from `org-cycle'."
         (setq markdown-cycle-subtree-status nil))
        ((>= eol eos)
         ;; Entire subtree is hidden in one line: open it
-        (show-entry)
-        (show-children)
+        (markdown-show-entry)
+        (markdown-show-children)
         (message "CHILDREN")
         (setq markdown-cycle-subtree-status 'children))
        ((and (eq last-command this-command)
              (eq markdown-cycle-subtree-status 'children))
         ;; We just showed the children, now show everything.
-        (show-subtree)
+        (markdown-show-subtree)
         (message "SUBTREE")
         (setq markdown-cycle-subtree-status 'subtree))
        (t
         ;; Default action: hide the subtree.
-        (hide-subtree)
+        (markdown-hide-subtree)
         (message "FOLDED")
         (setq markdown-cycle-subtree-status 'folded)))))
 
