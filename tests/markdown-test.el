@@ -2295,6 +2295,15 @@ body"
    (should (eq (point) 69))
    (should (looking-at "^## A second-level header$"))))
 
+(ert-deftest test-markdown-outline/navigation-with-code ()
+  "Test outline navigation functions with code blocks."
+  :expected-result :failed
+  (markdown-test-file "outline-code.text"
+   ;; Navigate forward at the same level
+   (outline-forward-same-level 1)
+   (should (eq (point) 159))
+   (should (looking-at "^# Level one again"))))
+
 (ert-deftest test-markdown-outline/visibility-atx ()
   "Test outline visibility cycling for ATX-style headers."
   (markdown-test-file "outline.text"
