@@ -564,15 +564,6 @@
 ;;     (default: `end`).  The set of location options is the same as
 ;;     for `markdown-reference-location'.
 ;;
-;;   * `markdown-font-lock-support-mode' - the variable
-;;     `font-lock-support-mode' is made buffer-local and set to
-;;     `markdown-font-lock-support-mode', which is `jit-mode' by
-;;     default. This is currently the default support mode in Emacs as
-;;     well.  However, if fontification of multi-line constructs such
-;;     as preformatted code blocks, nested lists, and so on is
-;;     inaccurate, setting this to `nil' will allow more aggressive
-;;     fontification at the expense of some performance.
-;;
 ;;   * `comment-auto-fill-only-comments' - variable is made
 ;;     buffer-local and set to `nil' by default.  In programming
 ;;     language modes, when this variable is non-nil, only comments
@@ -996,17 +987,6 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   "String inserted before unordered list items."
   :group 'markdown
   :type 'string)
-
-(defcustom markdown-font-lock-support-mode 'jit-lock-mode
-  "Support modes speed up Font Lock by being selective about when
-fontification occurs. Because Markdown has many multline
-constructions by nature, `markdown-mode' is aggressive about Font
-Lock by default. If fontification is inaccurate, try setting this
-to `nil' instead. See `font-lock-support-mode' for more details."
-  :type '(choice (const :tag "none" nil)
-		 (const :tag "fast lock" fast-lock-mode)
-		 (const :tag "lazy lock" lazy-lock-mode)
-		 (const :tag "jit lock" jit-lock-mode)))
 
 (defcustom markdown-make-gfm-checkboxes-buttons t
   "When non-nil, make GFM checkboxes into buttons."
@@ -5220,8 +5200,6 @@ before regenerating font-lock rules for extensions."
   (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
-  (set (make-local-variable 'font-lock-support-mode)
-       markdown-font-lock-support-mode)
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
   ;; Reload extensions
