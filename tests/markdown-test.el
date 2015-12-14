@@ -1868,8 +1868,8 @@ if (y)
    (markdown-test-range-has-face 1 19 nil)
    (markdown-test-range-has-face 20 63 markdown-pre-face)))
 
-(ert-deftest test-markdown-font-lock/gfm-fenced ()
-  "Test GFM-style fenced code blocks."
+(ert-deftest test-markdown-font-lock/gfm-fenced-1 ()
+  "Test GFM-style fenced code blocks (1)."
   (markdown-test-string "```ruby
 require 'redcarpet'
 markdown = Redcarpet.new('Hello World!')
@@ -1878,24 +1878,28 @@ puts markdown.to_html
    (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
    (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
    (markdown-test-range-has-face 9 90 markdown-pre-face) ; code
-   (markdown-test-range-has-face 92 94 markdown-markup-face)) ; ```
+   (markdown-test-range-has-face 92 94 markdown-markup-face))) ; ```
+
+(ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
+  "Test GFM-style fenced code blocks (2)."
   (markdown-test-string "```{r sum}\n2+2\n```"
    (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
    (markdown-test-range-has-face 4 10 markdown-language-keyword-face) ; {r sum}
    (markdown-test-range-has-face 12 14 markdown-pre-face) ; 2+2
    (markdown-test-range-has-face 16 18 markdown-markup-face))) ; ```
 
-(ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
-  "GFM-style code blocks must be preceded by a blank line."
+(ert-deftest test-markdown-font-lock/gfm-fenced-3 ()
+  "GFM-style code blocks need not be preceded by a blank line."
   (markdown-test-string "Paragraph
 ```js
 for (var i = 0; i < 10; i++) {
     console.log(i);
 }
 ```"
-    (markdown-test-range-has-face 1 10 nil)
-    (markdown-test-range-has-face 11 13 markdown-markup-face)
-    (markdown-test-range-has-face 14 69 markdown-inline-code-face)
+    (markdown-test-range-has-face 1 10 nil) ; Paragraph
+    (markdown-test-range-has-face 11 13 markdown-markup-face) ; ```
+    (markdown-test-range-has-face 14 15 markdown-language-keyword-face) ; js
+    (markdown-test-range-has-face 17 68 markdown-pre-face)
     (markdown-test-range-has-face 70 72 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
@@ -1935,9 +1939,13 @@ for (var i = 0; i < 10; i++) {
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
-  :expected-result :failed
   (markdown-test-string "    <!-- pre, not comment -->"
    (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-pre-face)))
+
+(ert-deftest test-markdown-font-lock/inline-code-comment ()
+  "Test comments inside of a pre block."
+  (markdown-test-string "`<h1> <!-- HTML comment inside inline code -->`"
+   (markdown-test-range-has-face (1+ (point-min)) (- (point-max) 2) markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/comment-hanging-indent ()
   "Test comments with hanging indentation."

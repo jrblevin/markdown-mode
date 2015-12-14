@@ -1022,21 +1022,108 @@ Function is called repeatedly until it returns nil. For details, see
         (when (re-search-forward "\n\n" nil t)
           (cons (match-beginning 0) found))))))
 
+(defun markdown-syntax-propertize-pre-blocks (start end)
+  "Match preformatted text blocks from START to END."
+  (save-excursion
+    (goto-char start)
+    (let ((levels (markdown-calculate-list-levels))
+          indent pre-regexp close-regexp open close stop)
+      (while (and (< (point) end) (not close))
+        ;; Search for a region with sufficient indentation
+        (if (null levels)
+            (setq indent 1)
+          (setq indent (1+ (length levels))))
+        (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" indent))
+        (setq close-regexp (format "^\\(    \\|\t\\)\\{0,%d\\}\\([^ \t]\\)" (1- indent)))
+
+        (cond
+         ;; If not at the beginning of a line, move forward
+         ((not (bolp)) (forward-line))
+         ;; Move past blank lines
+         ((markdown-cur-line-blank-p) (forward-line))
+         ;; At headers and horizontal rules, reset levels
+         ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+         ;; If the current line has sufficient indentation, mark out pre block
+         ;; The opening should be preceded by a blank line.
+         ((and (looking-at pre-regexp)
+               (markdown-prev-line-blank-p))
+          (setq open (match-beginning 0))
+          (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
+                      (not (eobp)))
+            (forward-line))
+          (setq close (point)))
+         ;; If current line has a list marker, update levels, move to end of block
+         ((looking-at markdown-regex-list)
+          (setq levels (markdown-update-list-levels
+                        (match-string 2) (markdown-cur-line-indent) levels))
+          (markdown-end-of-block-element))
+         ;; If this is the end of the indentation level, adjust levels accordingly.
+         ;; Only match end of indentation level if levels is not the empty list.
+         ((and (car levels) (looking-at close-regexp))
+          (setq levels (markdown-update-list-levels
+                        nil (markdown-cur-line-indent) levels))
+          (markdown-end-of-block-element))
+         (t (markdown-end-of-block-element))))
+
+      (when (and open close)
+        ;; Set text property data
+        (put-text-property open close 'markdown-pre (list open close))
+        ;; Recursively search again
+        (markdown-syntax-propertize-pre-blocks (point) end)))))
+
+(defun markdown-syntax-propertize-fenced-code-blocks (start end)
+  "Match tilde-fenced code text blocks from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (re-search-forward "^\\([~]\\{3,\\}\\)" end t)
+      (beginning-of-line)
+      (let ((beg (point)))
+        (forward-line)
+        (when (re-search-forward
+               (concat "^" (match-string 1) "~*") end t)
+               (put-text-property beg (match-end 0) 'markdown-fenced-code
+                                  (list beg (point))))))))
+
+(defun markdown-syntax-propertize-gfm-code-blocks (start end)
+  "Match GFM code blocks from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (re-search-forward markdown-regex-gfm-code-block-open end t)
+      (beginning-of-line)
+      (let ((open (list (match-beginning 1) (match-end 1)))
+            (lang (list (match-beginning 2) (match-end 2))))
+        (forward-line)
+        (let ((body (list (point))))
+          (when (re-search-forward
+                 markdown-regex-gfm-code-block-close end t)
+            (let ((close (list (match-beginning 0) (match-end 0)))
+                  (all (list (car open) (match-end 0))))
+              (setq body (reverse (cons (1- (match-beginning 0)) body)))
+              (put-text-property (car open) (match-end 0) 'markdown-gfm-code
+                                 (append all open lang body close)))))))))
+
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
   (save-excursion
     (goto-char start)
     (while (re-search-forward markdown-regex-comment-start end t)
-      (let ((open-beg (match-beginning 0)))
-        (when (re-search-forward markdown-regex-comment-end end t)
-          (put-text-property open-beg (1+ open-beg)
-                             'syntax-table (string-to-syntax "<"))
-          (put-text-property (1- (match-end 0)) (match-end 0)
-                             'syntax-table (string-to-syntax ">")))))))
+      (when (and (not (markdown-code-at-point-p))
+                 (not (markdown-code-block-at-point-p)))
+        (let ((open-beg (match-beginning 0)))
+          (when (re-search-forward markdown-regex-comment-end end t)
+            (put-text-property open-beg (1+ open-beg)
+                               'syntax-table (string-to-syntax "<"))
+            (put-text-property (1- (match-end 0)) (match-end 0)
+                               'syntax-table (string-to-syntax ">"))))))))
 
 (defun markdown-syntax-propertize (start end)
   "See `syntax-propertize-function'."
-  (goto-char start)
+  (remove-text-properties start end '(markdown-gfm-code))
+  (remove-text-properties start end '(markdown-fenced-code))
+  (remove-text-properties start end '(markdown-pre))
+  (markdown-syntax-propertize-gfm-code-blocks start end)
+  (markdown-syntax-propertize-fenced-code-blocks start end)
+  (markdown-syntax-propertize-pre-blocks start end)
   (markdown-syntax-propertize-comments start end))
 
 
@@ -1414,6 +1501,17 @@ but not two newlines in a row.")
   "Regular expression for matching <kbd> tags.
 Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
+
+(defconst markdown-regex-gfm-code-block-open
+ "^\\s *\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$"
+ "Regular expression matching opening of GFM code blocks.
+Group 1 matches the opening three backticks.
+Group 2 matches the language identifier (optional).")
+
+(defconst markdown-regex-gfm-code-block-close
+ "^\\s *\\(```\\)\\s *$"
+ "Regular expression matching closing of GFM code blocks.
+Group 1 matches the closing three backticks.")
 
 (defconst markdown-regex-pre
   "^\\(    \\|\t\\).*$"
@@ -2122,6 +2220,14 @@ Group 3 matches the closing backticks."
            (<= (match-beginning 0) old-point) ; match contains old-point
            (>= (match-end 0) old-point)))))
 
+(defun markdown-code-block-at-point-p ()
+  "Return non-nil if the point is inside a code block.
+This includes pre blocks, tilde-fenced code blocks, and
+GFM quoted code blocks."
+  (or (get-text-property (point) 'markdown-pre)
+      (get-text-property (point) 'markdown-gfm-code)
+      (get-text-property (point) 'markdown-fenced-code)))
+
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
@@ -2129,7 +2235,10 @@ Group 3 matches the closing backticks."
   "Match inline code from the point to LAST."
   (unless (bobp)
     (backward-char 1))
-  (cond ((re-search-forward markdown-regex-code last t)
+  (cond ((and (re-search-forward markdown-regex-code last t)
+              (goto-char (match-beginning 0))
+              (not (markdown-code-block-at-point-p))
+              (goto-char (match-end 0)))
          (set-match-data (list (match-beginning 1) (match-end 1)
                                (match-beginning 2) (match-end 2)
                                (match-beginning 3) (match-end 3)
@@ -2138,88 +2247,38 @@ Group 3 matches the closing backticks."
          t)
         (t (forward-char 2) nil)))
 
+(defun markdown-match-propertized-text (property last)
+  "Match text with PROPERTY from point to LAST.
+Restore match data previously stored in PROPERTY."
+  (let ((pos (if (eq (point) (point-min))
+                 (point-min)
+               (next-single-char-property-change (point) property nil last))))
+    (when (and pos (>= pos (point)))
+      (goto-char pos)
+      (let ((saved-match-data (get-text-property pos property)))
+        (if saved-match-data
+            (progn
+              (set-match-data saved-match-data)
+              (goto-char (match-end 0)))
+          (when (< (point) last)
+            (forward-char)
+            (markdown-match-propertized-text property last)))))))
+
 (defun markdown-match-pre-blocks (last)
-  "Match Markdown pre blocks from point to LAST."
-  (let ((levels (markdown-calculate-list-levels))
-        indent pre-regexp end-regexp begin end stop)
-    (while (and (< (point) last) (not end))
-      ;; Search for a region with sufficient indentation
-      (if (null levels)
-          (setq indent 1)
-        (setq indent (1+ (length levels))))
-      (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" indent))
-      (setq end-regexp (format "^\\(    \\|\t\\)\\{0,%d\\}\\([^ \t]\\)" (1- indent)))
+  "Match preformatted blocks from point to LAST.
+Use data stored in 'markdown-pre text property during syntax
+analysis."
+  (markdown-match-propertized-text 'markdown-pre last))
 
-      (cond
-       ;; If not at the beginning of a line, move forward
-       ((not (bolp)) (forward-line))
-       ;; Move past blank lines
-       ((markdown-cur-line-blank-p) (forward-line))
-       ;; At headers and horizontal rules, reset levels
-       ((markdown-new-baseline-p) (forward-line) (setq levels nil))
-       ;; If the current line has sufficient indentation, mark out pre block
-       ;; The opening should be preceded by a blank line.
-       ((and (looking-at pre-regexp)
-             (markdown-prev-line-blank-p))
-        (setq begin (match-beginning 0))
-        (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
-                    (not (eobp)))
-          (forward-line))
-        (setq end (point)))
-       ;; If current line has a list marker, update levels, move to end of block
-       ((looking-at markdown-regex-list)
-        (setq levels (markdown-update-list-levels
-                      (match-string 2) (markdown-cur-line-indent) levels))
-        (markdown-end-of-block-element))
-       ;; If this is the end of the indentation level, adjust levels accordingly.
-       ;; Only match end of indentation level if levels is not the empty list.
-       ((and (car levels) (looking-at end-regexp))
-        (setq levels (markdown-update-list-levels
-                      nil (markdown-cur-line-indent) levels))
-        (markdown-end-of-block-element))
-       (t (markdown-end-of-block-element))))
-
-    (if (not (and begin end))
-        ;; Return nil if no pre block was found
-        nil
-      ;; Set match data and return t upon success
-      (set-match-data (list begin end))
-      t)))
+(defun markdown-match-gfm-code-blocks (last)
+  "Match GFM quoted code blocks from point to LAST.
+Use data stored in 'markdown-gfm-code text property during syntax
+analysis."
+  (markdown-match-propertized-text 'markdown-gfm-code last))
 
 (defun markdown-match-fenced-code-blocks (last)
   "Match fenced code blocks from the point to LAST."
-  (cond ((search-forward-regexp "^\\([~]\\{3,\\}\\)" last t)
-         (beginning-of-line)
-         (let ((beg (point)))
-           (forward-line)
-           (cond ((search-forward-regexp
-                   (concat "^" (match-string 1) "~*") last t)
-                  (set-match-data (list beg (point)))
-                  t)
-                 (t nil))))
-        (t nil)))
-
-(defun markdown-match-gfm-code-blocks (last)
-  "Match GFM quoted code blocks from point to LAST."
-  (let (open lang body close all)
-    (if (search-forward-regexp
-         "\\(?:\\`\\|[\n\r]+\\s *[\n\r]\\)\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" last t)
-        (progn
-          (beginning-of-line)
-          (setq open (list (match-beginning 1) (match-end 1))
-                lang (list (match-beginning 2) (match-end 2)))
-          (if (markdown-prev-line-blank-p)
-              (progn
-                (forward-line)
-                (setq body (list (point)))
-                (if (search-forward-regexp "^```$" last t)
-                    (progn
-                      (setq body (reverse (cons (1- (match-beginning 0)) body))
-                            close (list (match-beginning 0) (match-end 0))
-                            all (list (car open) (match-end 0)))
-                      (set-match-data (append all open lang body close))
-                      t)))))
-      nil)))
+  (markdown-match-propertized-text 'markdown-fenced-code last))
 
 (defun markdown-match-generic-metadata (regexp last)
   "Match generic metadata specified by REGEXP from the point to LAST."
