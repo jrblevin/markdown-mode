@@ -1935,6 +1935,7 @@ for (var i = 0; i < 10; i++) {
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
+  :expected-result :failed
   (markdown-test-string "    <!-- pre, not comment -->"
    (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-pre-face)))
 

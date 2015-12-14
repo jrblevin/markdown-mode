@@ -1006,6 +1006,40 @@ update the buffer containing the preview and return the buffer."
   :type 'boolean)
 
 
+;;; Syntax ====================================================================
+
+(defun markdown-syntax-propertize-extend-region (start end)
+  "Extend START to END region to include an entire block of text.
+This helps improve syntax analysis for block constructs.
+Returns a cons (NEW-START . NEW-END) or nil if no adjustment should be made.
+Function is called repeatedly until it returns nil. For details, see
+`syntax-propertize-extend-region-functions'."
+  (save-excursion
+    (goto-char start)
+    (unless (looking-back "\n\n" nil)
+      (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
+        (goto-char end)
+        (when (re-search-forward "\n\n" nil t)
+          (cons (match-beginning 0) found))))))
+
+(defun markdown-syntax-propertize-comments (start end)
+  "Match HTML comments from the START to END."
+  (save-excursion
+    (goto-char start)
+    (while (re-search-forward markdown-regex-comment-start end t)
+      (let ((open-beg (match-beginning 0)))
+        (when (re-search-forward markdown-regex-comment-end end t)
+          (put-text-property open-beg (1+ open-beg)
+                             'syntax-table (string-to-syntax "<"))
+          (put-text-property (1- (match-end 0)) (match-end 0)
+                             'syntax-table (string-to-syntax ">")))))))
+
+(defun markdown-syntax-propertize (start end)
+  "See `syntax-propertize-function'."
+  (goto-char start)
+  (markdown-syntax-propertize-comments start end))
+
+
 ;;; Font Lock =================================================================
 
 (require 'font-lock)
@@ -1263,6 +1297,14 @@ update the buffer containing the preview and return the buffer."
   "Face for mouse highlighting."
   :group 'markdown-faces)
 
+(defconst markdown-regex-comment-start
+  "<!--"
+  "Regular expression matches HTML comment opening.")
+
+(defconst markdown-regex-comment-end
+  "--[ \t]*>"
+  "Regular expression matches HTML comment closing.")
+
 (defconst markdown-regex-link-inline
   "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)\\((\\)\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?\\()\\)"
   "Regular expression for a [text](file) or an image link ![text](file).
@@ -1496,6 +1538,14 @@ Group 2 matches the mathematical expression contained within.")
   "^\\(%\\)\\([ \t]*\\)\\(.*\\)$"
   "Regular expression for matching Pandoc metadata.")
 
+(defun markdown-syntactic-face (state)
+  "Returns a font-lock face for characters with given STATE.
+See `font-lock-syntactic-face-function' for details."
+  (let ((in-comment (nth 4 state)))
+    (cond
+     (in-comment 'markdown-comment-face)
+     (t nil))))
+
 (defvar markdown-mode-font-lock-keywords-basic
   (list
    (cons 'markdown-match-gfm-code-blocks '((1 markdown-markup-face)
@@ -1535,7 +1585,6 @@ Group 2 matches the mathematical expression contained within.")
                                            (2 markdown-markup-face)
                                            (3 markdown-metadata-value-face)))
    (cons markdown-regex-hr 'markdown-header-delimiter-face)
-   (cons 'markdown-match-comments '((0 markdown-comment-face)))
    (cons 'markdown-match-code '((1 markdown-markup-face)
                                 (2 markdown-inline-code-face)
                                 (3 markdown-markup-face)))
@@ -2075,17 +2124,6 @@ Group 3 matches the closing backticks."
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
-
-(defun markdown-match-comments (last)
-  "Match HTML comments from the point to LAST."
-  (cond ((search-forward "<!--" last t)
-         (backward-char 4)
-         (let ((beg (point)))
-           (cond ((search-forward-regexp "--[ \t]*>" last t)
-                  (set-match-data (list beg (point)))
-                  t)
-                 (t nil))))
-        (t nil)))
 
 (defun markdown-match-code (last)
   "Match inline code from the point to LAST."
@@ -5106,7 +5144,10 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
              markdown-mode-font-lock-keywords-math)
            markdown-mode-font-lock-keywords-basic
            markdown-mode-font-lock-keywords-core))
-    (setq font-lock-defaults '(markdown-mode-font-lock-keywords))
+    (setq font-lock-defaults
+          '(markdown-mode-font-lock-keywords
+            nil nil nil nil
+            (font-lock-syntactic-face-function . markdown-syntactic-face)))
     (when (fboundp 'font-lock-refresh-defaults) (font-lock-refresh-defaults))))
 
 (defun markdown-enable-math (&optional arg)
@@ -5196,6 +5237,11 @@ before regenerating font-lock rules for extensions."
   (make-local-variable 'comment-column)
   (setq comment-column 0)
   (set (make-local-variable 'comment-auto-fill-only-comments) nil)
+  ;; Syntax
+  (add-hook 'syntax-propertize-extend-region-functions
+            'markdown-syntax-propertize-extend-region)
+  (set (make-local-variable 'syntax-propertize-function)
+       'markdown-syntax-propertize)
   ;; Font lock.
   (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
   (set (make-local-variable 'font-lock-defaults) nil)
