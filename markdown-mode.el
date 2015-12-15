@@ -1365,9 +1365,7 @@ Function is called repeatedly until it returns nil. For details, see
                 (not (markdown-code-block-at-pos-p (match-beginning 0))))
       (put-text-property (match-beginning 0) (match-end 0)
                          'markdown-blockquote
-                         (list (match-beginning 0) (match-end 0)
-                               (match-beginning 1) (match-end 1)
-                               (match-beginning 2) (match-end 2))))))
+                         (match-data t)))))
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
