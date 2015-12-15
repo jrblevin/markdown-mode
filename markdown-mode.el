@@ -2310,7 +2310,7 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
 Restore match data previously stored in PROPERTY."
   (let ((pos (if (eq (point) (point-min))
                  (point-min)
-               (next-single-char-property-change (point) property nil last))))
+               (next-single-char-property-change (1- (point)) property nil last))))
     (when (and pos (>= pos (point)))
       (goto-char pos)
       (let ((saved-match-data (get-text-property pos property)))
