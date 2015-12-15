@@ -1006,6 +1006,261 @@ update the buffer containing the preview and return the buffer."
   :type 'boolean)
 
 
+;;; Regular Expressions =======================================================
+
+(defconst markdown-regex-comment-start
+  "<!--"
+  "Regular expression matches HTML comment opening.")
+
+(defconst markdown-regex-comment-end
+  "--[ \t]*>"
+  "Regular expression matches HTML comment closing.")
+
+(defconst markdown-regex-link-inline
+  "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)\\((\\)\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?\\()\\)"
+  "Regular expression for a [text](file) or an image link ![text](file).
+Group 1 matches the leading exclamation point (optional).
+Group 2 matches the opening square bracket.
+Group 3 matches the text inside the square brackets.
+Group 4 matches the closing square bracket.
+Group 5 matches the opening parenthesis.
+Group 6 matches the URL.
+Group 7 matches the title (optional).
+Group 8 matches the closing parenthesis.")
+
+(defconst markdown-regex-link-reference
+  "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)[ ]?\\(\\[\\)\\([^]]*?\\)\\(\\]\\)"
+  "Regular expression for a reference link [text][id].
+Group 1 matches the leading exclamation point (optional).
+Group 2 matches the opening square bracket for the link text.
+Group 3 matches the text inside the square brackets.
+Group 4 matches the closing square bracket for the link text.
+Group 5 matches the opening square bracket for the reference label.
+Group 6 matches the reference label.
+Group 7 matches the closing square bracket for the reference label.")
+
+(defconst markdown-regex-reference-definition
+  "^ \\{0,3\\}\\(\\[\\)\\([^]\n]+?\\)\\(\\]\\)\\(:\\)\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
+  "Regular expression for a reference definition.
+Group 1 matches the opening square bracket.
+Group 2 matches the reference label.
+Group 3 matches the closing square bracket.
+Group 4 matches the colon.
+Group 5 matches the URL.
+Group 6 matches the title attribute (optional).")
+
+(defconst markdown-regex-footnote
+  "\\(\\[\\^\\)\\(.+?\\)\\(\\]\\)"
+  "Regular expression for a footnote marker [^fn].
+Group 1 matches the opening square bracket and carat.
+Group 2 matches only the label, without the surrounding markup.
+Group 3 matches the closing square bracket.")
+
+(defconst markdown-regex-header
+  "^\\(?:\\(.+\\)\n\\(=+\\)\\|\\(.+\\)\n\\(-+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
+  "Regexp identifying Markdown headers.")
+
+(defconst markdown-regex-header-1-atx
+  "^\\(#\\)[ \t]*\\([^\\.].*?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for level 1 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-2-atx
+  "^\\(##\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for level 2 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-3-atx
+  "^\\(###\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for level 3 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-4-atx
+  "^\\(####\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for level 4 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-5-atx
+  "^\\(#####\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for level 5 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-6-atx
+  "^\\(######\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for level 6 atx-style (hash mark) headers.")
+
+(defconst markdown-regex-header-1-setext
+  "^\\(.*\\)\n\\(=+\\)$"
+  "Regular expression for level 1 setext-style (underline) headers.")
+
+(defconst markdown-regex-header-2-setext
+  "^\\(.*\\)\n\\(-+\\)$"
+  "Regular expression for level 2 setext-style (underline) headers.")
+
+(defconst markdown-regex-header-setext
+  "^\\(.+\\)\n\\(\\(?:=\\|-\\)+\\)$"
+  "Regular expression for generic setext-style (underline) headers.")
+
+(defconst markdown-regex-header-atx
+  "^\\(#+\\)[ \t]*\\(.*?\\)[ \t]*\\(#*\\)$"
+  "Regular expression for generic atx-style (hash mark) headers.")
+
+(defconst markdown-regex-hr
+  "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
+  "Regular expression for matching Markdown horizontal rules.")
+
+(defconst markdown-regex-code
+  "\\(?:\\`\\|[^\\]\\)\\(\\(`+\\)\\(\\(?:.\\|\n[^\n]\\)*?[^`]\\)\\(\\2\\)\\)\\(?:[^`]\\|\\'\\)"
+  "Regular expression for matching inline code fragments.
+
+Group 1 matches the entire code fragment including the backticks.
+Group 2 matches the opening backticks.
+Group 3 matches the code fragment itself, without backticks.
+Group 4 matches the closing backticks.
+
+The leading, unnumbered group ensures that the leading backquote
+character is not escaped.
+The last group, also unnumbered, requires that the character
+following the code fragment is not a backquote.
+Note that \\(?:.\\|\n[^\n]\\) matches any character, including newlines,
+but not two newlines in a row.")
+
+(defconst markdown-regex-kbd
+  "\\(<kbd>\\)\\(\\(?:.\\|\n[^\n]\\)*?\\)\\(</kbd>\\)"
+  "Regular expression for matching <kbd> tags.
+Groups 1 and 3 match the opening and closing tags.
+Group 2 matches the key sequence.")
+
+(defconst markdown-regex-gfm-code-block-open
+ "^\\s *\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$"
+ "Regular expression matching opening of GFM code blocks.
+Group 1 matches the opening three backticks.
+Group 2 matches the language identifier (optional).")
+
+(defconst markdown-regex-gfm-code-block-close
+ "^\\s *\\(```\\)\\s *$"
+ "Regular expression matching closing of GFM code blocks.
+Group 1 matches the closing three backticks.")
+
+(defconst markdown-regex-pre
+  "^\\(    \\|\t\\).*$"
+  "Regular expression for matching preformatted text sections.")
+
+(defconst markdown-regex-list
+  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
+  "Regular expression for matching list items.")
+
+(defconst markdown-regex-bold
+  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\3\\)\\)"
+  "Regular expression for matching bold text.
+Group 1 matches the character before the opening asterisk or
+underscore, if any, ensuring that it is not a backslash escape.
+Group 2 matches the entire expression, including delimiters.
+Groups 3 and 5 matches the opening and closing delimiters.
+Group 4 matches the text inside the delimiters.")
+
+(defconst markdown-regex-italic
+  "\\(?:^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\2\\)\\)"
+  "Regular expression for matching italic text.
+The leading unnumbered matches the character before the opening
+asterisk or underscore, if any, ensuring that it is not a
+backslash escape.
+Group 1 matches the entire expression, including delimiters.
+Groups 2 and 4 matches the opening and closing delimiters.
+Group 3 matches the text inside the delimiters.")
+
+(defconst markdown-regex-strike-through
+  "\\(^\\|[^\\]\\)\\(\\(~~\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(~~\\)\\)"
+  "Regular expression for matching strike-through text.
+Group 1 matches the character before the opening tilde, if any,
+ensuring that it is not a backslash escape.
+Group 2 matches the entire expression, including delimiters.
+Groups 3 and 5 matches the opening and closing delimiters.
+Group 4 matches the text inside the delimiters.")
+
+(defconst markdown-regex-gfm-italic
+  "\\(?:^\\|\\s-\\)\\(\\([*_]\\)\\([^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\2\\)\\)"
+  "Regular expression for matching italic text in GitHub Flavored Markdown.
+Underscores in words are not treated as special.
+Group 1 matches the entire expression, including delimiters.
+Groups 2 and 4 matches the opening and closing delimiters.
+Group 3 matches the text inside the delimiters.")
+
+(defconst markdown-regex-blockquote
+  "^[ \t]*\\(>\\)\\(.*\\)$"
+  "Regular expression for matching blockquote lines.
+Group 1 matches the leading angle bracket.
+Group 2 matches the text.")
+
+(defconst markdown-regex-line-break
+  "[^ \n\t][ \t]*\\(  \\)$"
+  "Regular expression for matching line breaks.")
+
+(defconst markdown-regex-wiki-link
+  "\\(?:^\\|[^\\]\\)\\(\\(\\[\\[\\)\\([^]|]+\\)\\(?:\\(|\\)\\([^]]+\\)\\)?\\(\\]\\]\\)\\)"
+  "Regular expression for matching wiki links.
+This matches typical bracketed [[WikiLinks]] as well as 'aliased'
+wiki links of the form [[PageName|link text]].
+The meanings of the first and second components depend
+on the value of `markdown-wiki-link-alias-first'.
+
+Group 1 matches the entire link.
+Group 2 matches the opening square brackets.
+Group 3 matches the first component of the wiki link.
+Group 4 matches the pipe separator, when present.
+Group 5 matches the second component of the wiki link, when present.
+Group 6 matches the closing square brackets.")
+
+(defconst markdown-regex-uri
+  (concat (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+")
+  "Regular expression for matching inline URIs.")
+
+(defconst markdown-regex-angle-uri
+  (concat "\\(<\\)\\(" (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;()]+\\)\\(>\\)")
+  "Regular expression for matching inline URIs in angle brackets.")
+
+(defconst markdown-regex-email
+  "<\\(\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+\\)>"
+  "Regular expression for matching inline email addresses.")
+
+(defconst markdown-regex-link-generic
+  (concat "\\(?:" markdown-regex-wiki-link
+          "\\|" markdown-regex-link-inline
+          "\\|" markdown-regex-link-reference
+          "\\|" markdown-regex-angle-uri "\\)")
+  "Regular expression for matching any recognized link.")
+
+(defconst markdown-regex-gfm-checkbox
+  " \\(\\[[ xX]\\]\\) "
+  "Regular expression for matching GFM checkboxes.
+Group 1 matches the text to become a button.")
+
+(defconst markdown-regex-block-separator
+  "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)"
+  "Regular expression for matching block boundaries.")
+
+(defconst markdown-regex-math-inline-single
+  "\\(?:^\\|[^\\]\\)\\(\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\)"
+  "Regular expression for itex $..$ math mode expressions.
+Groups 1 and 3 match the opening and closing dollar signs.
+Group 3 matches the mathematical expression contained within.")
+
+(defconst markdown-regex-math-inline-double
+  "\\(?:^\\|[^\\]\\)\\(\\$\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\$\\)"
+  "Regular expression for itex $$..$$ math mode expressions.
+Groups 1 and 3 match opening and closing dollar signs.
+Group 3 matches the mathematical expression contained within.")
+
+(defconst markdown-regex-math-display
+  "^\\(\\\\\\[\\)\\(\\(?:.\\|\n\\)*\\)?\\(\\\\\\]\\)$"
+  "Regular expression for itex \[..\] display mode expressions.
+Groups 1 and 3 matche the opening and closing delimiters.
+Group 2 matches the mathematical expression contained within.")
+
+(defconst markdown-regex-multimarkdown-metadata
+  "^\\([[:alpha:]][[:alpha:] _-]*?\\)\\(:[ \t]*\\)\\(.*\\)$"
+  "Regular expression for matching MultiMarkdown metadata.")
+
+(defconst markdown-regex-pandoc-metadata
+  "^\\(%\\)\\([ \t]*\\)\\(.*\\)$"
+  "Regular expression for matching Pandoc metadata.")
+
+
 ;;; Syntax ====================================================================
 
 (defun markdown-syntax-propertize-extend-region (start end)
@@ -1383,258 +1638,6 @@ Function is called repeatedly until it returns nil. For details, see
   '((t (:inherit highlight)))
   "Face for mouse highlighting."
   :group 'markdown-faces)
-
-(defconst markdown-regex-comment-start
-  "<!--"
-  "Regular expression matches HTML comment opening.")
-
-(defconst markdown-regex-comment-end
-  "--[ \t]*>"
-  "Regular expression matches HTML comment closing.")
-
-(defconst markdown-regex-link-inline
-  "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)\\((\\)\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?\\()\\)"
-  "Regular expression for a [text](file) or an image link ![text](file).
-Group 1 matches the leading exclamation point (optional).
-Group 2 matches the opening square bracket.
-Group 3 matches the text inside the square brackets.
-Group 4 matches the closing square bracket.
-Group 5 matches the opening parenthesis.
-Group 6 matches the URL.
-Group 7 matches the title (optional).
-Group 8 matches the closing parenthesis.")
-
-(defconst markdown-regex-link-reference
-  "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)[ ]?\\(\\[\\)\\([^]]*?\\)\\(\\]\\)"
-  "Regular expression for a reference link [text][id].
-Group 1 matches the leading exclamation point (optional).
-Group 2 matches the opening square bracket for the link text.
-Group 3 matches the text inside the square brackets.
-Group 4 matches the closing square bracket for the link text.
-Group 5 matches the opening square bracket for the reference label.
-Group 6 matches the reference label.
-Group 7 matches the closing square bracket for the reference label.")
-
-(defconst markdown-regex-reference-definition
-  "^ \\{0,3\\}\\(\\[\\)\\([^]\n]+?\\)\\(\\]\\)\\(:\\)\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
-  "Regular expression for a reference definition.
-Group 1 matches the opening square bracket.
-Group 2 matches the reference label.
-Group 3 matches the closing square bracket.
-Group 4 matches the colon.
-Group 5 matches the URL.
-Group 6 matches the title attribute (optional).")
-
-(defconst markdown-regex-footnote
-  "\\(\\[\\^\\)\\(.+?\\)\\(\\]\\)"
-  "Regular expression for a footnote marker [^fn].
-Group 1 matches the opening square bracket and carat.
-Group 2 matches only the label, without the surrounding markup.
-Group 3 matches the closing square bracket.")
-
-(defconst markdown-regex-header
-  "^\\(?:\\(.+\\)\n\\(=+\\)\\|\\(.+\\)\n\\(-+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
-  "Regexp identifying Markdown headers.")
-
-(defconst markdown-regex-header-1-atx
-  "^\\(#\\)[ \t]*\\([^\\.].*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 1 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-2-atx
-  "^\\(##\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 2 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-3-atx
-  "^\\(###\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 3 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-4-atx
-  "^\\(####\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 4 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-5-atx
-  "^\\(#####\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 5 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-6-atx
-  "^\\(######\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 6 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-1-setext
-  "^\\(.*\\)\n\\(=+\\)$"
-  "Regular expression for level 1 setext-style (underline) headers.")
-
-(defconst markdown-regex-header-2-setext
-  "^\\(.*\\)\n\\(-+\\)$"
-  "Regular expression for level 2 setext-style (underline) headers.")
-
-(defconst markdown-regex-header-setext
-  "^\\(.+\\)\n\\(\\(?:=\\|-\\)+\\)$"
-  "Regular expression for generic setext-style (underline) headers.")
-
-(defconst markdown-regex-header-atx
-  "^\\(#+\\)[ \t]*\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for generic atx-style (hash mark) headers.")
-
-(defconst markdown-regex-hr
-  "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
-  "Regular expression for matching Markdown horizontal rules.")
-
-(defconst markdown-regex-code
-  "\\(?:\\`\\|[^\\]\\)\\(\\(`+\\)\\(\\(?:.\\|\n[^\n]\\)*?[^`]\\)\\(\\2\\)\\)\\(?:[^`]\\|\\'\\)"
-  "Regular expression for matching inline code fragments.
-
-Group 1 matches the entire code fragment including the backticks.
-Group 2 matches the opening backticks.
-Group 3 matches the code fragment itself, without backticks.
-Group 4 matches the closing backticks.
-
-The leading, unnumbered group ensures that the leading backquote
-character is not escaped.
-The last group, also unnumbered, requires that the character
-following the code fragment is not a backquote.
-Note that \\(?:.\\|\n[^\n]\\) matches any character, including newlines,
-but not two newlines in a row.")
-
-(defconst markdown-regex-kbd
-  "\\(<kbd>\\)\\(\\(?:.\\|\n[^\n]\\)*?\\)\\(</kbd>\\)"
-  "Regular expression for matching <kbd> tags.
-Groups 1 and 3 match the opening and closing tags.
-Group 2 matches the key sequence.")
-
-(defconst markdown-regex-gfm-code-block-open
- "^\\s *\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$"
- "Regular expression matching opening of GFM code blocks.
-Group 1 matches the opening three backticks.
-Group 2 matches the language identifier (optional).")
-
-(defconst markdown-regex-gfm-code-block-close
- "^\\s *\\(```\\)\\s *$"
- "Regular expression matching closing of GFM code blocks.
-Group 1 matches the closing three backticks.")
-
-(defconst markdown-regex-pre
-  "^\\(    \\|\t\\).*$"
-  "Regular expression for matching preformatted text sections.")
-
-(defconst markdown-regex-list
-  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
-  "Regular expression for matching list items.")
-
-(defconst markdown-regex-bold
-  "\\(^\\|[^\\]\\)\\(\\([*_]\\{2\\}\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\3\\)\\)"
-  "Regular expression for matching bold text.
-Group 1 matches the character before the opening asterisk or
-underscore, if any, ensuring that it is not a backslash escape.
-Group 2 matches the entire expression, including delimiters.
-Groups 3 and 5 matches the opening and closing delimiters.
-Group 4 matches the text inside the delimiters.")
-
-(defconst markdown-regex-italic
-  "\\(?:^\\|[^\\]\\)\\(\\([*_]\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\2\\)\\)"
-  "Regular expression for matching italic text.
-The leading unnumbered matches the character before the opening
-asterisk or underscore, if any, ensuring that it is not a
-backslash escape.
-Group 1 matches the entire expression, including delimiters.
-Groups 2 and 4 matches the opening and closing delimiters.
-Group 3 matches the text inside the delimiters.")
-
-(defconst markdown-regex-strike-through
-  "\\(^\\|[^\\]\\)\\(\\(~~\\)\\([^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(~~\\)\\)"
-  "Regular expression for matching strike-through text.
-Group 1 matches the character before the opening tilde, if any,
-ensuring that it is not a backslash escape.
-Group 2 matches the entire expression, including delimiters.
-Groups 3 and 5 matches the opening and closing delimiters.
-Group 4 matches the text inside the delimiters.")
-
-(defconst markdown-regex-gfm-italic
-  "\\(?:^\\|\\s-\\)\\(\\([*_]\\)\\([^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(\\2\\)\\)"
-  "Regular expression for matching italic text in GitHub Flavored Markdown.
-Underscores in words are not treated as special.
-Group 1 matches the entire expression, including delimiters.
-Groups 2 and 4 matches the opening and closing delimiters.
-Group 3 matches the text inside the delimiters.")
-
-(defconst markdown-regex-blockquote
-  "^[ \t]*\\(>\\)\\(.*\\)$"
-  "Regular expression for matching blockquote lines.
-Group 1 matches the leading angle bracket.
-Group 2 matches the text.")
-
-(defconst markdown-regex-line-break
-  "[^ \n\t][ \t]*\\(  \\)$"
-  "Regular expression for matching line breaks.")
-
-(defconst markdown-regex-wiki-link
-  "\\(?:^\\|[^\\]\\)\\(\\(\\[\\[\\)\\([^]|]+\\)\\(?:\\(|\\)\\([^]]+\\)\\)?\\(\\]\\]\\)\\)"
-  "Regular expression for matching wiki links.
-This matches typical bracketed [[WikiLinks]] as well as 'aliased'
-wiki links of the form [[PageName|link text]].
-The meanings of the first and second components depend
-on the value of `markdown-wiki-link-alias-first'.
-
-Group 1 matches the entire link.
-Group 2 matches the opening square brackets.
-Group 3 matches the first component of the wiki link.
-Group 4 matches the pipe separator, when present.
-Group 5 matches the second component of the wiki link, when present.
-Group 6 matches the closing square brackets.")
-
-(defconst markdown-regex-uri
-  (concat (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+")
-  "Regular expression for matching inline URIs.")
-
-(defconst markdown-regex-angle-uri
-  (concat "\\(<\\)\\(" (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;()]+\\)\\(>\\)")
-  "Regular expression for matching inline URIs in angle brackets.")
-
-(defconst markdown-regex-email
-  "<\\(\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+\\)>"
-  "Regular expression for matching inline email addresses.")
-
-(defconst markdown-regex-link-generic
-  (concat "\\(?:" markdown-regex-wiki-link
-          "\\|" markdown-regex-link-inline
-          "\\|" markdown-regex-link-reference
-          "\\|" markdown-regex-angle-uri "\\)")
-  "Regular expression for matching any recognized link.")
-
-(defconst markdown-regex-gfm-checkbox
-  " \\(\\[[ xX]\\]\\) "
-  "Regular expression for matching GFM checkboxes.
-Group 1 matches the text to become a button.")
-
-(defconst markdown-regex-block-separator
-  "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)"
-  "Regular expression for matching block boundaries.")
-
-(defconst markdown-regex-math-inline-single
-  "\\(?:^\\|[^\\]\\)\\(\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\)"
-  "Regular expression for itex $..$ math mode expressions.
-Groups 1 and 3 match the opening and closing dollar signs.
-Group 3 matches the mathematical expression contained within.")
-
-(defconst markdown-regex-math-inline-double
-  "\\(?:^\\|[^\\]\\)\\(\\$\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\$\\)"
-  "Regular expression for itex $$..$$ math mode expressions.
-Groups 1 and 3 match opening and closing dollar signs.
-Group 3 matches the mathematical expression contained within.")
-
-(defconst markdown-regex-math-display
-  "^\\(\\\\\\[\\)\\(\\(?:.\\|\n\\)*\\)?\\(\\\\\\]\\)$"
-  "Regular expression for itex \[..\] display mode expressions.
-Groups 1 and 3 matche the opening and closing delimiters.
-Group 2 matches the mathematical expression contained within.")
-
-(defconst markdown-regex-multimarkdown-metadata
-  "^\\([[:alpha:]][[:alpha:] _-]*?\\)\\(:[ \t]*\\)\\(.*\\)$"
-  "Regular expression for matching MultiMarkdown metadata.")
-
-(defconst markdown-regex-pandoc-metadata
-  "^\\(%\\)\\([ \t]*\\)\\(.*\\)$"
-  "Regular expression for matching Pandoc metadata.")
 
 (defun markdown-syntactic-face (state)
   "Returns a font-lock face for characters with given STATE.
