@@ -1336,8 +1336,8 @@ Function is called repeatedly until it returns nil. For details, see
       (let ((beg (match-beginning 1)))
         (when (re-search-forward
                (concat "^" (match-string 1) "~*") end t)
-               (put-text-property beg (match-end 0) 'markdown-fenced-code
-                                  (list beg (point))))))))
+          (put-text-property beg (match-end 0) 'markdown-fenced-code
+                             (list beg (point))))))))
 
 (defun markdown-syntax-propertize-gfm-code-blocks (start end)
   "Match GFM code blocks from START to END."
