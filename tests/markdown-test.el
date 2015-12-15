@@ -2360,6 +2360,26 @@ body"
    (markdown-test-range-has-property 404 417 'invisible nil)
    (markdown-test-range-has-property 420 451 'invisible nil)))
 
+(ert-deftest test-markdown-outline/visibility-with-code ()
+  "Test outline visibility cycling with code blocks."
+  (markdown-test-file "outline-code.text"
+   (let (last-command this-command)
+     ;; Cycle global visibility to "overview" mode
+     (setq this-command 'markdown-cycle)
+     (markdown-cycle t)
+     (setq last-command 'markdown-cycle)
+     (should (eq (point) (point-min)))
+     (should (looking-at "^# Level one"))
+     ;; Test that the code block is invisible
+     (markdown-test-range-has-property 83 157 'invisible 'outline)
+     ;; Check subsequent headings
+     (outline-next-visible-heading 1)
+     (should (eq (point) 69))
+     (should (looking-at "^## Level two"))
+     (outline-next-visible-heading 1)
+     (should (eq (point) 159))
+     (should (looking-at "^# Level one again")))))
+
 ;;; Movement tests:
 
 (ert-deftest test-markdown-movement/defun ()

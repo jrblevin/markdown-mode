@@ -4323,156 +4323,6 @@ a list."
     (markdown-cleanup-list-numbers-level "")))
 
 
-;;; Outline ===================================================================
-
-(defvar markdown-cycle-global-status 1)
-(defvar markdown-cycle-subtree-status nil)
-
-(defun markdown-end-of-subtree (&optional invisible-OK)
-  "Move to the end of the current subtree.
-Only visible heading lines are considered, unless INVISIBLE-OK is
-non-nil.
-Derived from `org-end-of-subtree'."
-  (outline-back-to-heading invisible-OK)
-  (let ((first t)
-        (level (funcall outline-level)))
-    (while (and (not (eobp))
-                (or first (> (funcall outline-level) level)))
-      (setq first nil)
-      (markdown-next-heading))
-    (if (memq (preceding-char) '(?\n ?\^M))
-        (progn
-          ;; Go to end of line before heading
-          (forward-char -1)
-          (if (memq (preceding-char) '(?\n ?\^M))
-              ;; leave blank line before heading
-              (forward-char -1)))))
-  (point))
-
-(defun markdown-cycle (&optional arg)
-  "Visibility cycling for Markdown mode.
-If ARG is t, perform global visibility cycling.  If the point is
-at an atx-style header, cycle visibility of the corresponding
-subtree.  Otherwise, insert a tab using `indent-relative'.
-Derived from `org-cycle'."
-  (interactive "P")
-  (cond
-   ((eq arg t) ;; Global cycling
-    (cond
-     ((and (eq last-command this-command)
-           (eq markdown-cycle-global-status 2))
-      ;; Move from overview to contents
-      (markdown-hide-sublevels 1)
-      (message "CONTENTS")
-      (setq markdown-cycle-global-status 3))
-
-     ((and (eq last-command this-command)
-           (eq markdown-cycle-global-status 3))
-      ;; Move from contents to all
-      (markdown-show-all)
-      (message "SHOW ALL")
-      (setq markdown-cycle-global-status 1))
-
-     (t
-      ;; Defaults to overview
-      (markdown-hide-body)
-      (message "OVERVIEW")
-      (setq markdown-cycle-global-status 2))))
-
-   ((save-excursion (beginning-of-line 1) (markdown-on-heading-p))
-    ;; At a heading: rotate between three different views
-    (outline-back-to-heading)
-    (let ((goal-column 0) eoh eol eos)
-      ;; Determine boundaries
-      (save-excursion
-        (outline-back-to-heading)
-        (save-excursion
-          (beginning-of-line 2)
-          (while (and (not (eobp)) ;; this is like `next-line'
-                      (get-char-property (1- (point)) 'invisible))
-            (beginning-of-line 2)) (setq eol (point)))
-        (outline-end-of-heading)   (setq eoh (point))
-        (markdown-end-of-subtree t)
-        (skip-chars-forward " \t\n")
-        (beginning-of-line 1) ; in case this is an item
-        (setq eos (1- (point))))
-      ;; Find out what to do next and set `this-command'
-      (cond
-       ((= eos eoh)
-        ;; Nothing is hidden behind this heading
-        (message "EMPTY ENTRY")
-        (setq markdown-cycle-subtree-status nil))
-       ((>= eol eos)
-        ;; Entire subtree is hidden in one line: open it
-        (markdown-show-entry)
-        (markdown-show-children)
-        (message "CHILDREN")
-        (setq markdown-cycle-subtree-status 'children))
-       ((and (eq last-command this-command)
-             (eq markdown-cycle-subtree-status 'children))
-        ;; We just showed the children, now show everything.
-        (markdown-show-subtree)
-        (message "SUBTREE")
-        (setq markdown-cycle-subtree-status 'subtree))
-       (t
-        ;; Default action: hide the subtree.
-        (markdown-hide-subtree)
-        (message "FOLDED")
-        (setq markdown-cycle-subtree-status 'folded)))))
-
-   (t
-    (indent-for-tab-command))))
-
-(defun markdown-shifttab ()
-  "Global visibility cycling.
-Calls `markdown-cycle' with argument t."
-  (interactive)
-  (markdown-cycle t))
-
-(defun markdown-outline-level ()
-  "Return the depth to which a statement is nested in the outline."
-  (cond
-   ((markdown-code-block-at-point-p) 7)
-   ((match-end 1) 1)
-   ((match-end 3) 2)
-   ((- (match-end 5) (match-beginning 5)))))
-
-(defun markdown-promote-subtree (&optional arg)
-  "Promote the current subtree of ATX headings.
-Note that Markdown does not support heading levels higher than six
-and therefore level-six headings will not be promoted further."
-  (interactive "*P")
-  (save-excursion
-    (when (or (thing-at-point-looking-at markdown-regex-header-atx)
-              (re-search-backward markdown-regex-header-atx nil t))
-      (let ((level (length (match-string 1)))
-            (promote-or-demote (if arg 1 -1))
-            (remove 't))
-        (markdown-cycle-atx promote-or-demote remove)
-        (forward-line)
-        (catch 'end-of-subtree
-          (while (re-search-forward markdown-regex-header-atx nil t)
-            ;; Exit if this not a higher level heading; promote otherwise.
-            (if (<= (length (match-string-no-properties 1)) level)
-                (throw 'end-of-subtree nil)
-              (markdown-cycle-atx promote-or-demote remove))))))))
-
-(defun markdown-demote-subtree ()
-  "Demote the current subtree of ATX headings."
-  (interactive)
-  (markdown-promote-subtree t))
-
-(defun markdown-move-subtree-up ()
-  "Move the current subtree of ATX headings up."
-  (interactive)
-  (outline-move-subtree-up 1))
-
-(defun markdown-move-subtree-down ()
-  "Move the current subtree of ATX headings down."
-  (interactive)
-  (outline-move-subtree-down 1))
-
-
 ;;; Movement ==================================================================
 
 (defun markdown-beginning-of-defun (&optional arg)
@@ -4598,6 +4448,9 @@ With argument, repeats or can move backward if negative."
   (while (markdown-code-block-at-point-p)
     (outline-previous-heading)))
 
+
+;;; Outline ===================================================================
+
 (defun markdown-move-heading-common (move-fn &optional arg)
   "Wrapper for `outline-mode' functions to skip false positives.
 For example, headings inside preformatted code blocks may match
@@ -4636,11 +4489,180 @@ With argument, move up ARG levels."
   (interactive "p")
   (markdown-move-heading-common 'outline-up-heading arg))
 
+(defun markdown-back-to-heading (&optional invisible-ok)
+  "Move to previous heading line, or beg of this line if it's a heading.
+Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
+  (markdown-move-heading-common 'outline-back-to-heading invisible-ok))
+
+(defalias 'markdown-end-of-heading 'outline-end-of-heading)
+
 (defun markdown-on-heading-p (&optional invisible-ok)
   "Return t if point is on a (visible) heading line.
 If INVISIBLE-OK is non-nil, an invisible heading line is ok too."
   (and (outline-on-heading-p)
        (not (markdown-code-block-at-point-p))))
+
+(defun markdown-end-of-subtree (&optional invisible-OK)
+  "Move to the end of the current subtree.
+Only visible heading lines are considered, unless INVISIBLE-OK is
+non-nil.
+Derived from `org-end-of-subtree'."
+  (markdown-back-to-heading invisible-OK)
+  (let ((first t)
+        (level (funcall outline-level)))
+    (while (and (not (eobp))
+                (or first (> (funcall outline-level) level)))
+      (setq first nil)
+      (markdown-next-heading))
+    (if (memq (preceding-char) '(?\n ?\^M))
+        (progn
+          ;; Go to end of line before heading
+          (forward-char -1)
+          (if (memq (preceding-char) '(?\n ?\^M))
+              ;; leave blank line before heading
+              (forward-char -1)))))
+  (point))
+
+(defun markdown-outline-fix-visibility ()
+  "Hide any false positive headings that should not be shown.
+For example, headings inside preformatted code blocks may match
+`outline-regexp' but should not be shown as headings when cycling."
+  (save-excursion
+    (goto-char (point-min))
+    (unless (outline-on-heading-p)
+      (outline-next-visible-heading 1))
+    (while (< (point) (point-max))
+      (when (markdown-code-block-at-point-p)
+        (outline-flag-region (1- (point-at-bol)) (point-at-eol) t))
+      (outline-next-visible-heading 1))))
+
+(defvar markdown-cycle-global-status 1)
+(defvar markdown-cycle-subtree-status nil)
+
+(defun markdown-cycle (&optional arg)
+  "Visibility cycling for Markdown mode.
+If ARG is t, perform global visibility cycling.  If the point is
+at an atx-style header, cycle visibility of the corresponding
+subtree.  Otherwise, insert a tab using `indent-relative'.
+Derived from `org-cycle'."
+  (interactive "P")
+  (cond
+   ((eq arg t) ;; Global cycling
+    (cond
+     ((and (eq last-command this-command)
+           (eq markdown-cycle-global-status 2))
+      ;; Move from overview to contents
+      (markdown-hide-sublevels 1)
+      (message "CONTENTS")
+      (setq markdown-cycle-global-status 3)
+      (markdown-outline-fix-visibility))
+
+     ((and (eq last-command this-command)
+           (eq markdown-cycle-global-status 3))
+      ;; Move from contents to all
+      (markdown-show-all)
+      (message "SHOW ALL")
+      (setq markdown-cycle-global-status 1))
+
+     (t
+      ;; Defaults to overview
+      (markdown-hide-body)
+      (message "OVERVIEW")
+      (setq markdown-cycle-global-status 2)
+      (markdown-outline-fix-visibility))))
+
+   ((save-excursion (beginning-of-line 1) (markdown-on-heading-p))
+    ;; At a heading: rotate between three different views
+    (markdown-back-to-heading)
+    (let ((goal-column 0) eoh eol eos)
+      ;; Determine boundaries
+      (save-excursion
+        (markdown-back-to-heading)
+        (save-excursion
+          (beginning-of-line 2)
+          (while (and (not (eobp)) ;; this is like `next-line'
+                      (get-char-property (1- (point)) 'invisible))
+            (beginning-of-line 2)) (setq eol (point)))
+        (markdown-end-of-heading)   (setq eoh (point))
+        (markdown-end-of-subtree t)
+        (skip-chars-forward " \t\n")
+        (beginning-of-line 1) ; in case this is an item
+        (setq eos (1- (point))))
+      ;; Find out what to do next and set `this-command'
+      (cond
+       ((= eos eoh)
+        ;; Nothing is hidden behind this heading
+        (message "EMPTY ENTRY")
+        (setq markdown-cycle-subtree-status nil))
+       ((>= eol eos)
+        ;; Entire subtree is hidden in one line: open it
+        (markdown-show-entry)
+        (markdown-show-children)
+        (message "CHILDREN")
+        (setq markdown-cycle-subtree-status 'children))
+       ((and (eq last-command this-command)
+             (eq markdown-cycle-subtree-status 'children))
+        ;; We just showed the children, now show everything.
+        (markdown-show-subtree)
+        (message "SUBTREE")
+        (setq markdown-cycle-subtree-status 'subtree))
+       (t
+        ;; Default action: hide the subtree.
+        (markdown-hide-subtree)
+        (message "FOLDED")
+        (setq markdown-cycle-subtree-status 'folded)))))
+
+   (t
+    (indent-for-tab-command))))
+
+(defun markdown-shifttab ()
+  "Global visibility cycling.
+Calls `markdown-cycle' with argument t."
+  (interactive)
+  (markdown-cycle t))
+
+(defun markdown-outline-level ()
+  "Return the depth to which a statement is nested in the outline."
+  (cond
+   ((markdown-code-block-at-point-p) 7)
+   ((match-end 1) 1)
+   ((match-end 3) 2)
+   ((- (match-end 5) (match-beginning 5)))))
+
+(defun markdown-promote-subtree (&optional arg)
+  "Promote the current subtree of ATX headings.
+Note that Markdown does not support heading levels higher than six
+and therefore level-six headings will not be promoted further."
+  (interactive "*P")
+  (save-excursion
+    (when (or (thing-at-point-looking-at markdown-regex-header-atx)
+              (re-search-backward markdown-regex-header-atx nil t))
+      (let ((level (length (match-string 1)))
+            (promote-or-demote (if arg 1 -1))
+            (remove 't))
+        (markdown-cycle-atx promote-or-demote remove)
+        (forward-line)
+        (catch 'end-of-subtree
+          (while (re-search-forward markdown-regex-header-atx nil t)
+            ;; Exit if this not a higher level heading; promote otherwise.
+            (if (<= (length (match-string-no-properties 1)) level)
+                (throw 'end-of-subtree nil)
+              (markdown-cycle-atx promote-or-demote remove))))))))
+
+(defun markdown-demote-subtree ()
+  "Demote the current subtree of ATX headings."
+  (interactive)
+  (markdown-promote-subtree t))
+
+(defun markdown-move-subtree-up ()
+  "Move the current subtree of ATX headings up."
+  (interactive)
+  (outline-move-subtree-up 1))
+
+(defun markdown-move-subtree-down ()
+  "Move the current subtree of ATX headings down."
+  (interactive)
+  (outline-move-subtree-down 1))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
