@@ -3691,11 +3691,11 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
     ;; Header navigation
-    (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
-    (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)
-    (define-key map (kbd "C-c C-f") 'outline-forward-same-level)
-    (define-key map (kbd "C-c C-b") 'outline-backward-same-level)
-    (define-key map (kbd "C-c C-u") 'outline-up-heading)
+    (define-key map (kbd "C-c C-n") 'markdown-next-visible-heading)
+    (define-key map (kbd "C-c C-p") 'markdown-previous-visible-heading)
+    (define-key map (kbd "C-c C-f") 'markdown-forward-same-level)
+    (define-key map (kbd "C-c C-b") 'markdown-backward-same-level)
+    (define-key map (kbd "C-c C-u") 'markdown-up-heading)
     ;; Buffer-wide commands
     (define-key map (kbd "C-c C-c m") 'markdown-other-window)
     (define-key map (kbd "C-c C-c p") 'markdown-preview)
@@ -3749,7 +3749,7 @@ See also `markdown-mode-map'.")
   "Menu for Markdown mode"
   '("Markdown"
     ("Show/Hide"
-     ["Cycle visibility" markdown-cycle (outline-on-heading-p)]
+     ["Cycle visibility" markdown-cycle (markdown-on-heading-p)]
      ["Cycle global visibility" markdown-shifttab])
     "---"
     ["Compile" markdown-other-window]
@@ -3795,11 +3795,11 @@ See also `markdown-mode-map'.")
     ["Jump" markdown-jump]
     ["Follow link" markdown-follow-thing-at-point]
     ("Outline"
-     ["Next visible heading" outline-next-visible-heading]
-     ["Previous visible heading" outline-previous-visible-heading]
-     ["Forward same level" outline-forward-same-level]
-     ["Backward same level" outline-backward-same-level]
-     ["Up to parent heading" outline-up-heading])
+     ["Next visible heading" markdown-next-visible-heading]
+     ["Previous visible heading" markdown-previous-visible-heading]
+     ["Forward same level" markdown-forward-same-level]
+     ["Backward same level" markdown-backward-same-level]
+     ["Up to parent heading" markdown-up-heading])
     "---"
     ("Completion and Cycling"
      ["Complete" markdown-complete]
@@ -4339,7 +4339,7 @@ Derived from `org-end-of-subtree'."
     (while (and (not (eobp))
                 (or first (> (funcall outline-level) level)))
       (setq first nil)
-      (outline-next-heading))
+      (markdown-next-heading))
     (if (memq (preceding-char) '(?\n ?\^M))
         (progn
           ;; Go to end of line before heading
@@ -4379,7 +4379,7 @@ Derived from `org-cycle'."
       (message "OVERVIEW")
       (setq markdown-cycle-global-status 2))))
 
-   ((save-excursion (beginning-of-line 1) (looking-at outline-regexp))
+   ((save-excursion (beginning-of-line 1) (markdown-on-heading-p))
     ;; At a heading: rotate between three different views
     (outline-back-to-heading)
     (let ((goal-column 0) eoh eol eos)
@@ -4432,6 +4432,7 @@ Calls `markdown-cycle' with argument t."
 (defun markdown-outline-level ()
   "Return the depth to which a statement is nested in the outline."
   (cond
+   ((markdown-code-block-at-point-p) 7)
    ((match-end 1) 1)
    ((match-end 3) 2)
    ((- (match-end 5) (match-beginning 5)))))
@@ -4582,6 +4583,64 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
   (if (re-search-backward markdown-regex-link-generic nil t)
       (goto-char (or (match-beginning 1) (match-beginning 0)))
     nil))
+
+(defun markdown-next-heading ()
+  "Move to the next heading line of any level.
+With argument, repeats or can move backward if negative."
+  (outline-next-heading)
+  (while (markdown-code-block-at-point-p)
+    (outline-next-heading)))
+
+(defun markdown-previous-heading ()
+  "Move to the previous heading line of any level.
+With argument, repeats or can move backward if negative."
+  (outline-previous-heading)
+  (while (markdown-code-block-at-point-p)
+    (outline-previous-heading)))
+
+(defun markdown-move-heading-common (move-fn &optional arg)
+  "Wrapper for `outline-mode' functions to skip false positives.
+For example, headings inside preformatted code blocks may match
+`outline-regexp' but should not be considered as headings."
+  (funcall move-fn arg)
+  (while (markdown-code-block-at-point-p)
+    (funcall move-fn arg)))
+
+(defun markdown-next-visible-heading (arg)
+  "Move to the next visible heading line of any level.
+With argument, repeats or can move backward if negative."
+  (interactive "p")
+  (markdown-move-heading-common 'outline-next-visible-heading arg))
+
+(defun markdown-previous-visible-heading (arg)
+  "Move to the previous visible heading line of any level.
+With argument, repeats or can move backward if negative."
+  (interactive "p")
+  (markdown-move-heading-common 'outline-previous-visible-heading arg))
+
+(defun markdown-forward-same-level (arg)
+  "Move forward to the ARG'th heading at same level as this one.
+Stop at the first and last headings of a superior heading."
+  (interactive "p")
+  (markdown-move-heading-common 'outline-forward-same-level arg))
+
+(defun markdown-backward-same-level (arg)
+  "Move backward to the ARG'th heading at same level as this one.
+Stop at the first and last headings of a superior heading."
+  (interactive "p")
+  (markdown-move-heading-common 'outline-backward-same-level arg))
+
+(defun markdown-up-heading (arg)
+  "Move to the visible heading line of which the present line is a subheading.
+With argument, move up ARG levels."
+  (interactive "p")
+  (markdown-move-heading-common 'outline-up-heading arg))
+
+(defun markdown-on-heading-p (&optional invisible-ok)
+  "Return t if point is on a (visible) heading line.
+If INVISIBLE-OK is non-nil, an invisible heading line is ok too."
+  (and (outline-on-heading-p)
+       (not (markdown-code-block-at-point-p))))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============

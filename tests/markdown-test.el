@@ -2292,24 +2292,23 @@ body"
   "Test outline navigation functions."
   (markdown-test-file "outline.text"
    ;; Navigate to the first visible heading
-   (outline-next-visible-heading 1)
+   (markdown-next-visible-heading 1)
    (should (eq (point) 19))
    (should (looking-at "^# A top-level header"))
    ;; Navigate forward at the same level
-   (outline-forward-same-level 1)
+   (markdown-forward-same-level 1)
    (should (eq (point) 377))
    (should (looking-at "^=+$"))
    ;; Navigate backward by four visible headings
-   (outline-previous-visible-heading 4)
+   (markdown-previous-visible-heading 4)
    (should (eq (point) 69))
    (should (looking-at "^## A second-level header$"))))
 
 (ert-deftest test-markdown-outline/navigation-with-code ()
   "Test outline navigation functions with code blocks."
-  :expected-result :failed
   (markdown-test-file "outline-code.text"
    ;; Navigate forward at the same level
-   (outline-forward-same-level 1)
+   (markdown-forward-same-level 1)
    (should (eq (point) 159))
    (should (looking-at "^# Level one again"))))
 
@@ -2318,7 +2317,7 @@ body"
   (markdown-test-file "outline.text"
    (let (last-command this-command)
      ;; Navigate to the second visible heading
-     (outline-next-visible-heading 2)
+     (markdown-next-visible-heading 2)
      (should (eq (point) 69))
      (should (looking-at "^## A second-level header$"))
      ;; Cycle visibility of this subtree
@@ -2348,8 +2347,8 @@ body"
   "Test outline visibility cycling for setext-style headers."
   (markdown-test-file "outline.text"
    ;; Navigate to the sixth visible heading
-   (outline-next-visible-heading 7)
-   (outline-previous-visible-heading 1)
+   (markdown-next-visible-heading 7)
+   (markdown-previous-visible-heading 1)
    (should (looking-at markdown-regex-header))
    (should (string-equal (match-string-no-properties 1) "An underline-style header"))
    (should (string-equal (match-string-no-properties 2) "========================="))
