@@ -4437,16 +4437,18 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
 (defun markdown-next-heading ()
   "Move to the next heading line of any level.
 With argument, repeats or can move backward if negative."
-  (outline-next-heading)
-  (while (markdown-code-block-at-point-p)
-    (outline-next-heading)))
+  (let ((pos (outline-next-heading)))
+    (while (markdown-code-block-at-point-p)
+      (setq pos (outline-next-heading)))
+    pos))
 
 (defun markdown-previous-heading ()
   "Move to the previous heading line of any level.
 With argument, repeats or can move backward if negative."
-  (outline-previous-heading)
-  (while (markdown-code-block-at-point-p)
-    (outline-previous-heading)))
+  (let ((pos (outline-previous-heading)))
+    (while (markdown-code-block-at-point-p)
+      (setq pos (outline-previous-heading)))
+    pos))
 
 
 ;;; Outline ===================================================================
@@ -4635,17 +4637,18 @@ Note that Markdown does not support heading levels higher than six
 and therefore level-six headings will not be promoted further."
   (interactive "*P")
   (save-excursion
-    (when (or (thing-at-point-looking-at markdown-regex-header-atx)
-              (re-search-backward markdown-regex-header-atx nil t))
+    (when (and (or (thing-at-point-looking-at markdown-regex-header-atx)
+                   (re-search-backward markdown-regex-header-atx nil t))
+               (not (markdown-code-block-at-point-p)))
       (let ((level (length (match-string 1)))
             (promote-or-demote (if arg 1 -1))
             (remove 't))
         (markdown-cycle-atx promote-or-demote remove)
-        (forward-line)
         (catch 'end-of-subtree
-          (while (re-search-forward markdown-regex-header-atx nil t)
+          (while (markdown-next-heading)
             ;; Exit if this not a higher level heading; promote otherwise.
-            (if (<= (length (match-string-no-properties 1)) level)
+            (if (and (looking-at markdown-regex-header-atx)
+                     (<= (length (match-string-no-properties 1)) level))
                 (throw 'end-of-subtree nil)
               (markdown-cycle-atx promote-or-demote remove))))))))
 
