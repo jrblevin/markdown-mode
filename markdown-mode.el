@@ -1357,6 +1357,18 @@ Function is called repeatedly until it returns nil. For details, see
               (put-text-property (car open) (match-end 0) 'markdown-gfm-code
                                  (append all open lang body close)))))))))
 
+(defun markdown-syntax-propertize-blockquotes (start end)
+  "Match blockquotes from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (and (re-search-forward markdown-regex-blockquote end t)
+                (not (markdown-code-block-at-pos-p (match-beginning 0))))
+      (put-text-property (match-beginning 0) (match-end 0)
+                         'markdown-blockquote
+                         (list (match-beginning 0) (match-end 0)
+                               (match-beginning 1) (match-end 1)
+                               (match-beginning 2) (match-end 2))))))
+
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
   (save-excursion
@@ -1376,9 +1388,11 @@ Function is called repeatedly until it returns nil. For details, see
   (remove-text-properties start end '(markdown-gfm-code))
   (remove-text-properties start end '(markdown-fenced-code))
   (remove-text-properties start end '(markdown-pre))
+  (remove-text-properties start end '(markdown-blockquote))
   (markdown-syntax-propertize-gfm-code-blocks start end)
   (markdown-syntax-propertize-fenced-code-blocks start end)
   (markdown-syntax-propertize-pre-blocks start end)
+  (markdown-syntax-propertize-blockquotes start end)
   (markdown-syntax-propertize-comments start end))
 
 
@@ -1655,8 +1669,8 @@ See `font-lock-syntactic-face-function' for details."
                                            (4 markdown-markup-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
-   (cons markdown-regex-blockquote '((1 markdown-markup-face)
-                                     (2 markdown-blockquote-face)))
+   (cons 'markdown-match-blockquotes '((1 markdown-markup-face)
+                                       (2 markdown-blockquote-face)))
    (cons markdown-regex-header-1-setext '((1 markdown-header-face-1)
                                           (2 markdown-header-rule-face)))
    (cons markdown-regex-header-2-setext '((1 markdown-header-face-2)
@@ -2288,6 +2302,12 @@ analysis."
 (defun markdown-match-fenced-code-blocks (last)
   "Match fenced code blocks from the point to LAST."
   (markdown-match-propertized-text 'markdown-fenced-code last))
+
+(defun markdown-match-blockquotes (last)
+  "Match blockquotes from point to LAST.
+Use data stored in 'markdown-blockquote text property during syntax
+analysis."
+  (markdown-match-propertized-text 'markdown-blockquote last))
 
 (defun markdown-match-generic-metadata (regexp last)
   "Match generic metadata specified by REGEXP from the point to LAST."
