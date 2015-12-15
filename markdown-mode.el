@@ -2220,13 +2220,19 @@ Group 3 matches the closing backticks."
            (<= (match-beginning 0) old-point) ; match contains old-point
            (>= (match-end 0) old-point)))))
 
+(defun markdown-code-block-at-pos-p (pos)
+  "Return non-nil if there is a code block at POS.
+This includes pre blocks, tilde-fenced code blocks, and
+GFM quoted code blocks."
+  (or (get-text-property pos 'markdown-pre)
+      (get-text-property pos 'markdown-gfm-code)
+      (get-text-property pos 'markdown-fenced-code)))
+
 (defun markdown-code-block-at-point-p ()
   "Return non-nil if the point is inside a code block.
 This includes pre blocks, tilde-fenced code blocks, and
-GFM quoted code blocks."
-  (or (get-text-property (point) 'markdown-pre)
-      (get-text-property (point) 'markdown-gfm-code)
-      (get-text-property (point) 'markdown-fenced-code)))
+GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
+  (markdown-code-block-at-pos-p (point)))
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
@@ -3793,23 +3799,6 @@ See also `markdown-mode-map'.")
 
 ;;; imenu =====================================================================
 
-(defun markdown-collect-gfm-code-blocks ()
-  (save-excursion
-    (goto-char (point-min))
-    (let (blocks)
-      (while (re-search-forward "\\(?:\\`\\|[\n\r]+\\s *[\n\r]\\)\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$" nil t)
-        (goto-char (line-beginning-position))
-        (let ((start (point)))
-          (when (markdown-prev-line-blank-p)
-            (forward-line +1)
-            (when (re-search-forward "^```$" nil t)
-              (push (cons start (point)) blocks)))))
-      (nreverse blocks))))
-
-(defun markdown-gfm-code-block-p (blocks pos)
-  (loop for (start . end) in blocks
-        thereis (<= start pos end)))
-
 (defun markdown-imenu-create-index ()
   "Create and return an imenu index alist for the current buffer.
 See `imenu-create-index-function' and `imenu--index-alist' for details."
@@ -3818,12 +3807,11 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
          (cur-level 0)
          (empty-heading "-")
          (self-heading ".")
-         (blocks (markdown-collect-gfm-code-blocks))
          hashes pos level heading)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (unless (markdown-gfm-code-block-p blocks (point))
+        (unless (markdown-code-block-at-point-p)
           (cond
            ((setq heading (match-string-no-properties 1))
             (setq pos (match-beginning 1)
