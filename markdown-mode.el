@@ -1272,10 +1272,12 @@ Function is called repeatedly until it returns nil. For details, see
   (save-excursion
     (goto-char start)
     (unless (looking-back "\n\n" nil)
-      (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
+      (let ((first (or (re-search-backward "\n\n" nil t) (point-min)))
+            (last end))
         (goto-char end)
         (when (re-search-forward "\n\n" nil t)
-          (cons (match-beginning 0) found))))))
+          (setq last (match-end 0)))
+        (cons first last)))))
 
 (defun markdown-syntax-propertize-pre-blocks (start end)
   "Match preformatted text blocks from START to END."
