@@ -1734,7 +1734,7 @@ See `font-lock-syntactic-face-function' for details."
    (cons 'markdown-match-pandoc-metadata '((1 markdown-markup-face)
                                            (2 markdown-markup-face)
                                            (3 markdown-metadata-value-face)))
-   (cons markdown-regex-hr 'markdown-header-delimiter-face)
+   (cons 'markdown-match-hr 'markdown-header-delimiter-face)
    (cons 'markdown-match-code '((1 markdown-markup-face)
                                 (2 markdown-inline-code-face)
                                 (3 markdown-markup-face)))
@@ -2375,6 +2375,18 @@ analysis."
 (defun markdown-match-heading-6-atx (last)
   "Match level 6 ATX headings from point to LAST."
   (markdown-match-propertized-text 'markdown-heading-6-atx last))
+
+(defun markdown-match-hr (last)
+  "Match horizontal rules comments from the point to LAST."
+  (while (and (re-search-forward markdown-regex-hr last t)
+              (or (markdown-on-heading-p)
+                  (markdown-code-block-at-point-p))
+              (< (match-end 0) last))
+    (forward-line))
+  (cond ((thing-at-point-looking-at markdown-regex-hr)
+         (forward-line)
+         t)
+        (t nil)))
 
 (defun markdown-match-generic-metadata (regexp last)
   "Match generic metadata specified by REGEXP from the point to LAST."
