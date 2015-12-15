@@ -1333,9 +1333,7 @@ Function is called repeatedly until it returns nil. For details, see
   (save-excursion
     (goto-char start)
     (while (re-search-forward "^\\([~]\\{3,\\}\\)" end t)
-      (beginning-of-line)
-      (let ((beg (point)))
-        (forward-line)
+      (let ((beg (match-beginning 1)))
         (when (re-search-forward
                (concat "^" (match-string 1) "~*") end t)
                (put-text-property beg (match-end 0) 'markdown-fenced-code
