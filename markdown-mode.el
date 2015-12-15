@@ -1367,6 +1367,18 @@ Function is called repeatedly until it returns nil. For details, see
                          'markdown-blockquote
                          (match-data t)))))
 
+(defun markdown-syntax-propertize-headings-generic (symbol regex start end)
+  "Match headings of type SYMBOL with REGEX from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (re-search-forward regex end t)
+      (unless (or (markdown-code-block-at-pos-p (match-beginning 0))
+                  (get-text-property (match-beginning 0) 'markdown-heading))
+        (put-text-property (match-beginning 0) (match-end 0)
+                           'markdown-heading t)
+        (put-text-property (match-beginning 0) (match-end 0)
+                           symbol (match-data t))))))
+
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
   (save-excursion
@@ -1387,10 +1399,35 @@ Function is called repeatedly until it returns nil. For details, see
   (remove-text-properties start end '(markdown-fenced-code))
   (remove-text-properties start end '(markdown-pre))
   (remove-text-properties start end '(markdown-blockquote))
+  (remove-text-properties start end '(markdown-heading))
+  (remove-text-properties start end '(markdown-heading-1-setext))
+  (remove-text-properties start end '(markdown-heading-2-setext))
+  (remove-text-properties start end '(markdown-heading-1-atx))
+  (remove-text-properties start end '(markdown-heading-2-atx))
+  (remove-text-properties start end '(markdown-heading-3-atx))
+  (remove-text-properties start end '(markdown-heading-4-atx))
+  (remove-text-properties start end '(markdown-heading-5-atx))
+  (remove-text-properties start end '(markdown-heading-6-atx))
   (markdown-syntax-propertize-gfm-code-blocks start end)
   (markdown-syntax-propertize-fenced-code-blocks start end)
   (markdown-syntax-propertize-pre-blocks start end)
   (markdown-syntax-propertize-blockquotes start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-1-setext markdown-regex-header-1-setext start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-2-setext markdown-regex-header-2-setext start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-6-atx markdown-regex-header-6-atx start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-5-atx markdown-regex-header-5-atx start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-4-atx markdown-regex-header-4-atx start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-3-atx markdown-regex-header-3-atx start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-2-atx markdown-regex-header-2-atx start end)
+  (markdown-syntax-propertize-headings-generic
+   'markdown-heading-1-atx markdown-regex-header-1-atx start end)
   (markdown-syntax-propertize-comments start end))
 
 
@@ -1669,28 +1706,28 @@ See `font-lock-syntactic-face-function' for details."
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-blockquotes '((1 markdown-markup-face)
                                        (2 markdown-blockquote-face)))
-   (cons markdown-regex-header-1-setext '((1 markdown-header-face-1)
-                                          (2 markdown-header-rule-face)))
-   (cons markdown-regex-header-2-setext '((1 markdown-header-face-2)
-                                          (2 markdown-header-rule-face)))
-   (cons markdown-regex-header-6-atx '((1 markdown-header-delimiter-face)
-                                       (2 markdown-header-face-6)
-                                       (3 markdown-header-delimiter-face)))
-   (cons markdown-regex-header-5-atx '((1 markdown-header-delimiter-face)
-                                       (2 markdown-header-face-5)
-                                       (3 markdown-header-delimiter-face)))
-   (cons markdown-regex-header-4-atx '((1 markdown-header-delimiter-face)
-                                       (2 markdown-header-face-4)
-                                       (3 markdown-header-delimiter-face)))
-   (cons markdown-regex-header-3-atx '((1 markdown-header-delimiter-face)
-                                       (2 markdown-header-face-3)
-                                       (3 markdown-header-delimiter-face)))
-   (cons markdown-regex-header-2-atx '((1 markdown-header-delimiter-face)
-                                       (2 markdown-header-face-2)
-                                       (3 markdown-header-delimiter-face)))
-   (cons markdown-regex-header-1-atx '((1 markdown-header-delimiter-face)
-                                       (2 markdown-header-face-1)
-                                       (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-1-setext '((1 markdown-header-face-1)
+                                            (2 markdown-header-rule-face)))
+   (cons 'markdown-match-heading-2-setext '((1 markdown-header-face-2)
+                                            (2 markdown-header-rule-face)))
+   (cons 'markdown-match-heading-6-atx '((1 markdown-header-delimiter-face)
+                                         (2 markdown-header-face-6)
+                                         (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-5-atx '((1 markdown-header-delimiter-face)
+                                         (2 markdown-header-face-5)
+                                         (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-4-atx '((1 markdown-header-delimiter-face)
+                                         (2 markdown-header-face-4)
+                                         (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-3-atx '((1 markdown-header-delimiter-face)
+                                         (2 markdown-header-face-3)
+                                         (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-2-atx '((1 markdown-header-delimiter-face)
+                                         (2 markdown-header-face-2)
+                                         (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-1-atx '((1 markdown-header-delimiter-face)
+                                         (2 markdown-header-face-1)
+                                         (3 markdown-header-delimiter-face)))
    (cons 'markdown-match-multimarkdown-metadata '((1 markdown-metadata-key-face)
                                                   (2 markdown-markup-face)
                                                   (3 markdown-metadata-value-face)))
@@ -2306,6 +2343,38 @@ analysis."
 Use data stored in 'markdown-blockquote text property during syntax
 analysis."
   (markdown-match-propertized-text 'markdown-blockquote last))
+
+(defun markdown-match-heading-1-setext (last)
+  "Match level 1 setext headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-1-setext last))
+
+(defun markdown-match-heading-2-setext (last)
+  "Match level 2 setext headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-2-setext last))
+
+(defun markdown-match-heading-1-atx (last)
+  "Match level 1 ATX headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-1-atx last))
+
+(defun markdown-match-heading-2-atx (last)
+  "Match level 2 ATX headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-2-atx last))
+
+(defun markdown-match-heading-3-atx (last)
+  "Match level 3 ATX headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-3-atx last))
+
+(defun markdown-match-heading-4-atx (last)
+  "Match level 4 ATX headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-4-atx last))
+
+(defun markdown-match-heading-5-atx (last)
+  "Match level 5 ATX headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-5-atx last))
+
+(defun markdown-match-heading-6-atx (last)
+  "Match level 6 ATX headings from point to LAST."
+  (markdown-match-propertized-text 'markdown-heading-6-atx last))
 
 (defun markdown-match-generic-metadata (regexp last)
   "Match generic metadata specified by REGEXP from the point to LAST."
