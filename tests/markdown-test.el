@@ -1952,6 +1952,15 @@ for (var i = 0; i < 10; i++) {
   (markdown-test-string "<!-- This comment has\n    hanging indentation -->"
    (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-comment-face)))
 
+(ert-deftest test-markdown-font-lock/comment-multiple ()
+  "Test multiple single-line comments in arow."
+  (markdown-test-string "<!-- This is a comment -->\n<!-- And so is this -->"
+   (markdown-test-range-has-face
+    (point-at-bol) (1- (point-at-eol)) markdown-comment-face)
+   (forward-line)
+   (markdown-test-range-has-face
+    (point-at-bol) (1- (point-at-eol)) markdown-comment-face)))
+
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."
   (markdown-test-string "Harvard[^1] [tuition][]"

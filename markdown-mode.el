@@ -1384,14 +1384,14 @@ Function is called repeatedly until it returns nil. For details, see
   (save-excursion
     (goto-char start)
     (while (re-search-forward markdown-regex-comment-start end t)
-      (when (and (not (markdown-code-at-point-p))
-                 (not (markdown-code-block-at-point-p)))
-        (let ((open-beg (match-beginning 0)))
-          (when (re-search-forward markdown-regex-comment-end end t)
-            (put-text-property open-beg (1+ open-beg)
-                               'syntax-table (string-to-syntax "<"))
-            (put-text-property (1- (match-end 0)) (match-end 0)
-                               'syntax-table (string-to-syntax ">"))))))))
+      (let ((open-beg (match-beginning 0)))
+        (when (and (not (markdown-code-at-point-p))
+                   (not (markdown-code-block-at-point-p))
+                   (re-search-forward markdown-regex-comment-end end t))
+          (put-text-property open-beg (1+ open-beg)
+                             'syntax-table (string-to-syntax "<"))
+          (put-text-property (1- (match-end 0)) (match-end 0)
+                             'syntax-table (string-to-syntax ">")))))))
 
 (defun markdown-syntax-propertize (start end)
   "See `syntax-propertize-function'."
