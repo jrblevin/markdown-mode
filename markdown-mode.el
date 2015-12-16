@@ -94,13 +94,14 @@
 ;; The latest development version can be downloaded directly
 ;; ([markdown-mode.el][devel.el]) or it can be obtained from the
 ;; (browsable and clonable) Git repository at
-;; <http://jblevins.org/git/markdown-mode.git>.  The entire repository,
-;; including the full project history, can be cloned via the Git protocol
-;; by running
+;; <http://jblevins.org/git/markdown-mode.git> or from [GitHub][].
+;; The entire repository, including the full project history, can be
+;; cloned via the Git protocol by running
 ;;
 ;;     git clone git://jblevins.org/git/markdown-mode.git
 ;;
 ;;  [devel.el]: http://jblevins.org/git/markdown-mode.git/plain/markdown-mode.el
+;;  [GitHub]: https://github.com/jrblevin/markdown-mode/
 
 ;;; Installation:
 
