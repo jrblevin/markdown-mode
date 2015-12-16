@@ -2465,14 +2465,10 @@ This helps improve font locking for block constructs such as pre blocks."
   ;; Avoid compiler warnings about these global variables from font-lock.el.
   ;; See the documentation for variable `font-lock-extend-region-functions'.
   (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
-  (save-excursion
-    (goto-char font-lock-beg)
-    (unless (looking-back "\n\n" nil)
-      (let ((found (or (re-search-backward "\n\n" nil t) (point-min))))
-        (goto-char font-lock-end)
-        (when (re-search-forward "\n\n" nil t)
-          (setq font-lock-end (match-beginning 0))
-          (setq font-lock-beg found))))))
+  (let ((range (markdown-syntax-propertize-extend-region
+                font-lock-beg font-lock-end)))
+    (setq font-lock-beg (car range))
+    (setq font-lock-end (cdr range))))
 
 (defun markdown-font-lock-extend-after-change-region (beg end old-len)
   "Possibly extends font-lock region range from BEG and END was edited.
