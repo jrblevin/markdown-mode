@@ -1772,20 +1772,14 @@ See `font-lock-syntactic-face-function' for details."
    (cons 'markdown-match-bold '((1 markdown-markup-face)
                                 (2 markdown-bold-face)
                                 (3 markdown-markup-face)))
+   (cons 'markdown-match-italic '((1 markdown-markup-face)
+                                  (2 markdown-italic-face)
+                                  (3 markdown-markup-face)))
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-line-break '(1 markdown-line-break-face prepend))
    )
   "Syntax highlighting for Markdown files.")
-
-(defvar markdown-mode-font-lock-keywords-core
-  (list
-   (cons markdown-regex-italic '((2 markdown-markup-face)
-                                 (3 markdown-italic-face)
-                                 (4 markdown-markup-face)))
-   )
-  "Additional syntax highlighting for Markdown files.
-Includes features which are overridden by some variants.")
 
 (defconst markdown-mode-font-lock-keywords-math
   (list
@@ -2324,6 +2318,18 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
                           (match-beginning 3) (match-end 3)
                           (match-beginning 4) (match-end 4)
                           (match-beginning 5) (match-end 5)))
+    (goto-char (1+ (match-end 0)))))
+
+(defun markdown-match-italic (last)
+  "Match inline italics from the point to LAST."
+  (when (markdown-match-inline-generic
+         (if (eq major-mode 'gfm-mode)
+             markdown-regex-gfm-italic markdown-regex-italic)
+         last)
+    (set-match-data (list (match-beginning 1) (match-end 1)
+                          (match-beginning 2) (match-end 2)
+                          (match-beginning 3) (match-end 3)
+                          (match-beginning 4) (match-end 4)))
     (goto-char (1+ (match-end 0)))))
 
 (defun markdown-match-propertized-text (property last)
@@ -5403,8 +5409,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
           (append
            (when markdown-enable-math
              markdown-mode-font-lock-keywords-math)
-           markdown-mode-font-lock-keywords-basic
-           markdown-mode-font-lock-keywords-core))
+           markdown-mode-font-lock-keywords-basic))
     (setq font-lock-defaults
           '(markdown-mode-font-lock-keywords
             nil nil nil nil
@@ -5625,12 +5630,7 @@ before regenerating font-lock rules for extensions."
                                           (4 markdown-strike-through-face)
                                           (5 markdown-markup-face))))
    ;; Basic Markdown features (excluding possibly overridden ones)
-   markdown-mode-font-lock-keywords-basic
-   ;; GFM features to match last
-   (list
-    (cons markdown-regex-gfm-italic '((2 markdown-markup-face)
-                                      (3 markdown-italic-face)
-                                      (4 markdown-markup-face)))))
+   markdown-mode-font-lock-keywords-basic)
   "Default highlighting expressions for GitHub Flavored Markdown mode.")
 
 ;;;###autoload
