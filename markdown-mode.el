@@ -4532,7 +4532,11 @@ See `markdown-wiki-link-p' and `markdown-previous-wiki-link'."
       ;; At a link already, move past it.
       (goto-char (+ (match-end 0) 1)))
     ;; Search for the next wiki link and move to the beginning.
-    (if (re-search-forward markdown-regex-link-generic nil t)
+    (while (and (re-search-forward markdown-regex-link-generic nil t)
+                (markdown-code-block-at-point-p)
+                (< (point) (point-max))))
+    (if (and (not (eq (point) opoint))
+             (or (markdown-link-p) (markdown-wiki-link-p)))
         ;; Group 1 will move past non-escape character in wiki link regexp.
         ;; Go to beginning of group zero for all other link types.
         (goto-char (or (match-beginning 1) (match-beginning 0)))
@@ -4544,9 +4548,15 @@ See `markdown-wiki-link-p' and `markdown-previous-wiki-link'."
 If successful, return point.  Otherwise, return nil.
 See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
   (interactive)
-  (if (re-search-backward markdown-regex-link-generic nil t)
-      (goto-char (or (match-beginning 1) (match-beginning 0)))
-    nil))
+  (let ((opoint (point)))
+    (while (and (re-search-backward markdown-regex-link-generic nil t)
+                (markdown-code-block-at-point-p)
+                (> (point) (point-min))))
+    (if (and (not (eq (point) opoint))
+             (or (markdown-link-p) (markdown-wiki-link-p)))
+        (goto-char (or (match-beginning 1) (match-beginning 0)))
+      (goto-char opoint)
+      nil)))
 
 (defun markdown-next-heading ()
   "Move to the next heading line of any level.
@@ -5106,6 +5116,7 @@ the rendered output."
 See `markdown-wiki-link-p' for more information."
   (let ((case-fold-search nil))
     (and (not (markdown-wiki-link-p))
+         (not (markdown-code-block-at-point-p))
          (or (thing-at-point-looking-at markdown-regex-link-inline)
              (thing-at-point-looking-at markdown-regex-link-reference)
              (thing-at-point-looking-at markdown-regex-uri)
@@ -5146,12 +5157,11 @@ returned by `match-data'.  Note that the potential wiki link name must
 be available via `match-string'."
   (let ((case-fold-search nil))
     (and (thing-at-point-looking-at markdown-regex-wiki-link)
+         (not (markdown-code-block-at-point-p))
          (or (not buffer-file-name)
              (not (string-equal (buffer-file-name)
                                 (markdown-convert-wiki-link-to-filename
-                                 (markdown-wiki-link-link)))))
-         (not (save-match-data
-                (save-excursion))))))
+                                 (markdown-wiki-link-link))))))))
 
 (defun markdown-wiki-link-link ()
   "Return the link part of the wiki link using current match data.
