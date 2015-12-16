@@ -1770,12 +1770,12 @@ See `font-lock-syntactic-face-function' for details."
                                                (4 markdown-markup-face)       ; :
                                                (5 markdown-url-face)          ; url
                                                (6 markdown-link-title-face))) ; "title" (optional)
-   (cons 'markdown-match-bold '((1 markdown-markup-face)
-                                (2 markdown-bold-face)
-                                (3 markdown-markup-face)))
-   (cons 'markdown-match-italic '((1 markdown-markup-face)
-                                  (2 markdown-italic-face)
-                                  (3 markdown-markup-face)))
+   (cons 'markdown-match-bold '((1 markdown-markup-face prepend)
+                                (2 markdown-bold-face append)
+                                (3 markdown-markup-face prepend)))
+   (cons 'markdown-match-italic '((1 markdown-markup-face prepend)
+                                  (2 markdown-italic-face append)
+                                  (3 markdown-markup-face prepend)))
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-line-break '(1 markdown-line-break-face prepend))

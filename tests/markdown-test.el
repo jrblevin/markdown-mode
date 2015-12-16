@@ -1649,6 +1649,42 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         (markdown-test-range-has-face 9 14 markdown-italic-face)
                         (markdown-test-range-has-face 15 15 markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/italics-in-heading ()
+  "Test italic overlay in a heading."
+  (markdown-test-string
+   "# *Italics* in a Heading"
+   (markdown-test-range-has-face 3 3 markdown-markup-face)
+   (markdown-test-range-has-face 4 10 markdown-italic-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/italics-link ()
+  "Test italic overlay in an inline link."
+  (markdown-test-string
+   "*[italic link](http://www.link.com/)*"
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 36 markdown-italic-face)
+   (markdown-test-range-has-face 37 37 markdown-markup-face))
+  (markdown-test-string
+   "[*italic link*](http://www.link.com/)"
+   (markdown-test-range-has-face 2 2 markdown-markup-face)
+   (markdown-test-range-has-face 3 13 markdown-italic-face)
+   (markdown-test-range-has-face 14 14 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/italics-in-blockquote ()
+  "Test italics overlay in a blockquote."
+  (markdown-test-string
+   "> *italics* inside a blockquote"
+   (markdown-test-range-has-face 3 3 markdown-markup-face)
+   (markdown-test-range-has-face 4 10 markdown-italic-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/italics-in-pre ()
+  "Test italics overlay in a blockquote."
+  (markdown-test-string
+   "    *italics* inside a pre block"
+   (markdown-test-range-has-face (point-min) (1- (point-max))
+                                 markdown-pre-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
@@ -1703,6 +1739,34 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 8 9 markdown-markup-face)
    (markdown-test-range-has-face 10 13 markdown-bold-face)
    (markdown-test-range-has-face 14 15 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/bold-link ()
+  "Test bold overlay in an inline link."
+  (markdown-test-string
+   "**[bold link](http://www.link.com/)**"
+   (markdown-test-range-has-face 1 2 markdown-markup-face)
+   (markdown-test-range-has-face 3 35 markdown-bold-face)
+   (markdown-test-range-has-face 36 37 markdown-markup-face))
+  (markdown-test-string
+   "[**bold link**](http://www.link.com/)"
+   (markdown-test-range-has-face 2 3 markdown-markup-face)
+   (markdown-test-range-has-face 4 12 markdown-bold-face)
+   (markdown-test-range-has-face 13 14 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/bold-in-blockquote ()
+  "Test bold overlay in a blockquote."
+  (markdown-test-string
+   "> **bold** inside a blockquote"
+   (markdown-test-range-has-face 3 4 markdown-markup-face)
+   (markdown-test-range-has-face 5 8 markdown-bold-face)
+   (markdown-test-range-has-face 9 10 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/bold-in-pre ()
+  "Test bold overlay in a blockquote."
+  (markdown-test-string
+   "    **bold** inside a pre block"
+   (markdown-test-range-has-face (point-min) (1- (point-max))
+                                 markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
