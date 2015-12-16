@@ -2289,11 +2289,9 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
-(defun markdown-match-code (last)
-  "Match inline code from the point to LAST."
-  (unless (bobp)
-    (backward-char 1))
-  (when (re-search-forward markdown-regex-code last t)
+(defun markdown-match-inline-generic (regex last)
+  "Match inline REGEX from the point to LAST."
+  (when (re-search-forward regex last t)
     (cond
      ;; In code block: move past it and recursively search again
      ((markdown-code-block-at-point-p)
@@ -2301,17 +2299,23 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
                   (< (point) (point-max)))
         (markdown-end-of-block))
       (when (and (< (point) last))
-        (markdown-match-code last)))
+        (markdown-match-inline-generic regex last)))
      ;; End of match out of range: return nil
      ((> (match-end 0) last)
       nil)
-     ;; Found: set match data and move point
-     (t
-      (set-match-data (list (match-beginning 1) (match-end 1)
-                            (match-beginning 2) (match-end 2)
-                            (match-beginning 3) (match-end 3)
-                            (match-beginning 4) (match-end 4)))
-      (goto-char (1+ (match-end 0)))))))
+     ;; Found: keep match data and return
+     (t t))))
+
+(defun markdown-match-code (last)
+  "Match inline code fragments from point to LAST."
+  (unless (bobp)
+    (backward-char 1))
+  (when (markdown-match-inline-generic markdown-regex-code last)
+    (set-match-data (list (match-beginning 1) (match-end 1)
+                          (match-beginning 2) (match-end 2)
+                          (match-beginning 3) (match-end 3)
+                          (match-beginning 4) (match-end 4)))
+    (goto-char (1+ (match-end 0)))))
 
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
