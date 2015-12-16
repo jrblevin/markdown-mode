@@ -1769,9 +1769,9 @@ See `font-lock-syntactic-face-function' for details."
                                                (4 markdown-markup-face)       ; :
                                                (5 markdown-url-face)          ; url
                                                (6 markdown-link-title-face))) ; "title" (optional)
-   (cons markdown-regex-bold '((3 markdown-markup-face)
-                               (4 markdown-bold-face)
-                               (5 markdown-markup-face)))
+   (cons 'markdown-match-bold '((1 markdown-markup-face)
+                                (2 markdown-bold-face)
+                                (3 markdown-markup-face)))
    (cons markdown-regex-uri 'markdown-link-face)
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-line-break '(1 markdown-line-break-face prepend))
@@ -2315,6 +2315,15 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
                           (match-beginning 2) (match-end 2)
                           (match-beginning 3) (match-end 3)
                           (match-beginning 4) (match-end 4)))
+    (goto-char (1+ (match-end 0)))))
+
+(defun markdown-match-bold (last)
+  "Match inline bold from the point to LAST."
+  (when (markdown-match-inline-generic markdown-regex-bold last)
+    (set-match-data (list (match-beginning 2) (match-end 2)
+                          (match-beginning 3) (match-end 3)
+                          (match-beginning 4) (match-end 4)
+                          (match-beginning 5) (match-end 5)))
     (goto-char (1+ (match-end 0)))))
 
 (defun markdown-match-propertized-text (property last)
