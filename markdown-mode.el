@@ -1349,12 +1349,12 @@ Function is called repeatedly until it returns nil. For details, see
       (let ((open (list (match-beginning 1) (match-end 1)))
             (lang (list (match-beginning 2) (match-end 2))))
         (forward-line)
-        (let ((body (list (point))))
+        (let ((body (point)))
           (when (re-search-forward
                  markdown-regex-gfm-code-block-close end t)
-            (let ((close (list (match-beginning 0) (match-end 0)))
-                  (all (list (car open) (match-end 0))))
-              (setq body (reverse (cons (1- (match-beginning 0)) body)))
+            (let ((close (list (match-beginning 1) (match-end 1)))
+                  (all (list (car open) (match-end 1))))
+              (setq body (list body (1- (match-beginning 0))))
               (put-text-property (car open) (match-end 0) 'markdown-gfm-code
                                  (append all open lang body close)))))))))
 
