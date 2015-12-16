@@ -1715,6 +1715,21 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face (point-min) (1- (point-max))
                                  markdown-pre-face)))
 
+(ert-deftest test-markdown-font-lock/italics-and-code ()
+  "Test seeming italics mixed with code."
+  (markdown-test-string
+   "define `var_1` and `var_2` inline code"
+   (markdown-test-range-has-face 9 13 markdown-inline-code-face)
+   (markdown-test-range-has-face 21 25 markdown-inline-code-face))
+  (markdown-test-string
+   "`var_1` and var_2"
+   (markdown-test-range-has-face 2 6 markdown-inline-code-face)
+   (markdown-test-range-has-face 8 17 nil))
+  (markdown-test-string
+   "var_1 and `var_2`"
+   (markdown-test-range-has-face 1 10 nil)
+   (markdown-test-range-has-face 12 16 markdown-inline-code-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
