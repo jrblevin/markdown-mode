@@ -5235,18 +5235,17 @@ and highlight accordingly."
   (goto-char from)
   (save-match-data
     (while (re-search-forward markdown-regex-wiki-link to t)
-      (let ((highlight-beginning (match-beginning 1))
-            (highlight-end (match-end 1))
-            (file-name
-             (markdown-convert-wiki-link-to-filename
-              (markdown-wiki-link-link))))
-        (if (file-exists-p file-name)
+      (when (not (markdown-code-block-at-point-p))
+        (let ((highlight-beginning (match-beginning 1))
+              (highlight-end (match-end 1))
+              (file-name
+               (markdown-convert-wiki-link-to-filename
+                (markdown-wiki-link-link))))
+          (if (file-exists-p file-name)
+              (markdown-highlight-wiki-link
+               highlight-beginning highlight-end markdown-link-face)
             (markdown-highlight-wiki-link
-             highlight-beginning highlight-end markdown-link-face)
-          (markdown-highlight-wiki-link
-           highlight-beginning highlight-end markdown-link-face)
-          (markdown-highlight-wiki-link
-           highlight-beginning highlight-end markdown-missing-link-face))))))
+             highlight-beginning highlight-end markdown-missing-link-face)))))))
 
 (defun markdown-extend-changed-region (from to)
   "Extend region given by FROM and TO so that we can fontify all links.

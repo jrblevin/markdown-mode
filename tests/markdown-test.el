@@ -2545,6 +2545,8 @@ body"
      (should (eq (markdown-next-link) 155))
      (should (string-equal (markdown-wiki-link-link) "inline"))
      (markdown-test-range-has-property 155 164 'font-lock-face markdown-link-face)
+     ;; Check wiki links in code blocks
+     (markdown-test-range-has-face 360 395 markdown-pre-face)
      ;; Remove temporary files
      (delete-file fn)
      )))
