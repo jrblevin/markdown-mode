@@ -1786,17 +1786,17 @@ See `font-lock-syntactic-face-function' for details."
 (defconst markdown-mode-font-lock-keywords-math
   (list
    ;; Math mode $..$
-   (cons markdown-regex-math-inline-single '((1 markdown-markup-face)
-                                             (2 markdown-math-face)
-                                             (3 markdown-markup-face)))
+   (cons 'markdown-match-math-single '((1 markdown-markup-face prepend)
+                                       (2 markdown-math-face append)
+                                       (3 markdown-markup-face prepend)))
    ;; Math mode $$..$$
-   (cons markdown-regex-math-inline-double '((1 markdown-markup-face)
-                                             (2 markdown-math-face)
-                                             (3 markdown-markup-face)))
+   (cons 'markdown-match-math-double '((1 markdown-markup-face prepend)
+                                       (2 markdown-math-face append)
+                                       (3 markdown-markup-face prepend)))
    ;; Display mode equations with brackets: \[ \]
-   (cons markdown-regex-math-display '((1 markdown-markup-face)
-                                       (2 markdown-math-face)
-                                       (3 markdown-markup-face)))
+   (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
+                                       (2 markdown-math-face append)
+                                       (3 markdown-markup-face prepend)))
    ;; Equation reference (eq:foo)
    (cons "\\((eq:\\)\\([[:alnum:]:_]+\\)\\()\\)" '((1 markdown-markup-face)
                                                    (2 markdown-reference-face)
@@ -2350,6 +2350,27 @@ Return nil otherwise."
                                 (match-beginning 3) (match-end 3)
                                 (match-beginning 4) (match-end 4)))
           (goto-char (1+ (match-end 0)))))))))
+
+
+(defun markdown-match-math-generic (regex last)
+  "Match quoted $..$ or $$..$$ math from point to LAST."
+  (when (markdown-match-inline-generic regex last)
+    (let ((begin (match-beginning 1)) (end (match-end 1)))
+      (prog1
+          (if (markdown-range-property-any
+               begin end 'face (list markdown-inline-code-face
+                                     markdown-bold-face))
+              (markdown-match-math-generic regex last)
+            t)
+        (goto-char (1+ (match-end 0)))))))
+
+(defun markdown-match-math-single (last)
+  "Match single quoted $..$ math from point to LAST."
+  (markdown-match-math-generic markdown-regex-math-inline-single last))
+
+(defun markdown-match-math-double (last)
+  "Match double quoted $$..$$ math from point to LAST."
+  (markdown-match-math-generic markdown-regex-math-inline-double last))
 
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
@@ -5437,9 +5458,9 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   (when (eq major-mode 'markdown-mode)
     (setq markdown-mode-font-lock-keywords
           (append
+           markdown-mode-font-lock-keywords-basic
            (when markdown-enable-math
-             markdown-mode-font-lock-keywords-math)
-           markdown-mode-font-lock-keywords-basic))
+             markdown-mode-font-lock-keywords-math)))
     (setq font-lock-defaults
           '(markdown-mode-font-lock-keywords
             nil nil nil nil

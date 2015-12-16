@@ -2935,9 +2935,9 @@ indented the same amount."
     ;; Flag should be set to t
     (should markdown-enable-math)
     ;; Font-lock keywords should be updated
-    (should (member (cons markdown-regex-math-display '((1 markdown-markup-face)
-                                                        (2 markdown-math-face)
-                                                        (3 markdown-markup-face)))
+    (should (member (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
+                                                        (2 markdown-math-face append)
+                                                        (3 markdown-markup-face prepend)))
                     markdown-mode-font-lock-keywords))))
 
 (ert-deftest test-markdown-math/font-lock ()
