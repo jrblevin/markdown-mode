@@ -2340,19 +2340,14 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
 Restore match data previously stored in PROPERTY."
-  (let ((pos (if (eq (point) (point-min))
-                 (point-min)
-               (next-single-char-property-change (1- (point)) property nil last))))
-    (when (and pos (>= pos (point)))
-      (goto-char pos)
-      (let ((saved-match-data (get-text-property pos property)))
-        (if saved-match-data
-            (progn
-              (set-match-data saved-match-data)
-              (goto-char (match-end 0)))
-          (when (< (point) last)
-            (forward-char)
-            (markdown-match-propertized-text property last)))))))
+  (let (saved pos)
+    (unless (setq saved (get-text-property (point) property))
+      (setq pos (next-single-char-property-change (point) property nil last))
+      (setq saved (get-text-property pos property)))
+    (when saved
+      (set-match-data saved)
+      (goto-char (min (1+ (match-end 0)) (point-max)))
+      saved)))
 
 (defun markdown-match-pre-blocks (last)
   "Match preformatted blocks from point to LAST.
