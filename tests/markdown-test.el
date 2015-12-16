@@ -1596,6 +1596,16 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         (markdown-indent-region (line-beginning-position) (line-end-position) nil)
                         (should (string-equal (buffer-string) "  * abc\n    def\n"))))
 
+(ert-deftest test-markdown-indentation/indent-list-hanging ()
+  "Test `markdown-indent-line' with hanging list item."
+  (markdown-test-string
+   "- list
+  - nested list with long lines which need to be
+    hard wrapped"
+   (goto-char (point-max))
+   (markdown-enter-key)
+   (should (eq (point) 78))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()

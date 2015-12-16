@@ -3471,9 +3471,9 @@ duplicate positions, which are handled up by calling functions."
 (defun markdown-enter-key ()
   "Handle RET according to to the value of `markdown-indent-on-enter'."
   (interactive)
-  (if markdown-indent-on-enter
-      (newline-and-indent)
-    (newline)))
+  (newline)
+  (when markdown-indent-on-enter
+    (markdown-indent-line)))
 
 (defun markdown-exdent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
