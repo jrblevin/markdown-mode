@@ -1615,6 +1615,17 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (should (string-equal (buffer-string) "  * item 1\n  "))
    (should (eq (point) 14))))
 
+(ert-deftest test-markdown-indentation/indent-pre ()
+  "Test `markdown-indent-line' with a pre block."
+  (markdown-test-string
+   "I'm gonna write a code block:
+
+    my first line of code"
+   (goto-char (point-max))
+   (markdown-enter-key)
+   (should (eq (point) 62))
+   (should (looking-back "^    "))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
