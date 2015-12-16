@@ -2470,14 +2470,6 @@ This helps improve font locking for block constructs such as pre blocks."
     (setq font-lock-beg (car range))
     (setq font-lock-end (cdr range))))
 
-(defun markdown-font-lock-extend-after-change-region (beg end old-len)
-  "Possibly extends font-lock region range from BEG and END was edited.
-Designed to be used as a `font-lock-extend-after-change-region-function'.
-OLD-LEN is the number of bytes of pre-change text replaced by the
-given range. Returns either a new regon (NEW-BEG . NEW-END) or nil to
-keep the default region."
-  (markdown-syntax-propertize-extend-region beg end))
-
 
 ;;; Syntax Table ==============================================================
 
@@ -5602,8 +5594,6 @@ before regenerating font-lock rules for extensions."
   ;; Multiline font lock
   (add-hook 'font-lock-extend-region-functions
             'markdown-font-lock-extend-region)
-  (setq font-lock-extend-after-change-region-function
-        'markdown-font-lock-extend-after-change-region)
 
   ;; Anytime text changes make sure it gets fontified correctly
   (add-hook 'after-change-functions 'markdown-check-change-for-wiki-link t t)
