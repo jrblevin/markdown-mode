@@ -2289,7 +2289,7 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos-p'."
   (when (re-search-forward regex last t)
     (cond
      ;; In code block: move past it and recursively search again
-     ((markdown-code-block-at-point-p)
+     ((markdown-code-block-at-pos-p (match-beginning 0))
       (while (and (markdown-code-block-at-point-p)
                   (< (point) (point-max)))
         (markdown-end-of-block))
