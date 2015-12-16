@@ -1606,6 +1606,15 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-enter-key)
    (should (eq (point) 78))))
 
+(ert-deftest test-markdown-indentation/indent-list-single ()
+  "Test `markdown-indent-line' with single list item."
+  (markdown-test-string
+   "  * item 1"
+   (end-of-line)
+   (markdown-enter-key)
+   (should (string-equal (buffer-string) "  * item 1\n  "))
+   (should (eq (point) 14))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
