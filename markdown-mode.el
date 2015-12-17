@@ -1272,11 +1272,9 @@ Function is called repeatedly until it returns nil. For details, see
 `syntax-propertize-extend-region-functions'."
   (save-excursion
     (cons
-     (or (and (looking-back "\n\n" nil) start)
-         (and (goto-char start) (re-search-backward "\n\n" nil t))
+     (or (and (goto-char start) (re-search-backward "\n\n" nil t))
          (point-min))
-     (or (and (looking-at "\n\n") end)
-         (and (goto-char end) (re-search-forward "\n\n" nil t))
+     (or (and (goto-char end) (re-search-forward "\n\n" nil t))
          (point-max)))))
 
 (defun markdown-syntax-propertize-pre-blocks (start end)
