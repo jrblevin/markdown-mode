@@ -2418,6 +2418,15 @@ analysis."
          t)
         (t nil)))
 
+(defun markdown-match-comments (last)
+  "Match HTML comments from the point to LAST."
+  (when (and (skip-syntax-forward "^<" last))
+    (let ((beg (point)))
+      (when (and (skip-syntax-forward "^>" last) (< (point) last))
+        (forward-char)
+        (set-match-data (list beg (point)))
+        t))))
+
 (defun markdown-match-generic-metadata (regexp last)
   "Match generic metadata specified by REGEXP from the point to LAST."
   (let ((header-end (save-excursion

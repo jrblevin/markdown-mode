@@ -2262,6 +2262,14 @@ body"
    (forward-line)
    (should-not (markdown-code-at-point-p))))
 
+(ert-deftest test-markdown-parsing/match-comments ()
+  "Test `markdown-match-comments'."
+  (markdown-test-string
+   "HTML <!-- foo --> comment"
+   (should (markdown-match-comments (point-max)))
+   (should (eq (point) 18))
+   (should (equal (match-data) (list 6 18)))
+   (should-not (markdown-match-comments (point-max)))))
 
 ;;; Reference Checking:
 
