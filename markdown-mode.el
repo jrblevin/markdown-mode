@@ -796,6 +796,8 @@
 (require 'thingatpt)
 (eval-when-compile (require 'cl))
 
+(declare-function eww-open-file "eww")
+
 
 ;;; Constants =================================================================
 
