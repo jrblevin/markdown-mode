@@ -2466,18 +2466,6 @@ analysis."
   "Match Pandoc metadata from the point to LAST."
   (markdown-match-generic-metadata markdown-regex-pandoc-metadata last))
 
-(defun markdown-font-lock-extend-region ()
-  "Extend the search region to include an entire block of text.
-This helps improve font locking for block constructs such as pre blocks."
-  ;; Avoid compiler warnings about these global variables from font-lock.el.
-  ;; See the documentation for variable `font-lock-extend-region-functions'.
-  (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
-  (let ((range (markdown-syntax-propertize-extend-region
-                font-lock-beg font-lock-end)))
-    (when range
-      (setq font-lock-beg (car range))
-      (setq font-lock-end (cdr range)))))
-
 
 ;;; Syntax Table ==============================================================
 
@@ -5598,10 +5586,6 @@ before regenerating font-lock rules for extensions."
     (make-local-hook 'after-change-functions)
     (make-local-hook 'font-lock-extend-region-functions)
     (make-local-hook 'window-configuration-change-hook))
-
-  ;; Multiline font lock
-  (add-hook 'font-lock-extend-region-functions
-            'markdown-font-lock-extend-region)
 
   ;; Anytime text changes make sure it gets fontified correctly
   (add-hook 'after-change-functions 'markdown-check-change-for-wiki-link t t)
