@@ -1277,8 +1277,9 @@ Function is called repeatedly until it returns nil. For details, see
   (save-excursion
     (let ((new-start (and (goto-char start) (re-search-backward "\n\n" nil t)))
           (new-end (and (goto-char end) (re-search-forward "\n\n" nil t))))
-      (when (and new-start new-end)
-        (cons new-start new-end)))))
+      (when (or new-start new-end)
+        (cons (or new-start start)
+              (or new-end end))))))
 
 (defun markdown-syntax-propertize-pre-blocks (start end)
   "Match preformatted text blocks from START to END."
