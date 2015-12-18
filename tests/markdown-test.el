@@ -1717,7 +1717,6 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-font-lock/italics-and-code ()
   "Test seeming italics mixed with code."
-  :expected-result :failed
   (markdown-test-string
    "define `var_1` and `var_2` inline code"
    (markdown-test-range-has-face 9 13 markdown-inline-code-face)
@@ -2271,6 +2270,18 @@ body"
    (should (eq (point) 18))
    (should (equal (match-data) (list 6 18)))
    (should-not (markdown-match-comments (point-max)))))
+
+(ert-deftest test-markdown-parsing/range-property-any ()
+  "Test behavior of `markdown-range-property-any'."
+  (markdown-test-file
+   "inline.text"
+   (should (markdown-range-property-any
+            (point-min) (point-at-eol)
+            'face (list markdown-markup-face
+                        markdown-italic-face)))
+   (should-not (markdown-range-property-any
+            (point-min) (point-at-eol)
+            'face (list markdown-bold-face)))))
 
 ;;; Reference Checking:
 

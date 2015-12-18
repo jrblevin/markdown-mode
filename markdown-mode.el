@@ -2285,6 +2285,23 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
+(defun markdown-range-property-any (begin end prop values)
+  "Return t if PROP from BEGIN to END is equal to one of the given VALUES.
+Also returns t if PROP is a list containing one of the VALUES.
+Return nil otherwise."
+  (let (loc props val)
+    (catch 'found
+      (dolist (loc (number-sequence begin end))
+        (when (setq props (get-char-property loc prop))
+          (cond ((listp props)
+                 ;; props is a list, check for membership
+                 (dolist (val values)
+                   (when (memq val props) (throw 'found loc))))
+              (t
+               ;; props is a scalar, check for equality
+               (dolist (val values)
+                 (when (eq val props) (throw 'found loc))))))))))
+
 (defun markdown-match-inline-generic (regex last)
   "Match inline REGEX from the point to LAST."
   (when (re-search-forward regex last t)
@@ -2321,11 +2338,19 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
   (let ((regex (if (eq major-mode 'gfm-mode)
                    markdown-regex-gfm-italic markdown-regex-italic)))
     (when (markdown-match-inline-generic regex last)
-      (set-match-data (list (match-beginning 1) (match-end 1)
-                            (match-beginning 2) (match-end 2)
-                            (match-beginning 3) (match-end 3)
-                            (match-beginning 4) (match-end 4)))
-      (goto-char (1+ (match-end 0))))))
+      (let ((begin (match-beginning 1)) (end (match-end 1)))
+        (cond
+         ((markdown-range-property-any
+           begin end 'face (list markdown-inline-code-face
+                                 markdown-bold-face))
+          (goto-char (1+ (match-end 0)))
+          (markdown-match-italic last))
+         (t
+          (set-match-data (list (match-beginning 1) (match-end 1)
+                                (match-beginning 2) (match-end 2)
+                                (match-beginning 3) (match-end 3)
+                                (match-beginning 4) (match-end 4)))
+          (goto-char (1+ (match-end 0)))))))))
 
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
