@@ -72,6 +72,20 @@
 ;; [^theme]: The theme used in the screenshot is
 ;;     [color-theme-twilight](https://github.com/crafterm/twilight-emacs).
 ;;
+;; The latest development version can be obtained from the Git
+;; repository at <http://jblevins.org/git/markdown-mode.git> or from
+;; [GitHub][]:
+;;
+;;     git clone git://jblevins.org/git/markdown-mode.git
+;;     git clone https://github.com/jrblevin/markdown-mode.git
+;;
+;; [![Build Status][status]][travis]
+;;
+;;  [devel.el]: http://jblevins.org/git/markdown-mode.git/plain/markdown-mode.el
+;;  [GitHub]: https://github.com/jrblevin/markdown-mode/
+;;  [travis]: https://travis-ci.org/jrblevin/markdown-mode
+;;  [status]: https://travis-ci.org/jrblevin/markdown-mode.svg?branch=master
+;;
 ;; markdown-mode is also available in several package managers, including:
 ;;
 ;;    * Debian Linux: [emacs-goodies-el][]
@@ -90,18 +104,6 @@
 ;;  [macports-package]: https://trac.macports.org/browser/trunk/dports/editors/markdown-mode.el/Portfile
 ;;  [macports-ticket]: http://trac.macports.org/ticket/35716
 ;;  [freebsd-port]: http://svnweb.freebsd.org/ports/head/textproc/markdown-mode.el
-;;
-;; The latest development version can be downloaded directly
-;; ([markdown-mode.el][devel.el]) or it can be obtained from the
-;; (browsable and clonable) Git repository at
-;; <http://jblevins.org/git/markdown-mode.git> or from [GitHub][].
-;; The entire repository, including the full project history, can be
-;; cloned via the Git protocol by running
-;;
-;;     git clone git://jblevins.org/git/markdown-mode.git
-;;
-;;  [devel.el]: http://jblevins.org/git/markdown-mode.git/plain/markdown-mode.el
-;;  [GitHub]: https://github.com/jrblevin/markdown-mode/
 
 ;;; Installation:
 
