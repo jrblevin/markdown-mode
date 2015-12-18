@@ -2317,22 +2317,11 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
   (let ((regex (if (eq major-mode 'gfm-mode)
                    markdown-regex-gfm-italic markdown-regex-italic)))
     (when (markdown-match-inline-generic regex last)
-      (let ((begin (match-beginning 1)) (end (match-end 1)))
-        (cond ((save-match-data
-                 (or (and (goto-char begin)
-                          (thing-at-point-looking-at markdown-regex-bold))
-                     (and (goto-char begin)
-                          (thing-at-point-looking-at markdown-regex-code))
-                     (and (goto-char end)
-                          (thing-at-point-looking-at markdown-regex-code))))
-               (goto-char (1+ (match-end 0)))
-               (markdown-match-italic last))
-              (t
-               (set-match-data (list (match-beginning 1) (match-end 1)
-                                     (match-beginning 2) (match-end 2)
-                                     (match-beginning 3) (match-end 3)
-                                     (match-beginning 4) (match-end 4)))
-               (goto-char (1+ (match-end 0)))))))))
+      (set-match-data (list (match-beginning 1) (match-end 1)
+                            (match-beginning 2) (match-end 2)
+                            (match-beginning 3) (match-end 3)
+                            (match-beginning 4) (match-end 4)))
+      (goto-char (1+ (match-end 0))))))
 
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
