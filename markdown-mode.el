@@ -1887,9 +1887,10 @@ in XEmacs 21."
 
 (defun markdown-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
-  (save-excursion
-    (beginning-of-line)
-    (re-search-forward "^\\s *$" (line-end-position) t)))
+  (save-match-data
+    (save-excursion
+      (beginning-of-line)
+      (re-search-forward "^\\s *$" (line-end-position) t))))
 
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
