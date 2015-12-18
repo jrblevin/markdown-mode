@@ -1930,14 +1930,14 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
       (markdown-test-range-has-face loc loc markdown-list-face))
     (markdown-test-range-has-face 6 25 nil)
     (markdown-test-range-has-face 31 83 nil)
-    (markdown-test-range-has-face 85 155 markdown-pre-face)
+    (markdown-test-range-has-face 85 154 markdown-pre-face)
     (markdown-test-range-has-face 157 189 nil)
     (markdown-test-range-has-face 196 215 nil)
     (markdown-test-range-has-face 226 403 nil)
-    (markdown-test-range-has-face 405 482 markdown-pre-face)
+    (markdown-test-range-has-face 405 481 markdown-pre-face)
     (markdown-test-range-has-face 493 512 nil)
     (markdown-test-range-has-face 527 546 nil)
-    (markdown-test-range-has-face 548 581 markdown-pre-face)))
+    (markdown-test-range-has-face 548 580 markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/pre-2 ()
   (markdown-test-string "* item\n\nreset baseline\n\n    pre block\n"

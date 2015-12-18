@@ -1305,6 +1305,7 @@ Function is called repeatedly until it returns nil. For details, see
           (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
                       (not (eobp)))
             (forward-line))
+          (skip-syntax-backward "-")
           (setq close (point)))
          ;; If current line has a list marker, update levels, move to end of block
          ((looking-at markdown-regex-list)
@@ -1341,7 +1342,6 @@ Function is called repeatedly until it returns nil. For details, see
   (save-excursion
     (goto-char start)
     (while (re-search-forward markdown-regex-gfm-code-block-open end t)
-      (beginning-of-line)
       (let ((open (list (match-beginning 1) (match-end 1)))
             (lang (list (match-beginning 2) (match-end 2))))
         (forward-line)
@@ -1351,7 +1351,7 @@ Function is called repeatedly until it returns nil. For details, see
             (let ((close (list (match-beginning 1) (match-end 1)))
                   (all (list (car open) (match-end 1))))
               (setq body (list body (1- (match-beginning 0))))
-              (put-text-property (car open) (match-end 0) 'markdown-gfm-code
+              (put-text-property (car open) (match-end 1) 'markdown-gfm-code
                                  (append all open lang body close)))))))))
 
 (defun markdown-syntax-propertize-blockquotes (start end)
