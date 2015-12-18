@@ -2284,19 +2284,13 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
 (defun markdown-match-inline-generic (regex last)
   "Match inline REGEX from the point to LAST."
   (when (re-search-forward regex last t)
-    (cond
-     ;; In code block: move past it and recursively search again
-     ((markdown-code-block-at-pos (match-beginning 0))
-      (while (and (markdown-code-block-at-point)
-                  (< (point) (point-max)))
-        (markdown-end-of-block))
-      (when (and (< (point) last))
-        (markdown-match-inline-generic regex last)))
-     ;; End of match out of range: return nil
-     ((> (match-end 0) last)
-      nil)
-     ;; Found: keep match data and return
-     (t t))))
+    (let ((bounds (markdown-code-block-at-pos (match-beginning 0))))
+      (if (null bounds)
+          ;; Not in a code block: keep match data and return t when in bounds
+          (<= (match-end 0) last)
+        ;; In code block: move past it and recursively search again
+        (when (< (goto-char (nth 1 bounds)) last)
+          (markdown-match-inline-generic regex last))))))
 
 (defun markdown-match-code (last)
   "Match inline code fragments from point to LAST."
