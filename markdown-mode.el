@@ -1271,11 +1271,10 @@ Returns a cons (NEW-START . NEW-END) or nil if no adjustment should be made.
 Function is called repeatedly until it returns nil. For details, see
 `syntax-propertize-extend-region-functions'."
   (save-excursion
-    (cons
-     (or (and (goto-char start) (re-search-backward "\n\n" nil t))
-         (point-min))
-     (or (and (goto-char end) (re-search-forward "\n\n" nil t))
-         (point-max)))))
+    (let ((new-start (and (goto-char start) (re-search-backward "\n\n" nil t)))
+          (new-end (and (goto-char end) (re-search-forward "\n\n" nil t))))
+      (when (and new-start new-end)
+        (cons new-start new-end)))))
 
 (defun markdown-syntax-propertize-pre-blocks (start end)
   "Match preformatted text blocks from START to END."
@@ -2474,8 +2473,9 @@ This helps improve font locking for block constructs such as pre blocks."
   (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
   (let ((range (markdown-syntax-propertize-extend-region
                 font-lock-beg font-lock-end)))
-    (setq font-lock-beg (car range))
-    (setq font-lock-end (cdr range))))
+    (when range
+      (setq font-lock-beg (car range))
+      (setq font-lock-end (cdr range)))))
 
 
 ;;; Syntax Table ==============================================================
