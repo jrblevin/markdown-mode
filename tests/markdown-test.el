@@ -1928,6 +1928,15 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 18 18 markdown-markup-face)
    (markdown-test-range-has-face 19 19 nil)))
 
+(ert-deftest test-markdown-font-lock/code-3 ()
+  "Backslashes don't escape backticks inside of inline code strings."
+  (markdown-test-string
+   "`foo\\`bar`"
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 5 markdown-inline-code-face)
+   (markdown-test-range-has-face 6 6 markdown-markup-face)
+   (markdown-test-range-has-face 7 10 nil)))
+
 (ert-deftest test-markdown-font-lock/kbd ()
   "Test font lock for <kbd> tags."
   (markdown-test-string "<kbd>C-c <</kbd>"
