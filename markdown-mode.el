@@ -1536,12 +1536,12 @@ Function is called repeatedly until it returns nil. For details, see
   :group 'faces)
 
 (defface markdown-italic-face
-  '((t (:inherit font-lock-variable-name-face :slant italic)))
+  '((t (:inherit font-lock-variable-name-face :slant italic :weight normal)))
   "Face for italic text."
   :group 'markdown-faces)
 
 (defface markdown-bold-face
-  '((t (:inherit font-lock-variable-name-face :weight bold)))
+  '((t (:inherit font-lock-variable-name-face :weight bold :slant normal)))
   "Face for bold text."
   :group 'markdown-faces)
 
