@@ -962,7 +962,14 @@ Test point position upon removal and insertion."
    (should (looking-back "2\. "))
    (should (string-equal
             (buffer-string)
-            "1. A\n    * AA\n        1. AAA\n    * \n2. "))))
+            "1. A\n    * AA\n        1. AAA\n    * \n2. "))
+   (let ((current-prefix-arg '(4)))
+     (call-interactively 'markdown-insert-list-item))
+   (should (eq (point) 44))
+   (should (looking-back "3\. "))
+   (should (string-equal
+            (buffer-string)
+            "1. A\n    * AA\n        1. AAA\n    * \n2. \n3. "))))
 
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."

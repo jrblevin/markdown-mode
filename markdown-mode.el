@@ -2063,12 +2063,14 @@ upon failure."
          ((and (looking-at markdown-regex-list)
                (setq bounds (markdown-cur-list-item-bounds)))
           (cond
-           ;; Continue at item with greater indentation
-           ((> (nth 3 bounds) level) t)
            ;; Stop and return point at item of lesser or equal indentation
            ((<= (nth 3 bounds) level)
             (setq prev (point))
-            nil)))
+            nil)
+           ;; Stop at beginning of buffer
+           ((bobp) (setq prev nil))
+           ;; Continue at item with greater indentation
+           ((> (nth 3 bounds) level) t)))
          ;; Stop at beginning of buffer
          ((bobp) (setq prev nil))
          ;; Continue if current line is blank
