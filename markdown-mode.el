@@ -2059,24 +2059,20 @@ upon failure."
     (setq indent (markdown-cur-line-indent))
     (while
         (cond
-         ;; Stop at beginning of buffer
-         ((bobp) (setq prev nil))
-         ;; Continue if current line is blank
-         ((markdown-cur-line-blank-p) t)
          ;; List item
          ((and (looking-at markdown-regex-list)
                (setq bounds (markdown-cur-list-item-bounds)))
           (cond
            ;; Continue at item with greater indentation
            ((> (nth 3 bounds) level) t)
-           ;; Stop and return point at item of equal indentation
-           ((= (nth 3 bounds) level)
+           ;; Stop and return point at item of lesser or equal indentation
+           ((<= (nth 3 bounds) level)
             (setq prev (point))
-            nil)
-           ;; Stop and return nil at item with lesser indentation
-           ((< (nth 3 bounds) level)
-            (setq prev nil)
             nil)))
+         ;; Stop at beginning of buffer
+         ((bobp) (setq prev nil))
+         ;; Continue if current line is blank
+         ((markdown-cur-line-blank-p) t)
          ;; Continue while indentation is the same or greater
          ((>= indent level) t)
          ;; Stop if current indentation is less than list item
@@ -4243,7 +4239,7 @@ decrease the indentation by one level.
 With two \\[universal-argument] prefixes (i.e., when ARG is (16)),
 increase the indentation by one level."
   (interactive "p")
-  (let (bounds item-indent marker indent new-indent new-loc)
+  (let (bounds cur-indent marker indent new-indent new-loc)
     (save-match-data
       ;; Look for a list item on current or previous non-blank line
       (save-excursion
@@ -4279,13 +4275,23 @@ increase the indentation by one level."
             (unless (markdown-cur-line-blank-p)
               (insert "\n"))
             (insert markdown-unordered-list-item-prefix))
-        ;; Compute indentation for a new list item
-        (setq item-indent (nth 2 bounds))
+        ;; Compute indentation and marker for new list item
+        (setq cur-indent (nth 2 bounds))
         (setq marker (nth 4 bounds))
-        (setq indent (cond
-                      ((= arg 4) (max (- item-indent 4) 0))
-                      ((= arg 16) (+ item-indent 4))
-                      (t item-indent)))
+        (cond
+         ;; Dedent: decrement indentation, find previous marker.
+         ((= arg 4)
+          (setq indent (max (- cur-indent 4) 0))
+          (let ((prev-bounds
+                 (save-excursion
+                   (when (markdown-prev-list-item (- (nth 3 bounds) 1))
+                     (markdown-cur-list-item-bounds)))))
+            (when prev-bounds
+              (setq marker (nth 4 prev-bounds)))))
+         ;; Indent: increment indentation by 4, use same marker.
+         ((= arg 16) (setq indent (+ cur-indent 4)))
+         ;; Same level: keep current indentation and marker.
+         (t (setq indent cur-indent)))
         (setq new-indent (make-string indent 32))
         (goto-char new-loc)
         (cond
@@ -4294,7 +4300,7 @@ increase the indentation by one level."
           (if (= arg 16) ;; starting a new column indented one more level
               (insert (concat new-indent "1. "))
             ;; travel up to the last item and pick the correct number.  If
-            ;; the argument was nil, "new-indent = item-indent" is the same,
+            ;; the argument was nil, "new-indent = cur-indent" is the same,
             ;; so we don't need special treatment. Neat.
             (save-excursion
               (while (and (not (looking-at (concat new-indent "\\([0-9]+\\)\\(\\.[ \t]*\\)")))

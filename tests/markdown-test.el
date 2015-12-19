@@ -944,6 +944,26 @@ Test point position upon removal and insertion."
                         (call-interactively 'markdown-insert-list-item)
                         (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
 
+(ert-deftest test-markdown-insertion/nested-list-marker ()
+  "Test marker detection for `markdown-insert-list-item'."
+  (markdown-test-string
+   "1. A\n    * AA\n        1. AAA"
+   (goto-char (point-max))
+   (let ((current-prefix-arg '(4)))
+     (call-interactively 'markdown-insert-list-item))
+   (should (eq (point) 36))
+   (should (looking-back "\* "))
+   (should (string-equal
+            (buffer-string)
+            "1. A\n    * AA\n        1. AAA\n    * "))
+   (let ((current-prefix-arg '(4)))
+     (call-interactively 'markdown-insert-list-item))
+   (should (eq (point) 40))
+   (should (looking-back "2\. "))
+   (should (string-equal
+            (buffer-string)
+            "1. A\n    * AA\n        1. AAA\n    * \n2. "))))
+
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."
   ;; Test optional parameters (leave point after link)
