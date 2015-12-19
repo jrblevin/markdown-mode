@@ -5035,8 +5035,9 @@ current filename, but with the extension removed and replaced with .html."
   (interactive)
   (browse-url-of-file (markdown-export)))
 
-(defvar-local markdown-live-preview-buffer nil
+(defvar markdown-live-preview-buffer nil
   "Buffer used to preview markdown output in `markdown-live-preview-export'.")
+(make-variable-buffer-local 'markdown-live-preview-buffer)
 
 (defun markdown-live-preview-window-eww (file)
   "A `markdown-live-preview-window-function' for previewing with eww."
