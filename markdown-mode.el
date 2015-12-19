@@ -5096,8 +5096,8 @@ the rendered output."
   (when (buffer-live-p markdown-live-preview-buffer)
     (kill-buffer markdown-live-preview-buffer))
   (setq markdown-live-preview-buffer nil)
-  (when (or (eq markdown-live-preview-delete-export 'delete-on-export)
-            (eq markdown-live-preview-delete-export 'delete-on-destroy))
+  (when (memq markdown-live-preview-delete-export
+              '(delete-on-export delete-on-destroy))
     (let ((outfile-name (markdown-live-preview-get-filename)))
       (when (file-exists-p outfile-name)
         (delete-file outfile-name)))))
