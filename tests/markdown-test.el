@@ -2228,6 +2228,26 @@ body"
 
 ;;; Markdown Parsing Functions:
 
+(ert-deftest test-markdown-parsing/extend-region-function ()
+  "Test `markdown-syntax-propertize-extend-region'.
+Should return a cons (NEW-START . NEW-END) or nil if no
+adjustment should be made. Function is called repeatedly until it
+returns nil."
+  (markdown-test-file
+   "inline.text"
+   (should (equal (markdown-syntax-propertize-extend-region 1 17)
+                  nil))
+   (should (equal (markdown-syntax-propertize-extend-region 2 17)
+                  (cons 1 91)))
+   (should (equal (markdown-syntax-propertize-extend-region 1 91)
+                  nil))
+   (should (equal (markdown-syntax-propertize-extend-region 93 157)
+                  nil))
+   (should (equal (markdown-syntax-propertize-extend-region 496 502)
+                  (cons 486 510)))
+   (should (equal (markdown-syntax-propertize-extend-region 486 510)
+                  nil))))
+
 (ert-deftest test-markdown-parsing/reference-definition-basic ()
   "Test reference definition function."
   (markdown-test-file "syntax.text"
