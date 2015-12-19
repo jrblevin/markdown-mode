@@ -2967,6 +2967,19 @@ indented the same amount."
    (markdown-test-range-has-face 219 223 markdown-math-face)
    (markdown-test-range-has-face 224 224 markdown-markup-face)))
 
+(ert-deftest test-markdown-math/font-lock-italics ()
+  "Test markdown math mode with underscores."
+  (markdown-test-file "math.text"
+   (markdown-enable-math t)
+   (funcall markdown-test-font-lock-function)
+   (markdown-test-range-has-face 227 227 markdown-markup-face)
+   (markdown-test-range-has-face 228 233 markdown-math-face)
+   (markdown-test-range-has-face 234 234 markdown-markup-face)
+   (markdown-test-range-has-face 235 270 nil)
+   (markdown-test-range-has-face 271 271 markdown-markup-face)
+   (markdown-test-range-has-face 272 274 markdown-math-face)
+   (markdown-test-range-has-face 275 275 markdown-markup-face)))
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()

@@ -1771,6 +1771,14 @@ See `font-lock-syntactic-face-function' for details."
                                                (4 markdown-markup-face)       ; :
                                                (5 markdown-url-face)          ; url
                                                (6 markdown-link-title-face))) ; "title" (optional)
+   ;; Math mode $..$
+   (cons 'markdown-match-math-single '((1 markdown-markup-face prepend)
+                                       (2 markdown-math-face append)
+                                       (3 markdown-markup-face prepend)))
+   ;; Math mode $$..$$
+   (cons 'markdown-match-math-double '((1 markdown-markup-face prepend)
+                                       (2 markdown-math-face append)
+                                       (3 markdown-markup-face prepend)))
    (cons 'markdown-match-bold '((1 markdown-markup-face prepend)
                                 (2 markdown-bold-face append)
                                 (3 markdown-markup-face prepend)))
@@ -1785,14 +1793,6 @@ See `font-lock-syntactic-face-function' for details."
 
 (defconst markdown-mode-font-lock-keywords-math
   (list
-   ;; Math mode $..$
-   (cons 'markdown-match-math-single '((1 markdown-markup-face prepend)
-                                       (2 markdown-math-face append)
-                                       (3 markdown-markup-face prepend)))
-   ;; Math mode $$..$$
-   (cons 'markdown-match-math-double '((1 markdown-markup-face prepend)
-                                       (2 markdown-math-face append)
-                                       (3 markdown-markup-face prepend)))
    ;; Display mode equations with brackets: \[ \]
    (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
                                        (2 markdown-math-face append)
@@ -2341,7 +2341,8 @@ Return nil otherwise."
         (cond
          ((markdown-range-property-any
            begin end 'face (list markdown-inline-code-face
-                                 markdown-bold-face))
+                                 markdown-bold-face
+                                 markdown-math-face))
           (goto-char (1+ (match-end 0)))
           (markdown-match-italic last))
          (t
@@ -2351,10 +2352,10 @@ Return nil otherwise."
                                 (match-beginning 4) (match-end 4)))
           (goto-char (1+ (match-end 0)))))))))
 
-
 (defun markdown-match-math-generic (regex last)
   "Match quoted $..$ or $$..$$ math from point to LAST."
-  (when (markdown-match-inline-generic regex last)
+  (when (and markdown-enable-math
+             (markdown-match-inline-generic regex last))
     (let ((begin (match-beginning 1)) (end (match-end 1)))
       (prog1
           (if (markdown-range-property-any

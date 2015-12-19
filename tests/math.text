@@ -16,6 +16,8 @@ f x = length $ tail x
 
 $x + 1$
 
+$e_{ik}$ in the statement the theorem about $V_k$
+
 <!-- Local Variables: -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->
