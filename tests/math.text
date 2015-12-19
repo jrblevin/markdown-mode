@@ -6,6 +6,10 @@ Again, but with dollar signs:
 
 $$ y = mx + b $$
 
+# Regarding $\vec g$ and its effects
+
+Math in a heading
+
 <!-- Local Variables: -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->
