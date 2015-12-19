@@ -998,17 +998,19 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type 'boolean)
 
-(defcustom markdown-live-preview-window-function 'markdown-live-preview-window-eww
+(defcustom markdown-live-preview-window-function
+  'markdown-live-preview-window-eww
   "Function to display preview of Markdown output within Emacs. Function must
 update the buffer containing the preview and return the buffer."
   :group 'markdown
   :type 'function)
 
-(defcustom markdown-live-preview-delete-export t
-  "When non-nil, deleted exported html file when using
-`markdown-live-preview-export'."
+(defcustom markdown-live-preview-delete-export 'delete-on-destroy
+  "Delete exported html file when using `markdown-live-preview-export' on every
+export, when quitting `markdown-live-preview-mode', or not at all."
   :group 'markdown
-  :type 'boolean)
+  :type 'symbol
+  :options '(nil delete-on-export delete-on-destroy))
 
 
 ;;; Regular Expressions =======================================================
@@ -5039,6 +5041,10 @@ current filename, but with the extension removed and replaced with .html."
   "Buffer used to preview markdown output in `markdown-live-preview-export'.")
 (make-variable-buffer-local 'markdown-live-preview-buffer)
 
+(defun markdown-live-preview-get-filename ()
+  "Standardize the filename exported by `markdown-live-preview-export'."
+  (markdown-export-file-name ".html"))
+
 (defun markdown-live-preview-window-eww (file)
   "A `markdown-live-preview-window-function' for previewing with eww."
   (eww-open-file file)
@@ -5065,7 +5071,7 @@ non-nil."
 Emacs using `markdown-live-preview-window-function' Return the buffer displaying
 the rendered output."
   (interactive)
-  (let ((export-file (markdown-export))
+  (let ((export-file (markdown-export (markdown-live-preview-get-filename)))
         ;; get positions in all windows currently displaying output buffer
         (window-data
          (markdown-live-preview-window-serialize markdown-live-preview-buffer))
@@ -5080,7 +5086,7 @@ the rendered output."
     ;; reset all windows displaying output buffer to where they were, now with
     ;; the new output
     (mapc #'markdown-live-preview-window-deserialize window-data)
-    (when (and markdown-live-preview-delete-export
+    (when (and (eq markdown-live-preview-delete-export 'delete-on-export)
                export-file (file-exists-p export-file))
       (delete-file export-file)
       (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf))))
@@ -5089,7 +5095,12 @@ the rendered output."
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
     (kill-buffer markdown-live-preview-buffer))
-  (setq markdown-live-preview-buffer nil))
+  (setq markdown-live-preview-buffer nil)
+  (when (or (eq markdown-live-preview-delete-export 'delete-on-export)
+            (eq markdown-live-preview-delete-export 'delete-on-destroy))
+    (let ((outfile-name (markdown-live-preview-get-filename)))
+      (when (file-exists-p outfile-name)
+        (delete-file outfile-name)))))
 
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
