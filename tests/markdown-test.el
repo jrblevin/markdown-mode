@@ -2163,6 +2163,47 @@ body"
    (markdown-test-range-has-face 1 9 nil)
    (markdown-test-range-has-face 10 11 markdown-line-break-face)))
 
+(ert-deftest test-markdown-font-lock/blockquote-bold ()
+  "Test font lock for bold inside of a blockquote."
+  (markdown-test-string
+   "> **bold**"
+   (markdown-test-range-has-face 2 10 markdown-blockquote-face)
+   (markdown-test-range-has-face 5 8 markdown-bold-face)))
+
+(ert-deftest test-markdown-font-lock/blockquote-italic ()
+  "Test font lock for italic inside of a blockquote."
+  (markdown-test-string
+   "> *italic*"
+   (markdown-test-range-has-face 2 10 markdown-blockquote-face)
+   (markdown-test-range-has-face 4 9 markdown-italic-face)))
+
+(ert-deftest test-markdown-font-lock/blockquote-link ()
+  "Test font lock for links inside of a blockquote."
+  :expected-result :failed
+  (markdown-test-string
+   "> [link](url)"
+   (markdown-test-range-has-face 1 13 markdown-blockquote-face)
+   (markdown-test-range-has-face 3 8 markdown-link-face)
+   (markdown-test-range-has-face 9 13 markdown-url-face)))
+
+(ert-deftest test-markdown-font-lock/blockquote-comment ()
+  "Test font lock for comments inside of a blockquote."
+  :expected-result :failed
+  (markdown-test-string
+   "> <!-- comment -->"
+   (markdown-test-range-has-face 1 18 markdown-blockquote-face)
+   (markdown-test-range-has-face 3 18 markdown-comment-face)))
+
+(ert-deftest test-markdown-font-lock/pre-override ()
+  "Test that font lock for pre blocks overrides everything else."
+  (markdown-test-string
+   "    **bold**
+    _italic_
+    <!-- comment -->
+    [link](url)
+    * list"
+   (markdown-test-range-has-face 1 73 markdown-pre-face)))
+
 (ert-deftest test-markdown-font-lock/gfm-code-block-font-lock ()
   "GFM code block font lock test. Now in base markdown-mode as well!"
   (markdown-test-file "gfm.text"
