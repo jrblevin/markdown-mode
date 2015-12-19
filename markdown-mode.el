@@ -1007,10 +1007,10 @@ update the buffer containing the preview and return the buffer."
 
 (defcustom markdown-live-preview-delete-export 'delete-on-destroy
   "Delete exported html file when using `markdown-live-preview-export' on every
-export, when quitting `markdown-live-preview-mode', or not at all."
+export by setting to 'delete-on-export, when quitting
+`markdown-live-preview-mode' by setting to 'delete-on-destroy, or not at all."
   :group 'markdown
-  :type 'symbol
-  :options '(nil delete-on-export delete-on-destroy))
+  :type 'symbol)
 
 
 ;;; Regular Expressions =======================================================
