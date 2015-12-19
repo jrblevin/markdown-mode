@@ -10,6 +10,12 @@ $$ y = mx + b $$
 
 Math in a heading
 
+~~~~ {.haskell}
+f x = length $ tail x
+~~~~
+
+$x + 1$
+
 <!-- Local Variables: -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->

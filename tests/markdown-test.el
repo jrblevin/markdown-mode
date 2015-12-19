@@ -2961,7 +2961,11 @@ indented the same amount."
    (markdown-test-range-has-face 117 117 markdown-header-delimiter-face)
    (markdown-test-range-has-face 119 152 markdown-header-face-1)
    (markdown-test-range-has-face 129 129 markdown-markup-face)
-   (markdown-test-range-has-face 136 136 markdown-markup-face)))
+   (markdown-test-range-has-face 136 136 markdown-markup-face)
+   (markdown-test-range-has-face 174 214 markdown-pre-face)
+   (markdown-test-range-has-face 218 218 markdown-markup-face)
+   (markdown-test-range-has-face 219 223 markdown-math-face)
+   (markdown-test-range-has-face 224 224 markdown-markup-face)))
 
 ;;; gfm-mode tests:
 
