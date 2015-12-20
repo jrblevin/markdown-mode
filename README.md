@@ -702,6 +702,8 @@ following people:
   * Howard Melman for supporting GFM checkboxes
     as buttons.
   * Danny McClanahan for live preview mode.
+  * Syohei Yoshida for better heading detection
+    and movement functions.
 
 ## Bugs
 

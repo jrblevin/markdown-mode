@@ -752,6 +752,8 @@
 ;;   * Howard Melman <hmelman@gmail.com> for supporting GFM checkboxes
 ;;     as buttons.
 ;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview mode.
+;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
+;;     and movement functions.
 
 ;;; Bugs:
 
