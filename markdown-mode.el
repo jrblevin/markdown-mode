@@ -2868,27 +2868,37 @@ to XHTML.  If URL is nil, insert only the link portion (for
 example, when a reference label is already defined)."
   (insert (concat "[" text "][" label "]"))
   (when url
-    (let ((end (point))
-          (label (if (> (length label) 0) label text)))
-      (cond
-       ((eq markdown-reference-location 'end) (goto-char (point-max)))
-       ((eq markdown-reference-location 'immediately) (markdown-end-of-block))
-       ((eq markdown-reference-location 'header) (markdown-end-of-defun)))
-      (unless (markdown-cur-line-blank-p) (insert "\n"))
-      (insert "\n[" label "]: " url)
-      (unless (> (length url) 0)
-        (setq end (point)))
-      (when (> (length title) 0)
-        (insert " \"" title "\""))
-      (insert "\n")
-      (unless (or (eobp) (looking-at "\n"))
-        (insert "\n"))
-      (goto-char end)
-      (when (> (length url) 0)
-        (message
-         (substitute-command-keys
-          "Defined reference [%s], press \\[markdown-jump] to jump there")
-         (or label text))))))
+    (markdown-insert-reference-definition
+     (if (string-equal label "") text label)
+     url title)))
+
+(defun markdown-insert-reference-definition (label &optional url title)
+  "Add definition for reference LABEL with URL and TITLE.
+LABEL is a Markdown reference label without square brackets.
+URL and TITLE are optional.  When given, the TITLE will
+be used to populate the title attribute when converted to XHTML."
+  ;; END specifies where to leave the point upon return
+  (let ((end (point)))
+    (cond
+     ((eq markdown-reference-location 'end) (goto-char (point-max)))
+     ((eq markdown-reference-location 'immediately) (markdown-end-of-block))
+     ((eq markdown-reference-location 'header) (markdown-end-of-defun)))
+    (unless (markdown-cur-line-blank-p) (insert "\n"))
+    (insert "\n[" label "]: ")
+    (if url
+        (insert url)
+      ;; When no URL is given, leave cursor at END following the colon
+      (setq end (point)))
+    (when title
+      (insert " \"" title "\""))
+    (unless (looking-at "\n")
+      (insert "\n"))
+    (goto-char end)
+    (when url
+      (message
+       (substitute-command-keys
+        "Defined reference [%s], press \\[markdown-jump] to jump there")
+       label))))
 
 (defun markdown-insert-reference-link-dwim ()
   "Insert a reference link of the form [text][label] at point.
@@ -4251,15 +4261,6 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
 
 ;;; References ================================================================
 
-(defun markdown-insert-reference-definition (ref &optional buffer)
-  "Add blank REF definition to the end of BUFFER.
-REF is a Markdown reference without the square brackets."
-  (or buffer (setq buffer (current-buffer)))
-  (with-current-buffer buffer
-    (goto-char (point-max))
-    (indent-new-comment-line)
-    (insert (concat "[" ref "]: "))))
-
 (defun markdown-reference-goto-definition ()
   "Jump to the definition of the reference at point or create it."
   (interactive)
@@ -4270,7 +4271,8 @@ REF is a Markdown reference without the square brackets."
            (loc (cadr (markdown-reference-definition target))))
       (if loc
           (goto-char loc)
-        (markdown-insert-reference-definition target (current-buffer))))))
+        (goto-char (match-beginning 0))
+        (markdown-insert-reference-definition target)))))
 
 (defun markdown-reference-find-links (reference)
   "Return a list of all links for REFERENCE.
@@ -4356,7 +4358,7 @@ BUFFER-NAME is the name of the main buffer being visited."
     linkbuf))
 
 (when (markdown-use-buttons-p)
-  ;; Add an empty Markdown reference definition to the end of buffer
+  ;; Add an empty Markdown reference definition to buffer
   ;; specified in the 'target-buffer property.  The reference name is
   ;; the button's label.
   (define-button-type 'markdown-undefined-reference-button
@@ -4364,10 +4366,13 @@ BUFFER-NAME is the name of the main buffer being visited."
     'follow-link t
     'face 'bold
     'action (lambda (b)
-              (let ((buffer (button-get b 'target-buffer)))
-                (markdown-insert-reference-definition (button-label b) buffer)
+              (let ((buffer (button-get b 'target-buffer))
+                    (line (button-get b 'target-line))
+                    (label (button-label b)))
                 (switch-to-buffer-other-window buffer)
-                (goto-char (point-max))
+                (goto-char (point-min))
+                (forward-line line)
+                (markdown-insert-reference-definition label)
                 (markdown-check-refs t))))
 
   ;; Jump to line in buffer specified by 'target-buffer property.
@@ -4405,7 +4410,8 @@ as by `markdown-get-undefined-refs'."
         ;; Create a reference button in Emacs 22
         (insert-button label
                        :type 'markdown-undefined-reference-button
-                       'target-buffer oldbuf)
+                       'target-buffer oldbuf
+                       'target-line (cdr (car (cdr reference))))
       ;; Insert reference as text in Emacs < 22
       (insert label))
     (insert " (")

@@ -1092,11 +1092,12 @@ Test point position upon removal and insertion."
                           (should (looking-at "\\[link\\]: http://jblevins.org/")))))
 
 (ert-deftest test-markdown-insertion/reference-link-header ()
-  "Basic reference link insertion test for 'header location."
+  "Basic reference link and definition insertion test for 'header location."
   (let ((markdown-reference-location 'header))
     (markdown-test-string "par one\n\npar two\n\n### header\n"
                           (end-of-line)
-                          (markdown-insert-reference-link "link" "" "")
+                          (markdown-insert-reference-link "link" "")
+                          (markdown-insert-reference-definition "link")
                           (should (= (point) 35))
                           (should (looking-back "\\[link\\]: " nil)))))
 
@@ -2923,7 +2924,7 @@ echo \"Hello, world v2!\"
   (markdown-test-string "[a][]\n"
    (markdown-reference-goto-definition)
    (should (= (point) 13))
-   (should (string-equal (buffer-string) "[a][]\n\n[a]: "))))
+   (should (string-equal (buffer-string) "[a][]\n\n[a]: \n"))))
 
 (ert-deftest test-markdown-movement/back-to-same-level-over-code-block ()
   "`markdown-backward-same-level' over code block which contains header
