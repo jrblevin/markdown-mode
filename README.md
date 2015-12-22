@@ -526,10 +526,11 @@ provides an interface to all of the possible customizations:
     this variable buffer-local allows `markdown-mode` to override
     the default behavior induced when the global variable is non-nil.
 
-  * `markdown-make-gfm-checkboxes-buttons` - Whether GitHub Flavored
-    Markdown style checkboxes should be turned into buttons that can
-    be toggled with mouse-1 or RET. If non-nil buttons are enabled, the
-    default is t. This works in `markdown-mode` as well as `gfm-mode`.
+  * `markdown-make-gfm-checkboxes-buttons` - Whether GitHub
+    Flavored Markdown style task lists (checkboxes) should be
+    turned into buttons that can be toggled with mouse-1 or RET. If
+    non-nil (default), then buttons are enabled.  This works in
+    `markdown-mode` as well as `gfm-mode`.
 
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
@@ -575,39 +576,82 @@ either via customize or by placing `(setq markdown-enable-math t)`
 in `.emacs`, and then restarting Emacs or calling
 `markdown-reload-extensions`.
 
-## GitHub Flavored Markdown
+## GitHub Flavored Markdown (GFM)
 
-A [GitHub Flavored Markdown][GFM] (GFM) mode, `gfm-mode`, is also
-available.  The GitHub implementation of differs slightly from
-standard Markdown.  The most important differences are that
-newlines are significant, triggering hard line breaks, and that
-underscores inside of words (e.g., variable names) need not be
-escaped.  As such, `gfm-mode` turns off `auto-fill-mode` and turns
-on `visual-line-mode` (or `longlines-mode` if `visual-line-mode` is
-not available).  Underscores inside of words (such as
-test_variable) will not trigger emphasis.
+A [GitHub Flavored Markdown][GFM] mode, `gfm-mode`, is also
+available.  The GitHub implementation differs slightly from
+standard Markdown in that it supports things like different
+behavior for underscores inside of words, automatic linking of
+URLs, strikethrough text, and fenced code blocks with an optional
+language keyword.
 
-Wiki links in this mode will be treated as on GitHub, with hyphens
-replacing spaces in filenames and where the first letter of the
-filename capitalized.  For example, `[[wiki link]]` will map to a
-file named `Wiki-link` with the same extension as the current file.
+The GFM-specific features above apply to `README.md` files, wiki
+pages, and other Markdown-formatted files in repositories on
+GitHub.  GitHub also enables [additional features][GFM comments] for
+writing on the site (for issues, pull requests, messages, etc.)
+that are further extensions of GFM.  These features include task
+lists (checkboxes), newlines corresponding to hard line breaks,
+auto-linked references to issues and commits, wiki links, and so
+on.  To make matters more confusing, although task lists are not
+part of [GFM proper][GFM], [since 2014][] they are rendered (in a
+read-only fashion) in all Markdown documents in repositories on the
+site.  These additional extensions are supported to varying degrees
+by `markdown-mode` and `gfm-mode` as described below.
 
-GFM code blocks, with optional programming language keywords, will
-be highlighted.  They can be inserted with <kbd>C-c C-s P</kbd>.  If there
-is an active region, the text in the region will be placed inside
-the code block.  You will be prompted for the name of the language,
-but may press enter to continue without naming a language.
+* **URL autolinking:** Both `markdown-mode` and `gfm-mode` support
+  highlighting of URLs without angle brackets.
 
-Similarly, strike through text is supoorted in GFM mode and can be
-inserted (and toggled) using <kbd>C-c C-s d</kbd>. Following the mnemonics
-for the other style keybindings, the letter <kbd>d</kbd> coincides with the
-HTML tag `<del>`.
+* **Multiple underscores in words:** You must enable `gfm-mode` to
+  toggle support for underscores inside of words. In this mode
+  variable names such as `a_test_variable` will not trigger
+  emphasis (italics).
 
-For GFM preview can be powered by setting `markdown-command` to
-use [Docter][].  This may also be configured to work with [Marked 2][]
-for `markdown-open-command`.
+* **Fenced code blocks:** Code blocks quoted with backticks, with
+  optional programming language keywords, are highlighted in
+  both `markdown-mode` and `gfm-mode`.  They can be inserted with
+  <kbd>C-c C-s P</kbd>.  If there is an active region, the text in the
+  region will be placed inside the code block.  You will be
+  prompted for the name of the language, but may press enter to
+  continue without naming a language.
+
+* **Strikethrough:** Strikethrough text is only supported in
+  `gfm-mode` and can be inserted (and toggled) using <kbd>C-c C-s d</kbd>.
+  Following the mnemonics for the other style keybindings, the
+  letter <kbd>d</kbd> coincides with the HTML tag `<del>`.
+
+* **Task lists:** GFM task lists will be rendered as checkboxes
+  (Emacs buttons) in both `markdown-mode` and `gfm-mode` when
+  `markdown-make-gfm-checkboxes-buttons` is set to a non-nil value
+  (and it is set to t by default).  These checkboxes can be
+  toggled by clicking `mouse-1` or pressing <kbd>RET</kbd> over the button.
+
+* **Wiki links:** Generic wiki links are supported in
+  `markdown-mode`, but in `gfm-mode` specifically they will be
+  treated as they are on GitHub: spaces will be replaced by hyphens
+  in filenames and the first letter of the filename will be
+  capitalized.  For example, `[[wiki link]]` will map to a file
+  named `Wiki-link` with the same extension as the current file.
+
+* **Newlines:** Neither `markdown-mode` nor `gfm-mode` do anything
+  specifically with respect to newline behavior.  If you use
+  `gfm-mode` mostly to write text for comments or issues on the
+  GitHub site--where newlines are significant and correspond to
+  hard line breaks--then you may want to enable `visual-line-mode`
+  for line wrapping in buffers.  You can do this with a
+  `gfm-mode-hook` as follows:
+
+        ;; Use visual-line-mode in gfm-mode
+        (defun my-gfm-mode-hook ()
+          (visual-line-mode 1))
+        (add-hook 'gfm-mode-hook 'my-gfm-mode-hook)
+
+* **Preview:** GFM-specific preview can be powered by setting
+  `markdown-command` to use [Docter][].  This may also be
+  configured to work with [Marked 2][] for `markdown-open-command`.
 
 [GFM]: http://github.github.com/github-flavored-markdown/
+[GFM comments]: https://help.github.com/articles/writing-on-github/
+[since 2014]: https://github.com/blog/1825-task-lists-in-all-markdown-documents
 [Docter]: https://github.com/alampros/Docter
 
 ## Acknowledgments
