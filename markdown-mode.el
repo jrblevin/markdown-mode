@@ -612,10 +612,7 @@
 ;; You can do this either by using `M-x customize-group markdown`
 ;; or by placing the following in your `.emacs` file:
 ;;
-;;     (defun markdown-custom ()
-;;       "markdown-mode-hook"
-;;       (setq markdown-command "markdown | smartypants"))
-;;     (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
+;;     (setq markdown-command "markdown | smartypants")
 ;;
 ;; [SmartyPants]: http://daringfireball.net/projects/smartypants/
 ;;
@@ -785,7 +782,7 @@
 ;;     behavior regarding list items, footnotes, and reference
 ;;     definitions, improved killing of footnotes, and numerous other
 ;;     tests and bug fixes.
-;;   * Antonis Kanouras <antonis@metadosis.gr> for strike through support.
+;;   * Antonis Kanouras <antonis@metadosis.gr> for strikethrough support.
 ;;   * Tim Visher <tim.visher@gmail.com> for multiple CSS files and other
 ;;     general improvements.
 ;;   * Matt McClure <matthewlmcclure@gmail.com> for a patch to prevent
@@ -2729,10 +2726,10 @@ insert italic delimiters and place the cursor in between them."
         (markdown-wrap-or-insert delim delim 'word nil nil)))))
 
 (defun markdown-insert-strike-through ()
-  "Insert markup to make a region or word strike-through.
-If there is an active region, make the region strike-through.  If the point
-is at a non-bold word, make the word strike-through.  If the point is at a
-strike-through word or phrase, remove the strike-through markup.  Otherwise,
+  "Insert markup to make a region or word strikethrough.
+If there is an active region, make the region strikethrough.  If the point
+is at a non-bold word, make the word strikethrough.  If the point is at a
+strikethrough word or phrase, remove the strikethrough markup.  Otherwise,
 simply insert bold delimiters and place the cursor in between them."
   (interactive)
   (let ((delim "~~"))
@@ -2742,7 +2739,7 @@ simply insert bold delimiters and place the cursor in between them."
                        (region-beginning) (region-end)
                        markdown-regex-strike-through 2 4)))
           (markdown-wrap-or-insert delim delim nil (car bounds) (cdr bounds)))
-      ;; Strike-through markup removal, strike-through word at point, or empty markup insertion
+      ;; Strikethrough markup removal, strikethrough word at point, or empty markup insertion
       (if (thing-at-point-looking-at markdown-regex-strike-through)
           (markdown-unwrap-thing-at-point nil 2 4)
         (markdown-wrap-or-insert delim delim 'word nil nil)))))
@@ -3444,7 +3441,7 @@ text to kill ring), and list items."
      ((thing-at-point-looking-at markdown-regex-italic)
       (kill-new (match-string 3))
       (delete-region (match-beginning 1) (match-end 1)))
-     ;; Strike-through
+     ;; Strikethrough
      ((thing-at-point-looking-at markdown-regex-strike-through)
       (kill-new (match-string 4))
       (delete-region (match-beginning 2) (match-end 2)))
@@ -3969,7 +3966,7 @@ See also `markdown-mode-map'.")
     "---"
     ["Bold" markdown-insert-bold]
     ["Italic" markdown-insert-italic]
-    ["Strike-through" markdown-insert-strike-through]
+    ["Strikethrough" markdown-insert-strike-through]
     ["Blockquote" markdown-insert-blockquote]
     ["Preformatted" markdown-insert-pre]
     ["Code" markdown-insert-code]

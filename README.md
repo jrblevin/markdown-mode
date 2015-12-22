@@ -562,10 +562,7 @@ then you can set `markdown-command` to `"markdown | smartypants"`.
 You can do this either by using <kbd>M-x customize-group markdown</kbd>
 or by placing the following in your `.emacs` file:
 
-    (defun markdown-custom ()
-      "markdown-mode-hook"
-      (setq markdown-command "markdown | smartypants"))
-    (add-hook 'markdown-mode-hook '(lambda() (markdown-custom)))
+    (setq markdown-command "markdown | smartypants")
 
 [SmartyPants]: http://daringfireball.net/projects/smartypants/
 
@@ -735,7 +732,7 @@ following people:
     behavior regarding list items, footnotes, and reference
     definitions, improved killing of footnotes, and numerous other
     tests and bug fixes.
-  * Antonis Kanouras for strike through support.
+  * Antonis Kanouras for strikethrough support.
   * Tim Visher for multiple CSS files and other
     general improvements.
   * Matt McClure for a patch to prevent
