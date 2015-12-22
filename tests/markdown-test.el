@@ -107,13 +107,25 @@ This file is not saved."
 
 (defun markdown-test-range-has-property (begin end prop value)
   "Verify that the range from BEGIN to END has property PROP equal to VALUE."
-  (let (loc props)
-    (dolist (loc (number-sequence begin end))
-      (setq props (get-char-property loc prop))
-      (cond ((and props (listp props))
-             (should (memq value props)))
-            (t
-             (should (eq props value)))))))
+  (let (loc vals fail-loc)
+    (setq fail-loc
+          (catch 'fail
+            (dolist (loc (number-sequence begin end))
+              (setq vals (get-char-property loc prop))
+              (if (and vals (listp vals))
+                  (unless (memq value vals)
+                    (throw 'fail loc))
+                (unless (eq vals value)
+                  (throw 'fail loc))))))
+    (when fail-loc
+      (message "Testing range (%d,%d) for property %s equal to %s."
+               begin end prop value)
+      (message "Expected value (%s) not found in property (%s) at location %d" value prop fail-loc)
+      (message "Buffer substring: %s" (buffer-substring begin end))
+      (message "Properties in range are as follows:")
+      (dolist (loc (number-sequence begin end))
+        (message "%d: %s" loc (get-char-property loc prop))))
+    (should-not fail-loc)))
 
 (defun markdown-test-range-has-face (begin end face)
   "Verify that the range from BEGIN to END has face equal to FACE."
