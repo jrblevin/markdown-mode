@@ -1444,17 +1444,26 @@ Function is called repeatedly until it returns nil. For details, see
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
-  (save-excursion
+  (let* ((state (syntax-ppss)) (in-comment (nth 4 state)))
     (goto-char start)
-    (while (re-search-forward markdown-regex-comment-start end t)
+    (cond
+     ;; Comment start
+     ((and (not in-comment)
+           (re-search-forward markdown-regex-comment-start end t)
+           (save-match-data (not (markdown-code-at-point-p)))
+           (save-match-data (not (markdown-code-block-at-point))))
       (let ((open-beg (match-beginning 0)))
-        (when (and (not (markdown-code-at-point-p))
-                   (not (markdown-code-block-at-point))
-                   (re-search-forward markdown-regex-comment-end end t))
-          (put-text-property open-beg (1+ open-beg)
-                             'syntax-table (string-to-syntax "<"))
-          (put-text-property (1- (match-end 0)) (match-end 0)
-                             'syntax-table (string-to-syntax ">")))))))
+        (put-text-property open-beg (1+ open-beg)
+                           'syntax-table (string-to-syntax "<"))
+        (markdown-syntax-propertize-comments (1+ open-beg) end)))
+     ;; Comment end
+     ((and in-comment
+           (re-search-forward markdown-regex-comment-end end t))
+      (put-text-property (1- (match-end 0)) (match-end 0)
+                         'syntax-table (string-to-syntax ">"))
+      (markdown-syntax-propertize-comments (match-end 0) end))
+     ;; Nothing found
+     (t nil))))
 
 (defun markdown-syntax-propertize (start end)
   "See `syntax-propertize-function'."
