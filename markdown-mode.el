@@ -1055,6 +1055,12 @@ export by setting to 'delete-on-export, when quitting
   :group 'markdown
   :type 'symbol)
 
+(defcustom markdown-list-indent-width 4
+  "Depth of indentation for markdown lists. Used in `markdown-demote-list-item'
+and `markdown-promote-list-item'."
+  :group 'markdown
+  :type 'integer)
+
 
 ;;; Regular Expressions =======================================================
 
@@ -4443,12 +4449,11 @@ Optionally, BOUNDS of the current list item may be provided if available."
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
       (save-match-data
-        (let* ((end-marker (make-marker))
-               (end-marker (set-marker end-marker (nth 1 bounds))))
+        (let ((end-marker (set-marker (make-marker) (nth 1 bounds))))
           (goto-char (nth 0 bounds))
           (while (< (point) end-marker)
             (unless (markdown-cur-line-blank-p)
-              (insert "    "))
+              (insert (make-string markdown-list-indent-width ? )))
             (forward-line)))))))
 
 (defun markdown-promote-list-item (&optional bounds)
@@ -4458,11 +4463,11 @@ Optionally, BOUNDS of the current list item may be provided if available."
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
       (save-match-data
-        (let* ((end-marker (make-marker))
-               (end-marker (set-marker end-marker (nth 1 bounds)))
-               num regexp)
+        (let ((end-marker (set-marker (make-marker) (nth 1 bounds)))
+              num regexp)
           (goto-char (nth 0 bounds))
-          (when (looking-at "^[ ]\\{1,4\\}")
+          (when (looking-at (format "^[ ]\\{1,%d\\}"
+                                    markdown-list-indent-width))
             (setq num (- (match-end 0) (match-beginning 0)))
             (setq regexp (format "^[ ]\\{1,%d\\}" num))
             (while (and (< (point) end-marker)
