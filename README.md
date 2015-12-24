@@ -453,6 +453,9 @@ provides an interface to all of the possible customizations:
     asymmetric header styling, placing header characters only on
     the left of headers (default: `nil`).
 
+  * `markdown-list-indent-width` - depth of indentation for lists
+    when inserting, promoting, and demoting list items (default: 4).
+
   * `markdown-indent-function` - the function to use for automatic
     indentation (default: `markdown-indent-line`).
 

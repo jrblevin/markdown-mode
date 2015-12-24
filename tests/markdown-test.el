@@ -2533,6 +2533,29 @@ returns nil."
 
                  Nested pre block"))))
 
+(ert-deftest test-markdown-lists/promotion-and-demotion-custom ()
+  "Test custom variable `markdown-list-indent-width'."
+  (markdown-test-file "nested-list.text"
+    (forward-line)
+    (should (looking-at "   - List level 1 item 2
+
+     Second paragraph of item 2
+
+        Nested pre block in item 2
+        Four spaces past the marker
+
+     Another paragraph of item 2"))
+    (let ((markdown-list-indent-width 2))
+      (markdown-demote-list-item))
+    (should (looking-at "     - List level 1 item 2
+
+       Second paragraph of item 2
+
+          Nested pre block in item 2
+          Four spaces past the marker
+
+       Another paragraph of item 2"))))
+
 ;;; Outline minor mode tests:
 
 (ert-deftest test-markdown-outline/navigation ()
