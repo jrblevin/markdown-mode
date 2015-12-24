@@ -5159,10 +5159,11 @@ the rendered output."
     ;; reset all windows displaying output buffer to where they were, now with
     ;; the new output
     (mapc #'markdown-live-preview-window-deserialize window-data)
+    ;; delete html editing buffer
+    (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
     (when (and (eq markdown-live-preview-delete-export 'delete-on-export)
                export-file (file-exists-p export-file))
-      (delete-file export-file)
-      (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf))))
+      (delete-file export-file))
     markdown-live-preview-buffer))
 
 (defun markdown-live-preview-remove ()
