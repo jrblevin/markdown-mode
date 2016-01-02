@@ -5016,7 +5016,8 @@ Insert the output in the buffer named OUTPUT-BUFFER-NAME."
 When OUTPUT-BUFFER-NAME is given, insert the output in the buffer with
 that name."
   (interactive)
-  (display-buffer (markdown-standalone output-buffer-name)))
+  (markdown-display-buffer-other-window
+   (markdown-standalone output-buffer-name)))
 
 (defun markdown-output-standalone-p ()
   "Determine whether `markdown-command' output is standalone XHTML.
@@ -5201,13 +5202,19 @@ the rendered output."
       (when (file-exists-p outfile-name)
         (delete-file outfile-name)))))
 
+(defun markdown-display-buffer-other-window (buf)
+  (let ((cur-buf (current-buffer)))
+    (switch-to-buffer-other-window buf)
+    (set-buffer cur-buf)))
+
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
     (unless markdown-live-preview-currently-exporting
       (if (buffer-live-p markdown-live-preview-buffer)
           (markdown-live-preview-export)
-        (display-buffer (markdown-live-preview-export))))))
+        (markdown-display-buffer-other-window
+         (markdown-live-preview-export))))))
 
 (defun markdown-live-preview-remove-on-kill ()
   (cond ((and (derived-mode-p 'markdown-mode)
@@ -5223,7 +5230,7 @@ the rendered output."
   "Turn on `markdown-live-preview-mode' if not already on, and switch to its
 output buffer in another window."
   (if markdown-live-preview-mode
-      (display-buffer (markdown-live-preview-export)))
+      (markdown-display-buffer-other-window (markdown-live-preview-export)))
     (markdown-live-preview-mode))
 
 (defun markdown-open ()
@@ -5799,7 +5806,7 @@ before regenerating font-lock rules for extensions."
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
   (if markdown-live-preview-mode
-      (display-buffer (markdown-live-preview-export))
+      (markdown-display-buffer-other-window (markdown-live-preview-export))
     (markdown-live-preview-remove)))
 
 (add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
