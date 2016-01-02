@@ -1054,7 +1054,8 @@ update the buffer containing the preview and return the buffer."
 (defcustom markdown-live-preview-delete-export 'delete-on-destroy
   "Delete exported html file when using `markdown-live-preview-export' on every
 export by setting to 'delete-on-export, when quitting
-`markdown-live-preview-mode' by setting to 'delete-on-destroy, or not at all."
+`markdown-live-preview-mode' by setting to 'delete-on-destroy, or not at all
+when nil."
   :group 'markdown
   :type 'symbol)
 
@@ -5132,6 +5133,7 @@ current filename, but with the extension removed and replaced with .html."
 (defvar-local markdown-live-preview-source-buffer nil
   "Buffer with markdown source generating the source of the current
 buffer. Inverse of `markdown-live-preview-buffer'.")
+(defvar markdown-live-preview-currently-exporting nil)
 
 (defun markdown-live-preview-get-filename ()
   "Standardize the filename exported by `markdown-live-preview-export'."
@@ -5163,29 +5165,31 @@ non-nil."
 Emacs using `markdown-live-preview-window-function' Return the buffer displaying
 the rendered output."
   (interactive)
-  (let ((export-file (markdown-export (markdown-live-preview-get-filename)))
-        ;; get positions in all windows currently displaying output buffer
-        (window-data
-         (markdown-live-preview-window-serialize markdown-live-preview-buffer))
-        (cur-buf (current-buffer)))
+  (let* ((markdown-live-preview-currently-exporting t)
+         (cur-buf (current-buffer))
+         (export-file (markdown-export (markdown-live-preview-get-filename)))
+         ;; get positions in all windows currently displaying output buffer
+         (window-data
+          (markdown-live-preview-window-serialize
+           markdown-live-preview-buffer)))
     (save-window-excursion
-      ;; protect against `markdown-live-preview-window-function' changing
-      ;; `current-buffer'
       (let ((output-buffer
              (funcall markdown-live-preview-window-function export-file)))
         (with-current-buffer output-buffer
           (setq markdown-live-preview-source-buffer cur-buf))
         (with-current-buffer cur-buf
           (setq markdown-live-preview-buffer output-buffer))))
-    ;; reset all windows displaying output buffer to where they were, now with
-    ;; the new output
-    (mapc #'markdown-live-preview-window-deserialize window-data)
-    ;; delete html editing buffer
-    (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
-    (when (and (eq markdown-live-preview-delete-export 'delete-on-export)
-               export-file (file-exists-p export-file))
-      (delete-file export-file))
-    markdown-live-preview-buffer))
+    (with-current-buffer cur-buf
+      ;; reset all windows displaying output buffer to where they were,
+      ;; now with the new output
+      (mapc #'markdown-live-preview-window-deserialize window-data)
+      ;; delete html editing buffer
+      (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
+      (when (and export-file (file-exists-p export-file)
+                 (eq markdown-live-preview-delete-export
+                     'delete-on-export))
+        (delete-file export-file))
+      markdown-live-preview-buffer)))
 
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
@@ -5200,9 +5204,10 @@ the rendered output."
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
-    (if (buffer-live-p markdown-live-preview-buffer)
-        (markdown-live-preview-export)
-      (switch-to-buffer-other-window (markdown-live-preview-export)))))
+    (unless markdown-live-preview-currently-exporting
+      (if (buffer-live-p markdown-live-preview-buffer)
+          (markdown-live-preview-export)
+        (display-buffer (markdown-live-preview-export))))))
 
 (defun markdown-live-preview-remove-on-kill ()
   (cond ((and (derived-mode-p 'markdown-mode)
@@ -5218,7 +5223,7 @@ the rendered output."
   "Turn on `markdown-live-preview-mode' if not already on, and switch to its
 output buffer in another window."
   (if markdown-live-preview-mode
-      (switch-to-buffer-other-window (markdown-live-preview-export)))
+      (display-buffer (markdown-live-preview-export)))
     (markdown-live-preview-mode))
 
 (defun markdown-open ()
@@ -5793,9 +5798,9 @@ before regenerating font-lock rules for extensions."
 (define-minor-mode markdown-live-preview-mode
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
-  (cond (markdown-live-preview-mode
-         (switch-to-buffer-other-window (markdown-live-preview-export)))
-        (t (markdown-live-preview-remove))))
+  (if markdown-live-preview-mode
+      (display-buffer (markdown-live-preview-export))
+    (markdown-live-preview-remove)))
 
 (add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
 (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill)
