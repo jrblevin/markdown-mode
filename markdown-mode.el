@@ -5127,11 +5127,14 @@ current filename, but with the extension removed and replaced with .html."
   (interactive)
   (browse-url-of-file (markdown-export)))
 
-(defvar-local markdown-live-preview-buffer nil
+(defvar markdown-live-preview-buffer nil
   "Buffer used to preview markdown output in `markdown-live-preview-export'.")
-(defvar-local markdown-live-preview-source-buffer nil
+(make-variable-buffer-local 'markdown-live-preview-buffer)
+
+(defvar markdown-live-preview-source-buffer nil
   "Buffer with markdown source generating the source of the current
 buffer. Inverse of `markdown-live-preview-buffer'.")
+(make-variable-buffer-local 'markdown-live-preview-source-buffer)
 
 (defun markdown-live-preview-get-filename ()
   "Standardize the filename exported by `markdown-live-preview-export'."
