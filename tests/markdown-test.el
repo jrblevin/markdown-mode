@@ -44,6 +44,7 @@
 
 (defmacro markdown-test-string-mode (mode string &rest body)
   "Run BODY in a temporary buffer containing STRING in MODE."
+  (declare (indent 2))
   `(let ((win (selected-window)))
      (unwind-protect
          (with-temp-buffer
@@ -58,6 +59,7 @@
 
 (defmacro markdown-test-file-mode (mode file &rest body)
   "Open FILE from `markdown-test-dir' in MODE and execute BODY."
+  (declare (indent 2))
   `(let ((fn (concat markdown-test-dir ,file)))
      (save-window-excursion
        (with-temp-buffer
@@ -69,40 +71,47 @@
 
 (defmacro markdown-test-string (string &rest body)
   "Run body in a temporary buffer containing STRING in `markdown-mode'."
+  (declare (indent 1))
   `(markdown-test-string-mode 'markdown-mode ,string ,@body))
 (def-edebug-spec markdown-test-string (form body))
 
 (defmacro markdown-test-file (file &rest body)
   "Open FILE from `markdown-test-dir' in `markdown-mode' and execute BODY."
+  (declare (indent 1))
   `(markdown-test-file-mode 'markdown-mode ,file ,@body))
 (def-edebug-spec markdown-test-file (form body))
 
 (defmacro markdown-test-string-gfm (string &rest body)
   "Run body in a temporary buffer containing STRING in `gfm-mode'."
+  (declare (indent 1))
   `(markdown-test-string-mode 'gfm-mode ,string ,@body))
 (def-edebug-spec markdown-test-string-gfm (form body))
 
 (defmacro markdown-test-file-gfm (file &rest body)
   "Open FILE from `markdown-test-dir' in `gfm-mode' and execute BODY."
+  (declare (indent 1))
   `(markdown-test-file-mode 'gfm-mode ,file ,@body))
 (def-edebug-spec markdown-test-file-gfm (form body))
 
 (defmacro markdown-test-temp-file (file &rest body)
   "Open FILE from `markdown-test-dir' visiting temp file and execute body.
 This file is not saved."
+  (declare (indent 1))
   `(let ((fn (concat markdown-test-dir ,file))
          (tmp (make-temp-file "markdown-test" nil ".text"))
          buf)
      (save-window-excursion
-       (setq buf (find-file tmp))
-       (insert-file-contents fn)
-       (markdown-mode)
-       (goto-char (point-min))
-       (funcall markdown-test-font-lock-function)
-       ,@body
-       (set-buffer-modified-p nil)
-       (kill-buffer buf)
-       (delete-file tmp))))
+       (unwind-protect
+           (progn
+             (setq buf (find-file tmp))
+             (insert-file-contents fn)
+             (markdown-mode)
+             (goto-char (point-min))
+             (funcall markdown-test-font-lock-function)
+             ,@body
+             (set-buffer-modified-p nil))
+         (when (buffer-live-p buf) (kill-buffer buf))
+         (delete-file tmp)))))
 (def-edebug-spec markdown-test-temp-file (form body))
 
 (defun markdown-test-range-has-property (begin end prop value)
