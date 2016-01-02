@@ -5127,9 +5127,11 @@ current filename, but with the extension removed and replaced with .html."
   (interactive)
   (browse-url-of-file (markdown-export)))
 
-(defvar markdown-live-preview-buffer nil
+(defvar-local markdown-live-preview-buffer nil
   "Buffer used to preview markdown output in `markdown-live-preview-export'.")
-(make-variable-buffer-local 'markdown-live-preview-buffer)
+(defvar-local markdown-live-preview-source-buffer nil
+  "Buffer with markdown source generating the source of the current
+buffer. Inverse of `markdown-live-preview-buffer'.")
 
 (defun markdown-live-preview-get-filename ()
   "Standardize the filename exported by `markdown-live-preview-export'."
@@ -5171,6 +5173,8 @@ the rendered output."
       ;; `current-buffer'
       (let ((output-buffer
              (funcall markdown-live-preview-window-function export-file)))
+        (with-current-buffer output-buffer
+          (setq markdown-live-preview-source-buffer cur-buf))
         (with-current-buffer cur-buf
           (setq markdown-live-preview-buffer output-buffer))))
     ;; reset all windows displaying output buffer to where they were, now with
@@ -5196,12 +5200,26 @@ the rendered output."
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
-    (markdown-live-preview-export)))
+    (if (buffer-live-p markdown-live-preview-buffer)
+        (markdown-live-preview-export)
+      (switch-to-buffer-other-window (markdown-live-preview-export)))))
 
 (defun markdown-live-preview-remove-on-kill ()
-  (when (and (derived-mode-p 'markdown-mode)
-             markdown-live-preview-mode)
-    (markdown-live-preview-remove)))
+  (cond ((and (derived-mode-p 'markdown-mode)
+              markdown-live-preview-mode)
+         (markdown-live-preview-remove))
+        (markdown-live-preview-source-buffer
+         (with-current-buffer markdown-live-preview-source-buffer
+           (setq markdown-live-preview-buffer nil))
+         (setq markdown-live-preview-source-buffer nil))))
+
+(defun markdown-live-preview-switch-to-output ()
+  (interactive)
+  "Turn on `markdown-live-preview-mode' if not already on, and switch to its
+output buffer in another window."
+  (if markdown-live-preview-mode
+      (switch-to-buffer-other-window (markdown-live-preview-export)))
+    (markdown-live-preview-mode))
 
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
