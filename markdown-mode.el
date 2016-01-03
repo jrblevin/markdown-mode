@@ -3270,8 +3270,8 @@ already in `markdown-gfm-recognized-languages' or
   (let* ((cleaned-lang (markdown-clean-language-string lang))
          (find-result
           (cl-find cleaned-lang (append markdown-gfm-used-languages
-                                     markdown-gfm-additional-languages
-                                     markdown-gfm-recognized-languages)
+                                        markdown-gfm-additional-languages
+                                        markdown-gfm-recognized-languages)
                    :test #'markdown-compare-language-strings)))
     (if find-result (setq markdown-gfm-last-used-language find-result)
       ;; we have already checked whether it exists in the list using our fuzzy
