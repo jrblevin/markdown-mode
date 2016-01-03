@@ -3190,10 +3190,10 @@ if three backquotes inserted at the beginning of line."
     (call-interactively #'markdown-insert-gfm-code-block)))
 
 (defconst markdown-gfm-recognized-languages
-  ;; to reproduce/update, use the script in
-  ;; scripts/get-recognized-gfm-languages.coffee.  that produces a single long
-  ;; sexp, but with appropriate use of a keyboard macro, indenting and filling
-  ;; it properly is pretty fast.
+  ;; to reproduce/update, evaluate the let-form in
+  ;; scripts/get-recognized-gfm-languages.el. that produces a single long sexp,
+  ;; but with appropriate use of a keyboard macro, indenting and filling it
+  ;; properly is pretty fast.
   '("ABAP" "AMPL" "ANTLR" "APL" "ASP" "ATS" "ActionScript" "Ada" "Agda" "Alloy"
     "ApacheConf" "Apex" "AppleScript" "Arc" "Arduino" "AsciiDoc" "AspectJ"
     "Assembly" "Augeas" "AutoHotkey" "AutoIt" "Awk" "Batchfile" "Befunge"
