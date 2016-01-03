@@ -3225,7 +3225,6 @@ indented the same amount."
     (unless (featurep 'eww)
       (should-error (markdown-live-preview-mode)))
     (markdown-temp-eww
-     (message "%s" "hey")
      (markdown-live-preview-mode)
      (should (buffer-live-p markdown-live-preview-buffer))
      (should (eq (current-buffer)
