@@ -5146,11 +5146,11 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
 
 (defun markdown-live-preview-window-eww (file)
   "A `markdown-live-preview-window-function' for previewing with eww."
-  (if (eval-when-compile (featurep 'eww))
+  (if (featurep 'eww)
       (progn
         (eww-open-file file)
         (get-buffer "*eww*"))
-    (error "eww is not present on this version of emacs")))
+    (error "eww is not present or not loaded on this version of emacs")))
 
 (defun markdown-live-preview-window-serialize (buf)
   "Get window point and scroll data for all windows displaying BUF if BUF is
