@@ -1065,6 +1065,16 @@ and `markdown-promote-list-item'."
   :group 'markdown
   :type 'integer)
 
+(defcustom markdown-gfm-additional-languages nil
+  "Additional languages to make available when inserting GFM code blocks."
+  :group 'markdown
+  :type '(list string))
+
+(defcustom markdown-gfm-use-electric-backquote t
+  "Use `markdown-electric-backquote' when backquote is hit three times."
+  :group 'markdown
+  :type 'boolean)
+
 
 ;;; Regular Expressions =======================================================
 
@@ -3171,7 +3181,7 @@ Call `markdown-insert-gfm-code-block' interactively
 if three backquotes inserted at the beginning of line."
   (interactive "*P")
   (self-insert-command (prefix-numeric-value arg))
-  (when (looking-back "^```" nil)
+  (when (and markdown-gfm-use-electric-backquote (looking-back "^```" nil))
     (replace-match "")
     (call-interactively #'markdown-insert-gfm-code-block)))
 
@@ -3218,13 +3228,40 @@ if three backquotes inserted at the beginning of line."
     "nesC" "ooc" "reStructuredText" "wisp" "xBase")
   "Language specifiers recognized by github's syntax highlighting features.")
 
+(defvar markdown-gfm-used-languages nil
+  "Languages used in the current buffer in GFM code blocks, which are not
+already in `markdown-gfm-recognized-languages' or
+`markdown-gfm-additional-languages'.")
+(make-variable-buffer-local 'markdown-gfm-used-languages)
+(defvar markdown-gfm-last-used-language nil
+  "Last language used in the current buffer in GFM code blocks.")
+(make-variable-buffer-local 'markdown-gfm-last-used-language)
+(defvar markdown-gfm-language-history nil
+  "History list of languages used in the current buffer in GFM code blocks.")
+(make-variable-buffer-local 'markdown-gfm-language-history)
+
+;;; TODO: parse buffer for languages when gfm-mode turns on
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
 region is active, wrap this region with the markup instead.  If
 the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
-  (interactive "sProgramming language [none]: ")
+  (interactive
+   (list (let ((completion-ignore-case t))
+           (trim-whitespace
+            (completing-read
+             (format "Programming language [%s]: "
+                     (or markdown-gfm-last-used-language "none"))
+             (append markdown-gfm-used-languages
+                     markdown-gfm-additional-languages
+                     markdown-gfm-recognized-languages)
+             nil nil nil
+             'markdown-gfm-language-history
+             markdown-gfm-last-used-language)))))
+  (unless (find lang markdown-gfm-used-languages)
+    (push lang markdown-gfm-used-languages))
+  (setq markdown-gfm-last-used-language lang)
   (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
