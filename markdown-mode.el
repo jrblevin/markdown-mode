@@ -3246,18 +3246,26 @@ already in `markdown-gfm-recognized-languages' or
   (trim-whitespace str))
 
 (defun markdown-compare-language-strings (str1 str2)
+  ;; note that this keeps the first capitalization of a language used in a
+  ;; buffer
   (compare-strings (markdown-clean-language-string str1) nil nil
                    (markdown-clean-language-string str2) nil nil
                    t))
+
+(defun markdown-add-language-if-new (lang)
+  (unless (find lang (append markdown-gfm-used-languages
+                             markdown-gfm-additional-languages
+                             markdown-gfm-recognized-languages)
+                :test #'markdown-compare-language-strings)
+    ;; we have already checked whether it exists in the list using our fuzzy
+    ;; `markdown-compare-language-strings' function, so we can just push
+    (push (markdown-clean-language-string lang) markdown-gfm-used-languages)))
 
 (defun markdown-parse-gfm-buffer-for-languages (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
     (save-excursion
       (while (re-search-forward markdown-regex-gfm-code-block-open nil t)
-        (add-to-list
-         'markdown-gfm-used-languages
-         (markdown-clean-language-string (match-string-no-properties 2))
-         nil #'markdown-compare-language-strings)))))
+        (markdown-add-language-if-new (match-string-no-properties 2))))))
 
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
@@ -3277,8 +3285,7 @@ automatically in order to have the correct markup."
              nil 'confirm nil
              'markdown-gfm-language-history
              markdown-gfm-last-used-language)))))
-  (unless (find lang markdown-gfm-used-languages)
-    (push lang markdown-gfm-used-languages))
+  (markdown-add-language-if-new lang)
   (setq markdown-gfm-last-used-language lang)
   (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
