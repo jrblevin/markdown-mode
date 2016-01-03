@@ -3175,6 +3175,49 @@ if three backquotes inserted at the beginning of line."
     (replace-match "")
     (call-interactively #'markdown-insert-gfm-code-block)))
 
+(defconst markdown-gfm-recognized-languages
+  '("ABAP" "AMPL" "ANTLR" "APL" "ASP" "ATS" "ActionScript" "Ada" "Agda" "Alloy"
+    "ApacheConf" "Apex" "AppleScript" "Arc" "Arduino" "AsciiDoc" "AspectJ"
+    "Assembly" "Augeas" "AutoHotkey" "AutoIt" "Awk" "Batchfile" "Befunge"
+    "Bison" "BitBake" "BlitzBasic" "BlitzMax" "Bluespec" "Boo" "Brainfuck"
+    "Brightscript" "Bro" "C" "C++" "C-ObjDump" "CLIPS" "CMake" "COBOL" "CSS"
+    "CartoCSS" "Ceylon" "Chapel" "Charity" "ChucK" "Cirru" "Clarion" "Clean"
+    "Click" "Clojure" "CoffeeScript" "ColdFusion" "Cool" "Coq" "Cpp-ObjDump"
+    "Creole" "Crystal" "Cucumber" "Cuda" "Cycript" "Cython" "D" "D-ObjDump" "DM"
+    "DTrace" "Dart" "Diff" "Dockerfile" "Dogescript" "Dylan" "E" "ECL" "ECLiPSe"
+    "Eagle" "Eiffel" "Elixir" "Elm" "EmberScript" "Erlang" "FLUX" "FORTRAN"
+    "Factor" "Fancy" "Fantom" "Filterscript" "Formatted" "Forth" "FreeMarker"
+    "Frege" "G-code" "GAMS" "GAP" "GAS" "GDScript" "GLSL" "Genshi" "Glyph"
+    "Gnuplot" "Go" "Golo" "Gosu" "Grace" "Gradle" "Groff" "Groovy" "HCL" "HTML"
+    "HTML+Django" "HTML+EEX" "HTML+ERB" "HTML+PHP" "HTTP" "Hack" "Haml"
+    "Handlebars" "Harbour" "Haskell" "Haxe" "Hy" "HyPhy" "IDL" "INI" "Idris"
+    "Io" "Ioke" "Isabelle" "J" "JFlex" "JSON" "JSON5" "JSONLD" "JSONiq" "JSX"
+    "Jade" "Jasmin" "Java" "JavaScript" "Julia" "KRL" "KiCad" "Kit" "Kotlin"
+    "LFE" "LLVM" "LOLCODE" "LSL" "LabVIEW" "Lasso" "Latte" "Lean" "Less" "Lex"
+    "LilyPond" "Limbo" "Liquid" "LiveScript" "Logos" "Logtalk" "LookML"
+    "LoomScript" "Lua" "M" "MAXScript" "MTML" "MUF" "Makefile" "Mako" "Markdown"
+    "Mask" "Mathematica" "Matlab" "Max" "MediaWiki" "Mercury" "Metal" "MiniD"
+    "Mirah" "Modelica" "Modula-2" "Monkey" "Moocode" "MoonScript" "Myghty" "NCL"
+    "NL" "NSIS" "Nemerle" "NetLinx" "NetLinx+ERB" "NetLogo" "NewLisp" "Nginx"
+    "Nimrod" "Ninja" "Nit" "Nix" "Nu" "NumPy" "OCaml" "ObjDump" "Objective-C"
+    "Objective-C++" "Objective-J" "Omgrofl" "Opa" "Opal" "OpenCL" "OpenSCAD"
+    "Org" "Ox" "Oxygene" "Oz" "PAWN" "PHP" "PLSQL" "PLpgSQL" "Pan" "Papyrus"
+    "Parrot" "Pascal" "Perl" "Perl6" "Pickle" "PicoLisp" "PigLatin" "Pike" "Pod"
+    "PogoScript" "Pony" "PostScript" "PowerShell" "Processing" "Prolog" "Puppet"
+    "PureBasic" "PureScript" "Python" "QML" "QMake" "R" "RAML" "RDoc"
+    "REALbasic" "RHTML" "RMarkdown" "Racket" "Rebol" "Red" "Redcode" "Ren'Py"
+    "RenderScript" "RobotFramework" "Rouge" "Ruby" "Rust" "SAS" "SCSS" "SMT"
+    "SPARQL" "SQF" "SQL" "SQLPL" "STON" "SVG" "Sage" "SaltStack" "Sass" "Scala"
+    "Scaml" "Scheme" "Scilab" "Self" "Shell" "ShellSession" "Shen" "Slash"
+    "Slim" "Smali" "Smalltalk" "Smarty" "SourcePawn" "Squirrel" "Stan" "Stata"
+    "Stylus" "SuperCollider" "Swift" "SystemVerilog" "TOML" "TXL" "Tcl" "Tcsh"
+    "TeX" "Tea" "Text" "Textile" "Thrift" "Turing" "Turtle" "Twig" "TypeScript"
+    "UnrealScript" "UrWeb" "VCL" "VHDL" "Vala" "Verilog" "VimL" "Volt" "Vue"
+    "WebIDL" "X10" "XC" "XML" "XPages" "XProc" "XQuery" "XS" "XSLT" "Xojo"
+    "Xtend" "YAML" "Yacc" "Zephir" "Zimpl" "desktop" "eC" "edn" "fish" "mupad"
+    "nesC" "ooc" "reStructuredText" "wisp" "xBase")
+  "Language specifiers recognized by github's syntax highlighting features.")
+
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
