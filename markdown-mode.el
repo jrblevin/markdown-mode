@@ -1196,6 +1196,7 @@ but not two newlines in a row.")
 Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
 
+;;; TODO: why the curly braces at the end?
 (defconst markdown-regex-gfm-code-block-open
  "^\\s *\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$"
  "Regular expression matching opening of GFM code blocks.
@@ -3240,7 +3241,24 @@ already in `markdown-gfm-recognized-languages' or
   "History list of languages used in the current buffer in GFM code blocks.")
 (make-variable-buffer-local 'markdown-gfm-language-history)
 
-;;; TODO: parse buffer for languages when gfm-mode turns on
+(defun markdown-clean-language-string (str)
+  ;; TODO: clean curly braces, if required
+  (trim-whitespace str))
+
+(defun markdown-compare-language-strings (str1 str2)
+  (compare-strings (markdown-clean-language-string str1) nil nil
+                   (markdown-clean-language-string str2) nil nil
+                   t))
+
+(defun markdown-parse-gfm-buffer-for-languages (&optional buffer)
+  (with-current-buffer (or buffer (current-buffer))
+    (save-excursion
+      (while (re-search-forward markdown-regex-gfm-code-block-open nil t)
+        (add-to-list
+         'markdown-gfm-used-languages
+         (markdown-clean-language-string (match-string-no-properties 2))
+         nil #'markdown-compare-language-strings)))))
+
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
@@ -3249,14 +3267,14 @@ the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
   (interactive
    (list (let ((completion-ignore-case t))
-           (trim-whitespace
+           (markdown-clean-language-string
             (completing-read
              (format "Programming language [%s]: "
                      (or markdown-gfm-last-used-language "none"))
              (append markdown-gfm-used-languages
                      markdown-gfm-additional-languages
                      markdown-gfm-recognized-languages)
-             nil nil nil
+             nil 'confirm nil
              'markdown-gfm-language-history
              markdown-gfm-last-used-language)))))
   (unless (find lang markdown-gfm-used-languages)
@@ -5885,7 +5903,8 @@ before regenerating font-lock rules for extensions."
   (set (make-local-variable 'font-lock-defaults)
        '(gfm-font-lock-keywords))
   ;; do the initial link fontification
-  (markdown-fontify-buffer-wiki-links))
+  (markdown-fontify-buffer-wiki-links)
+  (markdown-parse-gfm-buffer-for-languages))
 
 
 ;;; Live Preview Mode  ============================================
