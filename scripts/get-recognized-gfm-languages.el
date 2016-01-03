@@ -9,4 +9,5 @@
     ;; get past http headers
     (re-search-forward "^$")
     (cl-loop while (re-search-forward "^\\([^#[:space:]]+?\\):" nil t)
-             collect (match-string-no-properties 1))))
+             collect (match-string-no-properties 1)))
+  (kill-buffer urlbuf))
