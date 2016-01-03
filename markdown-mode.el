@@ -1199,7 +1199,6 @@ but not two newlines in a row.")
 Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
 
-;;; TODO: why the curly braces at the end?
 (defconst markdown-regex-gfm-code-block
   (concat
    "^\\s *\\(```\\)[ ]?\\([^[:space:]]+\\|{[^}]*}\\)?"
@@ -3249,8 +3248,8 @@ already in `markdown-gfm-recognized-languages' or
    "\\(?:[[:space:]\r\n]+\\'\\|\\`[[:space:]\r\n]+\\)" "" str))
 
 (defun markdown-clean-language-string (str)
-  ;; TODO: clean curly braces, if required
-  (markdown-trim-whitespace str))
+  (markdown-replace-regexp-in-string
+   "{\\.?\\|}" "" (markdown-trim-whitespace str)))
 
 (defun markdown-compare-language-strings (str1 str2)
   ;; note that this keeps the first capitalization of a language used in a
@@ -3265,7 +3264,7 @@ already in `markdown-gfm-recognized-languages' or
           (cl-find cleaned-lang (append markdown-gfm-used-languages
                                      markdown-gfm-additional-languages
                                      markdown-gfm-recognized-languages)
-                :test #'markdown-compare-language-strings)))
+                   :test #'markdown-compare-language-strings)))
     (if find-result (setq markdown-gfm-last-used-language find-result)
       ;; we have already checked whether it exists in the list using our fuzzy
       ;; `markdown-compare-language-strings' function, so we can just push
@@ -3275,6 +3274,7 @@ already in `markdown-gfm-recognized-languages' or
 (defun markdown-parse-gfm-buffer-for-languages (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
     (save-excursion
+      (goto-char (point-min))
       (while (re-search-forward markdown-regex-gfm-code-block nil t)
         (markdown-add-language-if-new (match-string-no-properties 2))))))
 
