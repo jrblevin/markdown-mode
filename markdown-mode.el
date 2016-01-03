@@ -1069,9 +1069,11 @@ and `markdown-promote-list-item'."
   :type 'integer)
 
 (defcustom markdown-gfm-additional-languages nil
-  "Additional languages to make available when inserting GFM code blocks."
+  "Additional languages to make available when inserting GFM code
+blocks. Language strings must have be trimmed of whitespace and not contain any
+curly braces. They may be of arbitrary capitalization, though."
   :group 'markdown
-  :type '(list string))
+  :type '(repeat (string :validate markdown-validate-language-string)))
 
 (defcustom markdown-gfm-use-electric-backquote t
   "Use `markdown-electric-backquote' when backquote is hit three times."
@@ -3251,12 +3253,18 @@ already in `markdown-gfm-recognized-languages' or
   (markdown-replace-regexp-in-string
    "{\\.?\\|}" "" (markdown-trim-whitespace str)))
 
+(defun markdown-validate-language-string (widget)
+  (let ((str (widget-value widget)))
+    (unless (string= str (markdown-clean-language-string str))
+      (widget-put widget :error (format "Invalid language spec: '%s'" str))
+      widget)))
+
 (defun markdown-compare-language-strings (str1 str2)
   ;; note that this keeps the first capitalization of a language used in a
   ;; buffer
-  (eq t (compare-strings (markdown-clean-language-string str1) nil nil
-                         (markdown-clean-language-string str2) nil nil
-                         t)))
+  ;; this also relies upon the fact that all input strings have been cleaned
+  ;; with `markdown-clean-language-string'
+  (eq t (compare-strings str1 nil nil str2 nil nil t)))
 
 (defun markdown-add-language-if-new (lang)
   (let* ((cleaned-lang (markdown-clean-language-string lang))
