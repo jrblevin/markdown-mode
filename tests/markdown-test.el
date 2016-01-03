@@ -2208,7 +2208,10 @@ body"
    (markdown-test-range-has-face 4 9 markdown-italic-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-link ()
-  "Test font lock for links inside of a blockquote."
+  "Test font lock for links inside of a blockquote.
+This test will fail until font lock for inline links inside
+blockquotes is implemented (at present, the blockquote face
+takes precedence)."
   :expected-result :failed
   (markdown-test-string
    "> [link](url)"
@@ -2218,10 +2221,9 @@ body"
 
 (ert-deftest test-markdown-font-lock/blockquote-comment ()
   "Test font lock for comments inside of a blockquote."
-  :expected-result :failed
   (markdown-test-string
    "> <!-- comment -->"
-   (markdown-test-range-has-face 1 18 markdown-blockquote-face)
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
    (markdown-test-range-has-face 3 18 markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/pre-override ()
