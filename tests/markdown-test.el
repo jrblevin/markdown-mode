@@ -3211,7 +3211,7 @@ indented the same amount."
 
 (defmacro markdown-temp-eww (&rest body)
   `(progn
-     ,@(if (featurep 'eww) body
+     ,@(if (fboundp 'eww-open-file) body
          `((ad-enable-advice #'markdown-live-preview-window-eww
                              'around 'markdown-create-fake-eww)
            (ad-activate #'markdown-live-preview-window-eww)
@@ -3222,7 +3222,7 @@ indented the same amount."
 
 (ert-deftest test-markdown-ext/live-preview-exports ()
   (markdown-test-temp-file "inline.text"
-    (unless (featurep 'eww)
+    (unless (fboundp 'eww-open-file)
       (should-error (markdown-live-preview-mode)))
     (markdown-temp-eww
      (markdown-live-preview-mode)
