@@ -3295,7 +3295,8 @@ automatically in order to have the correct markup."
                      markdown-gfm-recognized-languages)
              nil 'confirm nil
              'markdown-gfm-language-history
-             markdown-gfm-last-used-language)))))
+             (or markdown-gfm-last-used-language
+                 (car markdown-gfm-additional-languages)))))))
   (markdown-add-language-if-new lang)
   (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
