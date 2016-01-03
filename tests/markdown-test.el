@@ -3153,6 +3153,19 @@ indented the same amount."
    (should (string-equal (buffer-string)
                          "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n"))))
 
+(ert-deftest test-markdown-gfm/parse-gfm-buffer-for-languages ()
+  "Parse buffer for existing languages for `markdown-gfm-used-languages' test."
+  (markdown-test-string-gfm "``` MADEUP\n\n```\n```LANGUAGES\n\n```\n"
+    (let ((markdown-gfm-language-history nil))
+      (markdown-parse-gfm-buffer-for-languages)
+      (should (equal markdown-gfm-used-languages (list "LANGUAGES" "MADEUP")))
+      (should (equal markdown-gfm-last-used-language "LANGUAGES"))
+      (goto-char (point-max))
+      (markdown-insert-gfm-code-block "newlang")
+      (should (equal markdown-gfm-used-languages
+                     (list "newlang" "LANGUAGES" "MADEUP")))
+      (should (equal markdown-gfm-last-used-language "newlang")))))
+
 (ert-deftest test-markdown-gfm/code-block-font-lock ()
   "GFM code block font lock test."
   (markdown-test-file-gfm "gfm.text"

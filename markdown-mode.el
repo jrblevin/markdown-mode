@@ -864,6 +864,9 @@
 (defvar markdown-live-preview-mode nil
   "Sentinel variable for `markdown-live-preview-mode'.")
 
+(defvar markdown-gfm-language-history nil
+  "History list of languages used in the current buffer in GFM code blocks.")
+
 
 ;;; Customizable Variables ====================================================
 
@@ -3236,29 +3239,34 @@ already in `markdown-gfm-recognized-languages' or
 (defvar markdown-gfm-last-used-language nil
   "Last language used in the current buffer in GFM code blocks.")
 (make-variable-buffer-local 'markdown-gfm-last-used-language)
-(defvar markdown-gfm-language-history nil
-  "History list of languages used in the current buffer in GFM code blocks.")
-(make-variable-buffer-local 'markdown-gfm-language-history)
+
+(defun markdown-trim-whitespace (str)
+  (markdown-replace-regexp-in-string
+   "\\(?:[[:space:]\r\n]+\\'\\|\\`[[:space:]\r\n]+\\)" "" str))
 
 (defun markdown-clean-language-string (str)
   ;; TODO: clean curly braces, if required
-  (trim-whitespace str))
+  (markdown-trim-whitespace str))
 
 (defun markdown-compare-language-strings (str1 str2)
   ;; note that this keeps the first capitalization of a language used in a
   ;; buffer
-  (compare-strings (markdown-clean-language-string str1) nil nil
-                   (markdown-clean-language-string str2) nil nil
-                   t))
+  (eq t (compare-strings (markdown-clean-language-string str1) nil nil
+                         (markdown-clean-language-string str2) nil nil
+                         t)))
 
 (defun markdown-add-language-if-new (lang)
-  (unless (find lang (append markdown-gfm-used-languages
-                             markdown-gfm-additional-languages
-                             markdown-gfm-recognized-languages)
-                :test #'markdown-compare-language-strings)
-    ;; we have already checked whether it exists in the list using our fuzzy
-    ;; `markdown-compare-language-strings' function, so we can just push
-    (push (markdown-clean-language-string lang) markdown-gfm-used-languages)))
+  (let* ((cleaned-lang (markdown-clean-language-string lang))
+         (find-result
+          (cl-find cleaned-lang (append markdown-gfm-used-languages
+                                     markdown-gfm-additional-languages
+                                     markdown-gfm-recognized-languages)
+                :test #'markdown-compare-language-strings)))
+    (if find-result (setq markdown-gfm-last-used-language find-result)
+      ;; we have already checked whether it exists in the list using our fuzzy
+      ;; `markdown-compare-language-strings' function, so we can just push
+      (push cleaned-lang markdown-gfm-used-languages)
+      (setq markdown-gfm-last-used-language cleaned-lang))))
 
 (defun markdown-parse-gfm-buffer-for-languages (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
@@ -3285,7 +3293,6 @@ automatically in order to have the correct markup."
              'markdown-gfm-language-history
              markdown-gfm-last-used-language)))))
   (markdown-add-language-if-new lang)
-  (setq markdown-gfm-last-used-language lang)
   (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
