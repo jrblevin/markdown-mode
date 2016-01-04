@@ -1433,7 +1433,7 @@ Function is called repeatedly until it returns nil. For details, see
             (body (list (match-beginning 3) (match-end 3)))
             (close (list (match-beginning 4) (match-end 4)))
             (all (list (match-beginning 1) (match-end 4))))
-        (put-text-property (first open) (second close) 'markdown-gfm-code
+        (put-text-property (cl-first open) (cl-second close) 'markdown-gfm-code
                            (append all open lang body close))))))
 
 (defun markdown-syntax-propertize-blockquotes (start end)
@@ -3270,7 +3270,7 @@ already in `markdown-gfm-recognized-languages' or
 (defun markdown-add-language-if-new (lang)
   (let* ((cleaned-lang (markdown-clean-language-string lang))
          (find-result
-          (find cleaned-lang (append markdown-gfm-used-languages
+          (cl-find cleaned-lang (append markdown-gfm-used-languages
                                         markdown-gfm-additional-languages
                                         markdown-gfm-recognized-languages)
                    :test #'markdown-compare-language-strings)))
