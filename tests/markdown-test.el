@@ -1538,7 +1538,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         ;; really overly broad.)
                         (should (string-equal
                                  "Cannot move past superior level"
-                                 (second (should-error (markdown-move-subtree-up)))))))
+                                 (cl-second (should-error (markdown-move-subtree-up)))))))
 
 (ert-deftest test-markdown-subtree/move-down ()
   "Test `markdown-move-subtree-down'."
@@ -2442,7 +2442,7 @@ returns nil."
   (markdown-test-file "nested-list.text"
    (let ((values '(((1 . 1) . nil) ((2 . 13) . (3)) ((14 . 23) . (7 3))
                    ((24 . 26) . (11 7 3)))))
-     (loop for (range . value) in values
+     (cl-loop for (range . value) in values
            do (goto-char (point-min))
               (forward-line (1- (car range)))
               (dotimes (n (- (cdr range) (car range)))
@@ -2457,7 +2457,7 @@ returns nil."
                    ((26 . 29) . (4 0)) ((30 . 30) . (0)) ((31 . 33) . (4 0))
                    ((34 . 588) . nil) ((589 . 595) . (0)) ((596 . 814) . nil)
                    ((815 . 820) . (0)) ((821 . 898) . nil))))
-     (loop for (range . value) in values
+     (cl-loop for (range . value) in values
            do (goto-char (point-min))
               (forward-line (1- (car range)))
               (dotimes (n (- (cdr range) (car range)))
