@@ -5347,8 +5347,7 @@ the rendered output."
              markdown-live-preview-mode)
     (if markdown-live-preview-currently-exporting
         (setq markdown-live-preview-dirty-flag t)
-      (let ((live (buffer-live-p markdown-live-preview-buffer))
-            (cur-buf (current-buffer)))
+      (let ((live (buffer-live-p markdown-live-preview-buffer)))
         (markdown-do-sync-or-async markdown-export-async
             output-buf (markdown-live-preview-export markdown-export-async)
           (unless live (markdown-display-buffer-other-window output-buf)))))))
