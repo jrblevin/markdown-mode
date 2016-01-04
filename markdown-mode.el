@@ -5224,12 +5224,6 @@ current filename, but with the extension removed and replaced with .html."
         (with-current-buffer output-buffer-name
           (run-hooks 'markdown-after-export-hook)
           (save-buffer))
-        ;; if modified, restore initial buffer
-        (when (buffer-modified-p init-buf)
-          (erase-buffer)
-          (insert init-buf-string)
-          (save-buffer)
-          (goto-char init-point))
         output-file))))
 
 (defun markdown-export-and-preview ()
@@ -5315,7 +5309,14 @@ the rendered output."
           (delete-file export-file))
         (with-current-buffer cur-buf
           (setq markdown-live-preview-currently-exporting nil)))
-      markdown-live-preview-buffer)))
+      (with-current-buffer cur-buf
+        (if markdown-live-preview-dirty-flag
+            (progn
+              (setq markdown-live-preview-dirty-flag nil)
+              (markdown-do-sync-or-async asyncp
+                  export-file (markdown-live-preview-export asyncp callback)
+                export-file))
+          markdown-live-preview-buffer)))))
 
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
@@ -5332,11 +5333,16 @@ the rendered output."
     (switch-to-buffer-other-window buf)
     (set-buffer cur-buf)))
 
+(defvar markdown-live-preview-dirty-flag nil)
+(make-variable-buffer-local 'markdown-live-preview-dirty-flag)
+
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
-    (unless markdown-live-preview-currently-exporting
-      (let ((live (buffer-live-p markdown-live-preview-buffer)))
+    (if markdown-live-preview-currently-exporting
+        (setq markdown-live-preview-dirty-flag t)
+      (let ((live (buffer-live-p markdown-live-preview-buffer))
+            (cur-buf (current-buffer)))
         (markdown-do-sync-or-async markdown-export-async
             output-buf (markdown-live-preview-export markdown-export-async)
           (unless live (markdown-display-buffer-other-window output-buf)))))))
