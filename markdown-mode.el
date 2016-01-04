@@ -1,4 +1,4 @@
-;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files
+;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2007-2015 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
@@ -31,6 +31,7 @@
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
 ;; Version: 2.0
+;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -842,7 +843,7 @@
 (require 'easymenu)
 (require 'outline)
 (require 'thingatpt)
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 (declare-function eww-open-file "eww")
 
@@ -1058,6 +1059,11 @@ export by setting to 'delete-on-export, when quitting
 when nil."
   :group 'markdown
   :type 'symbol)
+
+(defcustom markdown-export-async nil
+  "TODO: document this"
+  :group 'markdown
+  :type '(choice boolean function))
 
 (defcustom markdown-list-indent-width 4
   "Depth of indentation for markdown lists. Used in `markdown-demote-list-item'
@@ -1348,7 +1354,7 @@ Function is called repeatedly until it returns nil. For details, see
   (save-excursion
     (goto-char start)
     (let ((levels (markdown-calculate-list-levels))
-          indent pre-regexp close-regexp open close stop)
+          indent pre-regexp close-regexp open close)
       (while (and (< (point) end) (not close))
         ;; Search for a region with sufficient indentation
         (if (null levels)
@@ -2167,14 +2173,14 @@ upon failure."
   "Search forward from point for the next list item with indentation LEVEL.
 Set point to the beginning of the item, and return point, or nil
 upon failure."
-  (let (bounds indent prev next)
+  (let (bounds indent next)
     (setq next (point))
     (forward-line)
     (setq indent (markdown-cur-line-indent))
     (while
         (cond
          ;; Stop at end of the buffer.
-         ((eobp) (setq prev nil))
+         ((eobp) nil)
          ;; Continue if the current line is blank
          ((markdown-cur-line-blank-p) t)
          ;; List item
@@ -2309,8 +2315,8 @@ intact additional processing."
     (let (refs)
       (while (re-search-forward markdown-regex-reference-definition nil t)
         (let ((target (match-string-no-properties 2)))
-          (add-to-list 'refs target t)))
-      refs)))
+          (cl-pushnew target refs :test #'equal)))
+      (reverse refs))))
 
 (defun markdown-code-at-point-p ()
   "Return non-nil if the point is at an inline code fragment.
@@ -2359,7 +2365,7 @@ GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
   "Return t if PROP from BEGIN to END is equal to one of the given VALUES.
 Also returns t if PROP is a list containing one of the VALUES.
 Return nil otherwise."
-  (let (loc props val)
+  (let (props)
     (catch 'found
       (dolist (loc (number-sequence begin end))
         (when (setq props (get-char-property loc prop))
@@ -3016,9 +3022,9 @@ header text is determined."
     ;; check prefix argument
     (cond
      ((and (equal arg '(4)) (> level 1)) ;; C-u
-      (decf level))
+      (cl-decf level))
      ((and (equal arg '(16)) (< level 6)) ;; C-u C-u
-      (incf level))
+      (cl-incf level))
      (arg ;; numeric prefix
       (setq level (prefix-numeric-value arg))))
     ;; setext headers must be level one or two
@@ -3087,7 +3093,7 @@ Also see `markdown-pre-indentation'."
     (goto-char loc)
     (let* ((list-level (length (markdown-calculate-list-levels)))
            (indent ""))
-      (dotimes (count list-level indent)
+      (dotimes (_count list-level indent)
         (setq indent (concat indent "    "))))))
 
 (defun markdown-insert-blockquote ()
@@ -3143,7 +3149,7 @@ Also see `markdown-blockquote-indentation'."
     (goto-char loc)
     (let* ((list-level (length (markdown-calculate-list-levels)))
            indent)
-      (dotimes (count (1+ list-level) indent)
+      (dotimes (_count (1+ list-level) indent)
         (setq indent (concat indent "    "))))))
 
 (defun markdown-insert-pre ()
@@ -3220,7 +3226,7 @@ automatically in order to have the correct markup."
         (let ((fn (string-to-number (match-string 1))))
           (when (> fn markdown-footnote-counter)
             (setq markdown-footnote-counter fn))))))
-  (incf markdown-footnote-counter))
+  (cl-incf markdown-footnote-counter))
 
 (defun markdown-insert-footnote ()
   "Insert footnote with a new number and move point to footnote definition."
@@ -3255,7 +3261,7 @@ footnote marker or in the footnote text."
       ;; We're starting in footnote text, so mark our return position and jump
       ;; to the marker if possible.
       (let ((marker-pos (markdown-footnote-find-marker
-                         (first starting-footnote-text-positions))))
+                         (cl-first starting-footnote-text-positions))))
             (if marker-pos
                 (goto-char (1- marker-pos))
               ;; If there isn't a marker, we still want to kill the text.
@@ -3269,10 +3275,10 @@ footnote marker or in the footnote text."
           (error "Not at a footnote"))
         ;; Even if we knew the text position before, it changed when we deleted
         ;; the label.
-        (setq marker-pos (second marker))
-        (let ((new-text-pos (markdown-footnote-find-text (first marker))))
+        (setq marker-pos (cl-second marker))
+        (let ((new-text-pos (markdown-footnote-find-text (cl-first marker))))
           (unless new-text-pos
-            (error "No text for footnote `%s'" (first marker)))
+            (error "No text for footnote `%s'" (cl-first marker)))
           (goto-char new-text-pos))))
     (let ((pos (markdown-footnote-kill-text)))
       (goto-char (if starting-footnote-text-positions
@@ -3286,7 +3292,7 @@ start position of the marker before deletion.  If no footnote
 marker was deleted, this function returns NIL."
   (let ((marker (markdown-footnote-marker-positions)))
     (when marker
-      (delete-region (second marker) (third marker))
+      (delete-region (cl-second marker) (cl-third marker))
       (butlast marker))))
 
 (defun markdown-footnote-kill-text ()
@@ -3298,14 +3304,14 @@ The killed text is placed in the kill ring (without the footnote
 number)."
   (let ((fn (markdown-footnote-text-positions)))
     (when fn
-      (let ((text (delete-and-extract-region (second fn) (third fn))))
-        (string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
+      (let ((text (delete-and-extract-region (cl-second fn) (cl-third fn))))
+        (string-match (concat "\\[\\" (cl-first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
         (kill-new (match-string 1 text))
         (when (and (markdown-cur-line-blank-p)
                    (markdown-prev-line-blank-p)
                    (not (bobp)))
           (delete-region (1- (point)) (point)))
-        (second fn)))))
+        (cl-second fn)))))
 
 (defun markdown-footnote-goto-text ()
   "Jump to the text of the footnote at point."
@@ -3414,7 +3420,7 @@ addresses, bold, italics, reference definition (add URI to kill
 ring), footnote markers and text (kill both marker and text, add
 text to kill ring), and list items."
   (interactive "*")
-  (let (val tmp)
+  (let (val)
     (cond
      ;; Inline code
      ((markdown-code-at-point-p)
@@ -3476,7 +3482,7 @@ text to kill ring), and list items."
       (delete-region (match-beginning 0) (match-end 0)))
      ;; List item
      ((setq val (markdown-cur-list-item-bounds))
-      (kill-new (delete-and-extract-region (first val) (second val))))
+      (kill-new (delete-and-extract-region (cl-first val) (cl-second val))))
      (t
       (error "Nothing found at point to kill")))))
 
@@ -3608,7 +3614,7 @@ See `markdown-indent-line' and `markdown-indent-line'."
 (defun markdown-exdent-region (beg end)
   "Call `markdown-indent-region' on region from BEG to END with prefix."
   (interactive "*r")
-  (markdown-indent-region (region-beginning) (region-end) t))
+  (markdown-indent-region beg end t))
 
 
 ;;; Markup Completion =========================================================
@@ -3752,7 +3758,7 @@ match."
                   (or match (setq match (looking-back prev-regexp nil)))))
               (unless match
                 (save-excursion (funcall function))))))
-        (add-to-list 'previous regexp)))))
+        (cl-pushnew regexp previous :test #'equal)))))
 
 (defun markdown-complete-buffer ()
   "Complete markup for all objects in the current buffer."
@@ -3796,8 +3802,7 @@ zero.  Otherwise, cycle back to a level six atx header.  Assumes
 match data is available for `markdown-regex-header-setext'."
   (let* ((char (char-after (match-beginning 2)))
          (old-level (if (char-equal char ?=) 1 2))
-         (new-level (+ old-level arg))
-         (text (match-string 1)))
+         (new-level (+ old-level arg)))
     (when (and (not remove) (= new-level 0))
       (setq new-level 6))
     (cond
@@ -4060,7 +4065,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
               (setcdr cur-alist alist)
               (setq cur-alist alist))
              ((< cur-level level)       ; first child
-              (dotimes (i (- level cur-level 1))
+              (dotimes (_i (- level cur-level 1))
                 (setq alist (list (cons empty-heading alist))))
               (if cur-alist
                   (let* ((parent (car cur-alist))
@@ -4071,7 +4076,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
               (setq cur-level level))
              (t                         ; new sibling of an ancestor
               (let ((sibling-alist (last (cdr root))))
-                (dotimes (i (1- level))
+                (dotimes (_i (1- level))
                   (setq sibling-alist (last (cdar sibling-alist))))
                 (setcdr sibling-alist alist)
                 (setq cur-alist alist))
@@ -4119,7 +4124,7 @@ the link, and line is the line number on which the link appears."
                          (match-string-no-properties 2)))
                (start (match-beginning 0))
                (line (markdown-line-number-at-pos)))
-          (add-to-list 'links (list text start line)))))
+          (cl-pushnew (list text start line) links :test #'equal))))
     links))
 
 (defun markdown-get-undefined-refs ()
@@ -4140,11 +4145,13 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
           (unless (markdown-reference-definition target)
             (let ((entry (assoc target missing)))
               (if (not entry)
-                  (add-to-list 'missing (cons target
-                                              (list (cons text (markdown-line-number-at-pos)))) t)
+                  (cl-pushnew
+                   (cons target
+                         (list (cons text (markdown-line-number-at-pos))))
+                   missing)
                 (setcdr entry
                         (append (cdr entry) (list (cons text (markdown-line-number-at-pos))))))))))
-      missing)))
+      (reverse missing))))
 
 (defconst markdown-reference-check-buffer
   "*Undefined references for %buffer%*"
@@ -4258,9 +4265,9 @@ as by `markdown-get-undefined-refs'."
   "Insert a button for jumping to LINK in buffer OLDBUF.
 LINK should be a list of the form (text char line) containing
 the link text, location, and line number."
-  (let ((label (first link))
-        (char (second link))
-        (line (third link)))
+  (let ((label (cl-first link))
+        (char (cl-second link))
+        (line (cl-third link)))
     (if (markdown-use-buttons-p)
         ;; Create a reference button in Emacs 22
         (insert-button label
@@ -4725,6 +4732,7 @@ Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
 
 (defalias 'markdown-end-of-heading 'outline-end-of-heading)
 
+;;; FIXME: invisible-ok isn't used here, but mentioned in the docstring?
 (defun markdown-on-heading-p (&optional invisible-ok)
   "Return t if point is on a (visible) heading line.
 If INVISIBLE-OK is non-nil, an invisible heading line is ok too."
@@ -4926,7 +4934,7 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
       (markdown-cycle-hr -1))
      ;; Promote list item
      ((setq bounds (markdown-cur-list-item-bounds))
-      (markdown-promote-list-item))
+      (markdown-promote-list-item bounds))
      ;; Promote bold
      ((thing-at-point-looking-at markdown-regex-bold)
       (markdown-cycle-bold))
@@ -4954,7 +4962,7 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
       (markdown-cycle-hr 1))
      ;; Demote list item
      ((setq bounds (markdown-cur-list-item-bounds))
-      (markdown-demote-list-item))
+      (markdown-demote-list-item bounds))
      ;; Demote bold
      ((thing-at-point-looking-at markdown-regex-bold)
       (markdown-cycle-bold))
@@ -4964,60 +4972,157 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
      (t
       (error "Nothing to demote at point")))))
 
+(defvar markdown-async-result nil)
+(make-variable-buffer-local 'markdown-async-result)
+(defmacro markdown-do-sync-or-async
+    (asyncp output-symbol proc-or-output-file-expr &rest body)
+  "Bind OUTPUT-SYMBOL to the result of PROC-OR-OUTPUT-FILE-EXPR and execute
+BODY. If ASYNCP is non-nil, then assume PROC-OR-OUTPUT-FILE-EXPR returns a
+process, and perform body upon the completion of that process. If ASYNCP is nil,
+bind OUTPUT-SYMBOL to the result PROC-OR-OUTPUT-FILE-EXPR and execute BODY
+synchronously.
+
+This heavily relies upon every other \"link in the chain\" (the lambdas that
+keep getting added to the sentinel and call the previous one) to return the
+output buffer name as the result of PROC-OR-OUTPUT-FILE-EXPR.
+`markdown-make-process-sentinel', as well as all users of this macro, do this
+correctly."
+  (declare (indent 3))
+  (let ((proc-sentinel (cl-gensym))
+        (cur-buf (cl-gensym))
+        (proc (cl-gensym))
+        (new-proc-sentinel (cl-gensym))
+        (proc-arg (cl-gensym))
+        (msg-arg (cl-gensym))
+        (result (cl-gensym)))
+    `(if ,asyncp
+         (let ((,cur-buf (current-buffer))
+               (,proc ,proc-or-output-file-expr))
+           (if (process-live-p ,proc)
+               (let* ((,proc-sentinel (process-sentinel ,proc))
+                      (,new-proc-sentinel
+                       ;; the elisp manual advises the use of `add-function'
+                       ;; here, but it requires a relatively recent emacs
+                       (lambda (,proc-arg ,msg-arg)
+                         (unless (process-live-p ,proc-arg)
+                           (let* ((,output-symbol
+                                   (funcall ,proc-sentinel ,proc-arg ,msg-arg))
+                                  (,result (progn ,@body)))
+                             (with-current-buffer ,cur-buf
+                               (setq markdown-async-result ,result)))))))
+                 (set-process-sentinel ,proc ,new-proc-sentinel)
+                 ,proc)
+             ;; cover the possibility that the process completed in between the
+             ;; time it was started and ,proc-or-output-file-expr was evaluated
+             ;; (if a `sit-for' or `accept-process-output' call was made, for
+             ;; example) by reading `markdown-async-result'
+             (let* ((,output-symbol
+                     (with-current-buffer ,cur-buf markdown-async-result))
+                    (,result (progn ,@body)))
+               (with-current-buffer ,cur-buf
+                 (setq markdown-async-result ,result))
+               ;; pass dead process to next
+               ,proc)))
+       (let ((,output-symbol ,proc-or-output-file-expr)) ,@body))))
+
+(defun markdown-get-active-region ()
+  (let (begin-region end-region)
+    (if (markdown-use-region-p)
+        (setq begin-region (region-beginning)
+              end-region (region-end))
+      (setq begin-region (point-min)
+            end-region (point-max)))
+    (list begin-region end-region)))
+
+(defun markdown-make-process-sentinel (output-buffer-name callback)
+  (let ((cur-buf (current-buffer)))
+    (if (functionp callback)
+        (lambda (proc _msg)
+          (unless (process-live-p proc)
+            (funcall callback output-buffer-name)
+            (with-current-buffer cur-buf
+              (setq markdown-async-result output-buffer-name))
+            output-buffer-name))
+      (lambda (proc _msg)
+        (unless (process-live-p proc)
+          (message "markdown export %s" output-buffer-name)
+          (with-current-buffer cur-buf
+            (setq markdown-async-result output-buffer-name))
+          output-buffer-name)))))
+
+(defconst markdown-process-name "*markdown export*")
+
+(defun markdown-process-file (output-buffer-name &optional callback)
+  "Handle case when `markdown-command' does not read from stdin."
+  (unless buffer-file-name (error "Must be visiting a file"))
+  (let ((output-cmd (concat markdown-command " "
+                            (shell-quote-argument buffer-file-name))))
+    (if callback
+        (let ((proc
+               (start-process-shell-command
+                markdown-process-name output-buffer-name output-cmd)))
+          (set-process-sentinel
+           proc (markdown-make-process-sentinel output-buffer-name callback))
+          proc)
+      (shell-command output-cmd output-buffer-name)
+      output-buffer-name)))
+
+(defun markdown-process-region (beg end output-buffer-name &optional callback)
+  "Pass region to `markdown-command' via stdin."
+  (if callback
+      (let ((proc
+             (start-process-shell-command
+              markdown-process-name output-buffer-name markdown-command)))
+        (set-process-sentinel
+         proc (markdown-make-process-sentinel output-buffer-name callback))
+        (process-send-region proc beg end)
+        (process-send-eof proc)
+        proc)
+    (shell-command-on-region beg end markdown-command output-buffer-name)
+    output-buffer-name))
+
 
 ;;; Commands ==================================================================
 
-(defun markdown (&optional output-buffer-name)
+(defun markdown (&optional output-buffer-name callback)
   "Run `markdown-command' on buffer, sending output to OUTPUT-BUFFER-NAME.
 The output buffer name defaults to `markdown-output-buffer-name'.
 Return the name of the output buffer used."
   (interactive)
   (save-window-excursion
-    (let ((begin-region)
-          (end-region))
-      (if (markdown-use-region-p)
-          (setq begin-region (region-beginning)
-                end-region (region-end))
-        (setq begin-region (point-min)
-              end-region (point-max)))
+    (let ((output-buffer-name
+           (or output-buffer-name
+               (generate-new-buffer-name markdown-output-buffer-name))))
+      (with-current-buffer (get-buffer-create output-buffer-name)
+        (erase-buffer)
+        (buffer-disable-undo))
+      (if markdown-command-needs-filename
+          (markdown-process-file output-buffer-name callback)
+        (cl-destructuring-bind (beg end) (markdown-get-active-region)
+          (markdown-process-region beg end output-buffer-name callback))))))
 
-      (unless output-buffer-name
-        (setq output-buffer-name markdown-output-buffer-name))
-
-      (cond
-       ;; Handle case when `markdown-command' does not read from stdin
-       (markdown-command-needs-filename
-        (if (not buffer-file-name)
-            (error "Must be visiting a file")
-          (shell-command (concat markdown-command " "
-                                 (shell-quote-argument buffer-file-name))
-                         output-buffer-name)))
-       ;; Pass region to `markdown-command' via stdin
-       (t
-        (shell-command-on-region begin-region end-region markdown-command
-                                 output-buffer-name))))
-    output-buffer-name))
-
-(defun markdown-standalone (&optional output-buffer-name)
+(defun markdown-standalone (&optional output-buffer-name callback)
   "Special function to provide standalone HTML output.
 Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (interactive)
-  (setq output-buffer-name (markdown output-buffer-name))
-  (with-current-buffer output-buffer-name
-    (set-buffer output-buffer-name)
-    (unless (markdown-output-standalone-p)
-      (markdown-add-xhtml-header-and-footer output-buffer-name))
-    (goto-char (point-min))
-    (html-mode))
-  output-buffer-name)
+  (markdown-do-sync-or-async callback
+      output-buffer-name (markdown output-buffer-name callback)
+    (with-current-buffer output-buffer-name
+      (unless (markdown-output-standalone-p)
+        (markdown-add-xhtml-header-and-footer output-buffer-name))
+      (goto-char (point-min))
+      (html-mode))
+    output-buffer-name))
 
 (defun markdown-other-window (&optional output-buffer-name)
   "Run `markdown-command' on current buffer and display in other window.
 When OUTPUT-BUFFER-NAME is given, insert the output in the buffer with
 that name."
   (interactive)
-  (markdown-display-buffer-other-window
-   (markdown-standalone output-buffer-name)))
+  (markdown-do-sync-or-async markdown-export-async
+      output-buffer-name
+      (markdown-standalone output-buffer-name markdown-export-async)
+    (markdown-display-buffer-other-window output-buffer-name)))
 
 (defun markdown-output-standalone-p ()
   "Determine whether `markdown-command' output is standalone XHTML.
@@ -5074,7 +5179,10 @@ Standalone XHTML output is identified by an occurrence of
 When OUTPUT-BUFFER-NAME is given, insert the output in the buffer with
 that name."
   (interactive)
-  (browse-url-of-buffer (markdown-standalone markdown-output-buffer-name)))
+  (markdown-do-sync-or-async markdown-export-async
+      output-buffer-name
+      (markdown-standalone output-buffer-name markdown-export-async)
+    (browse-url-of-buffer output-buffer-name)))
 
 (defun markdown-export-file-name (&optional extension)
   "Attempt to generate a filename for Markdown output.
@@ -5097,7 +5205,7 @@ output filename based on that filename.  Otherwise, return nil."
        (t
         candidate)))))
 
-(defun markdown-export (&optional output-file)
+(defun markdown-export (&optional output-file callback)
   "Run Markdown on the current buffer, save to file, and return the filename.
 If OUTPUT-FILE is given, use that as the filename.  Otherwise, use the filename
 generated by `markdown-export-file-name', which will be constructed using the
@@ -5112,22 +5220,25 @@ current filename, but with the extension removed and replaced with .html."
            (output-buffer (find-file-noselect output-file))
            (output-buffer-name (buffer-name output-buffer)))
       (run-hooks 'markdown-before-export-hook)
-      (markdown-standalone output-buffer-name)
-      (with-current-buffer output-buffer
-        (run-hooks 'markdown-after-export-hook)
-        (save-buffer))
-      ;; if modified, restore initial buffer
-      (when (buffer-modified-p init-buf)
-        (erase-buffer)
-        (insert init-buf-string)
-        (save-buffer)
-        (goto-char init-point))
-      output-file)))
+      (markdown-do-sync-or-async callback
+          output-buffer-name (markdown-standalone output-buffer-name callback)
+        (with-current-buffer output-buffer-name
+          (run-hooks 'markdown-after-export-hook)
+          (save-buffer))
+        ;; if modified, restore initial buffer
+        (when (buffer-modified-p init-buf)
+          (erase-buffer)
+          (insert init-buf-string)
+          (save-buffer)
+          (goto-char init-point))
+        output-file))))
 
 (defun markdown-export-and-preview ()
   "Export to XHTML using `markdown-export' and browse the resulting file."
   (interactive)
-  (browse-url-of-file (markdown-export)))
+  (markdown-do-sync-or-async markdown-export-async
+      output-file-name (markdown-export nil markdown-export-async)
+    (browse-url-of-file output-file-name)))
 
 (defvar markdown-live-preview-buffer nil
   "Buffer used to preview markdown output in `markdown-live-preview-export'.")
@@ -5139,6 +5250,7 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
 (make-variable-buffer-local 'markdown-live-preview-source-buffer)
 
 (defvar markdown-live-preview-currently-exporting nil)
+(make-variable-buffer-local 'markdown-live-preview-currently-exporting)
 
 (defun markdown-live-preview-get-filename ()
   "Standardize the filename exported by `markdown-live-preview-export'."
@@ -5162,42 +5274,61 @@ non-nil."
 (defun markdown-live-preview-window-deserialize (window-posns)
   "Apply window point and scroll data from WINDOW-POSNS, given by
 `markdown-live-preview-window-serialize'."
-  (destructuring-bind (win pt start) window-posns
+  (cl-destructuring-bind (win pt start) window-posns
     (when (window-live-p win)
       (set-window-buffer win markdown-live-preview-buffer)
       (set-window-point win pt)
       (set-window-start win start))))
 
-(defun markdown-live-preview-export ()
+(defun markdown-live-preview-export (&optional asyncp callback)
   "Export to XHTML using `markdown-export' and browse the resulting file within
 Emacs using `markdown-live-preview-window-function' Return the buffer displaying
 the rendered output."
   (interactive)
-  (let* ((markdown-live-preview-currently-exporting t)
-         (cur-buf (current-buffer))
-         (export-file (markdown-export (markdown-live-preview-get-filename)))
+  (setq markdown-live-preview-currently-exporting t)
+  (let* ((cur-buf (current-buffer))
          ;; get positions in all windows currently displaying output buffer
          (window-data
           (markdown-live-preview-window-serialize
-           markdown-live-preview-buffer)))
-    (save-window-excursion
-      (let ((output-buffer
-             (funcall markdown-live-preview-window-function export-file)))
-        (with-current-buffer output-buffer
-          (setq markdown-live-preview-source-buffer cur-buf))
+           markdown-live-preview-buffer))
+         (cb (or callback markdown-export-async)))
+    (markdown-do-sync-or-async asyncp
+        export-file (markdown-export (markdown-live-preview-get-filename) cb)
+      (unwind-protect
+          (progn
+            (save-window-excursion
+              (let ((output-buffer
+                     (funcall
+                      markdown-live-preview-window-function export-file)))
+                (with-current-buffer output-buffer
+                  (setq markdown-live-preview-source-buffer cur-buf))
+                (with-current-buffer cur-buf
+                  (setq markdown-live-preview-buffer output-buffer))))
+            (with-current-buffer cur-buf
+              ;; FIXME: when this is asynchronous, the user could have
+              ;; intentionally moved point or scrolled in any of the windows in
+              ;; between when the export begins and completes, and this wouldn't
+              ;; restore that.
+
+              ;; reset all windows displaying output buffer to where they
+              ;; were, now with the new output
+              (mapc #'markdown-live-preview-window-deserialize window-data)))
+        ;; delete html editing buffer
+        (let ((buf (get-file-buffer export-file)))
+          (when buf (kill-buffer buf)))
+        (when (and export-file (file-exists-p export-file)
+                   (eq markdown-live-preview-delete-export 'delete-on-export))
+          (delete-file export-file))
         (with-current-buffer cur-buf
-          (setq markdown-live-preview-buffer output-buffer))))
-    (with-current-buffer cur-buf
-      ;; reset all windows displaying output buffer to where they were,
-      ;; now with the new output
-      (mapc #'markdown-live-preview-window-deserialize window-data)
-      ;; delete html editing buffer
-      (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
-      (when (and export-file (file-exists-p export-file)
-                 (eq markdown-live-preview-delete-export
-                     'delete-on-export))
-        (delete-file export-file))
-      markdown-live-preview-buffer)))
+          (setq markdown-live-preview-currently-exporting nil)))
+      (with-current-buffer cur-buf
+        (if markdown-live-preview-dirty-flag
+            (progn
+              (setq markdown-live-preview-dirty-flag nil)
+              (markdown-do-sync-or-async asyncp
+                  export-file (markdown-live-preview-export asyncp callback)
+                export-file))
+          markdown-live-preview-buffer)))))
 
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
@@ -5214,14 +5345,18 @@ the rendered output."
     (switch-to-buffer-other-window buf)
     (set-buffer cur-buf)))
 
+(defvar markdown-live-preview-dirty-flag nil)
+(make-variable-buffer-local 'markdown-live-preview-dirty-flag)
+
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
-    (unless markdown-live-preview-currently-exporting
-      (if (buffer-live-p markdown-live-preview-buffer)
-          (markdown-live-preview-export)
-        (markdown-display-buffer-other-window
-         (markdown-live-preview-export))))))
+    (if markdown-live-preview-currently-exporting
+        (setq markdown-live-preview-dirty-flag t)
+      (let ((live (buffer-live-p markdown-live-preview-buffer)))
+        (markdown-do-sync-or-async markdown-export-async
+            output-buf (markdown-live-preview-export markdown-export-async)
+          (unless live (markdown-display-buffer-other-window output-buf)))))))
 
 (defun markdown-live-preview-remove-on-kill ()
   (cond ((and (derived-mode-p 'markdown-mode)
@@ -5237,7 +5372,9 @@ the rendered output."
   "Turn on `markdown-live-preview-mode' if not already on, and switch to its
 output buffer in another window."
   (if markdown-live-preview-mode
-      (markdown-display-buffer-other-window (markdown-live-preview-export)))
+      (markdown-do-sync-or-async markdown-export-async
+          output-buf (markdown-live-preview-export markdown-export-async)
+        (markdown-display-buffer-other-window output-buf)))
     (markdown-live-preview-mode))
 
 (defun markdown-open ()
@@ -5347,7 +5484,7 @@ and [[test test]] both map to Test-test.ext."
                                 (file-name-extension (buffer-file-name))))))
            (current default))
       (catch 'done
-        (loop
+        (cl-loop
          (if (or (file-exists-p current)
                  (not markdown-wiki-link-search-parent-directories))
              (throw 'done current))
@@ -5423,9 +5560,9 @@ newline after."
     (re-search-forward "\n" nil t)
     (if (not (= (point) to))
         (setq new-to (point)))
-    (values new-from new-to)))
+    (cl-values new-from new-to)))
 
-(defun markdown-check-change-for-wiki-link (from to change)
+(defun markdown-check-change-for-wiki-link (from to _change)
   "Check region between FROM and TO for wiki links and re-fontfy as needed.
 Designed to be used with the `after-change-functions' hook.
 CHANGE is the number of bytes of pre-change text replaced by the
@@ -5443,7 +5580,7 @@ given range."
              (save-restriction
                ;; Extend the region to fontify so that it starts
                ;; and ends at safe places.
-               (multiple-value-bind (new-from new-to)
+               (cl-multiple-value-bind (new-from new-to)
                    (markdown-extend-changed-region from to)
                  (goto-char new-from)
                  ;; Only refontify when the range contains text with a
@@ -5639,7 +5776,7 @@ before regenerating font-lock rules for extensions."
                        :type 'markdown-gfm-checkbox-button))))))
 
 ;; Called when any modification is made to buffer text.
-(defun markdown-gfm-checkbox-after-change-function (beg end old-len)
+(defun markdown-gfm-checkbox-after-change-function (beg end _old-len)
   "Add to `after-change-functions' to setup GFM checkboxes as buttons."
   (save-excursion
     (save-match-data
@@ -5813,7 +5950,9 @@ before regenerating font-lock rules for extensions."
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
   (if markdown-live-preview-mode
-      (markdown-display-buffer-other-window (markdown-live-preview-export))
+      (markdown-do-sync-or-async markdown-export-async
+          output-buf (markdown-live-preview-export markdown-export-async)
+        (markdown-display-buffer-other-window output-buf))
     (markdown-live-preview-remove)))
 
 (add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
