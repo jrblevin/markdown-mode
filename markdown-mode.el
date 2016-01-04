@@ -1,4 +1,4 @@
-;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files
+;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2007-2015 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
@@ -4969,25 +4969,57 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
      (t
       (error "Nothing to demote at point")))))
 
+(defvar markdown-async-result nil)
+(make-variable-buffer-local 'markdown-async-result)
 (defmacro markdown-do-sync-or-async
     (asyncp output-symbol proc-or-output-file-expr &rest body)
+  "Bind OUTPUT-SYMBOL to the result of PROC-OR-OUTPUT-FILE-EXPR and execute
+BODY. If ASYNCP is non-nil, then assume PROC-OR-OUTPUT-FILE-EXPR returns a
+process, and perform body upon the completion of that process. If ASYNCP is nil,
+bind OUTPUT-SYMBOL to the result PROC-OR-OUTPUT-FILE-EXPR and execute BODY
+synchronously.
+
+This heavily relies upon every other \"link in the chain\" (the lambdas that
+keep getting added to the sentinel and call the previous one) to return the
+output buffer name as the result of PROC-OR-OUTPUT-FILE-EXPR.
+`markdown-make-process-sentinel', as well as all users of this macro, do this
+correctly."
   (declare (indent 3))
   (let ((proc-sentinel (cl-gensym))
+        (cur-buf (cl-gensym))
         (proc (cl-gensym))
         (new-proc-sentinel (cl-gensym))
-        (arg1 (cl-gensym))
-        (arg2 (cl-gensym)))
+        (proc-arg (cl-gensym))
+        (msg-arg (cl-gensym))
+        (result (cl-gensym)))
     `(if ,asyncp
-         (let* ((,proc ,proc-or-output-file-expr)
-                (,proc-sentinel (process-sentinel ,proc))
-                (,new-proc-sentinel
-                 ;; the elisp manual advises the use of `add-function' here, but
-                 ;; it requires a relatively recent emacs
-                 (lambda (,arg1 ,arg2)
-                   (let ((,output-symbol (funcall ,proc-sentinel ,arg1 ,arg2)))
-                     ,@body))))
-           (set-process-sentinel ,proc ,new-proc-sentinel)
-           ,proc)
+         (let ((,cur-buf (current-buffer))
+               (,proc ,proc-or-output-file-expr))
+           (if (process-live-p ,proc)
+               (let* ((,proc-sentinel (process-sentinel ,proc))
+                      (,new-proc-sentinel
+                       ;; the elisp manual advises the use of `add-function'
+                       ;; here, but it requires a relatively recent emacs
+                       (lambda (,proc-arg ,msg-arg)
+                         (unless (process-live-p ,proc-arg)
+                           (let* ((,output-symbol
+                                   (funcall ,proc-sentinel ,proc-arg ,msg-arg))
+                                  (,result (progn ,@body)))
+                             (with-current-buffer ,cur-buf
+                               (setq markdown-async-result ,result)))))))
+                 (set-process-sentinel ,proc ,new-proc-sentinel)
+                 ,proc)
+             ;; cover the possibility that the process completed in between the
+             ;; time it was started and ,proc-or-output-file-expr was evaluated
+             ;; (if a `sit-for' or `accept-process-output' call was made, for
+             ;; example) by reading `markdown-async-result'
+             (let* ((,output-symbol
+                     (with-current-buffer ,cur-buf markdown-async-result))
+                    (,result (progn ,@body)))
+               (with-current-buffer ,cur-buf
+                 (setq markdown-async-result ,result))
+               ;; pass dead process to next
+               ,proc)))
        (let ((,output-symbol ,proc-or-output-file-expr)) ,@body))))
 
 (defun markdown-get-active-region ()
@@ -4999,16 +5031,21 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
             end-region (point-max)))
     (list begin-region end-region)))
 
-(defun markdown-make-process-sentinel (output-buffer callback)
-  (if (functionp callback)
+(defun markdown-make-process-sentinel (output-buffer-name callback)
+  (let ((cur-buf (current-buffer)))
+    (if (functionp callback)
+        (lambda (proc msg)
+          (unless (process-live-p proc)
+            (funcall callback output-buffer-name)
+            (with-current-buffer cur-buf
+              (setq markdown-async-result output-buffer-name))
+            output-buffer-name))
       (lambda (proc msg)
         (unless (process-live-p proc)
-          (funcall callback output-buffer)
-          output-buffer))
-    (lambda (proc msg)
-      (unless (process-live-p proc)
-        (message "markdown export %s" output-buffer)
-        output-buffer))))
+          (message "markdown export %s" output-buffer-name)
+          (with-current-buffer cur-buf
+            (setq markdown-async-result output-buffer-name))
+          output-buffer-name)))))
 
 (defconst markdown-process-name "*markdown export*")
 
