@@ -5304,6 +5304,11 @@ the rendered output."
                 (with-current-buffer cur-buf
                   (setq markdown-live-preview-buffer output-buffer))))
             (with-current-buffer cur-buf
+              ;; FIXME: when this is asynchronous, the user could have
+              ;; intentionally moved point or scrolled in any of the windows in
+              ;; between when the export begins and completes, and this wouldn't
+              ;; restore that.
+
               ;; reset all windows displaying output buffer to where they
               ;; were, now with the new output
               (mapc #'markdown-live-preview-window-deserialize window-data)))
