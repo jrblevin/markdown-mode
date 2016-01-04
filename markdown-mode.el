@@ -5240,6 +5240,15 @@ output buffer in another window."
       (markdown-display-buffer-other-window (markdown-live-preview-export)))
     (markdown-live-preview-mode))
 
+(defun markdown-live-preview-re-export ()
+  (interactive)
+  "If the current buffer is a buffer displaying the exported version of a
+`markdown-live-preview-mode' buffer, call `markdown-live-preview-export' and
+update this buffer's contents."
+  (when markdown-live-preview-source-buffer
+    (with-current-buffer markdown-live-preview-source-buffer
+      (markdown-live-preview-export))))
+
 (defun markdown-open ()
   "Open file for the current buffer with `markdown-open-command'."
   (interactive)
