@@ -2314,7 +2314,7 @@ intact additional processing."
     (let (refs)
       (while (re-search-forward markdown-regex-reference-definition nil t)
         (let ((target (match-string-no-properties 2)))
-          (pushnew target refs :test #'equal)))
+          (cl-pushnew target refs :test #'equal)))
       (reverse refs))))
 
 (defun markdown-code-at-point-p ()
@@ -3757,7 +3757,7 @@ match."
                   (or match (setq match (looking-back prev-regexp nil)))))
               (unless match
                 (save-excursion (funcall function))))))
-        (pushnew regexp previous :test #'equal)))))
+        (cl-pushnew regexp previous :test #'equal)))))
 
 (defun markdown-complete-buffer ()
   "Complete markup for all objects in the current buffer."
@@ -4123,7 +4123,7 @@ the link, and line is the line number on which the link appears."
                          (match-string-no-properties 2)))
                (start (match-beginning 0))
                (line (markdown-line-number-at-pos)))
-          (pushnew (list text start line) links :test #'equal))))
+          (cl-pushnew (list text start line) links :test #'equal))))
     links))
 
 (defun markdown-get-undefined-refs ()
@@ -4144,7 +4144,7 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
           (unless (markdown-reference-definition target)
             (let ((entry (assoc target missing)))
               (if (not entry)
-                  (pushnew
+                  (cl-pushnew
                    (cons target
                          (list (cons text (markdown-line-number-at-pos))))
                    missing)
@@ -4987,13 +4987,13 @@ output buffer name as the result of PROC-OR-OUTPUT-FILE-EXPR.
 `markdown-make-process-sentinel', as well as all users of this macro, do this
 correctly."
   (declare (indent 3))
-  (let ((proc-sentinel (gensym))
-        (cur-buf (gensym))
-        (proc (gensym))
-        (new-proc-sentinel (gensym))
-        (proc-arg (gensym))
-        (msg-arg (gensym))
-        (result (gensym)))
+  (let ((proc-sentinel (cl-gensym))
+        (cur-buf (cl-gensym))
+        (proc (cl-gensym))
+        (new-proc-sentinel (cl-gensym))
+        (proc-arg (cl-gensym))
+        (msg-arg (cl-gensym))
+        (result (cl-gensym)))
     `(if ,asyncp
          (let ((,cur-buf (current-buffer))
                (,proc ,proc-or-output-file-expr))
