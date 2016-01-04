@@ -1538,7 +1538,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         ;; really overly broad.)
                         (should (string-equal
                                  "Cannot move past superior level"
-                                 (second (should-error (markdown-move-subtree-up)))))))
+                                 (cl-second (should-error (markdown-move-subtree-up)))))))
 
 (ert-deftest test-markdown-subtree/move-down ()
   "Test `markdown-move-subtree-down'."
@@ -2208,7 +2208,10 @@ body"
    (markdown-test-range-has-face 4 9 markdown-italic-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-link ()
-  "Test font lock for links inside of a blockquote."
+  "Test font lock for links inside of a blockquote.
+This test will fail until font lock for inline links inside
+blockquotes is implemented (at present, the blockquote face
+takes precedence)."
   :expected-result :failed
   (markdown-test-string
    "> [link](url)"
@@ -2218,10 +2221,9 @@ body"
 
 (ert-deftest test-markdown-font-lock/blockquote-comment ()
   "Test font lock for comments inside of a blockquote."
-  :expected-result :failed
   (markdown-test-string
    "> <!-- comment -->"
-   (markdown-test-range-has-face 1 18 markdown-blockquote-face)
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
    (markdown-test-range-has-face 3 18 markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/pre-override ()
@@ -2442,7 +2444,7 @@ returns nil."
   (markdown-test-file "nested-list.text"
    (let ((values '(((1 . 1) . nil) ((2 . 13) . (3)) ((14 . 23) . (7 3))
                    ((24 . 26) . (11 7 3)))))
-     (loop for (range . value) in values
+     (cl-loop for (range . value) in values
            do (goto-char (point-min))
               (forward-line (1- (car range)))
               (dotimes (n (- (cdr range) (car range)))
@@ -2457,7 +2459,7 @@ returns nil."
                    ((26 . 29) . (4 0)) ((30 . 30) . (0)) ((31 . 33) . (4 0))
                    ((34 . 588) . nil) ((589 . 595) . (0)) ((596 . 814) . nil)
                    ((815 . 820) . (0)) ((821 . 898) . nil))))
-     (loop for (range . value) in values
+     (cl-loop for (range . value) in values
            do (goto-char (point-min))
               (forward-line (1- (car range)))
               (dotimes (n (- (cdr range) (car range)))
@@ -3237,7 +3239,6 @@ indented the same amount."
     (unless (featurep 'eww)
       (should-error (markdown-live-preview-mode)))
     (markdown-temp-eww
-     (message "%s" "hey")
      (markdown-live-preview-mode)
      (should (buffer-live-p markdown-live-preview-buffer))
      (should (eq (current-buffer)

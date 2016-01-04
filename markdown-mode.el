@@ -31,6 +31,7 @@
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
 ;; Version: 2.0
+;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -842,7 +843,7 @@
 (require 'easymenu)
 (require 'outline)
 (require 'thingatpt)
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 (declare-function eww-open-file "eww")
 
@@ -3030,9 +3031,9 @@ header text is determined."
     ;; check prefix argument
     (cond
      ((and (equal arg '(4)) (> level 1)) ;; C-u
-      (decf level))
+      (cl-decf level))
      ((and (equal arg '(16)) (< level 6)) ;; C-u C-u
-      (incf level))
+      (cl-incf level))
      (arg ;; numeric prefix
       (setq level (prefix-numeric-value arg))))
     ;; setext headers must be level one or two
@@ -3344,7 +3345,7 @@ automatically in order to have the correct markup."
         (let ((fn (string-to-number (match-string 1))))
           (when (> fn markdown-footnote-counter)
             (setq markdown-footnote-counter fn))))))
-  (incf markdown-footnote-counter))
+  (cl-incf markdown-footnote-counter))
 
 (defun markdown-insert-footnote ()
   "Insert footnote with a new number and move point to footnote definition."
@@ -3379,7 +3380,7 @@ footnote marker or in the footnote text."
       ;; We're starting in footnote text, so mark our return position and jump
       ;; to the marker if possible.
       (let ((marker-pos (markdown-footnote-find-marker
-                         (first starting-footnote-text-positions))))
+                         (cl-first starting-footnote-text-positions))))
             (if marker-pos
                 (goto-char (1- marker-pos))
               ;; If there isn't a marker, we still want to kill the text.
@@ -3393,10 +3394,10 @@ footnote marker or in the footnote text."
           (error "Not at a footnote"))
         ;; Even if we knew the text position before, it changed when we deleted
         ;; the label.
-        (setq marker-pos (second marker))
-        (let ((new-text-pos (markdown-footnote-find-text (first marker))))
+        (setq marker-pos (cl-second marker))
+        (let ((new-text-pos (markdown-footnote-find-text (cl-first marker))))
           (unless new-text-pos
-            (error "No text for footnote `%s'" (first marker)))
+            (error "No text for footnote `%s'" (cl-first marker)))
           (goto-char new-text-pos))))
     (let ((pos (markdown-footnote-kill-text)))
       (goto-char (if starting-footnote-text-positions
@@ -3410,7 +3411,7 @@ start position of the marker before deletion.  If no footnote
 marker was deleted, this function returns NIL."
   (let ((marker (markdown-footnote-marker-positions)))
     (when marker
-      (delete-region (second marker) (third marker))
+      (delete-region (cl-second marker) (cl-third marker))
       (butlast marker))))
 
 (defun markdown-footnote-kill-text ()
@@ -3422,14 +3423,14 @@ The killed text is placed in the kill ring (without the footnote
 number)."
   (let ((fn (markdown-footnote-text-positions)))
     (when fn
-      (let ((text (delete-and-extract-region (second fn) (third fn))))
-        (string-match (concat "\\[\\" (first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
+      (let ((text (delete-and-extract-region (cl-second fn) (cl-third fn))))
+        (string-match (concat "\\[\\" (cl-first fn) "\\]:[[:space:]]*\\(\\(.*\n?\\)*\\)") text)
         (kill-new (match-string 1 text))
         (when (and (markdown-cur-line-blank-p)
                    (markdown-prev-line-blank-p)
                    (not (bobp)))
           (delete-region (1- (point)) (point)))
-        (second fn)))))
+        (cl-second fn)))))
 
 (defun markdown-footnote-goto-text ()
   "Jump to the text of the footnote at point."
@@ -3600,7 +3601,7 @@ text to kill ring), and list items."
       (delete-region (match-beginning 0) (match-end 0)))
      ;; List item
      ((setq val (markdown-cur-list-item-bounds))
-      (kill-new (delete-and-extract-region (first val) (second val))))
+      (kill-new (delete-and-extract-region (cl-first val) (cl-second val))))
      (t
       (error "Nothing found at point to kill")))))
 
@@ -4382,9 +4383,9 @@ as by `markdown-get-undefined-refs'."
   "Insert a button for jumping to LINK in buffer OLDBUF.
 LINK should be a list of the form (text char line) containing
 the link text, location, and line number."
-  (let ((label (first link))
-        (char (second link))
-        (line (third link)))
+  (let ((label (cl-first link))
+        (char (cl-second link))
+        (line (cl-third link)))
     (if (markdown-use-buttons-p)
         ;; Create a reference button in Emacs 22
         (insert-button label
@@ -5107,7 +5108,6 @@ Return the name of the output buffer used."
 
       (unless output-buffer-name
         (setq output-buffer-name markdown-output-buffer-name))
-
       (cond
        ;; Handle case when `markdown-command' does not read from stdin
        (markdown-command-needs-filename
@@ -5270,11 +5270,11 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
 
 (defun markdown-live-preview-window-eww (file)
   "A `markdown-live-preview-window-function' for previewing with eww."
-  (if (eval-when-compile (featurep 'eww))
+  (if (featurep 'eww)
       (progn
         (eww-open-file file)
         (get-buffer "*eww*"))
-    (error "eww is not present on this version of emacs")))
+    (error "eww is not present or not loaded on this version of emacs")))
 
 (defun markdown-live-preview-window-serialize (buf)
   "Get window point and scroll data for all windows displaying BUF if BUF is
@@ -5286,7 +5286,7 @@ non-nil."
 (defun markdown-live-preview-window-deserialize (window-posns)
   "Apply window point and scroll data from WINDOW-POSNS, given by
 `markdown-live-preview-window-serialize'."
-  (destructuring-bind (win pt start) window-posns
+  (cl-destructuring-bind (win pt start) window-posns
     (when (window-live-p win)
       (set-window-buffer win markdown-live-preview-buffer)
       (set-window-point win pt)
@@ -5471,7 +5471,7 @@ and [[test test]] both map to Test-test.ext."
                                 (file-name-extension (buffer-file-name))))))
            (current default))
       (catch 'done
-        (loop
+        (cl-loop
          (if (or (file-exists-p current)
                  (not markdown-wiki-link-search-parent-directories))
              (throw 'done current))
@@ -5547,7 +5547,7 @@ newline after."
     (re-search-forward "\n" nil t)
     (if (not (= (point) to))
         (setq new-to (point)))
-    (values new-from new-to)))
+    (cl-values new-from new-to)))
 
 (defun markdown-check-change-for-wiki-link (from to change)
   "Check region between FROM and TO for wiki links and re-fontfy as needed.
@@ -5567,7 +5567,7 @@ given range."
              (save-restriction
                ;; Extend the region to fontify so that it starts
                ;; and ends at safe places.
-               (multiple-value-bind (new-from new-to)
+               (cl-multiple-value-bind (new-from new-to)
                    (markdown-extend-changed-region from to)
                  (goto-char new-from)
                  ;; Only refontify when the range contains text with a
