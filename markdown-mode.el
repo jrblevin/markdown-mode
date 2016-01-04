@@ -3269,7 +3269,7 @@ already in `markdown-gfm-recognized-languages' or
 (defun markdown-add-language-if-new (lang)
   (let* ((cleaned-lang (markdown-clean-language-string lang))
          (find-result
-          (cl-find cleaned-lang (append markdown-gfm-used-languages
+          (find cleaned-lang (append markdown-gfm-used-languages
                                         markdown-gfm-additional-languages
                                         markdown-gfm-recognized-languages)
                    :test #'markdown-compare-language-strings)))
