@@ -5224,6 +5224,12 @@ current filename, but with the extension removed and replaced with .html."
         (with-current-buffer output-buffer-name
           (run-hooks 'markdown-after-export-hook)
           (save-buffer))
+        ;; if modified, restore initial buffer
+        (when (buffer-modified-p init-buf)
+          (erase-buffer)
+          (insert init-buf-string)
+          (save-buffer)
+          (goto-char init-point))
         output-file))))
 
 (defun markdown-export-and-preview ()
