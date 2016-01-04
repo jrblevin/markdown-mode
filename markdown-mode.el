@@ -5075,7 +5075,7 @@ correctly."
         (set-process-sentinel
          proc (markdown-make-process-sentinel output-buffer-name callback))
         (process-send-region proc beg end)
-        (process-send-eof)
+        (process-send-eof proc)
         proc)
     (shell-command-on-region beg end markdown-command output-buffer-name)
     output-buffer-name))
@@ -5092,6 +5092,9 @@ Return the name of the output buffer used."
     (let ((output-buffer-name
            (or output-buffer-name
                (generate-new-buffer-name markdown-output-buffer-name))))
+      (with-current-buffer (get-buffer-create output-buffer-name)
+        (erase-buffer)
+        (buffer-disable-undo))
       (if markdown-command-needs-filename
           (markdown-process-file output-buffer-name callback)
         (destructuring-bind (beg end) (markdown-get-active-region)
@@ -5104,7 +5107,6 @@ Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (markdown-do-sync-or-async callback
       output-buffer-name (markdown output-buffer-name callback)
     (with-current-buffer output-buffer-name
-      (set-buffer output-buffer-name)
       (unless (markdown-output-standalone-p)
         (markdown-add-xhtml-header-and-footer output-buffer-name))
       (goto-char (point-min))
@@ -5219,7 +5221,7 @@ current filename, but with the extension removed and replaced with .html."
       (run-hooks 'markdown-before-export-hook)
       (markdown-do-sync-or-async callback
           output-buffer-name (markdown-standalone output-buffer-name callback)
-        (with-current-buffer output-buffer
+        (with-current-buffer output-buffer-name
           (run-hooks 'markdown-after-export-hook)
           (save-buffer))
         ;; if modified, restore initial buffer
@@ -5291,25 +5293,29 @@ the rendered output."
          (cb (or callback markdown-export-async)))
     (markdown-do-sync-or-async asyncp
         export-file (markdown-export (markdown-live-preview-get-filename) cb)
-      (save-window-excursion
-        (let ((output-buffer
-               (funcall markdown-live-preview-window-function export-file)))
-          (with-current-buffer output-buffer
-            (setq markdown-live-preview-source-buffer cur-buf))
-          (with-current-buffer cur-buf
-            (setq markdown-live-preview-buffer output-buffer))))
-      (with-current-buffer cur-buf
-        ;; reset all windows displaying output buffer to where they were,
-        ;; now with the new output
-        (mapc #'markdown-live-preview-window-deserialize window-data)
+      (unwind-protect
+          (progn
+            (save-window-excursion
+              (let ((output-buffer
+                     (funcall
+                      markdown-live-preview-window-function export-file)))
+                (with-current-buffer output-buffer
+                  (setq markdown-live-preview-source-buffer cur-buf))
+                (with-current-buffer cur-buf
+                  (setq markdown-live-preview-buffer output-buffer))))
+            (with-current-buffer cur-buf
+              ;; reset all windows displaying output buffer to where they
+              ;; were, now with the new output
+              (mapc #'markdown-live-preview-window-deserialize window-data)))
         ;; delete html editing buffer
-        (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
+        (let ((buf (get-file-buffer export-file)))
+          (when buf (kill-buffer buf)))
         (when (and export-file (file-exists-p export-file)
-                   (eq markdown-live-preview-delete-export
-                       'delete-on-export))
+                   (eq markdown-live-preview-delete-export 'delete-on-export))
           (delete-file export-file))
-        (setq markdown-live-preview-currently-exporting nil)
-        markdown-live-preview-buffer))))
+        (with-current-buffer cur-buf
+          (setq markdown-live-preview-currently-exporting nil)))
+      markdown-live-preview-buffer)))
 
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
@@ -5330,10 +5336,10 @@ the rendered output."
   (when (and (derived-mode-p 'markdown-mode)
              markdown-live-preview-mode)
     (unless markdown-live-preview-currently-exporting
-      (markdown-do-sync-or-async markdown-export-async
-          output-buf (markdown-live-preview-export)
-        (unless (buffer-live-p markdown-live-preview-buffer)
-          (markdown-display-buffer-other-window output-buf))))))
+      (let ((live (buffer-live-p markdown-live-preview-buffer)))
+        (markdown-do-sync-or-async markdown-export-async
+            output-buf (markdown-live-preview-export markdown-export-async)
+          (unless live (markdown-display-buffer-other-window output-buf)))))))
 
 (defun markdown-live-preview-remove-on-kill ()
   (cond ((and (derived-mode-p 'markdown-mode)
