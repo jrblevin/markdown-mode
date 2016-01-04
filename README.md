@@ -529,6 +529,17 @@ provides an interface to all of the possible customizations:
     this variable buffer-local allows `markdown-mode` to override
     the default behavior induced when the global variable is non-nil.
 
+  * `markdown-gfm-additional-languages`, - additional languages to
+    make available, aside from those predefined in
+    `markdown-gfm-recognized-languages`, when inserting GFM code
+    blocks (default: `nil`). Language strings must have be trimmed
+    of whitespace and not contain any curly braces. They may be of
+    arbitrary capitalization, though.
+
+  * `markdown-gfm-use-electric-backquote` - use
+    `markdown-electric-backquote` for interactive insertion of GFM
+    code blocks when backquote is pressed three times (default: <kbd>t</kbd>).
+
   * `markdown-make-gfm-checkboxes-buttons` - Whether GitHub
     Flavored Markdown style task lists (checkboxes) should be
     turned into buttons that can be toggled with mouse-1 or RET. If
@@ -745,15 +756,19 @@ following people:
     a monetary contribution in June 2015.
   * Howard Melman for supporting GFM checkboxes
     as buttons.
-  * Danny McClanahan for live preview mode.
+  * Danny McClanahan for live preview mode,
+    completion of GFM programming language names, and `cl-lib` updates.
   * Syohei Yoshida for better heading detection
     and movement functions.
 
-## Bugs
+## Compatibility
 
-Although markdown-mode is developed and tested primarily using
-GNU Emacs 24, compatibility with earlier Emacsen is also a
-priority.
+Markdown mode is developed and tested primarily for compatibility with
+GNU Emacs 24.3 and later.  It requires `cl-lib`, which has been
+bundled with GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2
+can install `cl-lib` with `package.el`.
+
+## Bugs
 
 If you find any bugs in markdown-mode, please construct a test case
 or a patch and open a ticket on the [GitHub issue tracker][issues].

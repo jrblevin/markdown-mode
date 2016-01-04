@@ -1,6 +1,6 @@
 ;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files
 
-;; Copyright (C) 2007-2015 Jason R. Blevins <jrblevin@sdf.org>
+;; Copyright (C) 2007-2016 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
 ;; Copyright (C) 2007 Conal Elliott <conal@conal.net>
 ;; Copyright (C) 2008 Greg Bognar <greg_bognar@hms.harvard.edu>
@@ -25,7 +25,7 @@
 ;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
 ;; Copyright (C) 2015 Antonis Kanouras <antonis@metadosis.gr>
 ;; Copyright (C) 2015 Howard Melman <hmelman@gmail.com>
-;; Copyright (C) 2015 Danny McClanahan <danieldmcclanahan@gmail.com>
+;; Copyright (C) 2015-2016 Danny McClanahan <danieldmcclanahan@gmail.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -580,6 +580,17 @@
 ;;     this variable buffer-local allows `markdown-mode' to override
 ;;     the default behavior induced when the global variable is non-nil.
 ;;
+;;   * `markdown-gfm-additional-languages', - additional languages to
+;;     make available, aside from those predefined in
+;;     `markdown-gfm-recognized-languages', when inserting GFM code
+;;     blocks (default: `nil`). Language strings must have be trimmed
+;;     of whitespace and not contain any curly braces. They may be of
+;;     arbitrary capitalization, though.
+;;
+;;   * `markdown-gfm-use-electric-backquote' - use
+;;     `markdown-electric-backquote' for interactive insertion of GFM
+;;     code blocks when backquote is pressed three times (default: `t`).
+;;
 ;;   * `markdown-make-gfm-checkboxes-buttons' - Whether GitHub
 ;;     Flavored Markdown style task lists (checkboxes) should be
 ;;     turned into buttons that can be toggled with mouse-1 or RET. If
@@ -796,16 +807,20 @@
 ;;     a monetary contribution in June 2015.
 ;;   * Howard Melman <hmelman@gmail.com> for supporting GFM checkboxes
 ;;     as buttons.
-;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview mode.
+;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview mode,
+;;     completion of GFM programming language names, and `cl-lib' updates.
 ;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
 ;;     and movement functions.
 
+;;; Compatibility:
+
+;; Markdown mode is developed and tested primarily for compatibility with
+;; GNU Emacs 24.3 and later.  It requires `cl-lib', which has been
+;; bundled with GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2
+;; can install `cl-lib' with `package.el'.
+
 ;;; Bugs:
 
-;; Although markdown-mode is developed and tested primarily using
-;; GNU Emacs 24, compatibility with earlier Emacsen is also a
-;; priority.
-;;
 ;; If you find any bugs in markdown-mode, please construct a test case
 ;; or a patch and open a ticket on the [GitHub issue tracker][issues].
 ;;
