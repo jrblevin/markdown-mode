@@ -4014,6 +4014,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-s\C-b" 'markdown-blockquote-region)
     (define-key map "\C-c\C-sp" 'markdown-insert-pre)
     (define-key map "\C-c\C-s\C-p" 'markdown-pre-region)
+    (define-key map "\C-c\C-sP" 'markdown-insert-gfm-code-block)
     (define-key map "\C-c-" 'markdown-insert-hr)
     ;; Element insertion (deprecated)
     (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
@@ -4083,7 +4084,6 @@ Assumes match data is available for `markdown-regex-italic'."
 (defvar gfm-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map markdown-mode-map)
-    (define-key map (kbd "C-c C-s P") 'markdown-insert-gfm-code-block)
     (define-key map (kbd "C-c C-s d") 'markdown-insert-strike-through)
     (define-key map "`" 'markdown-electric-backquote)
     map)
