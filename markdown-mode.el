@@ -5314,7 +5314,9 @@ the rendered output."
       (let ((output-buffer
              (funcall markdown-live-preview-window-function export-file)))
         (with-current-buffer output-buffer
-          (setq markdown-live-preview-source-buffer cur-buf))
+          (setq markdown-live-preview-source-buffer cur-buf)
+          (add-hook 'kill-buffer-hook
+                    #'markdown-live-preview-remove-on-kill t t))
         (with-current-buffer cur-buf
           (setq markdown-live-preview-buffer output-buffer))))
     (with-current-buffer cur-buf
@@ -5912,6 +5914,7 @@ before regenerating font-lock rules for extensions."
 
   ;; add live preview export hook
   (add-hook 'after-save-hook #'markdown-live-preview-if-markdown t t)
+  (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t t)
 
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
@@ -5958,8 +5961,6 @@ before regenerating font-lock rules for extensions."
   (if markdown-live-preview-mode
       (markdown-display-buffer-other-window (markdown-live-preview-export))
     (markdown-live-preview-remove)))
-
-(add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t)
 
 
 (provide 'markdown-mode)
