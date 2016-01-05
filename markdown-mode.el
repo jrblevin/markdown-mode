@@ -3285,18 +3285,8 @@ already in `markdown-gfm-recognized-languages' or
          (find-result
           (cl-find cleaned-lang (markdown-gfm-get-corpus)
                    :test #'equal)))
-    (if find-result (setq markdown-gfm-last-used-language find-result)
-      ;; we have already checked whether it exists in the list using our fuzzy
-      ;; `markdown-compare-language-strings' function, so we can just push
-      (push cleaned-lang markdown-gfm-used-languages)
-      (setq markdown-gfm-last-used-language cleaned-lang))))
-
-(defun markdown-parse-gfm-buffer-for-languages (&optional buffer)
-  (with-current-buffer (or buffer (current-buffer))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward markdown-regex-gfm-code-block nil t)
-        (markdown-add-language-if-new (match-string-no-properties 2))))))
+    (setq markdown-gfm-last-used-language cleaned-lang)
+    (unless find-result (push cleaned-lang markdown-gfm-used-languages))))
 
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
@@ -3340,6 +3330,13 @@ automatically in order to have the correct markup."
     (insert "```")
     (markdown-ensure-blank-line-after)
     (forward-line -1)))
+
+(defun markdown-gfm-parse-buffer-for-languages (&optional buffer)
+  (with-current-buffer (or buffer (current-buffer))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward markdown-regex-gfm-code-block nil t)
+        (markdown-add-language-if-new (match-string-no-properties 2))))))
 
 
 ;;; Footnotes ======================================================================
@@ -5948,7 +5945,7 @@ before regenerating font-lock rules for extensions."
        '(gfm-font-lock-keywords))
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links)
-  (markdown-parse-gfm-buffer-for-languages))
+  (markdown-gfm-parse-buffer-for-languages))
 
 
 ;;; Live Preview Mode  ============================================
