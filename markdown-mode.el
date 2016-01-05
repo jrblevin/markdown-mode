@@ -3274,20 +3274,13 @@ already in `markdown-gfm-recognized-languages' or
       (widget-put widget :error (format "Invalid language spec: '%s'" str))
       widget)))
 
-(defun markdown-compare-language-strings (str1 str2)
-  ;; note that this keeps the first capitalization of a language used in a
-  ;; buffer
-  ;; this also relies upon the fact that all input strings have been cleaned
-  ;; with `markdown-clean-language-string'
-  (eq t (compare-strings str1 nil nil str2 nil nil t)))
-
 (defun markdown-add-language-if-new (lang)
   (let* ((cleaned-lang (markdown-clean-language-string lang))
          (find-result
           (cl-find cleaned-lang (append markdown-gfm-used-languages
                                         markdown-gfm-additional-languages
                                         markdown-gfm-recognized-languages)
-                   :test #'markdown-compare-language-strings)))
+                   :test #'equal)))
     (if find-result (setq markdown-gfm-last-used-language find-result)
       ;; we have already checked whether it exists in the list using our fuzzy
       ;; `markdown-compare-language-strings' function, so we can just push
@@ -3308,7 +3301,7 @@ region is active, wrap this region with the markup instead.  If
 the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
   (interactive
-   (list (let ((completion-ignore-case t))
+   (list (let ((completion-ignore-case nil))
            (markdown-clean-language-string
             (completing-read
              (format "Programming language [%s]: "
