@@ -5910,6 +5910,9 @@ before regenerating font-lock rules for extensions."
   (add-hook 'window-configuration-change-hook
             'markdown-fontify-buffer-wiki-links t t)
 
+  ;; add live preview export hook
+  (add-hook 'after-save-hook #'markdown-live-preview-if-markdown t t)
+
   ;; do the initial link fontification
   (markdown-fontify-buffer-wiki-links))
 
@@ -5956,8 +5959,7 @@ before regenerating font-lock rules for extensions."
       (markdown-display-buffer-other-window (markdown-live-preview-export))
     (markdown-live-preview-remove)))
 
-(add-hook 'after-save-hook #'markdown-live-preview-if-markdown)
-(add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill)
+(add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t)
 
 
 (provide 'markdown-mode)
