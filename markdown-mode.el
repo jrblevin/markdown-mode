@@ -121,6 +121,10 @@
 ;; There is no official Markdown file extension, nor is there even a
 ;; _de facto_ standard, so you can easily add, change, or remove any
 ;; of the file extensions above as needed.
+;;
+;; `markdown-mode' depends on `cl-lib', which has been bundled with
+;; GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2 can install
+;; `cl-lib' with `package.el'.
 
 ;;; Usage:
 
@@ -812,17 +816,12 @@
 ;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
 ;;     and movement functions.
 
-;;; Compatibility:
-
-;; Markdown mode is developed and tested primarily for compatibility with
-;; GNU Emacs 24.3 and later.  It requires `cl-lib', which has been
-;; bundled with GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2
-;; can install `cl-lib' with `package.el'.
-
 ;;; Bugs:
 
-;; If you find any bugs in markdown-mode, please construct a test case
-;; or a patch and open a ticket on the [GitHub issue tracker][issues].
+;; markdown-mode is developed and tested primarily for compatibility
+;; with GNU Emacs 24.3 and later.  If you find any bugs in
+;; markdown-mode, please construct a test case or a patch and open a
+;; ticket on the [GitHub issue tracker][issues].
 ;;
 ;;  [issues]: https://github.com/jrblevin/markdown-mode/issues
 
