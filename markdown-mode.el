@@ -3274,12 +3274,16 @@ already in `markdown-gfm-recognized-languages' or
       (widget-put widget :error (format "Invalid language spec: '%s'" str))
       widget)))
 
+(defun markdown-gfm-get-corpus ()
+  "Create corpus of recognized GFM code block languages for the given buffer."
+  (append markdown-gfm-used-languages
+          markdown-gfm-additional-languages
+          markdown-gfm-recognized-languages))
+
 (defun markdown-add-language-if-new (lang)
   (let* ((cleaned-lang (markdown-clean-language-string lang))
          (find-result
-          (cl-find cleaned-lang (append markdown-gfm-used-languages
-                                        markdown-gfm-additional-languages
-                                        markdown-gfm-recognized-languages)
+          (cl-find cleaned-lang (markdown-gfm-get-corpus)
                    :test #'equal)))
     (if find-result (setq markdown-gfm-last-used-language find-result)
       ;; we have already checked whether it exists in the list using our fuzzy
@@ -3306,9 +3310,7 @@ automatically in order to have the correct markup."
             (completing-read
              (format "Programming language [%s]: "
                      (or markdown-gfm-last-used-language "none"))
-             (append markdown-gfm-used-languages
-                     markdown-gfm-additional-languages
-                     markdown-gfm-recognized-languages)
+             (markdown-gfm-get-corpus)
              nil 'confirm nil
              'markdown-gfm-language-history
              (or markdown-gfm-last-used-language
