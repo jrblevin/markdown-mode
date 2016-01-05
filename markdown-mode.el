@@ -4856,9 +4856,8 @@ Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
 
 (defalias 'markdown-end-of-heading 'outline-end-of-heading)
 
-(defun markdown-on-heading-p (&optional invisible-ok)
-  "Return t if point is on a (visible) heading line.
-If INVISIBLE-OK is non-nil, an invisible heading line is ok too."
+(defun markdown-on-heading-p ()
+  "Return t if point is on a (visible) heading line."
   (get-text-property (point) 'markdown-heading))
 
 (defun markdown-end-of-subtree (&optional invisible-OK)
@@ -5523,7 +5522,7 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
 
 (defun markdown-unfontify-region-wiki-links (from to)
   "Remove wiki link faces from the region specified by FROM and TO."
-  (interactive "nfrom: \nnto: ")
+  (interactive "*r")
   (remove-text-properties from to '(font-lock-face markdown-link-face))
   (remove-text-properties from to '(font-lock-face markdown-missing-link-face)))
 
@@ -5564,47 +5563,49 @@ newline after."
         (setq new-to (point)))
     (cl-values new-from new-to)))
 
-(defun markdown-check-change-for-wiki-link (from to change)
-  "Check region between FROM and TO for wiki links and re-fontfy as needed.
-Designed to be used with the `after-change-functions' hook.
-CHANGE is the number of bytes of pre-change text replaced by the
-given range."
-  (interactive "nfrom: \nnto: \nnchange: ")
+(defun markdown-check-change-for-wiki-link (from to)
+  "Check region between FROM and TO for wiki links and re-fontify as needed."
+  (interactive "*r")
   (let* ((modified (buffer-modified-p))
          (buffer-undo-list t)
          (inhibit-read-only t)
          (inhibit-point-motion-hooks t)
          deactivate-mark
          buffer-file-truename)
-     (unwind-protect
-         (save-excursion
-           (save-match-data
-             (save-restriction
-               ;; Extend the region to fontify so that it starts
-               ;; and ends at safe places.
-               (cl-multiple-value-bind (new-from new-to)
-                   (markdown-extend-changed-region from to)
-                 (goto-char new-from)
-                 ;; Only refontify when the range contains text with a
-                 ;; wiki link face or if the wiki link regexp matches.
-                 (when (or (markdown-range-property-any
-                            new-from new-to 'font-lock-face
-                            (list markdown-link-face
-                                  markdown-missing-link-face))
-                           (re-search-forward
-                            markdown-regex-wiki-link new-to t))
-                   ;; Unfontify existing fontification (start from scratch)
-                   (markdown-unfontify-region-wiki-links new-from new-to)
-                   ;; Now do the fontification.
-                   (markdown-fontify-region-wiki-links new-from new-to))))))
-       (and (not modified)
-            (buffer-modified-p)
-            (set-buffer-modified-p nil)))))
+    (unwind-protect
+        (save-excursion
+          (save-match-data
+            (save-restriction
+              ;; Extend the region to fontify so that it starts
+              ;; and ends at safe places.
+              (cl-multiple-value-bind (new-from new-to)
+                  (markdown-extend-changed-region from to)
+                (goto-char new-from)
+                ;; Only refontify when the range contains text with a
+                ;; wiki link face or if the wiki link regexp matches.
+                (when (or (markdown-range-property-any
+                           new-from new-to 'font-lock-face
+                           (list markdown-link-face
+                                 markdown-missing-link-face))
+                          (re-search-forward
+                           markdown-regex-wiki-link new-to t))
+                  ;; Unfontify existing fontification (start from scratch)
+                  (markdown-unfontify-region-wiki-links new-from new-to)
+                  ;; Now do the fontification.
+                  (markdown-fontify-region-wiki-links new-from new-to))))))
+      (and (not modified)
+           (buffer-modified-p)
+           (set-buffer-modified-p nil)))))
+
+(defun markdown-check-change-for-wiki-link-after-change (from to _)
+    "Check region between FROM and TO for wiki links and re-fontify as needed.
+Designed to be used with the `after-change-functions' hook."
+  (markdown-check-change-for-wiki-link from to))
 
 (defun markdown-fontify-buffer-wiki-links ()
   "Refontify all wiki links in the buffer."
   (interactive)
-  (markdown-check-change-for-wiki-link (point-min) (point-max) 0))
+  (markdown-check-change-for-wiki-link (point-min) (point-max)))
 
 
 ;;; Following and Jumping =====================================================
@@ -5897,7 +5898,8 @@ before regenerating font-lock rules for extensions."
     (make-local-hook 'window-configuration-change-hook))
 
   ;; Anytime text changes make sure it gets fontified correctly
-  (add-hook 'after-change-functions 'markdown-check-change-for-wiki-link t t)
+  (add-hook 'after-change-functions
+            'markdown-check-change-for-wiki-link-after-change t t)
 
   ;; Make checkboxes buttons
   (when markdown-make-gfm-checkboxes-buttons
