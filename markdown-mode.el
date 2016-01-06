@@ -3295,16 +3295,18 @@ the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
   (interactive
    (list (let ((completion-ignore-case nil))
-           (markdown-clean-language-string
-            (completing-read
-             (format "Programming language [%s]: "
-                     (or markdown-gfm-last-used-language "none"))
-             (markdown-gfm-get-corpus)
-             nil 'confirm nil
-             'markdown-gfm-language-history
-             (or markdown-gfm-last-used-language
-                 (car markdown-gfm-additional-languages)))))))
-  (markdown-add-language-if-new lang)
+           (condition-case _err
+               (markdown-clean-language-string
+                (completing-read
+                 (format "Programming language [%s]: "
+                         (or markdown-gfm-last-used-language "none"))
+                 (markdown-gfm-get-corpus)
+                 nil 'confirm nil
+                 'markdown-gfm-language-history
+                 (or markdown-gfm-last-used-language
+                     (car markdown-gfm-additional-languages))))
+             (quit "")))))
+  (unless (string= lang "") (markdown-add-language-if-new lang))
   (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
