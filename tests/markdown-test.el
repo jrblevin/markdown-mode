@@ -3157,9 +3157,10 @@ indented the same amount."
 
 (ert-deftest test-markdown-gfm/gfm-parse-buffer-for-languages ()
   "Parse buffer for existing languages for `markdown-gfm-used-languages' test."
-  (markdown-test-string-gfm "``` MADEUP\n\n```\n```LANGUAGES\n\n```\n```MaDeUp\n\n```\n"
+  (markdown-test-string-gfm "``` MADEUP\n\n```\n``` LANGUAGES\n\n```\n```MaDeUp\n\n```\n```\n\n```\n``` \n\n```\n"
     (markdown-gfm-parse-buffer-for-languages)
-    (should (equal markdown-gfm-used-languages (list "MaDeUp" "LANGUAGES" "MADEUP")))
+    (should (equal markdown-gfm-used-languages
+                   (list "MaDeUp" "LANGUAGES" "MADEUP")))
     (should (equal markdown-gfm-last-used-language "MaDeUp"))
     (goto-char (point-max))
     (markdown-insert-gfm-code-block "newlang")
