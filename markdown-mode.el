@@ -1218,13 +1218,10 @@ Group 2 matches the key sequence.")
 
 (defconst markdown-regex-gfm-code-block
   (concat
-   "^\\s *\\(```\\)[ ]?\\([^[:space:]]+\\|{[^}]*}\\)?"
+   "^\\s *\\(```\\)[ ]*\\([^[:space:]]+\\|{[^}]*}\\)?"
    "[[:space:]]*?\n"
    "\\(\\(?:.\\|\n\\)*?\\)?"
-   ;; the newline before the final line could have a ?, but then it gets mixed
-   ;; up with `markdown-regex-code'. this way, there always needs to be at least
-   ;; two newlines between the pair of triple backticks
-   "\n\\s *?\\(```\\)\\s *?$")
+   "\n?\\s *?\\(```\\)\\s *?$")
  "Regular expression matching opening of GFM code blocks.
 Group 1 matches the opening three backticks.
 Group 2 matches the language identifier (optional).
