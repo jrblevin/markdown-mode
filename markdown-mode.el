@@ -3336,7 +3336,8 @@ automatically in order to have the correct markup."
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-gfm-code-block nil t)
-        (markdown-add-language-if-new (match-string-no-properties 2))))))
+        (let ((lang (match-string-no-properties 2)))
+          (when lang (markdown-add-language-if-new lang)))))))
 
 
 ;;; Footnotes ======================================================================
