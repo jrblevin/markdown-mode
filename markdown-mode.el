@@ -5545,7 +5545,7 @@ and highlight accordingly."
               (file-name
                (markdown-convert-wiki-link-to-filename
                 (markdown-wiki-link-link))))
-          (if (file-exists-p file-name)
+          (if (condition-case nil (file-exists-p file-name) (error nil))
               (markdown-highlight-wiki-link
                highlight-beginning highlight-end markdown-link-face)
             (markdown-highlight-wiki-link
