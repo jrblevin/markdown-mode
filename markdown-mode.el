@@ -5489,14 +5489,16 @@ and [[test test]] both map to Test-test.ext."
                                 (file-name-extension (buffer-file-name))))))
            (current default))
       (catch 'done
-        (cl-loop
-         (if (or (file-exists-p current)
-                 (not markdown-wiki-link-search-parent-directories))
-             (throw 'done current))
-         (if (string-equal (expand-file-name current)
-                           (concat "/" default))
-             (throw 'done default))
-         (setq current (concat "../" current)))))))
+        (condition-case nil
+            (cl-loop
+             (if (or (not markdown-wiki-link-search-parent-directories)
+                     (file-exists-p current))
+                 (throw 'done current))
+             (if (string-equal (expand-file-name current)
+                               (concat "/" default))
+                 (throw 'done default))
+             (setq current (concat "../" current)))
+          (error default))))))
 
 (defun markdown-follow-wiki-link (name &optional other)
   "Follow the wiki link NAME.
