@@ -1719,6 +1719,14 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 2 2 markdown-italic-face)
    (markdown-test-range-has-face 3 3 markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/italics-6 ()
+  "Test multiline italics across list items."
+  (markdown-test-string
+   "* something about function foo_bar
+* something else about foo_bar"
+   (markdown-test-range-has-face 31 34 nil)
+   (markdown-test-range-has-face 38 62 nil)))
+
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n*italic*\n"
