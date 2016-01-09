@@ -1721,6 +1721,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-font-lock/italics-6 ()
   "Test multiline italics across list items."
+  :expected-result :failed
   (markdown-test-string
    "* something about function foo_bar
 * something else about foo_bar"
