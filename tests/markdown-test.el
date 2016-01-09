@@ -130,7 +130,7 @@ This file is not saved."
       (message "Testing range (%d,%d) for property %s equal to %s."
                begin end prop value)
       (message "Expected value (%s) not found in property (%s) at location %d" value prop fail-loc)
-      (message "Buffer substring: %s" (buffer-substring begin end))
+      (message "Buffer substring: %s" (buffer-substring begin (1+ end)))
       (message "Properties in range are as follows:")
       (dolist (loc (number-sequence begin end))
         (message "%d: %s" loc (get-char-property loc prop))))
