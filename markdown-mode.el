@@ -30,7 +30,7 @@
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
-;; Version: 2.0
+;; Version: 2.1
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
@@ -60,15 +60,15 @@
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
 ;;
-;; The latest stable version is markdown-mode 2.0, released on March 24, 2013:
+;; The latest stable version is markdown-mode 2.1, released on January 9, 2016:
 ;;
 ;;    * [markdown-mode.el][]
 ;;    * [Screenshot][][^theme]
 ;;    * [Release notes][]
 ;;
 ;;  [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
-;;  [Screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20130131-002.png
-;;  [Release notes]: http://jblevins.org/projects/markdown-mode/rev-2-0
+;;  [Screenshot]: http://jblevins.org/projects/markdown-mode/screenshots/20160108-001.png
+;;  [Release notes]: http://jblevins.org/projects/markdown-mode/rev-2-1
 ;;
 ;; [^theme]: The theme used in the screenshot is
 ;;     [color-theme-twilight](https://github.com/crafterm/twilight-emacs).
@@ -843,6 +843,7 @@
 ;;   * 2011-08-15: [Version 1.8.1][]
 ;;   * 2013-01-25: [Version 1.9][]
 ;;   * 2013-03-24: [Version 2.0][]
+;;   * 2016-01-09: [Version 2.1][]
 ;;
 ;; [Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
 ;; [Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
@@ -852,6 +853,7 @@
 ;; [Version 1.8.1]: http://jblevins.org/projects/markdown-mode/rev-1-8-1
 ;; [Version 1.9]: http://jblevins.org/projects/markdown-mode/rev-1-9
 ;; [Version 2.0]: http://jblevins.org/projects/markdown-mode/rev-2-0
+;; [Version 2.1]: http://jblevins.org/projects/markdown-mode/rev-2-1
 
 
 ;;; Code:
@@ -866,7 +868,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.0"
+(defconst markdown-mode-version "2.1"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
