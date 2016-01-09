@@ -3739,7 +3739,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
 
 (defmacro markdown-temp-eww (&rest body)
   `(progn
-     ,@(if (featurep 'eww) body
+     ,@(if (markdown-live-preview-has-eww-p) body
          `((ad-enable-advice #'markdown-live-preview-window-eww
                              'around 'markdown-create-fake-eww)
            (ad-activate #'markdown-live-preview-window-eww)
@@ -3748,44 +3748,162 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
                               'around 'markdown-create-fake-eww)
            (ad-activate #'markdown-live-preview-window-eww)))))
 
-(ert-deftest test-markdown-ext/live-preview-exports ()
-  (markdown-test-temp-file "inline.text"
-    (unless (require 'eww nil t)
-      (should-error (markdown-live-preview-mode)))
-    (markdown-temp-eww
-     (markdown-live-preview-mode)
-     (should (buffer-live-p markdown-live-preview-buffer))
-     (should (eq (current-buffer)
-                 (with-current-buffer markdown-live-preview-buffer
-                   markdown-live-preview-source-buffer)))
-     (kill-buffer markdown-live-preview-buffer)
-     (should (null markdown-live-preview-buffer))
-     (set-buffer-modified-p t)
-     (save-buffer)                      ; should create new export
-     (should (buffer-live-p markdown-live-preview-buffer)))))
+(defun markdown-test/live-preview-wait ()
+  (unless markdown-live-preview-current-buffer-sync-async
+    (sit-for (* markdown-live-preview-idle-delay 10))
+    (accept-process-output
+     markdown-live-preview-currently-exporting-process nil nil t)))
 
-(ert-deftest test-markdown-ext/live-preview-delete-exports ()
-  (markdown-temp-eww
-   (let ((markdown-live-preview-delete-export 'delete-on-destroy)
-         file-output)
-     (markdown-test-temp-file "inline.text"
+(defun markdown-test/live-preview-exports ()
+  (markdown-test-temp-file "inline.text"
+    (let ((markdown-live-preview-idle-delay .01))
+      (markdown-temp-eww
        (markdown-live-preview-mode)
-       (setq file-output (markdown-export-file-name)))
-     (should-not (file-exists-p file-output)))
-   (let ((markdown-live-preview-delete-export 'delete-on-export)
-         file-output)
-     (markdown-test-temp-file "inline.text"
-       (markdown-live-preview-mode)
-       (setq file-output (markdown-export-file-name))
-       (should-not (file-exists-p file-output))))
-   (let ((markdown-live-preview-delete-export nil)
-         file-output)
+       (markdown-test/live-preview-wait)
+       (should (buffer-live-p markdown-live-preview-view-buffer))
+       (should (eq (current-buffer)
+                   (with-current-buffer markdown-live-preview-view-buffer
+                     markdown-live-preview-source-buffer)))
+       (kill-buffer markdown-live-preview-view-buffer)
+       (should (null markdown-live-preview-view-buffer))
+       (if markdown-live-preview-current-buffer-sync-async
+           (markdown-live-preview-sync-export)
+         (markdown-live-preview-async-export)
+         (markdown-test/live-preview-wait))
+       (should (buffer-live-p markdown-live-preview-view-buffer))))))
+
+(ert-deftest test-markdown-ext/live-preview-exports-sync ()
+  (let ((markdown-live-preview-do-sync t))
+    (unless (markdown-live-preview-has-eww-p)
+      (should-error (markdown-live-preview-sync-export)))
+    (markdown-test/live-preview-exports)))
+
+(ert-deftest test-markdown-ext/live-preview-exports-async ()
+  (markdown-test/live-preview-exports))
+
+(defun markdown-test/live-preview-delete-exports ()
+  (let ((markdown-live-preview-idle-delay .01)
+        file-output)
+    (markdown-temp-eww
+     (let ((markdown-live-preview-delete-export 'delete-on-destroy))
+       (markdown-test-temp-file "inline.text"
+         (markdown-live-preview-mode)
+         (markdown-test/live-preview-wait)
+         (setq file-output (markdown-export-file-name)))
+       (should-not (file-exists-p file-output)))
+     (let ((markdown-live-preview-delete-export 'delete-on-export))
+       (markdown-test-temp-file "inline.text"
+         (markdown-live-preview-mode)
+         (markdown-test/live-preview-wait)
+         (setq file-output (markdown-export-file-name))
+         (should-not (file-exists-p file-output))))
      (unwind-protect
          (markdown-test-temp-file "inline.text"
            (markdown-live-preview-mode)
+           (markdown-test/live-preview-wait)
            (setq file-output (markdown-export-file-name))
+           (setq markdown-live-preview-delete-export nil)
            (should (file-exists-p file-output)))
        (delete-file file-output)))))
+
+(ert-deftest test-markdown-ext/live-preview-delete-exports-sync ()
+  (let ((markdown-live-preview-do-sync t))
+    (markdown-test/live-preview-delete-exports)))
+
+(ert-deftest test-markdown-ext/live-preview-delete-exports-async ()
+  (markdown-test/live-preview-delete-exports))
+
+(defvar markdown-test-eww-window nil)
+(defvar markdown-test-hit-advice nil)
+
+(defadvice eww-open-file (before markdown-test-set-window-width disable)
+  (setq markdown-test-hit-advice t)
+  (should (eq (selected-window) markdown-test-eww-window)))
+
+(defadvice get-buffer-create (before markdown-set-window-width-mock disable)
+  (when (let ((buf (ad-get-arg 0))) (and (stringp buf) (string= buf "*eww*")))
+    (setq markdown-test-hit-advice t)
+    (should (eq (selected-window) markdown-test-eww-window))))
+
+(defmacro markdown-eww-open-file-advice (&rest body)
+  (if (markdown-live-preview-has-eww-p)
+      `(progn
+         (ad-enable-advice #'eww-open-file 'before
+                           'markdown-test-set-window-width)
+         (ad-activate #'eww-open-file)
+         ,@body
+         (ad-disable-advice #'eww-open-file 'before
+                            'markdown-test-set-window-width)
+         (ad-activate #'eww-open-file))
+    `(progn
+       (ad-enable-advice #'get-buffer-create 'before
+                         'markdown-set-window-width-mock)
+       (ad-activate #'get-buffer-create)
+       ,@body
+       (ad-disable-advice #'get-buffer-create 'before
+                          'markdown-set-window-width-mock)
+       (ad-activate #'get-buffer-create))))
+
+(defadvice markdown-live-preview-get-displaying-window
+    (after markdown-test-get-test-window disable)
+  (setq markdown-test-eww-window ad-return-value))
+
+(defmacro markdown-initial-window-create-advice (&rest body)
+  `(progn
+     (ad-enable-advice #'markdown-live-preview-get-displaying-window
+                       'after 'markdown-test-get-test-window)
+     (ad-activate #'markdown-live-preview-get-displaying-window)
+     ,@body
+     (ad-disable-advice #'markdown-live-preview-get-displaying-window
+                        'after 'markdown-test-get-test-window)
+     (ad-activate #'markdown-live-preview-get-displaying-window)))
+
+(defun markdown-test/test-window-usage-live-preview ()
+  (setq markdown-test-hit-advice nil)
+  (save-window-excursion
+    (markdown-test-temp-file "inline.text"
+      (let ((markdown-live-preview-idle-delay .01)
+            (windows (window-list))
+            (md-buf (current-buffer)))
+        (cl-loop for win in windows
+                 unless (eq win (selected-window))
+                 do (delete-window win))
+        ;; note that advices are used in this test to supply `should' conditions
+        (markdown-temp-eww
+         ;; test that first window created by
+         ;; `markdown-live-preview-get-displaying-window' is the same window
+         ;; that is used to finally render the buffer, on the first try
+         (markdown-eww-open-file-advice
+          (markdown-initial-window-create-advice
+           (if markdown-live-preview-do-sync
+               (markdown-live-preview-sync-export)
+             (markdown-live-preview-async-export)
+             (markdown-test/live-preview-wait))
+           (should (eq t markdown-test-hit-advice))
+           (setq markdown-test-hit-advice nil))
+          (setq markdown-test-eww-window
+                (get-buffer-window (get-buffer "*eww*")))
+          (should markdown-live-preview-view-buffer)
+          (with-selected-window (get-buffer-window md-buf)
+            (if markdown-live-preview-do-sync
+                (markdown-live-preview-sync-export)
+              (markdown-live-preview-async-export)
+              (markdown-test/live-preview-wait))
+            ;; at this point, `eww-render' should have finished, and eww should
+            ;; have redisplayed. the advice checks that, since there was a
+            ;; single window displaying the *eww* buffer, that window was used
+            ;; as the selected window so that eww renders with a width
+            ;; equal to the width of its window
+            (should (eq t markdown-test-hit-advice))))))))
+  (setq markdown-test-hit-advice nil))
+
+(ert-deftest test-markdown-ext/live-preview-window-size-sync ()
+  (let ((markdown-live-preview-do-sync t))
+    (markdown-test/test-window-usage-live-preview)))
+
+(ert-deftest test-markdown-ext/live-preview-window-size-async ()
+  (let ((markdown-live-preview-do-sync nil))
+    (markdown-test/test-window-usage-live-preview)))
 
 (provide 'markdown-test)
 
