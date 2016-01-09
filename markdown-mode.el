@@ -5277,7 +5277,7 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
 
 (defun markdown-live-preview-window-eww (file)
   "A `markdown-live-preview-window-function' for previewing with eww."
-  (if (featurep 'eww)
+  (if (require 'eww nil t)
       (progn
         (eww-open-file file)
         (get-buffer "*eww*"))
