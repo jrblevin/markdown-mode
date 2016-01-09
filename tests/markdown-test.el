@@ -3237,7 +3237,7 @@ indented the same amount."
 
 (ert-deftest test-markdown-ext/live-preview-exports ()
   (markdown-test-temp-file "inline.text"
-    (unless (featurep 'eww)
+    (unless (require 'eww nil t)
       (should-error (markdown-live-preview-mode)))
     (markdown-temp-eww
      (markdown-live-preview-mode)
