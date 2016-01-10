@@ -1989,6 +1989,18 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 6 6 markdown-markup-face)
    (markdown-test-range-has-face 7 10 nil)))
 
+(ert-deftest test-markdown-font-lock/code-link-precedence ()
+  "Test that inline code takes precedence over inline links.
+Test currently fails because this case isn't handled properly."
+  :expected-result :failed
+  (markdown-test-string
+   "[not a `link](/foo`)"
+   (markdown-test-range-has-face 1 7 nil)
+   (markdown-test-range-has-face 8 8 markdown-markup-face)
+   (markdown-test-range-has-face 9 18 markdown-inline-code-face)
+   (markdown-test-range-has-face 19 19 markdown-markup-face)
+   (markdown-test-range-has-face 20 20 nil)))
+
 (ert-deftest test-markdown-font-lock/kbd ()
   "Test font lock for <kbd> tags."
   (markdown-test-string "<kbd>C-c <</kbd>"
