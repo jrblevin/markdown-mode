@@ -1761,6 +1761,19 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 4 7 nil)
    (markdown-test-range-has-face 11 14 nil)))
 
+(ert-deftest test-markdown-font-lock/italics-7 ()
+  "Underscores in URLs should not trigger italics."
+  :expected-result :failed
+  (markdown-test-string
+   "<http://jblevins.org/research/centroid/cd_z_path.m>"
+   (markdown-test-range-face-equals 2 50 markdown-link-face))
+  (markdown-test-string
+   "[1]: http://jblevins.org/research/centroid/cd_z_path.m"
+   (markdown-test-range-face-equals 6 54 markdown-url-face))
+  (markdown-test-string
+   "[cd\\_z\\_path.m](http://jblevins.org/research/centroid/cd_z_path.m)"
+   (markdown-test-range-face-equals 17 65 markdown-url-face)))
+
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n*italic*\n"
