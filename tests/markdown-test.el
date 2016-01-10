@@ -114,9 +114,16 @@ This file is not saved."
          (delete-file tmp)))))
 (def-edebug-spec markdown-test-temp-file (form body))
 
+(defun markdown-test-report-property-range (begin end prop)
+  "Report buffer substring and property PROP from BEGIN to END."
+  (message "Buffer substring: %s" (buffer-substring begin (1+ end)))
+  (message "Properties in range are as follows:")
+  (dolist (loc (number-sequence begin end))
+    (message "%d: %s" loc (get-char-property loc prop))))
+
 (defun markdown-test-range-has-property (begin end prop value)
-  "Verify that the range from BEGIN to END has property PROP equal to VALUE."
-  (let (loc vals fail-loc)
+  "Verify that range BEGIN to END has PROP equal to or containing VALUE."
+  (let (vals fail-loc)
     (setq fail-loc
           (catch 'fail
             (dolist (loc (number-sequence begin end))
@@ -130,10 +137,7 @@ This file is not saved."
       (message "Testing range (%d,%d) for property %s equal to %s."
                begin end prop value)
       (message "Expected value (%s) not found in property (%s) at location %d" value prop fail-loc)
-      (message "Buffer substring: %s" (buffer-substring begin (1+ end)))
-      (message "Properties in range are as follows:")
-      (dolist (loc (number-sequence begin end))
-        (message "%d: %s" loc (get-char-property loc prop))))
+      (markdown-test-report-property-range begin end prop))
     (should-not fail-loc)))
 
 (defun markdown-test-range-has-face (begin end face)
