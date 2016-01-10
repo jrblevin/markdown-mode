@@ -1743,12 +1743,22 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-font-lock/italics-6 ()
   "Test multiline italics across list items."
-  :expected-result :failed
   (markdown-test-string
    "* something about function foo_bar
 * something else about foo_bar"
    (markdown-test-range-has-face 31 34 nil)
-   (markdown-test-range-has-face 38 62 nil)))
+   (markdown-test-range-has-face 38 62 nil))
+  (markdown-test-string
+   "foo_bar
+* foo_bar"
+   (markdown-test-range-has-face 4 7 nil)
+   (markdown-test-range-has-face 11 14 nil))
+
+  (markdown-test-string
+   "* foo_bar
+foo_bar"
+   (markdown-test-range-has-face 6 9 nil)
+   (markdown-test-range-has-face 11 14 nil)))
 
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
