@@ -2158,6 +2158,16 @@ for (var i = 0; i < 10; i++) {
    (markdown-test-range-has-face
     (point-at-bol) (1- (point-at-eol)) markdown-comment-face)))
 
+(ert-deftest test-markdown-font-lock/comment-list-items ()
+  "Test comment with list inside."
+  (markdown-test-string
+   "<!--
+  - note 1;
+  - note 2.
+-->"
+   (markdown-test-range-face-equals (point-min) (1- (point-max))
+                                    markdown-comment-face)))
+
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."
   (markdown-test-string "Harvard[^1] [tuition][]"
