@@ -3328,9 +3328,7 @@ automatically in order to have the correct markup."
         (markdown-ensure-blank-line-before)
         (insert "```" lang))
     (markdown-ensure-blank-line-before)
-    (insert "```" lang)
-    (newline 2)
-    (insert "```")
+    (insert "```" lang "\n\n```")
     (markdown-ensure-blank-line-after)
     (forward-line -1)))
 
