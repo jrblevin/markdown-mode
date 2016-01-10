@@ -26,6 +26,7 @@
 ;; Copyright (C) 2015 Antonis Kanouras <antonis@metadosis.gr>
 ;; Copyright (C) 2015 Howard Melman <hmelman@gmail.com>
 ;; Copyright (C) 2015-2016 Danny McClanahan <danieldmcclanahan@gmail.com>
+;; Copyright (C) 2015-2016 Syohei Yoshida <syohex@gmail.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -816,7 +817,7 @@
 ;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview mode,
 ;;     completion of GFM programming language names, and `cl-lib' updates.
 ;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
-;;     and movement functions.
+;;     and movement functions, improved italic font lock.
 
 ;;; Bugs:
 
