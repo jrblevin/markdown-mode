@@ -2433,6 +2433,15 @@ Return nil otherwise."
                           (match-beginning 5) (match-end 5)))
     (goto-char (1+ (match-end 0)))))
 
+(defun markdown-list-p (pos)
+  (save-excursion
+    (goto-char pos)
+    (goto-char (line-beginning-position))
+    (looking-at-p markdown-regex-list)))
+
+(defun markdown-same-line-p (pos1 pos2)
+  (= (markdown-line-number-at-pos pos1) (markdown-line-number-at-pos pos2)))
+
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
   (let ((regex (if (eq major-mode 'gfm-mode)
@@ -2446,7 +2455,8 @@ Return nil otherwise."
                                  markdown-math-face))
           (goto-char (1+ (match-end 0)))
           (markdown-match-italic last))
-         (t
+         ((or (markdown-same-line-p begin end)
+              (not (or (markdown-list-p begin) (markdown-list-p end))))
           (set-match-data (list (match-beginning 1) (match-end 1)
                                 (match-beginning 2) (match-end 2)
                                 (match-beginning 3) (match-end 3)
