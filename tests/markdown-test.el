@@ -140,9 +140,27 @@ This file is not saved."
       (markdown-test-report-property-range begin end prop))
     (should-not fail-loc)))
 
+(defun markdown-test-range-property-equals (begin end prop value)
+  "Verify that range BEGIN to END has property PROP equal to VALUE."
+  (let ((fail-loc
+         (catch 'fail
+           (dolist (loc (number-sequence begin end))
+             (unless (eq (get-char-property loc prop) value)
+               (throw 'fail loc))))))
+    (when fail-loc
+      (message "Testing range (%d,%d) for property %s equal to %s."
+               begin end prop value)
+      (message "Expected value (%s) not found in property (%s) at location %d" value prop fail-loc)
+      (markdown-test-report-property-range begin end prop))
+    (should-not fail-loc)))
+
 (defun markdown-test-range-has-face (begin end face)
-  "Verify that the range from BEGIN to END has face equal to FACE."
+  "Verify that the range from BEGIN to END has face FACE."
   (markdown-test-range-has-property begin end 'face face))
+
+(defun markdown-test-range-face-equals (begin end face)
+  "Verify that the range from BEGIN to END has face equal to FACE."
+  (markdown-test-range-property-equals begin end 'face face))
 
 (defun markdown-test-goto-heading (title)
   "Move the point to section with TITLE."
