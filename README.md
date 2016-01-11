@@ -42,7 +42,6 @@ markdown-mode is also available in several package managers, including:
    * Ubuntu Linux: [elpa-markdown-mode][elpa-ubuntu] and [emacs-goodies-el][emacs-goodies-el-ubuntu]
    * RedHat and Fedora Linux: [emacs-goodies][]
    * NetBSD: [textproc/markdown-mode][]
-   * Arch Linux (AUR): [emacs-markdown-mode-git][]
    * MacPorts: [markdown-mode.el][macports-package] ([pending][macports-ticket])
    * FreeBSD: [textproc/markdown-mode.el][freebsd-port]
 
@@ -52,7 +51,6 @@ markdown-mode is also available in several package managers, including:
  [emacs-goodies-el-ubuntu]: http://packages.ubuntu.com/search?keywords=emacs-goodies-el
  [emacs-goodies]: https://apps.fedoraproject.org/packages/emacs-goodies
  [textproc/markdown-mode]: http://pkgsrc.se/textproc/markdown-mode
- [emacs-markdown-mode-git]: https://aur.archlinux.org/packages/emacs-goodies-el/
  [macports-package]: https://trac.macports.org/browser/trunk/dports/editors/markdown-mode.el/Portfile
  [macports-ticket]: http://trac.macports.org/ticket/35716
  [freebsd-port]: http://svnweb.freebsd.org/ports/head/textproc/markdown-mode.el
