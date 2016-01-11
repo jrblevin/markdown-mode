@@ -502,10 +502,12 @@
 ;;     demotion, keep these sorted from largest to smallest.
 ;;
 ;;   * `markdown-bold-underscore' - set to a non-nil value to use two
-;;     underscores for bold instead of two asterisks (default: `nil').
+;;     underscores when inserting bold text instead of two asterisks
+;;     (default: `nil').
 ;;
 ;;   * `markdown-italic-underscore' - set to a non-nil value to use
-;;     underscores for italic instead of asterisks (default: `nil').
+;;     underscores when inserting italic text instead of asterisks
+;;     (default: `nil').
 ;;
 ;;   * `markdown-asymmetric-header' - set to a non-nil value to use
 ;;     asymmetric header styling, placing header characters only on
@@ -945,12 +947,12 @@ promotion and demotion functions."
   :type 'list)
 
 (defcustom markdown-bold-underscore nil
-  "Use two underscores for bold instead of two asterisks."
+  "Use two underscores when inserting bold text instead of two asterisks."
   :group 'markdown
   :type 'boolean)
 
 (defcustom markdown-italic-underscore nil
-  "Use underscores for italic instead of asterisks."
+  "Use underscores when inserting italic text instead of asterisks."
   :group 'markdown
   :type 'boolean)
 

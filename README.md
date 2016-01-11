@@ -450,10 +450,12 @@ provides an interface to all of the possible customizations:
     demotion, keep these sorted from largest to smallest.
 
   * `markdown-bold-underscore` - set to a non-nil value to use two
-    underscores for bold instead of two asterisks (default: `nil`).
+    underscores when inserting bold text instead of two asterisks
+    (default: `nil`).
 
   * `markdown-italic-underscore` - set to a non-nil value to use
-    underscores for italic instead of asterisks (default: `nil`).
+    underscores when inserting italic text instead of asterisks
+    (default: `nil`).
 
   * `markdown-asymmetric-header` - set to a non-nil value to use
     asymmetric header styling, placing header characters only on
@@ -765,7 +767,7 @@ following people:
   * Danny McClanahan for live preview mode,
     completion of GFM programming language names, and `cl-lib` updates.
   * Syohei Yoshida for better heading detection
-    and movement functions.
+    and movement functions, improved italic font lock.
 
 ## Bugs
 
