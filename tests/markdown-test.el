@@ -699,6 +699,16 @@ Test point position upon removal and insertion."
                                        (buffer-substring (line-beginning-position) (line-end-position 2))
                                        (cdr test))))))))
 
+(ert-deftest test-markdown-insertion/header-setext-dwim-prefix ()
+  "Test 'do what I mean' header insertion with setext headers."
+  (markdown-test-string
+   "asdfasfasfdsadfasdfasdf\n======="
+   (goto-char 12)
+   (call-interactively 'markdown-insert-header-dwim)
+   (should (string-equal
+            (buffer-string)
+            "asdfasfasfdsadfasdfasdf\n======================="))))
+
 (ert-deftest test-markdown-insertion/remove-header ()
   "Test ATX and setext header."
   (markdown-test-string
