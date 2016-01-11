@@ -3243,7 +3243,21 @@ indented the same amount."
     (markdown-insert-gfm-code-block "newlang")
     (should (equal markdown-gfm-used-languages
                    (list "newlang" "MaDeUp" "LANGUAGES" "MADEUP")))
-    (should (equal markdown-gfm-last-used-language "newlang"))))
+    (should (equal markdown-gfm-last-used-language "newlang"))
+    (let ((markdown-gfm-downcase-languages nil))
+      (should
+       (equal (markdown-gfm-get-corpus)
+              (append markdown-gfm-used-languages
+                      markdown-gfm-additional-languages
+                      markdown-gfm-recognized-languages))))
+    (let ((markdown-gfm-downcase-languages t))
+      (should
+       (equal
+        (markdown-gfm-get-corpus)
+        (append markdown-gfm-used-languages
+                (cl-mapcar #'downcase
+                           (append markdown-gfm-additional-languages
+                                   markdown-gfm-recognized-languages))))))))
 
 (ert-deftest test-markdown-gfm/code-block-font-lock ()
   "GFM code block font lock test."

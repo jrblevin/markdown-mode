@@ -1100,6 +1100,12 @@ curly braces. They may be of arbitrary capitalization, though."
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-gfm-downcase-languages t
+  "Downcase suggested languages when inserting them to code blocks with
+`markdown-electric-backquote'."
+  :group 'markdown
+  :type 'boolean)
+
 
 ;;; Regular Expressions =======================================================
 
@@ -3279,9 +3285,12 @@ already in `markdown-gfm-recognized-languages' or
 
 (defun markdown-gfm-get-corpus ()
   "Create corpus of recognized GFM code block languages for the given buffer."
-  (append markdown-gfm-used-languages
-          markdown-gfm-additional-languages
-          markdown-gfm-recognized-languages))
+  (let ((given-corpus (append markdown-gfm-additional-languages
+                              markdown-gfm-recognized-languages)))
+    (append
+     markdown-gfm-used-languages
+     (if markdown-gfm-downcase-languages (cl-mapcar #'downcase given-corpus)
+       given-corpus))))
 
 (defun markdown-add-language-if-new (lang)
   (let* ((cleaned-lang (markdown-clean-language-string lang))
@@ -3299,16 +3308,14 @@ the region boundaries are not on empty lines, these are added
 automatically in order to have the correct markup."
   (interactive
    (list (let ((completion-ignore-case nil))
-           (condition-case _err
+           (condition-case nil
                (markdown-clean-language-string
                 (completing-read
                  (format "Programming language [%s]: "
                          (or markdown-gfm-last-used-language "none"))
                  (markdown-gfm-get-corpus)
                  nil 'confirm nil
-                 'markdown-gfm-language-history
-                 (or markdown-gfm-last-used-language
-                     (car markdown-gfm-additional-languages))))
+                 'markdown-gfm-language-history))
              (quit "")))))
   (unless (string= lang "") (markdown-add-language-if-new lang))
   (when (> (length lang) 0) (setq lang (concat " " lang)))
