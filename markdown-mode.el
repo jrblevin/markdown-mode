@@ -1161,7 +1161,14 @@ Group 3 matches the closing square bracket.")
 
 (defconst markdown-regex-header
   "^\\(?:\\(.+\\)\n\\(=+\\)\\|\\(.+\\)\n\\(-+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
-  "Regexp identifying Markdown headers.")
+  "Regexp identifying Markdown headings.
+Group 1 matches the text of a level-1 setext heading.
+Group 2 matches the underline of a level-1 setext heading.
+Group 3 matches the text of a level-1 setext heading.
+Group 4 matches the underline of a level-1 setext heading.
+Group 5 matches the opening hash marks of an atx heading.
+Group 6 matches the text, without surrounding whitespace, of an atx heading.
+Group 7 matches the closing hash marks of an atx heading.")
 
 (defconst markdown-regex-header-1-atx
   "^\\(#\\)[ \t]*\\([^\\.].*?\\)[ \t]*\\(#*\\)$"
