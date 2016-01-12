@@ -1985,10 +1985,6 @@ in XEmacs 21."
     (if (fboundp 'outline-hide-body)
         'outline-hide-body
       'hide-body))
-  (defalias 'markdown-show-entry
-    (if (fboundp 'outline-show-entry)
-        'outline-show-entry
-      'show-entry))
   (defalias 'markdown-show-children
     (if (fboundp 'outline-show-children)
         'outline-show-children
@@ -4915,6 +4911,27 @@ For example, headings inside preformatted code blocks may match
 
 (defvar markdown-cycle-global-status 1)
 (defvar markdown-cycle-subtree-status nil)
+
+(defun markdown-next-preface ()
+  (let (finish)
+    (while (and (not finish) (re-search-forward (concat "\n\\(?:" outline-regexp "\\)")
+                                                nil 'move))
+      (unless (markdown-code-block-at-point)
+        (goto-char (match-beginning 0))
+        (setq finish t))))
+  (when (and (bolp) (or outline-blank-line (eobp)) (not (bobp)))
+    (forward-char -1)))
+
+(defun markdown-show-entry ()
+  (save-excursion
+    (outline-back-to-heading t)
+    (outline-flag-region (1- (point))
+                         (progn
+                           (markdown-next-preface)
+                           (if (= 1 (- (point-max) (point)))
+                               (point-max)
+                             (point)))
+                         nil)))
 
 (defun markdown-cycle (&optional arg)
   "Visibility cycling for Markdown mode.
