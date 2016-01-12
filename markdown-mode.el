@@ -6587,7 +6587,9 @@ handles filling itself, it always returns t so that
             nil nil nil nil
             (font-lock-syntactic-face-function . markdown-syntactic-face)))
     ;; Refontify buffer
-    (when (fboundp 'font-lock-refresh-defaults) (font-lock-refresh-defaults))
+    (when (and font-lock-mode (fboundp 'font-lock-refresh-defaults))
+      (font-lock-refresh-defaults))
+
     ;; Add or remove hooks related to extensions
     (markdown-setup-wiki-link-hooks)))
 
