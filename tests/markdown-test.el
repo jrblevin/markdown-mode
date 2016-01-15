@@ -2847,6 +2847,38 @@ returns nil."
    (should (= (point) 13))
    (should (string-equal (buffer-string) "[a][]\n\n[a]: "))))
 
+(ert-deftest test-markdown-movement/back-to-same-level-over-code-block ()
+  "`markdown-backward-same-level' over code block which contains header
+like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
+  (markdown-test-string "
+## Header 2-1
+
+## Header 2-2
+
+```R
+# Header Like Statement
+```
+
+## Header 2-3
+"
+    (search-forward "## Header 2-3")
+    (let ((last-header-pos (point)))
+      (forward-line -1)
+      (call-interactively #'markdown-backward-same-level)
+      (should (looking-at-p "## Header 2-1"))
+
+      (goto-char last-header-pos)
+      (call-interactively #'markdown-backward-same-level)
+      (should (looking-at-p "## Header 2-2"))
+
+      (goto-char last-header-pos)
+      (markdown-backward-same-level 2)
+      (should (looking-at-p "## Header 2-1"))
+
+      (search-forward "# Header Like Statement")
+      (call-interactively #'markdown-backward-same-level)
+      (should (looking-at-p "## Header 2-1")))))
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/aliasing ()
