@@ -4852,11 +4852,38 @@ Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-move-heading-common 'outline-forward-same-level arg))
 
+(defun markdown-back-to-heading-over-code-block (&optional invisible-ok)
+  (beginning-of-line)
+  (or (and (outline-on-heading-p invisible-ok)
+           (not (markdown-code-block-at-point)))
+      (let ((header-re (concat "^\\(?:" outline-regexp "\\)"))
+            found)
+        (save-excursion
+          (while (not found)
+            (let (finish)
+              (while (and (not finish) (re-search-backward header-re nil t))
+                (when (and (or invisible-ok (not (outline-invisible-p)))
+                           (not (markdown-code-block-at-point)))
+                  (setq finish t)))
+              (if (not finish)
+                  (error "Before first heading")
+                (setq found (point))))))
+        (goto-char found)
+        found)))
+
 (defun markdown-backward-same-level (arg)
   "Move backward to the ARG'th heading at same level as this one.
 Stop at the first and last headings of a superior heading."
   (interactive "p")
-  (markdown-move-heading-common 'outline-backward-same-level arg))
+  (markdown-back-to-heading-over-code-block)
+  (while (> arg 0)
+    (let ((point-to-move-to (save-excursion
+			      (outline-get-last-sibling))))
+      (if point-to-move-to
+	  (progn
+	    (goto-char point-to-move-to)
+	    (setq arg (1- arg)))
+        (error "No previous same-level heading")))))
 
 (defun markdown-up-heading (arg)
   "Move to the visible heading line of which the present line is a subheading.
