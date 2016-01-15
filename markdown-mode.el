@@ -1234,16 +1234,17 @@ but not two newlines in a row.")
 Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
 
-(defconst markdown-regex-gfm-code-block
-  (concat
-   "^\\s *\\(```\\)[ ]*\\([^[:space:]]+\\|{[^}]*}\\)?"
-   "[[:space:]]*?\n"
-   "\\(\\(?:.\\|\n\\)*?\\)?"
-   "\n?\\s *?\\(```\\)\\s *?$")
+(defconst markdown-regex-gfm-code-block-open
+ "^\\s *\\(```\\)[ ]?\\([^[:space:]]+[[:space:]]*\\|{[^}]*}\\)?$"
  "Regular expression matching opening of GFM code blocks.
 Group 1 matches the opening three backticks.
 Group 2 matches the language identifier (optional).
 Group 3 matches the closing three backticks.")
+
+(defconst markdown-regex-gfm-code-block-close
+ "^\\s *\\(```\\)\\s *$"
+ "Regular expression matching closing of GFM code blocks.
+Group 1 matches the closing three backticks.")
 
 (defconst markdown-regex-pre
   "^\\(    \\|\t\\).*$"
@@ -1456,14 +1457,18 @@ Function is called repeatedly until it returns nil. For details, see
   "Match GFM code blocks from START to END."
   (save-excursion
     (goto-char start)
-    (while (re-search-forward markdown-regex-gfm-code-block end t)
+    (while (re-search-forward markdown-regex-gfm-code-block-open end t)
       (let ((open (list (match-beginning 1) (match-end 1)))
-            (lang (list (match-beginning 2) (match-end 2)))
-            (body (list (match-beginning 3) (match-end 3)))
-            (close (list (match-beginning 4) (match-end 4)))
-            (all (list (match-beginning 1) (match-end 4))))
-        (put-text-property (cl-first open) (cl-second close) 'markdown-gfm-code
-                           (append all open lang body close))))))
+            (lang (list (match-beginning 2) (match-end 2))))
+        (forward-line)
+        (let ((body (point)))
+          (when (re-search-forward
+                 markdown-regex-gfm-code-block-close end t)
+            (let ((close (list (match-beginning 1) (match-end 1)))
+                  (all (list (car open) (match-end 1))))
+              (setq body (list body (1- (match-beginning 0))))
+              (put-text-property (car open) (match-end 1) 'markdown-gfm-code
+                                 (append all open lang body close)))))))))
 
 (defun markdown-syntax-propertize-blockquotes (start end)
   "Match blockquotes from START to END."
@@ -3349,7 +3354,7 @@ automatically in order to have the correct markup."
   (with-current-buffer (or buffer (current-buffer))
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward markdown-regex-gfm-code-block nil t)
+      (while (re-search-forward markdown-regex-gfm-code-block-open nil t)
         (let ((lang (match-string-no-properties 2)))
           (when lang (markdown-add-language-if-new lang)))))))
 
