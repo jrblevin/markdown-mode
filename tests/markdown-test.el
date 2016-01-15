@@ -2355,7 +2355,7 @@ returns nil."
   (markdown-test-file
    "inline.text"
    (should (equal (markdown-syntax-propertize-extend-region 1 17)
-                  nil))
+                  (cons 1 91)))
    (should (equal (markdown-syntax-propertize-extend-region 2 17)
                   (cons 1 91)))
    (should (equal (markdown-syntax-propertize-extend-region 1 91)
@@ -2369,7 +2369,6 @@ returns nil."
 
 (ert-deftest test-markdown-parsing/syntax-with-adjacent-code-blocks ()
   "Test `markdown-syntax-propertize-fenced-code-blocks' with adjacent blocks."
-  :expected-result :failed
   (markdown-test-string
    "~~~ shell
 #!/bin/sh

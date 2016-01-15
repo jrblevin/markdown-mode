@@ -1379,18 +1379,18 @@ Returns a cons (NEW-START . NEW-END) or nil if no adjustment should be made.
 Function is called repeatedly until it returns nil. For details, see
 `syntax-propertize-extend-region-functions'."
   (save-excursion
-    (goto-char start)
-    (unless (or (bobp) (looking-back "\n\n" nil))
-      (let (new-start new-end)
-        (setq new-start (if (re-search-backward "\n\n" nil t)
-                            (match-end 0)
-                          (point-min)))
-        (goto-char end)
-        (setq new-end (if (re-search-forward "\n\n" nil t)
-                          (match-beginning 0)
-                        (point-max)))
-        (unless (and (eq new-start start) (eq new-end end))
-          (cons new-start new-end))))))
+    (let* ((new-start (progn (goto-char start)
+                             (if (re-search-backward "\n\n" nil t)
+                                 (match-end 0) (point-min))))
+           (new-end (progn (goto-char end)
+                           (if (re-search-forward "\n\n" nil t)
+                               (match-beginning 0) (point-max))))
+           (code-match (markdown-code-block-at-pos new-start))
+           (new-start (or (and code-match (cl-first code-match)) new-start))
+           (code-match (markdown-code-block-at-pos end))
+           (new-end (or (and code-match (cl-second code-match)) new-end)))
+      (unless (and (eq new-start start) (eq new-end end))
+        (cons new-start new-end)))))
 
 (defun markdown-syntax-propertize-pre-blocks (start end)
   "Match preformatted text blocks from START to END."
