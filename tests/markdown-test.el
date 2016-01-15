@@ -2367,6 +2367,63 @@ returns nil."
    (should (equal (markdown-syntax-propertize-extend-region 486 510)
                   nil))))
 
+(ert-deftest test-markdown-parsing/syntax-with-adjacent-code-blocks ()
+  "Test `markdown-syntax-propertize-fenced-code-blocks' with adjacent blocks."
+  :expected-result :failed
+  (markdown-test-string
+   "~~~ shell
+#!/bin/sh
+
+echo \"Hello, world!\"
+~~~
+
+~~~ shell
+#!/bin/sh
+
+echo \"Hello, world v2!\"
+~~~
+"
+   (let ((start-1 (make-marker)) (end-1 (make-marker))
+         (between (make-marker))
+         (start-2 (make-marker)) (end-2 (make-marker)))
+     ;; First code block
+     (set-marker start-1 1)
+     (set-marker end-1 46)
+     (should (equal (get-text-property start-1 'markdown-fenced-code)
+                    (list (marker-position start-1) (marker-position end-1))))
+     (should (equal (get-text-property (1- end-1) 'markdown-fenced-code)
+                    (list (marker-position start-1) (marker-position end-1))))
+     ;; Point between code blocks
+     (set-marker between 47)
+     (should (equal (get-text-property between 'markdown-fenced-code)
+                    nil))
+     ;; Second code block
+     (set-marker start-2 48)
+     (set-marker end-2 96)
+     (should (equal (get-text-property start-2 'markdown-fenced-code)
+                    (list (marker-position start-2) (marker-position end-2))))
+     (should (equal (get-text-property (1- end-2) 'markdown-fenced-code)
+                    (list (marker-position start-2) (marker-position end-2))))
+     ;; Move point between code blocks and insert a character
+     (goto-char between)
+     (insert "x")
+     ;; Re-propertize region after change
+     (let ((range (markdown-syntax-propertize-extend-region (1- between) (point-max))))
+       (markdown-syntax-propertize (car range) (cdr range)))
+     ;; Re-check first code block
+     (should (equal (get-text-property start-1 'markdown-fenced-code)
+                    (list (marker-position start-1) (marker-position end-1))))
+     (should (equal (get-text-property (1- end-1) 'markdown-fenced-code)
+                    (list (marker-position start-1) (marker-position end-1))))
+     ;; Re-check point between code blocks
+     (should (equal (get-text-property between 'markdown-fenced-code)
+                    nil))
+     ;; Re-check first code block
+     (should (equal (get-text-property start-1 'markdown-fenced-code)
+                    (list (marker-position start-1) (marker-position end-1))))
+     (should (equal (get-text-property (1- end-1) 'markdown-fenced-code)
+                    (list (marker-position start-1) (marker-position end-1)))))))
+
 (ert-deftest test-markdown-parsing/reference-definition-basic ()
   "Test reference definition function."
   (markdown-test-file "syntax.text"
