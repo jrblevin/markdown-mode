@@ -4895,8 +4895,10 @@ With argument, repeats or can move backward if negative."
 For example, headings inside preformatted code blocks may match
 `outline-regexp' but should not be considered as headings."
   (funcall move-fn arg)
-  (while (markdown-code-block-at-point)
-    (funcall move-fn arg)))
+  (let ((prev -1))
+    (while (and (/= prev (point)) (markdown-code-block-at-point))
+      (setq prev (point))
+      (funcall move-fn arg))))
 
 (defun markdown-next-visible-heading (arg)
   "Move to the next visible heading line of any level.
