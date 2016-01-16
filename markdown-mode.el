@@ -309,9 +309,9 @@
 ;;     or in the other window with the `C-u` prefix).  Use `M-p` and
 ;;     `M-n` to quickly jump to the previous or next link of any type.
 ;;
-;;   * Jumping: `C-c C-j`
+;;   * Jumping: `C-c C-l`
 ;;
-;;     Use `C-c C-j` to jump from the object at point to its counterpart
+;;     Use `C-c C-l` to jump from the object at point to its counterpart
 ;;     elsewhere in the text, when possible.  Jumps between reference
 ;;     links and definitions; between footnote markers and footnote
 ;;     text.  If more than one link uses the same reference name, a
@@ -350,8 +350,8 @@
 ;;
 ;;   * Editing Lists: `M-RET`, `M-UP`, `M-DOWN`, `M-LEFT`, and `M-RIGHT`
 ;;
-;;     New list items can be inserted with `M-RET`.  This command
-;;     determines the appropriate marker (one of the possible
+;;     New list items can be inserted with `M-RET` or `C-c C-j`.  This
+;;     command determines the appropriate marker (one of the possible
 ;;     unordered list markers or the next number in sequence for an
 ;;     ordered list) and indentation level by examining nearby list
 ;;     items.  If there is no list before or after the point, start a
@@ -4082,7 +4082,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-]") 'markdown-complete)
     ;; Following and Jumping
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
-    (define-key map (kbd "C-c C-j") 'markdown-jump)
+    (define-key map (kbd "C-c C-l") 'markdown-jump)
     ;; Indentation
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "DEL") 'markdown-exdent-or-delete)
@@ -4116,6 +4116,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-<left>") 'markdown-promote)
     (define-key map (kbd "M-<right>") 'markdown-demote)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
+    (define-key map (kbd "C-c C-j") 'markdown-insert-list-item)
     ;; Subtree editing
     (define-key map (kbd "M-S-<up>") 'markdown-move-subtree-up)
     (define-key map (kbd "M-S-<down>") 'markdown-move-subtree-down)

@@ -257,9 +257,9 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     or in the other window with the <kbd>C-u</kbd> prefix).  Use <kbd>M-p</kbd> and
     <kbd>M-n</kbd> to quickly jump to the previous or next link of any type.
 
-  * Jumping: <kbd>C-c C-j</kbd>
+  * Jumping: <kbd>C-c C-l</kbd>
 
-    Use <kbd>C-c C-j</kbd> to jump from the object at point to its counterpart
+    Use <kbd>C-c C-l</kbd> to jump from the object at point to its counterpart
     elsewhere in the text, when possible.  Jumps between reference
     links and definitions; between footnote markers and footnote
     text.  If more than one link uses the same reference name, a
@@ -298,8 +298,8 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Editing Lists: <kbd>M-RET</kbd>, <kbd>M-UP</kbd>, <kbd>M-DOWN</kbd>, <kbd>M-LEFT</kbd>, and <kbd>M-RIGHT</kbd>
 
-    New list items can be inserted with <kbd>M-RET</kbd>.  This command
-    determines the appropriate marker (one of the possible
+    New list items can be inserted with <kbd>M-RET</kbd> or <kbd>C-c C-j</kbd>.  This
+    command determines the appropriate marker (one of the possible
     unordered list markers or the next number in sequence for an
     ordered list) and indentation level by examining nearby list
     items.  If there is no list before or after the point, start a
