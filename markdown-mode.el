@@ -824,7 +824,8 @@
 ;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview mode,
 ;;     completion of GFM programming language names, and `cl-lib' updates.
 ;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
-;;     and movement functions, improved italic font lock.
+;;     and movement functions, improved italic font lock, and fixing adaptive
+;;     filling for hanging list items.
 
 ;;; Bugs:
 

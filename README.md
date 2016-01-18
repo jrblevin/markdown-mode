@@ -772,7 +772,8 @@ following people:
   * Danny McClanahan for live preview mode,
     completion of GFM programming language names, and `cl-lib` updates.
   * Syohei Yoshida for better heading detection
-    and movement functions, improved italic font lock.
+    and movement functions, improved italic font lock, and fixing adaptive
+    filling for hanging list items.
 
 ## Bugs
 
