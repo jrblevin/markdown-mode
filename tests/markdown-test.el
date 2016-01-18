@@ -3150,6 +3150,20 @@ indented the same amount."
      (forward-paragraph)
      (should (= (point) 198))))
 
+(ert-deftest test-markdown-filling/list-line ()
+  "Test fill-paragraph for list line. Don't insert bullet automatically.
+Detail: https://github.com/jrblevin/markdown-mode/issues/79"
+  (markdown-test-string "* foo foo *foo* foo foo foo foo foo foo"
+    (let ((fill-column 10))
+      (fill-paragraph)
+      (fill-paragraph)
+      (forward-line 2)
+      (back-to-indentation)
+      (should-not (looking-at-p "\\*foo"))
+      (forward-line 1)
+      (back-to-indentation)
+      (should-not (looking-at-p "\\*foo")))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
