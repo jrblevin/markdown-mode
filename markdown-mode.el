@@ -5999,6 +5999,7 @@ before regenerating font-lock rules for extensions."
               "\\|"))
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
        "\\`[ \t]*>[ \t]*?\\'")
+  (set (make-local-variable 'adaptive-fill-regexp) "\\s-*")
   (set (make-local-variable 'adaptive-fill-function)
        'markdown-adaptive-fill-function)
   (set (make-local-variable 'fill-forward-paragraph-function)
