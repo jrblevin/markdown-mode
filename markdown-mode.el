@@ -5270,8 +5270,13 @@ Return the name of the output buffer used."
                          output-buffer-name)))
        ;; Pass region to `markdown-command' via stdin
        (t
-        (shell-command-on-region begin-region end-region markdown-command
-                                 output-buffer-name))))
+        (let ((buf (get-buffer-create output-buffer-name)))
+          (with-current-buffer buf
+            (setq buffer-read-only nil)
+            (erase-buffer))
+          (call-process-region begin-region end-region
+                               shell-file-name nil buf nil
+                               shell-command-switch markdown-command)))))
     output-buffer-name))
 
 (defun markdown-standalone (&optional output-buffer-name)
