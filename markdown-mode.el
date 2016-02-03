@@ -2909,7 +2909,7 @@ be used to populate the title attribute when converted to XHTML."
         (insert url)
       ;; When no URL is given, leave cursor at END following the colon
       (setq end (point)))
-    (when (and title (> (length title) 0))
+    (when (> (length title) 0)
       (insert " \"" title "\""))
     (unless (looking-at "\n")
       (insert "\n"))
