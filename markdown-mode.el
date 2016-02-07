@@ -6072,7 +6072,9 @@ before regenerating font-lock rules for extensions."
   (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t t)
 
   ;; do the initial link fontification
-  (markdown-fontify-buffer-wiki-links))
+  (markdown-fontify-buffer-wiki-links)
+  ;; add `outline-minor-mode' for free section hiding
+  (outline-minor-mode 1))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
