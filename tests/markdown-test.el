@@ -2297,6 +2297,60 @@ body"
    (markdown-test-range-has-face 60 63 markdown-metadata-value-face)
    (markdown-test-range-has-face 64 69 nil)))
 
+(ert-deftest test-markdown-font-lock/yaml-metadata ()
+  "Basic yaml metadata tests."
+  (markdown-test-string
+   "---
+layout: post
+date: 2015-08-13 11:35:25 EST
+---
+"
+   ;; first section
+   (markdown-test-range-has-face 1 3 markdown-markup-face)
+   (markdown-test-range-has-face 5 10 markdown-metadata-key-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)
+   (markdown-test-range-has-face 13 16 markdown-metadata-value-face)
+   (markdown-test-range-has-face 18 21 markdown-metadata-key-face)
+   (markdown-test-range-has-face 22 22 markdown-markup-face)
+   (markdown-test-range-has-face 24 46 markdown-metadata-value-face)
+   (markdown-test-range-has-face 48 50 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/pandoc-yaml-metadata ()
+  "Basic yaml metadata tests, with pandoc syntax."
+  (let ((markdown-use-pandoc-style-yaml-metadata t))
+    (markdown-test-string
+     "some text
+
+---
+layout: post
+date: 2015-08-13 11:35:25 EST
+...
+
+more text
+
+---
+layout: post
+date: 2015-08-13 11:35:25 EST
+---"
+     ;; first section
+     (markdown-test-range-has-face 12 14 markdown-markup-face)
+     (markdown-test-range-has-face 16 21 markdown-metadata-key-face)
+     (markdown-test-range-has-face 22 22 markdown-markup-face)
+     (markdown-test-range-has-face 24 27 markdown-metadata-value-face)
+     (markdown-test-range-has-face 29 32 markdown-metadata-key-face)
+     (markdown-test-range-has-face 33 33 markdown-markup-face)
+     (markdown-test-range-has-face 35 57 markdown-metadata-value-face)
+     (markdown-test-range-has-face 59 61 markdown-markup-face)
+     ;; second section
+     (markdown-test-range-has-face 75 77 markdown-markup-face)
+     (markdown-test-range-has-face 79 84 markdown-metadata-key-face)
+     (markdown-test-range-has-face 85 85 markdown-markup-face)
+     (markdown-test-range-has-face 87 90 markdown-metadata-value-face)
+     (markdown-test-range-has-face 92 95 markdown-metadata-key-face)
+     (markdown-test-range-has-face 96 96 markdown-markup-face)
+     (markdown-test-range-has-face 98 120 markdown-metadata-value-face)
+     (markdown-test-range-has-face 122 124 markdown-markup-face))))
+
 (ert-deftest test-markdown-font-lock/line-break ()
   "Basic line break tests."
   (markdown-test-string "    \nasdf  \n"
