@@ -81,12 +81,8 @@
 ;;     git clone git://jblevins.org/git/markdown-mode.git
 ;;     git clone https://github.com/jrblevin/markdown-mode.git
 ;;
-;; [![Build Status][status]][travis]
-;;
 ;;  [devel.el]: http://jblevins.org/git/markdown-mode.git/plain/markdown-mode.el
 ;;  [GitHub]: https://github.com/jrblevin/markdown-mode/
-;;  [travis]: https://travis-ci.org/jrblevin/markdown-mode
-;;  [status]: https://travis-ci.org/jrblevin/markdown-mode.svg?branch=master
 ;;
 ;; markdown-mode is also available in several package managers, including:
 ;;
