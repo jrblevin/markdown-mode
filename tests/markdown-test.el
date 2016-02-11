@@ -2252,33 +2252,33 @@ for (var i = 0; i < 10; i++) {
 
 (ert-deftest test-markdown-font-lock/mmd-metadata ()
   "Basic MultMarkdown metadata tests."
-  (markdown-test-string "Title: peg-multimarkdown User's Guide  
-Author: Fletcher T. Penney  
-Base Header Level: 2  "
+  (markdown-test-string "Title: peg-multimarkdown User's Guide
+Author: Fletcher T. Penney
+Base Header Level: 2"
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
    (markdown-test-range-has-face 6 6 markdown-markup-face)
    (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
-   (markdown-test-range-has-face 41 46 markdown-metadata-key-face)
-   (markdown-test-range-has-face 47 47 markdown-markup-face)
-   (markdown-test-range-has-face 49 66 markdown-metadata-value-face)
-   (markdown-test-range-has-face 70 86 markdown-metadata-key-face)
-   (markdown-test-range-has-face 87 87 markdown-markup-face)
-   (markdown-test-range-has-face 89 89 markdown-metadata-value-face))
+   (markdown-test-range-has-face 39 44 markdown-metadata-key-face)
+   (markdown-test-range-has-face 46 46 markdown-markup-face)
+   (markdown-test-range-has-face 47 64 markdown-metadata-value-face)
+   (markdown-test-range-has-face 66 82 markdown-metadata-key-face)
+   (markdown-test-range-has-face 83 83 markdown-markup-face)
+   (markdown-test-range-has-face 85 85 markdown-metadata-value-face))
   ;; Avoid triggering when a title contains a colon (e.g., Markdown: Syntax)
   (markdown-test-file "syntax.text"
    (markdown-test-range-has-face 1 16 markdown-header-face-1)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata-after-header ()
   "Ensure that similar lines are not matched after the header."
-  (markdown-test-string "Title: peg-multimarkdown User's Guide  
+  (markdown-test-string "Title: peg-multimarkdown User's Guide
 
-Author: Fletcher T. Penney  
-Base Header Level: 2  "
+Author: Fletcher T. Penney
+Base Header Level: 2"
    (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
    (markdown-test-range-has-face 6 6 markdown-markup-face)
    (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
-   (markdown-test-range-has-face 40 67 nil)
-   (markdown-test-range-has-face 71 90 nil)))
+   (markdown-test-range-has-face 40 65 nil)
+   (markdown-test-range-has-face 67 86 nil)))
 
 (ert-deftest test-markdown-font-lock/pandoc-metadata ()
   "Basic Pandoc metadata tests."
