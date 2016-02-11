@@ -2317,6 +2317,7 @@ date: 2015-08-13 11:35:25 EST
 
 (ert-deftest test-markdown-font-lock/pandoc-yaml-metadata ()
   "Basic yaml metadata tests, with pandoc syntax."
+  :expected-result :failed
   (let ((markdown-use-pandoc-style-yaml-metadata t))
     (markdown-test-string
      "some text
@@ -2331,7 +2332,17 @@ more text
 ---
 layout: post
 date: 2015-08-13 11:35:25 EST
----"
+---
+
+But this is merely a code block
+
+```
+---
+layout: post
+date: 2015-08-13 11:35:25 EST
+---
+```
+"
      ;; first section
      (markdown-test-range-has-face 12 14 markdown-markup-face)
      (markdown-test-range-has-face 16 21 markdown-metadata-key-face)
@@ -2349,7 +2360,11 @@ date: 2015-08-13 11:35:25 EST
      (markdown-test-range-has-face 92 95 markdown-metadata-key-face)
      (markdown-test-range-has-face 96 96 markdown-markup-face)
      (markdown-test-range-has-face 98 120 markdown-metadata-value-face)
-     (markdown-test-range-has-face 122 124 markdown-markup-face))))
+     (markdown-test-range-has-face 122 124 markdown-markup-face)
+     ;; third section
+     (markdown-test-range-has-face 160 162 markdown-markup-face)
+     (markdown-test-range-has-face 164 213 markdown-pre-face)
+     (markdown-test-range-has-face 215 217 markdown-markup-face))))
 
 (ert-deftest test-markdown-font-lock/line-break ()
   "Basic line break tests."
