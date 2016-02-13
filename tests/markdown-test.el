@@ -2132,7 +2132,8 @@ if (y)
 ~~~
 "
    (markdown-test-range-has-face 1 19 nil)
-   (markdown-test-range-has-face 20 63 markdown-pre-face)))
+   (markdown-test-range-has-face 20 22 markdown-pre-face)
+   (markdown-test-range-has-face 24 63 markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-1 ()
   "Test GFM-style fenced code blocks (1)."
@@ -2317,7 +2318,6 @@ date: 2015-08-13 11:35:25 EST
 
 (ert-deftest test-markdown-font-lock/pandoc-yaml-metadata ()
   "Basic yaml metadata tests, with pandoc syntax."
-  :expected-result :failed
   (let ((markdown-use-pandoc-style-yaml-metadata t))
     (markdown-test-string
      "some text
@@ -2459,6 +2459,15 @@ returns nil."
    (should (equal (markdown-syntax-propertize-extend-region 486 510)
                   nil))))
 
+(defun markdown-test-check-match-limits (prop num begin end &optional pos)
+  (let* ((posn (or pos (point)))
+         (props (get-text-property posn prop)))
+    (save-match-data
+      (set-match-data props)
+      (and (match-beginning num) (match-end num)
+           (= (match-beginning num) begin)
+           (= (match-end num) end)))))
+
 (ert-deftest test-markdown-parsing/syntax-with-adjacent-code-blocks ()
   "Test `markdown-syntax-propertize-fenced-code-blocks' with adjacent blocks."
   (markdown-test-string
@@ -2474,46 +2483,251 @@ echo \"Hello, world!\"
 echo \"Hello, world v2!\"
 ~~~
 "
-   (let ((start-1 (make-marker)) (end-1 (make-marker))
+   (let ((start-top-1 (make-marker)) (end-top-1 (make-marker))
+         (start-lang-1 (make-marker)) (end-lang-1 (make-marker))
+         (start-mid-1 (make-marker)) (end-mid-1 (make-marker))
+         (start-bottom-1 (make-marker)) (end-bottom-1 (make-marker))
          (between (make-marker))
-         (start-2 (make-marker)) (end-2 (make-marker)))
+         (start-top-2 (make-marker)) (end-top-2 (make-marker))
+         (start-lang-2 (make-marker)) (end-lang-2 (make-marker))
+         (start-mid-2 (make-marker)) (end-mid-2 (make-marker))
+         (start-bottom-2 (make-marker)) (end-bottom-2 (make-marker)))
      ;; First code block
-     (set-marker start-1 1)
-     (set-marker end-1 46)
-     (should (equal (get-text-property start-1 'markdown-fenced-code)
-                    (list (marker-position start-1) (marker-position end-1))))
-     (should (equal (get-text-property (1- end-1) 'markdown-fenced-code)
-                    (list (marker-position start-1) (marker-position end-1))))
+     (set-marker start-top-1 1)
+     (set-marker end-top-1 4)
+     (set-marker start-lang-1 5)
+     (set-marker end-lang-1 10)
+     (set-marker start-mid-1 11)
+     (set-marker end-mid-1 43)
+     (set-marker start-bottom-1 43)
+     (set-marker end-bottom-1 46)
+     ;; check top tildes
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 1 (marker-position start-top-1)
+              (marker-position end-top-1) (marker-position start-top-1)))
+     ;; check top language specifier
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 2 (marker-position start-lang-1)
+              (marker-position end-lang-1) (marker-position start-lang-1)))
+     ;; check text in between
+     (should (markdown-test-check-match-limits
+              'markdown-fenced-code 0 (marker-position start-mid-1)
+              (marker-position end-mid-1) (marker-position start-mid-1)))
+     ;; check bottom tildes
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-end 1 (marker-position start-bottom-1)
+              (marker-position end-bottom-1) (marker-position start-bottom-1)))
      ;; Point between code blocks
      (set-marker between 47)
      (should (equal (get-text-property between 'markdown-fenced-code)
                     nil))
      ;; Second code block
-     (set-marker start-2 48)
-     (set-marker end-2 96)
-     (should (equal (get-text-property start-2 'markdown-fenced-code)
-                    (list (marker-position start-2) (marker-position end-2))))
-     (should (equal (get-text-property (1- end-2) 'markdown-fenced-code)
-                    (list (marker-position start-2) (marker-position end-2))))
-     ;; Move point between code blocks and insert a character
+     (set-marker start-top-2 48)
+     (set-marker end-top-2 51)
+     (set-marker start-lang-2 52)
+     (set-marker end-lang-2 57)
+     (set-marker start-mid-2 58)
+     (set-marker end-mid-2 93)
+     (set-marker start-bottom-2 93)
+     (set-marker end-bottom-2 96)
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 1 (marker-position start-top-2)
+              (marker-position end-top-2) (marker-position start-top-2)))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 2 (marker-position start-lang-2)
+              (marker-position end-lang-2) (marker-position start-lang-2)))
+     (should (markdown-test-check-match-limits
+              'markdown-fenced-code 0 (marker-position start-mid-2)
+              (marker-position end-mid-2) (marker-position start-mid-2)))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-end 1 (marker-position start-bottom-2)
+              (marker-position end-bottom-2) (marker-position start-bottom-2)))
+     ;; ;; Move point between code blocks and insert a character
      (goto-char between)
      (insert "x")
      ;; Re-propertize region after change
      (let ((range (markdown-syntax-propertize-extend-region (1- between) (point-max))))
        (markdown-syntax-propertize (car range) (cdr range)))
      ;; Re-check first code block
-     (should (equal (get-text-property start-1 'markdown-fenced-code)
-                    (list (marker-position start-1) (marker-position end-1))))
-     (should (equal (get-text-property (1- end-1) 'markdown-fenced-code)
-                    (list (marker-position start-1) (marker-position end-1))))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 1 (marker-position start-top-1)
+              (marker-position end-top-1) (marker-position start-top-1)))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 2 (marker-position start-lang-1)
+              (marker-position end-lang-1) (marker-position start-lang-1)))
+     (should (markdown-test-check-match-limits
+              'markdown-fenced-code 0 (marker-position start-mid-1)
+              (marker-position end-mid-1) (marker-position start-mid-1)))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-end 1 (marker-position start-bottom-1)
+              (marker-position end-bottom-1) (marker-position start-bottom-1)))
      ;; Re-check point between code blocks
      (should (equal (get-text-property between 'markdown-fenced-code)
                     nil))
-     ;; Re-check first code block
-     (should (equal (get-text-property start-1 'markdown-fenced-code)
-                    (list (marker-position start-1) (marker-position end-1))))
-     (should (equal (get-text-property (1- end-1) 'markdown-fenced-code)
-                    (list (marker-position start-1) (marker-position end-1)))))))
+     ;; Re-check second code block
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 1 (marker-position start-top-2)
+              (marker-position end-top-2) (marker-position start-top-2)))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-begin 2 (marker-position start-lang-2)
+              (marker-position end-lang-2) (marker-position start-lang-2)))
+     (should (markdown-test-check-match-limits
+              'markdown-fenced-code 0 (marker-position start-mid-2)
+              (marker-position end-mid-2) (marker-position start-mid-2)))
+     (should (markdown-test-check-match-limits
+              'markdown-tilde-fence-end 1 (marker-position start-bottom-2)
+              (marker-position end-bottom-2)
+              (marker-position start-bottom-2))))))
+
+(ert-deftest test-markdown-parsing/propertize-fenced-in-between ()
+  "Test whether `markdown-syntax-propertize-fenced-block-constructs' handles the
+case when it can't propertize both the start and end of a fenced block within a
+single pass (the end of the block is past the END argument)."
+  (markdown-test-string
+      "~~~ shell
+#!/bin/sh
+
+echo \"Hello, world!\"
+~~~
+"
+    (set-text-properties (point-min) (point-max) nil)
+    ;; syntax-propertize up to right after hashbang
+    (markdown-syntax-propertize-fenced-block-constructs (point-min) 21)
+    ;; ~~~ shell should be propertized, but nothing else
+    ;; check tildes
+    (should (markdown-test-check-match-limits
+             'markdown-tilde-fence-begin 1 1 4 1))
+    ;; check language
+    (should (markdown-test-check-match-limits
+             'markdown-tilde-fence-begin 2 5 10 5))
+    ;; middle should not be propertized
+    (should-not (get-text-property 11 'markdown-fenced-code))
+    ;; neither should end
+    (should-not (get-text-property 43 'markdown-tilde-fence-end))
+    (markdown-syntax-propertize-fenced-block-constructs 21 (point-max))
+    ;; everything should be propertized now
+    ;; re-check top
+    (should (markdown-test-check-match-limits
+             'markdown-tilde-fence-begin 1 1 4 1))
+    (should (markdown-test-check-match-limits
+             'markdown-tilde-fence-begin 2 5 10 5))
+    ;; check middle
+    (should (markdown-test-check-match-limits 'markdown-fenced-code 0 10 43 10))
+    ;; check ending tildes
+    (should (markdown-test-check-match-limits
+             'markdown-tilde-fence-end 1 43 46 43))))
+
+(ert-deftest test-markdown-parsing/get-code-block-at-pos ()
+  "Test whether `markdown-code-block-at-pos' works in all situations. All
+  situations are:
+1. pre block
+2. tilde block
+3. gfm block
+4. yaml metadata block"
+  (let ((markdown-use-pandoc-style-yaml-metadata t))
+    (markdown-test-string
+        "
+~~~ ruby
+some_ruby_fun()
+~~~
+
+---
+a: b
+---
+
+``` {.bash}
+#!/bin/sh
+echo hey
+```
+
+    pre code
+    random stuff
+    more preformatted code
+
+---
+data: pandoc
+...
+"
+      ;; start/mid/end at tilde block
+      (should (equal (markdown-code-block-at-pos 2) (list 2 30)))
+      (should (equal (markdown-code-block-at-pos 11) (list 2 30)))
+      (should (equal (markdown-code-block-at-pos 27) (list 2 30)))
+      ;; yaml metadata block
+      (should (equal (markdown-code-block-at-pos 32) (list 32 44)))
+      (should (equal (markdown-code-block-at-pos 36) (list 32 44)))
+      (should (equal (markdown-code-block-at-pos 41) (list 32 44)))
+      ;; gfm block
+      (should (equal (markdown-code-block-at-pos 46) (list 46 80)))
+      (should (equal (markdown-code-block-at-pos 58) (list 46 80)))
+      (should (equal (markdown-code-block-at-pos 77) (list 46 80)))
+      ;; pre block
+      (should (equal (markdown-code-block-at-pos 82) (list 82 138)))
+      (should (equal (markdown-code-block-at-pos 99) (list 82 138)))
+      (should (equal (markdown-code-block-at-pos 137) (list 82 138)))
+      ;; pandoc yaml metadata block (should work if yaml above works)
+      (should (equal (markdown-code-block-at-pos 140) (list 140 160)))
+      (should (equal (markdown-code-block-at-pos 142) (list 140 160)))
+      (should (equal (markdown-code-block-at-pos 144) (list 140 160)))
+      (should (equal (markdown-code-block-at-pos 157) (list 140 160)))
+      (should (equal (markdown-code-block-at-pos 159) (list 140 160))))))
+
+(ert-deftest test-markdown-parsing/syntax-get-fenced-blocks ()
+  "Test whether *-get-fenced-block-* functions work in the case where a block is
+only partially propertized."
+  (save-match-data
+    (markdown-test-string
+     "~~~
+"
+     (should (equal (markdown-syntax-propertize-extend-region
+                     (point-min) (point-max))
+                    nil))
+     (goto-char 1)
+     (set-match-data (markdown-text-property-at-point
+                      'markdown-tilde-fence-begin))
+     (should (equal (markdown-get-fenced-block-from-start
+                     'markdown-tilde-fence-begin)
+                    nil)))
+    (markdown-test-string
+     "~~~
+~~~"
+     (goto-char 1)
+     (set-match-data (markdown-text-property-at-point
+                      'markdown-tilde-fence-begin))
+     (should (equal (markdown-get-fenced-block-from-start
+                     'markdown-tilde-fence-begin)
+                    (list 1 8)))
+     (should (equal (markdown-code-block-at-point) (list 1 8)))
+     (goto-char 5)
+     (set-match-data (markdown-text-property-at-point
+                      'markdown-tilde-fence-end))
+     (should (equal (markdown-get-fenced-block-from-end
+                     'markdown-tilde-fence-end)
+                    (list 1 8)))
+     (should (equal (markdown-code-block-at-point) (list 1 8))))
+    (markdown-test-string
+     "~~~
+
+~~~"
+     (goto-char 1)
+     (set-match-data (markdown-text-property-at-point
+                      'markdown-tilde-fence-begin))
+     (should (equal (markdown-get-fenced-block-from-start
+                     'markdown-tilde-fence-begin)
+                    (list 1 9)))
+     (should (equal (markdown-code-block-at-point) (list 1 9)))
+     (goto-char 5)
+     (set-match-data (markdown-text-property-at-point 'markdown-fenced-code))
+     (should (equal (markdown-get-fenced-block-from-middle
+                     'markdown-fenced-code)
+                    (list 1 9)))
+     (should (equal (markdown-code-block-at-point) (list 1 9)))
+     (goto-char 6)
+     (set-match-data (markdown-text-property-at-point
+                      'markdown-tilde-fence-end))
+     (should (equal (markdown-get-fenced-block-from-end
+                     'markdown-tilde-fence-end)
+                    (list 1 9)))
+     (should (equal (markdown-code-block-at-point) (list 1 9))))))
 
 (ert-deftest test-markdown-parsing/reference-definition-basic ()
   "Test reference definition function."
@@ -3359,7 +3573,9 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
    (markdown-test-range-has-face 119 152 markdown-header-face-1)
    (markdown-test-range-has-face 129 129 markdown-markup-face)
    (markdown-test-range-has-face 136 136 markdown-markup-face)
-   (markdown-test-range-has-face 174 214 markdown-pre-face)
+   (markdown-test-range-has-face 174 177 markdown-pre-face)
+   (markdown-test-range-has-face 179 188 markdown-language-keyword-face)
+   (markdown-test-range-has-face 190 215 markdown-pre-face)
    (markdown-test-range-has-face 218 218 markdown-markup-face)
    (markdown-test-range-has-face 219 223 markdown-math-face)
    (markdown-test-range-has-face 224 224 markdown-markup-face)))
