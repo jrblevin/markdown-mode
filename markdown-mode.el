@@ -2202,9 +2202,9 @@ See `font-lock-syntactic-face-function' for details."
          '((1 markdown-markup-face)))
    (cons 'markdown-match-gfm-code-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-fenced-start-code-block
-         '((1 markdown-pre-face)
+         '((1 markdown-markup-face)
            (2 markdown-language-keyword-face nil t)))
-   (cons 'markdown-match-fenced-end-code-block '((0 markdown-pre-face)))
+   (cons 'markdown-match-fenced-end-code-block '((0 markdown-markup-face)))
    (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
    (cons 'markdown-match-blockquotes '((1 markdown-markup-face)

@@ -2132,8 +2132,9 @@ if (y)
 ~~~
 "
    (markdown-test-range-has-face 1 19 nil)
-   (markdown-test-range-has-face 20 22 markdown-pre-face)
-   (markdown-test-range-has-face 24 63 markdown-pre-face)))
+   (markdown-test-range-has-face 20 22 markdown-markup-face)
+   (markdown-test-range-has-face 24 60 markdown-pre-face)
+   (markdown-test-range-has-face 61 63 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-1 ()
   "Test GFM-style fenced code blocks (1)."
@@ -3573,9 +3574,10 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
    (markdown-test-range-has-face 119 152 markdown-header-face-1)
    (markdown-test-range-has-face 129 129 markdown-markup-face)
    (markdown-test-range-has-face 136 136 markdown-markup-face)
-   (markdown-test-range-has-face 174 177 markdown-pre-face)
+   (markdown-test-range-has-face 174 177 markdown-markup-face)
    (markdown-test-range-has-face 179 188 markdown-language-keyword-face)
-   (markdown-test-range-has-face 190 215 markdown-pre-face)
+   (markdown-test-range-has-face 190 211 markdown-pre-face)
+   (markdown-test-range-has-face 212 215 markdown-markup-face)
    (markdown-test-range-has-face 218 218 markdown-markup-face)
    (markdown-test-range-has-face 219 223 markdown-math-face)
    (markdown-test-range-has-face 224 224 markdown-markup-face)))
