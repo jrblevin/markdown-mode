@@ -1312,9 +1312,17 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                           (markdown-footnote-kill)
                           (should (string-equal (current-kill 0) "foo\n")))))
 
+(when (version< emacs-version "24.2")
+  ;; fix segfault on 24.1 with the normal implementation of this function. isn't
+  ;; exactly correct, but should make tests work the same
+  (defadvice kill-buffer-and-window (around markdown-test-fix-segfault activate)
+    (kill-buffer)
+    (select-window (previous-window))))
+
 (ert-deftest test-markdown-footnote-reference/jump ()
   "Test `markdown-jump' for footnotes and reference links."
-  (markdown-test-string "body[^1], [link 1][ref],
+  (markdown-test-string
+      "body[^1], [link 1][ref],
 [link 2][ref]
 
 [^1]: footnote
@@ -2764,28 +2772,29 @@ only partially propertized."
   (markdown-test-file "wiki-links.text"
    (should (equal (markdown-get-defined-references) nil))))
 
+(defun markdown-test-test-region (beg end)
+  (goto-char (1- beg))
+  (should-not (markdown-code-at-point-p))
+  (goto-char (1+ end))
+  (should-not (markdown-code-at-point-p))
+  (dolist (loc (number-sequence beg end))
+    (goto-char loc)
+    (should (markdown-code-at-point-p))
+    (should (equal (match-beginning 0) beg))
+    (should (equal (match-end 0) end))))
+
 (ert-deftest test-markdown-parsing/code-at-point-inline ()
   "Test `markdown-code-at-point-p'."
-  (cl-flet ((test-region (beg end)
-              (goto-char (1- beg))
-              (should-not (markdown-code-at-point-p))
-              (goto-char (1+ end))
-              (should-not (markdown-code-at-point-p))
-              (dolist (loc (number-sequence beg end))
-                (goto-char loc)
-                (should (markdown-code-at-point-p))
-                (should (equal (match-beginning 0) beg))
-                (should (equal (match-end 0) end)))))
-    (markdown-test-file "inline.text"
-                        (test-region 45 51) ; Regular code span
-                        (test-region 61 90) ; Code containing backticks
-                        (test-region 228 240) ; Backquotes at beginning
-                        (test-region 341 352) ; Backquotes at end
-                        (test-region 460 469) ; Backslash as final character
-                        (test-region 657 667) ; A code span crossing lines
-                        (test-region 749 758) ; Three backquotes on same line
-                        (test-region 806 815) ; Three backquotes across lines
-                        )))
+  (markdown-test-file "inline.text"
+    (markdown-test-test-region 45 51) ; Regular code span
+    (markdown-test-test-region 61 90) ; Code containing backticks
+    (markdown-test-test-region 228 240) ; Backquotes at beginning
+    (markdown-test-test-region 341 352) ; Backquotes at end
+    (markdown-test-test-region 460 469) ; Backslash as final character
+    (markdown-test-test-region 657 667) ; A code span crossing lines
+    (markdown-test-test-region 749 758) ; Three backquotes on same line
+    (markdown-test-test-region 806 815) ; Three backquotes across lines
+    ))
 
 (ert-deftest test-markdown-parsing/code-at-point-one-space ()
   "Test `markdown-code-at-point-p' with multiple code spans in a row."
