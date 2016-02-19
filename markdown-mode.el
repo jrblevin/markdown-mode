@@ -5166,8 +5166,9 @@ a list."
         (setq cpfx (match-string-no-properties 1))
         (cond
          ((string= cpfx pfx)
-          (replace-match
-           (concat pfx (number-to-string  (setq idx (1+ idx))) ". "))
+          (save-excursion
+            (replace-match
+             (concat pfx (number-to-string (setq idx (1+ idx))) ". ")))
           (setq sep nil))
          ;; indented a level
          ((string< pfx cpfx)
