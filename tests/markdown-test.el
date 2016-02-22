@@ -3543,7 +3543,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
 (ert-deftest test-markdown-math/reload ()
   "Test enabling math mode via function `markdown-enable-math'."
   (markdown-test-file "math.text"
-    (markdown-enable-math t)
+    (markdown-toggle-math t)
     ;; Flag should be set to t
     (should markdown-enable-math)
     ;; Font-lock keywords should be updated
@@ -3555,7 +3555,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
 (ert-deftest test-markdown-math/font-lock ()
   "Test markdown math mode."
   (markdown-test-file "math.text"
-   (markdown-enable-math t)
+   (markdown-toggle-math t)
    (funcall markdown-test-font-lock-function)
    (markdown-test-range-has-face 1 32 nil)
    (markdown-test-range-has-face 33 33 markdown-markup-face)
@@ -3585,7 +3585,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
 (ert-deftest test-markdown-math/font-lock-italics ()
   "Test markdown math mode with underscores."
   (markdown-test-file "math.text"
-   (markdown-enable-math t)
+   (markdown-toggle-math t)
    (funcall markdown-test-font-lock-function)
    (markdown-test-range-has-face 227 227 markdown-markup-face)
    (markdown-test-range-has-face 228 233 markdown-math-face)

@@ -528,8 +528,8 @@
 ;;
 ;;   * `markdown-enable-math' - syntax highlighting for LaTeX
 ;;     fragments (default: `nil').  Set this to `t' to turn on math
-;;     support by default.  Math support can be toggled later using
-;;     the function `markdown-enable-math'."
+;;     support by default.  Math support can be enabled, disabled, or
+;;     toggled later using the function `markdown-toggle-math'."
 ;;
 ;;   * `markdown-css-paths' - CSS files to link to in XHTML output
 ;;     (default: `nil`).
@@ -1008,8 +1008,8 @@ This is the default search behavior of Ikiwiki."
 (defcustom markdown-enable-math nil
   "Syntax highlighting for inline LaTeX and itex expressions.
 Set this to a non-nil value to turn on math support by default.
-Math support can be toggled later using `markdown-enable-math'
-or \\[markdown-enable-math]."
+Math support can be enabled, disabled, or toggled later using
+`markdown-toggle-math' or \\[markdown-toggle-math]."
   :group 'markdown
   :type 'boolean
   :safe 'booleanp)
@@ -2289,22 +2289,6 @@ See `font-lock-syntactic-face-function' for details."
    (cons markdown-regex-email 'markdown-link-face)
    (cons markdown-regex-line-break '(1 markdown-line-break-face prepend)))
   "Syntax highlighting for Markdown files.")
-
-(defconst markdown-mode-font-lock-keywords-math
-  (list
-   ;; Display mode equations with brackets: \[ \]
-   (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
-                                       (2 markdown-math-face append)
-                                       (3 markdown-markup-face prepend)))
-   ;; Equation reference (eq:foo)
-   (cons "\\((eq:\\)\\([[:alnum:]:_]+\\)\\()\\)" '((1 markdown-markup-face)
-                                                   (2 markdown-reference-face)
-                                                   (3 markdown-markup-face)))
-   ;; Equation reference \eqref{foo}
-   (cons "\\(\\\\eqref{\\)\\([[:alnum:]:_]+\\)\\(}\\)" '((1 markdown-markup-face)
-                                                         (2 markdown-reference-face)
-                                                         (3 markdown-markup-face))))
-  "Syntax highlighting for LaTeX and itex fragments.")
 
 (defvar markdown-mode-font-lock-keywords nil
   "Default highlighting expressions for Markdown mode.
@@ -6298,24 +6282,38 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     paragraphs-remaining))
 
 
-;;; Extensions ================================================================
+;;; Extension Framework =======================================================
 
 (defun markdown-reload-extensions ()
   "Check settings, update font-lock keywords, and re-fontify buffer."
   (interactive)
   (when (eq major-mode 'markdown-mode)
+    ;; Update font lock keywords with extensions
     (setq markdown-mode-font-lock-keywords
           (append
            markdown-mode-font-lock-keywords-basic
-           (when markdown-enable-math
-             markdown-mode-font-lock-keywords-math)))
+           (markdown-mode-font-lock-keywords-math)))
+    ;; Update font lock defaults
     (setq font-lock-defaults
           '(markdown-mode-font-lock-keywords
             nil nil nil nil
             (font-lock-syntactic-face-function . markdown-syntactic-face)))
+    ;; Refontify buffer
     (when (fboundp 'font-lock-refresh-defaults) (font-lock-refresh-defaults))))
 
-(defun markdown-enable-math (&optional arg)
+(defun markdown-handle-local-variables ()
+  "Runs as a `hack-local-variables-hook' to update font lock rules.
+Checks to see if there is actually a markdown-mode file local variable
+before regenerating font-lock rules for extensions."
+  (when (and (boundp 'file-local-variables-alist)
+             (assoc 'markdown-enable-math file-local-variables-alist))
+    (markdown-reload-extensions)))
+
+;;; Math Support ==============================================================
+
+(make-obsolete 'markdown-enable-math 'markdown-toggle-math "v2.1")
+
+(defun markdown-toggle-math (&optional arg)
   "Toggle support for inline and display LaTeX math expressions.
 With a prefix argument ARG, enable math mode if ARG is positive,
 and disable it otherwise.  If called from Lisp, enable the mode
@@ -6330,13 +6328,22 @@ if ARG is omitted or nil."
     (message "markdown-mode math support disabled"))
   (markdown-reload-extensions))
 
-(defun markdown-handle-local-variables ()
-  "Runs as a `hack-local-variables-hook' to update font lock rules.
-Checks to see if there is actually a markdown-mode file local variable
-before regenerating font-lock rules for extensions."
-  (when (and (boundp 'file-local-variables-alist)
-             (assoc 'markdown-enable-math file-local-variables-alist))
-    (markdown-reload-extensions)))
+(defun markdown-mode-font-lock-keywords-math ()
+  "Return math font lock keywords if support is enabled."
+  (when markdown-enable-math
+    (list
+     ;; Display mode equations with brackets: \[ \]
+     (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
+                                         (2 markdown-math-face append)
+                                         (3 markdown-markup-face prepend)))
+     ;; Equation reference (eq:foo)
+     (cons "\\((eq:\\)\\([[:alnum:]:_]+\\)\\()\\)" '((1 markdown-markup-face)
+                                                     (2 markdown-reference-face)
+                                                     (3 markdown-markup-face)))
+     ;; Equation reference \eqref{foo}
+     (cons "\\(\\\\eqref{\\)\\([[:alnum:]:_]+\\)\\(}\\)" '((1 markdown-markup-face)
+                                                           (2 markdown-reference-face)
+                                                           (3 markdown-markup-face))))))
 
 
 ;;; GFM Checkboxes as Buttons =================================================
