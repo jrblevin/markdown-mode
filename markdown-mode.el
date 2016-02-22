@@ -630,10 +630,13 @@
 ;; Aliased or piped wiki links of the form `[[link text|PageName]]`
 ;; are also supported.  Since some wikis reverse these components, set
 ;; `markdown-wiki-link-alias-first' to nil to treat them as
-;; `[[PageName|link text]]`.  By default, Markdown Mode only searches
-;; for target files in the current directory.  Sequential parent
-;; directory search (as in [Ikiwiki][]) can be enabled by setting
-;; `markdown-wiki-link-search-parent-directories' to a non-nil value.
+;; `[[PageName|link text]]`.  If `markdown-wiki-link-fontify-missing'
+;; is also non-nil, Markdown Mode will highlight wiki links with
+;; missing target file in a different color.  By default, Markdown
+;; Mode only searches for target files in the current directory.
+;; Sequential parent directory search (as in [Ikiwiki][]) can be
+;; enabled by setting `markdown-wiki-link-search-parent-directories'
+;; to a non-nil value.
 ;;
 ;; [Ikiwiki]: https://ikiwiki.info
 ;;
@@ -1008,6 +1011,15 @@ Otherwise, they will be treated as [[PageName|alias text]]."
 (defcustom markdown-wiki-link-search-parent-directories nil
   "When non-nil, search for wiki link targets in parent directories.
 This is the default search behavior of Ikiwiki."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp)
+
+(defcustom markdown-wiki-link-fontify-missing nil
+  "When non-nil, change wiki link face according to existence of target files.
+This is expensive because it requires checking for the file each time the buffer
+changes or the user switches windows.  It is disabled by default because it may
+cause lag when typing on slower machines."
   :group 'markdown
   :type 'boolean
   :safe 'booleanp)
@@ -6310,17 +6322,17 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     (setq markdown-mode-font-lock-keywords
           (append
            markdown-mode-font-lock-keywords-basic
+           (markdown-mode-font-lock-keywords-wiki-links)
            (markdown-mode-font-lock-keywords-math)))
     ;; Update font lock defaults
     (setq font-lock-defaults
           '(markdown-mode-font-lock-keywords
             nil nil nil nil
             (font-lock-syntactic-face-function . markdown-syntactic-face)))
-    ;; Add or remove hooks related to extensions
-    (markdown-setup-wiki-link-hooks)
     ;; Refontify buffer
     (when (fboundp 'font-lock-refresh-defaults) (font-lock-refresh-defaults))
-    (when markdown-enable-wiki-links (markdown-fontify-buffer-wiki-links))))
+    ;; Add or remove hooks related to extensions
+    (markdown-setup-wiki-link-hooks)))
 
 (defun markdown-handle-local-variables ()
   "Runs as a `hack-local-variables-hook' to update font lock rules.
@@ -6348,9 +6360,11 @@ and disable it otherwise."
   (markdown-reload-extensions))
 
 (defun markdown-setup-wiki-link-hooks ()
-  "Add or remove hooks for fontifying wiki links."
+  "Add or remove hooks for fontifying wiki links.
+These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
   ;; Anytime text changes make sure it gets fontified correctly
-  (if markdown-enable-wiki-links
+  (if (and markdown-enable-wiki-links
+           markdown-wiki-link-fontify-missing)
       (add-hook 'after-change-functions
                 'markdown-check-change-for-wiki-link-after-change t t)
     (remove-hook 'after-change-functions
@@ -6358,11 +6372,24 @@ and disable it otherwise."
   ;; If we left the buffer there is a really good chance we were
   ;; creating one of the wiki link documents. Make sure we get
   ;; refontified when we come back.
-  (if markdown-enable-wiki-links
-      (add-hook 'window-configuration-change-hook
-                'markdown-fontify-buffer-wiki-links t t)
+  (if (and markdown-enable-wiki-links
+           markdown-wiki-link-fontify-missing)
+      (progn
+        (add-hook 'window-configuration-change-hook
+                  'markdown-fontify-buffer-wiki-links t t)
+        (markdown-fontify-buffer-wiki-links))
     (remove-hook 'window-configuration-change-hook
-                 'markdown-fontify-buffer-wiki-links t)))
+                 'markdown-fontify-buffer-wiki-links t)
+  (markdown-unfontify-region-wiki-links (point-min) (point-max))))
+
+(defun markdown-mode-font-lock-keywords-wiki-links ()
+  "Return wiki-link lock keywords if support is enabled.
+If `markdown-wiki-link-fontify-missing' is also enabled, we use
+hooks in `markdown-setup-wiki-link-hooks' for fontification instead."
+  (when (and markdown-enable-wiki-links
+             (not markdown-wiki-link-fontify-missing))
+    (list
+     (cons markdown-regex-wiki-link '((1 markdown-link-face prepend))))))
 
 ;;; Math Support ==============================================================
 
@@ -6596,7 +6623,6 @@ if ARG is omitted or nil."
   (set (make-local-variable 'font-lock-defaults)
        '(gfm-font-lock-keywords))
   ;; do the initial link fontification
-  (markdown-fontify-buffer-wiki-links)
   (markdown-gfm-parse-buffer-for-languages))
 
 

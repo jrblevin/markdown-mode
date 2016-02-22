@@ -3736,6 +3736,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
 
 (ert-deftest test-markdown-ext/ikiwiki ()
   (let ((markdown-enable-wiki-links t)
+        (markdown-wiki-link-fontify-missing t)
         (markdown-wiki-link-search-parent-directories t))
     (progn
       (find-file "ikiwiki/root")
