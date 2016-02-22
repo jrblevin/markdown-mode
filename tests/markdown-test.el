@@ -1354,8 +1354,6 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                      '("![foo][bar]" . "foo")
                      '("<http://foo.com/>" . "http://foo.com/")
                      '("<foo@bar.com>" . "foo@bar.com")
-                     '("[[foo]]" . "foo")
-                     '("[[foo|bar]]" . "foo")
                      '("**foo**" . "foo")
                      '("__foo__" . "foo")
                      '("*foo*" . "foo")
@@ -3244,47 +3242,57 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
 
 ;;; Wiki link tests:
 
+(ert-deftest test-markdown-wiki-link/file-local-variabls ()
+  "Test enabling wiki links via file-local variables."
+  (markdown-test-file "wiki-links.text"
+   (should-not markdown-enable-wiki-links)
+   (hack-local-variables)
+   (should markdown-enable-wiki-links)))
+
 (ert-deftest test-markdown-wiki-link/aliasing ()
   "Test filename extraction for aliased wiki links."
-  (markdown-test-file "wiki-links.text"
-   ;; Confirm location of first wiki link
-   (should (eq (markdown-next-link) 8))
-   ;; Confirm location of second wiki link
-   (should (eq (markdown-next-link) 73))
-   ;; Test predicate function
-   (should (markdown-wiki-link-p))
-   ;; Test alias-first filename extraction
-   (setq markdown-wiki-link-alias-first t)
-   (should (string-equal (markdown-wiki-link-link) "second"))
-   ;; Test alias-second filename extraction
-   (setq markdown-wiki-link-alias-first nil)
-   (should (string-equal (markdown-wiki-link-link) "first"))))
+  (let ((markdown-enable-wiki-links t))
+    (markdown-test-file "wiki-links.text"
+      ;; Confirm location of first wiki link
+      (should (eq (markdown-next-link) 8))
+      ;; Confirm location of second wiki link
+      (should (eq (markdown-next-link) 73))
+      ;; Test predicate function
+      (should (markdown-wiki-link-p))
+      ;; Test alias-first filename extraction
+      (setq markdown-wiki-link-alias-first t)
+      (should (string-equal (markdown-wiki-link-link) "second"))
+      ;; Test alias-second filename extraction
+      (setq markdown-wiki-link-alias-first nil)
+      (should (string-equal (markdown-wiki-link-link) "first")))))
 
 (ert-deftest test-markdown-wiki-link/navigation ()
   "Test wiki link navigation."
-  (markdown-test-file "wiki-links.text"
-   ;; Advance to first link
-   (should (eq (markdown-next-link) 8))
-   ;; Advance to second link
-   (should (eq (markdown-next-link) 73))
-   ;; Avance to final link
-   (should (eq (markdown-next-link) 155))
-   ;; Return nil and don't advance point
-   (should (eq (markdown-next-link) nil))
-   (should (eq (point) 155))
-   ;; Move back to second link
-   (should (eq (markdown-previous-link) 73))
-   ;; Move back to first link
-   (should (eq (markdown-previous-link) 8))
-   ;; Return nil and don't move point
-   (should (eq (markdown-previous-link) nil))
-   (should (eq (point) 8))))
+  (let ((markdown-enable-wiki-links t))
+    (markdown-test-file "wiki-links.text"
+      ;; Advance to first link
+      (should (eq (markdown-next-link) 8))
+      ;; Advance to second link
+      (should (eq (markdown-next-link) 73))
+      ;; Avance to final link
+      (should (eq (markdown-next-link) 155))
+      ;; Return nil and don't advance point
+      (should (eq (markdown-next-link) nil))
+      (should (eq (point) 155))
+      ;; Move back to second link
+      (should (eq (markdown-previous-link) 73))
+      ;; Move back to first link
+      (should (eq (markdown-previous-link) 8))
+      ;; Return nil and don't move point
+      (should (eq (markdown-previous-link) nil))
+      (should (eq (point) 8)))))
 
 (ert-deftest test-markdown-wiki-link/font-lock ()
   "Test font lock faces for wiki links."
   (markdown-test-temp-file "wiki-links.text"
    (let* ((fn (concat (file-name-directory buffer-file-name)
-                     "inline.text")))
+                     "inline.text"))
+          (markdown-enable-wiki-links t))
      ;; Create inline.text in the same temp directory, refontify
      (write-region "" nil fn nil 1)
      (markdown-fontify-buffer-wiki-links)
@@ -3304,6 +3312,20 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
      ;; Remove temporary files
      (delete-file fn)
      )))
+
+(ert-deftest test-markdown-wiki-link/kill ()
+  "Simple tests for `markdown-kill-thing-at-point' for wiki links."
+  (let ((kill-ring nil)
+        (markdown-enable-wiki-links t)
+        (tests (list '("[[foo]]" . "foo")
+                     '("[[foo|bar]]" . "bar"))))
+    (dolist (test tests)
+      ;; Load test string (the car), move to end of first line, kill
+      ;; thing at point, and then verify that the kill ring contains cdr.
+      (markdown-test-string (car test)
+                            (end-of-line)
+                            (call-interactively 'markdown-kill-thing-at-point)
+                            (should (string-equal (current-kill 0) (cdr test)))))))
 
 ;;; Filling tests:
 
@@ -3713,7 +3735,8 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
     (should (string-equal (buffer-string) " #. abc\n    def\n"))))
 
 (ert-deftest test-markdown-ext/ikiwiki ()
-  (let ((markdown-wiki-link-search-parent-directories t))
+  (let ((markdown-enable-wiki-links t)
+        (markdown-wiki-link-search-parent-directories t))
     (progn
       (find-file "ikiwiki/root")
       (unwind-protect
