@@ -5873,21 +5873,63 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
         (get-buffer "*eww*"))
     (error "eww is not present or not loaded on this version of emacs")))
 
+(defun markdown-visual-lines-between-points (beg end)
+  (save-excursion
+    (goto-char beg)
+    (cl-loop with count = 0
+             while (progn (end-of-visual-line)
+                          (and (< (point) end) (line-move-visual 1 t)))
+             do (cl-incf count)
+             finally return count)))
+
 (defun markdown-live-preview-window-serialize (buf)
   "Get window point and scroll data for all windows displaying BUF if BUF is
-non-nil."
-  (when buf
-    (mapcar (lambda (win) (list win (window-point win) (window-start win)))
-            (get-buffer-window-list buf))))
+live."
+  (when (buffer-live-p buf)
+    (with-current-buffer buf
+      (mapcar
+       (lambda (win)
+         (with-selected-window win
+           (let* ((start (window-start))
+                  (pt (window-point))
+                  (pt-or-sym (cond ((= pt (point-min)) 'min)
+                                   ((= pt (point-max)) 'max)
+                                   (t pt)))
+                  (diff (markdown-visual-lines-between-points
+                         start pt)))
+             (message "serialize: start=%d, pt=%d, pt-or-sym=%S, diff=%d"
+                      start pt pt-or-sym diff)
+             (list win pt-or-sym diff))))
+       (get-buffer-window-list buf)))))
+
+(defun markdown-get-point-back-lines (pt num-lines)
+  (save-excursion
+    (goto-char pt)
+    (line-move-visual (- num-lines) t)
+    ;; in testing, can occasionally overshoot the number of lines to traverse
+    (let ((actual-num-lines (markdown-visual-lines-between-points (point) pt)))
+      (when (> actual-num-lines num-lines)
+        (line-move-visual (- actual-num-lines num-lines) t)))
+    (point)))
 
 (defun markdown-live-preview-window-deserialize (window-posns)
   "Apply window point and scroll data from WINDOW-POSNS, given by
 `markdown-live-preview-window-serialize'."
-  (cl-destructuring-bind (win pt start) window-posns
+  (cl-destructuring-bind (win pt-or-sym diff) window-posns
     (when (window-live-p win)
-      (set-window-buffer win markdown-live-preview-buffer)
-      (set-window-point win pt)
-      (set-window-start win start))))
+      (with-current-buffer markdown-live-preview-buffer
+        (set-window-buffer win (current-buffer))
+        (cl-destructuring-bind (actual-pt actual-diff)
+            (cl-case pt-or-sym
+              (min (list (point-min) 0))
+              (max (list (point-max) diff))
+              (t (list pt-or-sym diff)))
+          (message "deserialize: pt-or-sym=%S, diff=%d" pt-or-sym actual-diff)
+          (message "point-back-lines: %d"
+                   (markdown-get-point-back-lines actual-pt actual-diff))
+          (set-window-start
+           win (markdown-get-point-back-lines actual-pt actual-diff))
+          (set-window-point win actual-pt))))))
 
 (defun markdown-live-preview-export ()
   "Export to XHTML using `markdown-export' and browse the resulting file within

@@ -3767,25 +3767,30 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
         (kill-buffer)))))
 
 (defadvice markdown-live-preview-window-eww
-    (around markdown-create-fake-eww disable)
+    (around markdown-test-create-fake-eww disable)
   (setq ad-return-value (get-buffer-create "*eww*")))
 
-(defmacro markdown-temp-eww (&rest body)
+(defmacro markdown-test-fake-eww (&rest body)
   `(progn
-     ,@(if (featurep 'eww) body
+     ,@(if (and (fboundp 'libxml-parse-html-region) (require 'eww nil t)) body
          `((ad-enable-advice #'markdown-live-preview-window-eww
-                             'around 'markdown-create-fake-eww)
+                             'around 'markdown-test-create-fake-eww)
            (ad-activate #'markdown-live-preview-window-eww)
            ,@body
            (ad-disable-advice #'markdown-live-preview-window-eww
-                              'around 'markdown-create-fake-eww)
+                              'around 'markdown-test-create-fake-eww)
            (ad-activate #'markdown-live-preview-window-eww)))))
+
+(defmacro markdown-test-eww-or-nothing (test &rest body)
+  (if (and (fboundp 'libxml-parse-html-region) (require 'eww nil t)) `(progn ,@body)
+    (message "no eww, or no libxml2 found: skipping %s" test)
+    nil))
 
 (ert-deftest test-markdown-ext/live-preview-exports ()
   (markdown-test-temp-file "inline.text"
-    (unless (require 'eww nil t)
+    (unless (and (fboundp 'libxml-parse-html-region) (require 'eww nil t))
       (should-error (markdown-live-preview-mode)))
-    (markdown-temp-eww
+    (markdown-test-fake-eww
      (markdown-live-preview-mode)
      (should (buffer-live-p markdown-live-preview-buffer))
      (should (eq (current-buffer)
@@ -3798,7 +3803,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
      (should (buffer-live-p markdown-live-preview-buffer)))))
 
 (ert-deftest test-markdown-ext/live-preview-delete-exports ()
-  (markdown-temp-eww
+  (markdown-test-fake-eww
    (let ((markdown-live-preview-delete-export 'delete-on-destroy)
          file-output)
      (markdown-test-temp-file "inline.text"
@@ -3819,6 +3824,49 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
            (setq file-output (markdown-export-file-name))
            (should (file-exists-p file-output)))
        (delete-file file-output)))))
+
+(ert-deftest test-markdown-ext/live-preview-follow-min-max ()
+  (markdown-test-eww-or-nothing "live-preview-follow-min-max"
+   (markdown-test-temp-file "inline.text"
+     (markdown-live-preview-mode)
+     (should (buffer-live-p markdown-live-preview-buffer))
+     (should (window-live-p (get-buffer-window markdown-live-preview-buffer)))
+     (with-selected-window (get-buffer-window markdown-live-preview-buffer)
+       (goto-char (point-min)))
+     (goto-char (point-min))
+     (insert "a test ")
+     (markdown-live-preview-export)
+     (let (final-pt final-win-st-diff)
+       ;; test that still starts at point-min
+       (with-selected-window (get-buffer-window markdown-live-preview-buffer)
+         (should (= (window-point) 1))
+         (should (= (markdown-visual-lines-between-points
+                     (window-start) (window-point))
+                    0))
+         (set-window-point (selected-window) (point-max))
+         (setq final-pt (window-point)
+               final-win-st-diff (markdown-visual-lines-between-points
+                                  (window-start) (window-point))))
+       (goto-char (point-min))
+       (insert "this is ")
+       (markdown-live-preview-export)
+       (with-selected-window (get-buffer-window markdown-live-preview-buffer)
+         (should (= (window-point) (+ final-pt (length "this is "))))
+         (should (= (markdown-visual-lines-between-points
+                     (window-start) (window-point))
+                    final-win-st-diff))
+         ;; test that still starts at point-max, with correct line difference
+         (goto-char (floor (/ (float (- (point-max) (point-min))) 2)))
+         (setq final-pt (window-point)
+               final-win-st-diff (markdown-visual-lines-between-points
+                                  (window-start) final-pt)))
+       (markdown-live-preview-export)
+       ;; test that still starts at same point, with correct line difference
+       (with-selected-window (get-buffer-window markdown-live-preview-buffer)
+         (should (= (window-point) final-pt))
+         (should (= (markdown-visual-lines-between-points
+                     (window-start) (window-point))
+                    final-win-st-diff)))))))
 
 (provide 'markdown-test)
 
