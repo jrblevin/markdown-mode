@@ -1206,12 +1206,12 @@ Group 2 matches only the label, without the surrounding markup.
 Group 3 matches the closing square bracket.")
 
 (defconst markdown-regex-header
-  "^\\(?:\\(.+\\)\n\\(=+\\)\\|\\(.+\\)\n\\(-+\\)\\|\\(#+\\)\\s-*\\(.*?\\)\\s-*?\\(#*\\)\\)$"
+  "^\\(?:\\(.+\\)\n\\(=+\\)\\|\\(.+\\)\n\\(-+\\)\\|\\(#+\\)[ \t]*\\(.+?\\)[ \t]*\\(#*\\)\\)$"
   "Regexp identifying Markdown headings.
 Group 1 matches the text of a level-1 setext heading.
 Group 2 matches the underline of a level-1 setext heading.
-Group 3 matches the text of a level-1 setext heading.
-Group 4 matches the underline of a level-1 setext heading.
+Group 3 matches the text of a level-2 setext heading.
+Group 4 matches the underline of a level-2 setext heading.
 Group 5 matches the opening hash marks of an atx heading.
 Group 6 matches the text, without surrounding whitespace, of an atx heading.
 Group 7 matches the closing hash marks of an atx heading.")
@@ -1867,17 +1867,25 @@ start which was previously propertized."
           (put-text-property (match-beginning 3) (match-end 3)
                              'markdown-metadata-value (match-data t))))))
 
-(defun markdown-syntax-propertize-headings-generic (symbol regex start end)
+(defun markdown-syntax-propertize-headings (start end)
   "Match headings of type SYMBOL with REGEX from START to END."
-  (save-excursion
-    (goto-char start)
-    (while (re-search-forward regex end t)
-      (unless (or (markdown-code-block-at-pos (match-beginning 0))
-                  (get-text-property (match-beginning 0) 'markdown-heading))
-        (put-text-property (match-beginning 0) (match-end 0)
-                           'markdown-heading t)
-        (put-text-property (match-beginning 0) (match-end 0)
-                           symbol (match-data t))))))
+  (goto-char start)
+  (while (re-search-forward markdown-regex-header end t)
+    (unless (markdown-code-block-at-pos (match-beginning 0))
+      (put-text-property
+       (match-beginning 0) (match-end 0) 'markdown-heading t)
+      (put-text-property
+       (match-beginning 0) (match-end 0)
+       (cond ((match-string-no-properties 1) 'markdown-heading-1-setext)
+             ((match-string-no-properties 3) 'markdown-heading-2-setext)
+             (t (let ((atx-level (length (match-string-no-properties 5))))
+                  (cond ((= atx-level 1) 'markdown-heading-1-atx)
+                        ((= atx-level 2) 'markdown-heading-2-atx)
+                        ((= atx-level 3) 'markdown-heading-3-atx)
+                        ((= atx-level 4) 'markdown-heading-4-atx)
+                        ((= atx-level 5) 'markdown-heading-5-atx)
+                        ((= atx-level 6) 'markdown-heading-6-atx)))))
+       (match-data t)))))
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
@@ -1931,22 +1939,7 @@ start which was previously propertized."
   (markdown-syntax-propertize-yaml-metadata start end)
   (markdown-syntax-propertize-pre-blocks start end)
   (markdown-syntax-propertize-blockquotes start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-1-setext markdown-regex-header-1-setext start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-2-setext markdown-regex-header-2-setext start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-6-atx markdown-regex-header-6-atx start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-5-atx markdown-regex-header-5-atx start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-4-atx markdown-regex-header-4-atx start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-3-atx markdown-regex-header-3-atx start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-2-atx markdown-regex-header-2-atx start end)
-  (markdown-syntax-propertize-headings-generic
-   'markdown-heading-1-atx markdown-regex-header-1-atx start end)
+  (markdown-syntax-propertize-headings start end)
   (markdown-syntax-propertize-comments start end))
 
 
@@ -2238,26 +2231,26 @@ See `font-lock-syntactic-face-function' for details."
                                        (2 markdown-blockquote-face)))
    (cons 'markdown-match-heading-1-setext '((1 markdown-header-face-1)
                                             (2 markdown-header-rule-face)))
-   (cons 'markdown-match-heading-2-setext '((1 markdown-header-face-2)
-                                            (2 markdown-header-rule-face)))
-   (cons 'markdown-match-heading-6-atx '((1 markdown-header-delimiter-face)
-                                         (2 markdown-header-face-6)
-                                         (3 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-5-atx '((1 markdown-header-delimiter-face)
-                                         (2 markdown-header-face-5)
-                                         (3 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-4-atx '((1 markdown-header-delimiter-face)
-                                         (2 markdown-header-face-4)
-                                         (3 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-3-atx '((1 markdown-header-delimiter-face)
-                                         (2 markdown-header-face-3)
-                                         (3 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-2-atx '((1 markdown-header-delimiter-face)
-                                         (2 markdown-header-face-2)
-                                         (3 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-1-atx '((1 markdown-header-delimiter-face)
-                                         (2 markdown-header-face-1)
-                                         (3 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-2-setext '((3 markdown-header-face-2)
+                                            (4 markdown-header-rule-face)))
+   (cons 'markdown-match-heading-6-atx '((5 markdown-header-delimiter-face)
+                                         (6 markdown-header-face-6)
+                                         (7 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-5-atx '((5 markdown-header-delimiter-face)
+                                         (6 markdown-header-face-5)
+                                         (7 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-4-atx '((5 markdown-header-delimiter-face)
+                                         (6 markdown-header-face-4)
+                                         (7 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-3-atx '((5 markdown-header-delimiter-face)
+                                         (6 markdown-header-face-3)
+                                         (7 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-2-atx '((5 markdown-header-delimiter-face)
+                                         (6 markdown-header-face-2)
+                                         (7 markdown-header-delimiter-face)))
+   (cons 'markdown-match-heading-1-atx '((5 markdown-header-delimiter-face)
+                                         (6 markdown-header-face-1)
+                                         (7 markdown-header-delimiter-face)))
    (cons 'markdown-match-multimarkdown-metadata '((1 markdown-metadata-key-face)
                                                   (2 markdown-markup-face)
                                                   (3 markdown-metadata-value-face)))
