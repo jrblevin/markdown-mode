@@ -473,6 +473,11 @@ provides an interface to all of the possible customizations:
     automatically indent new lines when the enter key is pressed
     (default: <kbd>t</kbd>)
 
+  * `markdown-enable-wiki-links` - syntax highlighting for wiki
+    links (default: `nil`).  Set this to a non-nil value to turn on
+    wiki link support by default.  Wiki link support can be toggled
+    later using the function `markdown-toggle-wiki-links`."
+
   * `markdown-wiki-link-alias-first` - set to a non-nil value to
     treat aliased wiki links like `[[link text|PageName]]`
     (default: <kbd>t</kbd>).  When set to nil, they will be treated as
@@ -483,8 +488,8 @@ provides an interface to all of the possible customizations:
 
   * `markdown-enable-math` - syntax highlighting for LaTeX
     fragments (default: `nil`).  Set this to <kbd>t</kbd> to turn on math
-    support by default.  Math support can be toggled later using
-    the function `markdown-enable-math`."
+    support by default.  Math support can be enabled, disabled, or
+    toggled later using the function `markdown-toggle-math`."
 
   * `markdown-css-paths` - CSS files to link to in XHTML output
     (default: `nil`).
@@ -571,18 +576,22 @@ customization screen.
 
 ## Extensions
 
-Besides supporting the basic Markdown syntax, markdown-mode also
-includes syntax highlighting for `[[Wiki Links]]` by default.  Wiki
-links may be followed by pressing <kbd>C-c C-o</kbd> when the point
+Besides supporting the basic Markdown syntax, Markdown Mode also
+includes syntax highlighting for `[[Wiki Links]]`.  This can be
+enabled by setting `markdown-enable-wiki-links` to a non-nil value.
+Wiki links may be followed by pressing <kbd>C-c C-o</kbd> when the point
 is at a wiki link.  Use <kbd>M-p</kbd> and <kbd>M-n</kbd> to quickly jump to the
 previous and next links (including links of other types).
 Aliased or piped wiki links of the form `[[link text|PageName]]`
 are also supported.  Since some wikis reverse these components, set
 `markdown-wiki-link-alias-first` to nil to treat them as
-`[[PageName|link text]]`.  By default, Markdown Mode only searches
-for target files in the current directory.  Sequential parent
-directory search (as in [Ikiwiki][]) can be enabled by setting
-`markdown-wiki-link-search-parent-directories` to a non-nil value.
+`[[PageName|link text]]`.  If `markdown-wiki-link-fontify-missing`
+is also non-nil, Markdown Mode will highlight wiki links with
+missing target file in a different color.  By default, Markdown
+Mode only searches for target files in the current directory.
+Sequential parent directory search (as in [Ikiwiki][]) can be
+enabled by setting `markdown-wiki-link-search-parent-directories`
+to a non-nil value.
 
 [Ikiwiki]: https://ikiwiki.info
 
