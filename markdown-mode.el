@@ -993,6 +993,13 @@ cause lag when typing on slower machines."
   :type 'boolean
   :safe 'booleanp)
 
+(defcustom markdown-math-use-mathjax t
+  "Add MathJax <script> tag to standalone output for rendering math in XHTML.
+Only affects output when `markdown-enable-math' is non-nil."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp)
+
 (defcustom markdown-uri-types
   '("acap" "cid" "data" "dav" "fax" "file" "ftp" "gopher" "http" "https"
     "imap" "ldap" "mailto" "mid" "modem" "news" "nfs" "nntp" "pop" "prospero"
@@ -5913,12 +5920,18 @@ Return the name of the output buffer used."
 Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (interactive)
   (setq output-buffer-name (markdown output-buffer-name))
-  (with-current-buffer output-buffer-name
-    (set-buffer output-buffer-name)
-    (unless (markdown-output-standalone-p)
-      (markdown-add-xhtml-header-and-footer output-buffer-name))
-    (goto-char (point-min))
-    (html-mode))
+  (let ((markdown-xhtml-header-content
+         (concat markdown-xhtml-header-content
+                 (when (and markdown-enable-math markdown-math-use-mathjax)
+                   (concat "<script type=\"text/javascript\""
+                           "src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\">"
+                           "</script>")))))
+    (with-current-buffer output-buffer-name
+      (set-buffer output-buffer-name)
+      (unless (markdown-output-standalone-p)
+        (markdown-add-xhtml-header-and-footer output-buffer-name))
+      (goto-char (point-min))
+      (html-mode)))
   output-buffer-name)
 
 (defun markdown-other-window (&optional output-buffer-name)
