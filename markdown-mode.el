@@ -1502,7 +1502,7 @@ region to refontify."
          ;; If the current line has sufficient indentation, mark out pre block
          ;; The opening should be preceded by a blank line.
          ((and (looking-at pre-regexp)
-               (markdown-prev-line-blank-p))
+               (save-match-data (markdown-prev-line-blank-p)))
           (setq open (match-beginning 0))
           (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
                       (not (eobp)))
@@ -2399,10 +2399,9 @@ in XEmacs 21."
 
 (defun markdown-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
-  (save-match-data
-    (save-excursion
-      (beginning-of-line)
-      (re-search-forward "^\\s *$" (line-end-position) t))))
+  (save-excursion
+    (beginning-of-line)
+    (re-search-forward "^\\s *$" (line-end-position) t)))
 
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
@@ -2474,12 +2473,11 @@ Return nil if the current line is not the beginning of a list item."
   "Determine if the current line begins a new baseline level."
   (save-excursion
     (beginning-of-line)
-    (save-match-data
-      (or (looking-at markdown-regex-header)
-          (looking-at markdown-regex-hr)
-          (and (null (markdown-cur-non-list-indent))
-               (= (markdown-cur-line-indent) 0)
-               (markdown-prev-line-blank-p))))))
+    (or (looking-at markdown-regex-header)
+        (looking-at markdown-regex-hr)
+        (and (null (markdown-cur-non-list-indent))
+             (= (markdown-cur-line-indent) 0)
+             (markdown-prev-line-blank-p)))))
 
 (defun markdown-search-backward-baseline ()
   "Search backward baseline point with no indentation and not a list item."
