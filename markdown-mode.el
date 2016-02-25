@@ -1166,7 +1166,7 @@ curly braces. They may be of arbitrary capitalization, though."
   "Regular expression matches HTML comment closing.")
 
 (defconst markdown-regex-link-inline
-  "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)\\((\\)\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?\\()\\)"
+  "\\(!\\)?\\(\\[\\)\\([^]\n]*?\\)\\(\\]\\)\\((\\)\\([^)\n]*?\\)\\(?:\\s-+\\(\"[^\"\n]*?\"\\)\\)?\\()\\)"
   "Regular expression for a [text](file) or an image link ![text](file).
 Group 1 matches the leading exclamation point (optional).
 Group 2 matches the opening square bracket.
@@ -1178,7 +1178,7 @@ Group 7 matches the title (optional).
 Group 8 matches the closing parenthesis.")
 
 (defconst markdown-regex-link-reference
-  "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)[ ]?\\(\\[\\)\\([^]]*?\\)\\(\\]\\)"
+  "\\(!\\)?\\(\\[\\)\\([^]\n]*?\\)\\(\\]\\)[ ]?\\(\\[\\)\\([^]\n]*?\\)\\(\\]\\)"
   "Regular expression for a reference link [text][id].
 Group 1 matches the leading exclamation point (optional).
 Group 2 matches the opening square bracket for the link text.
@@ -1189,7 +1189,7 @@ Group 6 matches the reference label.
 Group 7 matches the closing square bracket for the reference label.")
 
 (defconst markdown-regex-reference-definition
-  "^ \\{0,3\\}\\(\\[\\)\\([^]\n]+?\\)\\(\\]\\)\\(:\\)\\s *\\(.*?\\)\\s *\\( \"[^\"]*\"$\\|$\\)"
+  "^ \\{0,3\\}\\(\\[\\)\\([^]\n]*?\\)\\(\\]\\)\\(:\\)\\s *?\\(.*?\\)\\s *?\\(\"[^\"\n]*?\"\\)?\\s *?$"
   "Regular expression for a reference definition.
 Group 1 matches the opening square bracket.
 Group 2 matches the reference label.
@@ -1457,23 +1457,21 @@ Function is called repeatedly until it returns nil. For details, see
 `syntax-propertize-extend-region-functions'."
   (save-match-data
     (save-excursion
-      (let* ((new-start (progn (goto-char start)
-                               (if (re-search-backward "\n\n" nil t)
-                                   (match-end 0) (point-min))))
-             (new-end (progn (goto-char end)
-                             (if (re-search-forward "\n\n" nil t)
-                                 (match-beginning 0) (point-max))))
-             (code-match (markdown-code-block-at-pos new-start))
-             (new-start (or (and code-match (cl-first code-match)) new-start))
-             (code-match (markdown-code-block-at-pos end))
-             (new-end (or (and code-match (cl-second code-match)) new-end)))
-        (unless (and (eq new-start start) (eq new-end end))
-          (cons new-start new-end))))))
+      (let ((code-match-start
+             (or (markdown-code-block-at-pos start)
+                 (markdown-link-at-pos start)))
+            (code-match-end
+             (or (markdown-code-block-at-pos end)
+                 (markdown-link-at-pos end))))
+        (cond (code-match-start (cons (car code-match-start) end))
+              (code-match-end (cons start (cadr code-match-end)))
+              (t nil))))))
 
 (defun markdown-font-lock-extend-region-function (start end _)
   "Used in `jit-lock-after-change-extend-region-functions'. Delegates to
 `markdown-syntax-propertize-extend-region'. START and END are the previous
 region to refontify."
+  (message "jit lockin")
   (let ((res (markdown-syntax-propertize-extend-region start end)))
     (when res
       (setq jit-lock-start (car res)
@@ -1566,6 +1564,17 @@ MIDDLE-PROPERTY to the text in between the two. The value of *-PROPERTY is the
 MIDDLE-PROPERTY, the value is a false match data of the form '(begin end), with
 begin and end set to the edges of the \"middle\" text. This makes fontification
 easier.")
+
+(defun markdown-get-code-block-properties ()
+  (let* ((face-lists
+          (cl-mapcar
+           (lambda (entry)
+             (list (cl-second (cl-first entry))
+                   (cl-second (cl-second entry))
+                   (cl-third entry)))
+           markdown-fenced-block-pairs))
+         (faces (apply #'append face-lists)))
+    (delete-dups faces)))
 
 (defun markdown-text-property-at-point (prop)
   (get-text-property (point) prop))
@@ -1911,37 +1920,127 @@ start which was previously propertized."
      ;; Nothing found
      (t nil))))
 
+(defconst markdown-link-regexps-properties-alist
+  `((,markdown-regex-footnote
+     . ((1 . markdown-link-container)   ; [^
+        (2 . markdown-link-content)     ; label
+        (3 . markdown-link-container))) ; ]
+    (,markdown-regex-link-inline
+     . ((1 . markdown-link-bang)            ; ! (optional)
+        (2 . markdown-link-container)       ; [
+        (3 . markdown-link-content)         ; text
+        (4 . markdown-link-container)       ; ]
+        (5 . markdown-link-url-container)   ; (
+        (6 . markdown-link-url)             ; url
+        (7 . markdown-link-url-title)       ; "title" (optional)
+        (8 . markdown-link-url-container))) ; )
+    (,markdown-regex-link-reference
+     . ((1 . markdown-link-bang)              ; ! (optional)
+        (2 . markdown-link-container)         ; [
+        (3 . markdown-link-content)           ; text
+        (4 . markdown-link-container)         ; ]
+        (5 . markdown-link-label-container)   ; [
+        (6 . markdown-link-label)             ; label
+        (7 . markdown-link-label-container))) ; ]
+    (,markdown-regex-reference-definition
+     . ((1 . markdown-link-container)          ; [
+        (2 . markdown-link-definition-content) ; label
+        (3 . markdown-link-container)          ; ]
+        (4 . markdown-link-separator)          ; :
+        (5 . markdown-link-url)                ; url
+        (6 . markdown-link-url-title))))       ; "title" (optional)
+  "FIXME: don't forget to allow for optional groups!")
+
+(defun markdown-get-link-properties ()
+  (let* ((entries (cl-mapcar #'cdr markdown-link-regexps-properties-alist))
+         (face-lists (cl-mapcar (apply-partially #'cl-mapcar #'cdr) entries)))
+    (delete-dups (apply #'append face-lists))))
+
+(defun markdown-link-at-pos (pos) (get-text-property pos 'markdown-link-data))
+
+(defsubst markdown-link-at-point () (markdown-link-at-pos (point)))
+
+(defun markdown-syntax-propertize-links (start end)
+  "Match links and propertize from START to END."
+  ;; TODO: add invisible, link props
+  (message "propertizing start=%d, end=%d" start end)
+  (save-excursion
+    (goto-char start)
+    (let ((link-regexps (mapcar #'car markdown-link-regexps-properties-alist))
+          regexp-ind)
+      (while (setq regexp-ind (markdown-find-next-of-regexps link-regexps end t))
+        (message "point: %d" (point))
+        (put-text-property
+         (match-beginning 0) (match-end 0) 'markdown-link-data (match-data t))
+        (cl-loop
+         with reg-entry = (nth
+                           regexp-ind markdown-link-regexps-properties-alist)
+         for group-prop in (cdr reg-entry)
+         do (let* ((group (car group-prop))
+                   (prop (cdr group-prop))
+                   (beg (match-beginning group))
+                   (end (match-end group)))
+              (message "group=%d, prop=%S, beg=%S, end=%S" group prop beg end)
+              (when beg
+                (put-text-property beg end prop (list beg end))))))))
+  (message "finished!")
+  nil)
+
+(defun markdown-join-regexps-explicitly-number (regexps)
+  (let ((numbered-regexps
+         (cl-loop for str in regexps
+                  for i = 1 then (1+ i)
+                  collect (concat "\\(?" (number-to-string i) ":" str "\\)"))))
+    (mapconcat #'identity numbered-regexps "\\|")))
+
+(defun markdown-find-next-of-regexps (regexps &rest args)
+  (when (or (not (listp regexps)) (null regexps)
+            (not (cl-every #'stringp regexps)))
+    (error "Must provide list of valid regexps"))
+  (let ((joined-regexp (markdown-join-regexps-explicitly-number regexps)))
+    (when (apply markdown-conditional-search-function (cons joined-regexp args))
+      ;; find which regexp "caused" the match (which created group is non-nil)
+      (let ((regexp-ind
+             (catch 'markdown-regexp-next
+               (cl-loop
+                for ind = 0 then (1+ ind)
+                for cur-group = (cddr (match-data t)) then (cddr cur-group)
+                do (cond ((null cur-group)
+                          (error "Internal error: no matching group"))
+                         ((not (null (car cur-group)))
+                          (throw 'markdown-regexp-next ind)))))))
+        ;; "reapply" the regexp to where it was matched to get the "real" match
+        (goto-char (match-beginning 0))
+        (re-search-forward (nth regexp-ind regexps) (match-end 0))
+        regexp-ind))))
+
 (defun markdown-syntax-propertize (start end)
   "See `syntax-propertize-function'."
-  (remove-text-properties start end '(markdown-tilde-fence-begin))
-  (remove-text-properties start end '(markdown-tilde-fence-end))
-  (remove-text-properties start end '(markdown-fenced-code))
-  (remove-text-properties start end '(markdown-yaml-metadata-begin))
-  (remove-text-properties start end '(markdown-yaml-metadata-end))
-  (remove-text-properties start end '(markdown-yaml-metadata-section))
-  (remove-text-properties start end '(markdown-gfm-block-begin))
-  (remove-text-properties start end '(markdown-gfm-block-end))
-  (remove-text-properties start end '(markdown-gfm-code))
-  (remove-text-properties start end '(markdown-pre))
-  (remove-text-properties start end '(markdown-blockquote))
-  (remove-text-properties start end '(markdown-heading))
-  (remove-text-properties start end '(markdown-heading-1-setext))
-  (remove-text-properties start end '(markdown-heading-2-setext))
-  (remove-text-properties start end '(markdown-heading-1-atx))
-  (remove-text-properties start end '(markdown-heading-2-atx))
-  (remove-text-properties start end '(markdown-heading-3-atx))
-  (remove-text-properties start end '(markdown-heading-4-atx))
-  (remove-text-properties start end '(markdown-heading-5-atx))
-  (remove-text-properties start end '(markdown-heading-6-atx))
-  (remove-text-properties start end '(markdown-metadata-key))
-  (remove-text-properties start end '(markdown-metadata-value))
-  (remove-text-properties start end '(markdown-metadata-markup))
-  (markdown-syntax-propertize-fenced-block-constructs start end)
-  (markdown-syntax-propertize-yaml-metadata start end)
-  (markdown-syntax-propertize-pre-blocks start end)
-  (markdown-syntax-propertize-blockquotes start end)
-  (markdown-syntax-propertize-headings start end)
-  (markdown-syntax-propertize-comments start end))
+  (save-excursion
+    (remove-text-properties start end (markdown-get-code-block-properties))
+    (remove-text-properties start end '(markdown-pre))
+    (remove-text-properties start end '(markdown-blockquote))
+    (remove-text-properties start end '(markdown-heading))
+    (remove-text-properties start end '(markdown-heading-1-setext))
+    (remove-text-properties start end '(markdown-heading-2-setext))
+    (remove-text-properties start end '(markdown-heading-1-atx))
+    (remove-text-properties start end '(markdown-heading-2-atx))
+    (remove-text-properties start end '(markdown-heading-3-atx))
+    (remove-text-properties start end '(markdown-heading-4-atx))
+    (remove-text-properties start end '(markdown-heading-5-atx))
+    (remove-text-properties start end '(markdown-heading-6-atx))
+    (remove-text-properties start end '(markdown-metadata-key))
+    (remove-text-properties start end '(markdown-metadata-value))
+    (remove-text-properties start end '(markdown-metadata-markup))
+    (remove-text-properties start end (markdown-get-link-properties))
+    (remove-text-properties start end '(markdown-link-data))
+    (markdown-syntax-propertize-fenced-block-constructs start end)
+    (markdown-syntax-propertize-yaml-metadata start end)
+    (markdown-syntax-propertize-pre-blocks start end)
+    (markdown-syntax-propertize-blockquotes start end)
+    (markdown-syntax-propertize-headings start end)
+    (markdown-syntax-propertize-comments start end)
+    (markdown-syntax-propertize-links start end)))
 
 
 ;;; Font Lock =================================================================
@@ -2221,13 +2320,13 @@ See `font-lock-syntactic-face-function' for details."
            (2 markdown-language-keyword-face nil t)))
    (cons 'markdown-match-gfm-close-code-blocks
          '((1 markdown-markup-face)))
-   (cons 'markdown-match-gfm-code-blocks '((0 markdown-pre-face)))
+   (cons 'markdown-match-gfm-code-blocks 'markdown-pre-face)
    (cons 'markdown-match-fenced-start-code-block
          '((1 markdown-markup-face)
            (2 markdown-language-keyword-face nil t)))
-   (cons 'markdown-match-fenced-end-code-block '((0 markdown-markup-face)))
-   (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
-   (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
+   (cons 'markdown-match-fenced-end-code-block 'markdown-markup-face)
+   (cons 'markdown-match-fenced-code-blocks 'markdown-pre-face)
+   (cons 'markdown-match-pre-blocks 'markdown-pre-face)
    (cons 'markdown-match-blockquotes '((1 markdown-markup-face)
                                        (2 markdown-blockquote-face)))
    (cons 'markdown-match-heading-1-setext '((1 markdown-header-face-1)
@@ -2269,30 +2368,16 @@ See `font-lock-syntactic-face-function' for details."
                                     (2 markdown-link-face)
                                     (3 markdown-markup-face)))
    (cons markdown-regex-list '(2 markdown-list-face))
-   (cons markdown-regex-footnote '((1 markdown-markup-face)   ; [^
-                                   (2 markdown-footnote-face) ; label
-                                   (3 markdown-markup-face))) ; ]
-   (cons markdown-regex-link-inline '((1 markdown-markup-face nil t)     ; ! (optional)
-                                      (2 markdown-markup-face)           ; [
-                                      (3 markdown-link-face)             ; text
-                                      (4 markdown-markup-face)           ; ]
-                                      (5 markdown-markup-face)           ; (
-                                      (6 markdown-url-face)              ; url
-                                      (7 markdown-link-title-face nil t) ; "title" (optional)
-                                      (8 markdown-markup-face)))         ; )
-   (cons markdown-regex-link-reference '((1 markdown-markup-face nil t) ; ! (optional)
-                                         (2 markdown-markup-face)       ; [
-                                         (3 markdown-link-face)         ; text
-                                         (4 markdown-markup-face)       ; ]
-                                         (5 markdown-markup-face)       ; [
-                                         (6 markdown-reference-face)    ; label
-                                         (7 markdown-markup-face)))     ; ]
-   (cons markdown-regex-reference-definition '((1 markdown-markup-face)       ; [
-                                               (2 markdown-reference-face)    ; label
-                                               (3 markdown-markup-face)       ; ]
-                                               (4 markdown-markup-face)       ; :
-                                               (5 markdown-url-face)          ; url
-                                               (6 markdown-link-title-face))) ; "title" (optional)
+   (cons 'markdown-match-link-container 'markdown-markup-face)
+   (cons 'markdown-match-link-content 'markdown-link-face)
+   (cons 'markdown-match-link-bang 'markdown-markup-face)
+   (cons 'markdown-match-link-url-container 'markdown-markup-face)
+   (cons 'markdown-match-link-url 'markdown-url-face)
+   (cons 'markdown-match-link-url-title 'markdown-link-title-face)
+   (cons 'markdown-match-link-label-container 'markdown-markup-face)
+   (cons 'markdown-match-link-label 'markdown-reference-face)
+   (cons 'markdown-match-link-separator 'markdown-markup-face)
+   (cons 'markdown-match-link-definition-content 'markdown-markup-face)
    ;; Math mode $..$
    (cons 'markdown-match-math-single '((1 markdown-markup-face prepend)
                                        (2 markdown-math-face append)
@@ -2893,7 +2978,7 @@ Return nil otherwise."
 Restore match data previously stored in PROPERTY."
   (let (saved pos)
     (unless (setq saved (get-text-property (point) property))
-      (setq pos (next-single-char-property-change (point) property nil last))
+      (setq pos (next-single-property-change (point) property nil last))
       (setq saved (get-text-property pos property)))
     (when saved
       (set-match-data saved)
@@ -3063,6 +3148,36 @@ into a variable to allow for dynamic let-binding.")
 
 (defun markdown-match-yaml-metadata-key (last)
   (markdown-match-propertized-text 'markdown-metadata-key last))
+
+(defun markdown-match-link-container (last)
+  (markdown-match-propertized-text 'markdown-link-container last))
+
+(defun markdown-match-link-content (last)
+  (markdown-match-propertized-text 'markdown-link-content last))
+
+(defun markdown-match-link-bang (last)
+  (markdown-match-propertized-text 'markdown-link-bang last))
+
+(defun markdown-match-link-url-container (last)
+  (markdown-match-propertized-text 'markdown-link-url-container last))
+
+(defun markdown-match-link-url (last)
+  (markdown-match-propertized-text 'markdown-link-url last))
+
+(defun markdown-match-link-url-title (last)
+  (markdown-match-propertized-text 'markdown-link-url-title last))
+
+(defun markdown-match-link-label-container (last)
+  (markdown-match-propertized-text 'markdown-link-label-container last))
+
+(defun markdown-match-link-label (last)
+  (markdown-match-propertized-text 'markdown-link-label last))
+
+(defun markdown-match-link-definition-content (last)
+  (markdown-match-propertized-text 'markdown-link-definition-content last))
+
+(defun markdown-match-link-separator (last)
+  (markdown-match-propertized-text 'markdown-link-separator last))
 
 
 ;;; Syntax Table ==============================================================
@@ -6589,6 +6704,8 @@ if ARG is omitted or nil."
   (setq outline-level 'markdown-outline-level)
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
+  ;; add invisibility for links
+  (add-to-invisibility-spec 'markdown-link-hidden)
 
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
