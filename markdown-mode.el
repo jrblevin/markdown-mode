@@ -1602,7 +1602,7 @@ of (pos . property). pos is point if point contains non-nil PROP."
            (previous-single-property-change
             (point) prop nil (or lim (point-min))))))
     (when (and (not (get-text-property res prop))
-               (> res 1)
+               (> res (point-min))
                (get-text-property (1- res) prop))
       (cl-decf res))
     (when (and res (get-text-property res prop)) (cons res prop))))
