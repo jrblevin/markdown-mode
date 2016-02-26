@@ -5897,8 +5897,6 @@ live."
                                    (t pt)))
                   (diff (markdown-visual-lines-between-points
                          start pt)))
-             (message "serialize: start=%d, pt=%d, pt-or-sym=%S, diff=%d"
-                      start pt pt-or-sym diff)
              (list win pt-or-sym diff))))
        (get-buffer-window-list buf)))))
 
@@ -5924,9 +5922,6 @@ live."
               (min (list (point-min) 0))
               (max (list (point-max) diff))
               (t (list pt-or-sym diff)))
-          (message "deserialize: pt-or-sym=%S, diff=%d" pt-or-sym actual-diff)
-          (message "point-back-lines: %d"
-                   (markdown-get-point-back-lines actual-pt actual-diff))
           (set-window-start
            win (markdown-get-point-back-lines actual-pt actual-diff))
           (set-window-point win actual-pt))))))
