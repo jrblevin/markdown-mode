@@ -3782,8 +3782,10 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
            (ad-activate #'markdown-live-preview-window-eww)))))
 
 (defmacro markdown-test-eww-or-nothing (test &rest body)
-  (if (and (fboundp 'libxml-parse-html-region) (require 'eww nil t)) `(progn ,@body)
-    (message "no eww, or no libxml2 found: skipping %s" test)
+  (if (and (fboundp 'libxml-parse-html-region) (require 'eww nil t)
+           (executable-find markdown-command))
+      `(progn ,@body)
+    (message "no eww, no libxml2, or no %s found: skipping %s" markdown-command test)
     nil))
 
 (ert-deftest test-markdown-ext/live-preview-exports ()
