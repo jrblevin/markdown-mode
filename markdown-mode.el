@@ -2395,7 +2395,7 @@ in XEmacs 21."
   "Return t if the current line is blank and nil otherwise."
   (save-excursion
     (beginning-of-line)
-    (re-search-forward "^\\s *$" (line-end-position) t)))
+    (looking-at-p "^\\s *$")))
 
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
@@ -5063,6 +5063,8 @@ increase the indentation by one level."
          ((string-match-p "[0-9]" marker)
           (if (= arg 16) ;; starting a new column indented one more level
               (insert (concat new-indent "1. "))
+            ;; Don't use previous match-data
+            (set-match-data nil)
             ;; travel up to the last item and pick the correct number.  If
             ;; the argument was nil, "new-indent = cur-indent" is the same,
             ;; so we don't need special treatment. Neat.
@@ -5129,13 +5131,12 @@ Optionally, BOUNDS of the current list item may be provided if available."
   (interactive)
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
-      (save-match-data
-        (let ((end-marker (set-marker (make-marker) (nth 1 bounds))))
-          (goto-char (nth 0 bounds))
-          (while (< (point) end-marker)
-            (unless (markdown-cur-line-blank-p)
-              (insert (make-string markdown-list-indent-width ? )))
-            (forward-line)))))))
+      (let ((end-marker (set-marker (make-marker) (nth 1 bounds))))
+        (goto-char (nth 0 bounds))
+        (while (< (point) end-marker)
+          (unless (markdown-cur-line-blank-p)
+            (insert (make-string markdown-list-indent-width ? )))
+          (forward-line))))))
 
 (defun markdown-promote-list-item (&optional bounds)
   "Unindent (or promote) the current list item.
