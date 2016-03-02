@@ -2241,7 +2241,7 @@ See `font-lock-syntactic-face-function' for details."
                                          (6 markdown-header-delimiter-face)))
    (cons 'markdown-match-heading-4-atx '((4 markdown-header-delimiter-face)
                                          (5 markdown-header-face-4)
-                                         (7 markdown-header-delimiter-face)))
+                                         (6 markdown-header-delimiter-face)))
    (cons 'markdown-match-heading-3-atx '((4 markdown-header-delimiter-face)
                                          (5 markdown-header-face-3)
                                          (6 markdown-header-delimiter-face)))
