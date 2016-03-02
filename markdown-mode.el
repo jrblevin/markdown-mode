@@ -3485,7 +3485,7 @@ header will be inserted."
       (markdown-remove-header)
       (setq text (delete-and-extract-region
                   (line-beginning-position) (line-end-position)))
-      (when (and setext (string-match "^[ \t]*$" text))
+      (when (and setext (string-match-p "^[ \t]*$" text))
         (setq text (read-string "Header text: "))))
     (setq text (markdown-compress-whitespace-string text)))
   ;; Insertion with given text
@@ -4277,20 +4277,19 @@ Assumes match data is available for `markdown-regex-header-atx'.
 Checks that the number of trailing hash marks equals the number of leading
 hash marks, that there is only a single space before and after the text,
 and that there is no extraneous whitespace in the text."
-  (save-match-data
-    (or
-     ;; Number of starting and ending hash marks differs
-     (not (= (length (match-string 1)) (length (match-string 3))))
-     ;; When the header text is not empty...
-     (and (> (length (match-string 2)) 0)
-          ;; ...if there are extra leading, trailing, or interior spaces
-          (or (not (= (match-beginning 2) (1+ (match-end 1))))
-              (not (= (match-beginning 3) (1+ (match-end 2))))
-              (string-match "[ \t\n]\\{2\\}" (match-string 2))))
-     ;; When the header text is empty...
-     (and (= (length (match-string 2)) 0)
-          ;; ...if there are too many or too few spaces
-          (not (= (match-beginning 3) (+ (match-end 1) 2)))))))
+  (or
+   ;; Number of starting and ending hash marks differs
+   (not (= (length (match-string 1)) (length (match-string 3))))
+   ;; When the header text is not empty...
+   (and (> (length (match-string 2)) 0)
+        ;; ...if there are extra leading, trailing, or interior spaces
+        (or (not (= (match-beginning 2) (1+ (match-end 1))))
+            (not (= (match-beginning 3) (1+ (match-end 2))))
+            (string-match-p "[ \t\n]\\{2\\}" (match-string 2))))
+   ;; When the header text is empty...
+   (and (= (length (match-string 2)) 0)
+        ;; ...if there are too many or too few spaces
+        (not (= (match-beginning 3) (+ (match-end 1) 2))))))
 
 (defun markdown-complete-atx ()
   "Complete and normalize ATX headers.
@@ -4321,9 +4320,8 @@ Return nil if markup was complete and non-nil if markup was completed."
 Assumes match data is available for `markdown-regex-header-setext'.
 Checks that length of underline matches text and that there is no
 extraneous whitespace in the text."
-  (save-match-data
-    (or (not (= (length (match-string 1)) (length (match-string 2))))
-        (string-match "[ \t\n]\\{2\\}" (match-string 1)))))
+  (or (not (= (length (match-string 1)) (length (match-string 2))))
+      (string-match-p "[ \t\n]\\{2\\}" (match-string 1))))
 
 (defun markdown-complete-setext ()
   "Complete and normalize setext headers.
@@ -5062,7 +5060,7 @@ increase the indentation by one level."
         (goto-char new-loc)
         (cond
          ;; Ordered list
-         ((string-match "[0-9]" marker)
+         ((string-match-p "[0-9]" marker)
           (if (= arg 16) ;; starting a new column indented one more level
               (insert (concat new-indent "1. "))
             ;; travel up to the last item and pick the correct number.  If
@@ -5078,14 +5076,14 @@ increase the indentation by one level."
                                  "1"))
                    (space-adjust (- (length old-prefix) (length new-prefix)))
                    (new-spacing (if (and (match-string 2)
-                                         (not (string-match "\t" old-spacing))
+                                         (not (string-match-p "\t" old-spacing))
                                          (< space-adjust 0)
                                          (> space-adjust (- 1 (length (match-string 2)))))
                                     (substring (match-string 2) 0 space-adjust)
                                   (or old-spacing ". "))))
               (insert (concat new-indent new-prefix new-spacing)))))
          ;; Unordered list
-         ((string-match "[\\*\\+-]" marker)
+         ((string-match-p "[\\*\\+-]" marker)
           (insert new-indent marker)))))))
 
 (defun markdown-move-list-item-up ()
