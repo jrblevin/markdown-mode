@@ -1505,7 +1505,7 @@ region to refontify."
          ((and (looking-at pre-regexp)
                (save-match-data (markdown-prev-line-blank-p)))
           (setq open (match-beginning 0))
-          (while (and (or (looking-at pre-regexp) (markdown-cur-line-blank-p))
+          (while (and (or (looking-at-p pre-regexp) (markdown-cur-line-blank-p))
                       (not (eobp)))
             (forward-line))
           (skip-syntax-backward "-")
@@ -1517,7 +1517,7 @@ region to refontify."
           (markdown-end-of-block-element))
          ;; If this is the end of the indentation level, adjust levels accordingly.
          ;; Only match end of indentation level if levels is not the empty list.
-         ((and (car levels) (looking-at close-regexp))
+         ((and (car levels) (looking-at-p close-regexp))
           (setq levels (markdown-update-list-levels
                         nil (markdown-cur-line-indent) levels))
           (markdown-end-of-block-element))
@@ -2467,8 +2467,8 @@ Return nil if the current line is not the beginning of a list item."
   "Determine if the current line begins a new baseline level."
   (save-excursion
     (beginning-of-line)
-    (or (looking-at markdown-regex-header)
-        (looking-at markdown-regex-hr)
+    (or (looking-at-p markdown-regex-header)
+        (looking-at-p markdown-regex-hr)
         (and (null (markdown-cur-non-list-indent))
              (= (markdown-cur-line-indent) 0)
              (markdown-prev-line-blank-p)))))
@@ -2484,7 +2484,7 @@ Return nil if the current line is not the beginning of a list item."
         (cond
          ((markdown-new-baseline-p)
           (setq stop t))
-         ((looking-at markdown-regex-list)
+         ((looking-at-p markdown-regex-list)
           (setq stop nil))
          (t (setq stop t)))))))
 
@@ -2539,7 +2539,7 @@ immediately  after a list item, return nil."
          ;; Make sure this is not a header or hr
          ((markdown-new-baseline-p) (setq levels nil))
          ;; Make sure this is not a line from a pre block
-         ((looking-at pre-regexp))
+         ((looking-at-p pre-regexp))
          ;; If not, then update levels
          (t
           (setq indent (markdown-cur-line-indent))
@@ -2559,7 +2559,7 @@ upon failure."
     (while
         (cond
          ;; List item
-         ((and (looking-at markdown-regex-list)
+         ((and (looking-at-p markdown-regex-list)
                (setq bounds (markdown-cur-list-item-bounds)))
           (cond
            ;; Stop and return point at item of lesser or equal indentation
@@ -2582,9 +2582,9 @@ upon failure."
                (markdown-next-line-blank-p))
           (setq prev nil))
          ;; Stop at a header
-         ((looking-at markdown-regex-header) (setq prev nil))
+         ((looking-at-p markdown-regex-header) (setq prev nil))
          ;; Stop at a horizontal rule
-         ((looking-at markdown-regex-hr) (setq prev nil))
+         ((looking-at-p markdown-regex-hr) (setq prev nil))
          ;; Otherwise, continue.
          (t t))
       (forward-line -1)
@@ -2606,7 +2606,7 @@ upon failure."
          ;; Continue if the current line is blank
          ((markdown-cur-line-blank-p) t)
          ;; List item
-         ((and (looking-at markdown-regex-list)
+         ((and (looking-at-p markdown-regex-list)
                (setq bounds (markdown-cur-list-item-bounds)))
           (cond
            ;; Continue at item with greater indentation
@@ -2627,9 +2627,9 @@ upon failure."
                (markdown-prev-line-blank-p))
           (setq next nil))
          ;; Stop at a header
-         ((looking-at markdown-regex-header) (setq next nil))
+         ((looking-at-p markdown-regex-header) (setq next nil))
          ;; Stop at a horizontal rule
-         ((looking-at markdown-regex-hr) (setq next nil))
+         ((looking-at-p markdown-regex-hr) (setq next nil))
          ;; Otherwise, continue.
          (t t))
       (forward-line)
@@ -2656,11 +2656,11 @@ If the point is not in a list item, do nothing."
                (markdown-prev-line-blank-p))
           nil)
          ;; Stop at a new list item of the same or lesser indentation
-         ((looking-at markdown-regex-list) nil)
+         ((looking-at-p markdown-regex-list) nil)
          ;; Stop at a header
-         ((looking-at markdown-regex-header) nil)
+         ((looking-at-p markdown-regex-header) nil)
          ;; Stop at a horizontal rule
-         ((looking-at markdown-regex-hr) nil)
+         ((looking-at-p markdown-regex-hr) nil)
          ;; Otherwise, continue.
          (t t))
       (forward-line)
@@ -2978,7 +2978,7 @@ analysis."
               (< (match-end 0) last))
     (forward-line))
   (beginning-of-line)
-  (cond ((looking-at markdown-regex-hr)
+  (cond ((looking-at-p markdown-regex-hr)
          (forward-line)
          t)
         (t nil)))
@@ -3090,7 +3090,7 @@ into a variable to allow for dynamic let-binding.")
 Return the point where it was originally."
   (save-excursion
     (unless (eolp) (insert "\n"))
-    (unless (or (eobp) (looking-at "\n\\s-*\n")) (insert "\n"))))
+    (unless (or (eobp) (looking-at-p "\n\\s-*\n")) (insert "\n"))))
 
 (defun markdown-wrap-or-insert (s1 s2 &optional thing beg end)
   "Insert the strings S1 and S2, wrapping around region or THING.
@@ -3341,7 +3341,7 @@ be used to populate the title attribute when converted to XHTML."
       (setq end (point)))
     (when (> (length title) 0)
       (insert " \"" title "\""))
-    (unless (looking-at "\n")
+    (unless (looking-at-p "\n")
       (insert "\n"))
     (goto-char end)
     (when url
@@ -3830,7 +3830,7 @@ automatically in order to have the correct markup."
         (goto-char b)
         ;; if we're on a blank line, insert the quotes here, otherwise
         ;; add a new line first
-        (unless (looking-at "\n")
+        (unless (looking-at-p "\n")
           (newline)
           (forward-line -1))
         (markdown-ensure-blank-line-before)
@@ -4009,10 +4009,10 @@ The return value is a list (ID START END).  If point is not on a
 footnote, NIL is returned."
   ;; first make sure we're at a footnote marker
   (if (or (looking-back (concat "\\[\\^" markdown-footnote-chars "*\\]?") (line-beginning-position))
-          (looking-at (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
+          (looking-at-p (concat "\\[?\\^" markdown-footnote-chars "*?\\]")))
       (save-excursion
         ;; move point between [ and ^:
-        (if (looking-at "\\[")
+        (if (looking-at-p "\\[")
             (forward-char 1)
           (skip-chars-backward "^["))
         (looking-at (concat "\\(\\^" markdown-footnote-chars "*?\\)\\]"))
@@ -4238,7 +4238,7 @@ Otherwise, do normal delete by repeating
       (goto-char beg)
       (while (< (point) end)
         (back-to-indentation)
-        (unless (looking-at "[ \t]*$")
+        (unless (looking-at-p "[ \t]*$")
           (setq mincol (min mincol (current-column))))
         (forward-line 1)
         ))
@@ -5014,7 +5014,7 @@ increase the indentation by one level."
       (when bounds
         (cond ((save-excursion
                  (skip-chars-backward " \t")
-                 (looking-at markdown-regex-list))
+                 (looking-at-p markdown-regex-list))
                (beginning-of-line)
                (insert "\n")
                (forward-line -1))
@@ -5288,9 +5288,9 @@ Stops at blank lines, list items, headers, and horizontal rules."
   (forward-line)
   (while (and (or (not (markdown-prev-line-blank-p))
                   (markdown-cur-line-blank-p))
-              (not (or (looking-at markdown-regex-list)
-                       (looking-at markdown-regex-header)
-                       (looking-at markdown-regex-hr)))
+              (not (or (looking-at-p markdown-regex-list)
+                       (looking-at-p markdown-regex-header)
+                       (looking-at-p markdown-regex-hr)))
               (not (eobp)))
     (forward-line)))
 
@@ -6323,7 +6323,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
    ;; List items
    ((looking-at markdown-regex-list)
     (match-string-no-properties 0))
-   ((looking-at markdown-regex-footnote-definition)
+   ((looking-at-p markdown-regex-footnote-definition)
     "    ") ; four spaces
    ;; No match
    (t nil)))
@@ -6335,7 +6335,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     (when (< arg 0)
       (while (and (not (eobp))
                   (progn (move-to-left-margin) (not (eobp)))
-                  (looking-at paragraph-separate))
+                  (looking-at-p paragraph-separate))
         (forward-line 1))
       (if (looking-at markdown-regex-list)
           (forward-char (length (match-string 0)))
