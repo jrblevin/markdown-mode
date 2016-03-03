@@ -1879,12 +1879,7 @@ start which was previously propertized."
        (cond ((match-string-no-properties 2) 'markdown-heading-1-setext)
              ((match-string-no-properties 3) 'markdown-heading-2-setext)
              (t (let ((atx-level (length (match-string-no-properties 4))))
-                  (cond ((= atx-level 1) 'markdown-heading-1-atx)
-                        ((= atx-level 2) 'markdown-heading-2-atx)
-                        ((= atx-level 3) 'markdown-heading-3-atx)
-                        ((= atx-level 4) 'markdown-heading-4-atx)
-                        ((= atx-level 5) 'markdown-heading-5-atx)
-                        ((= atx-level 6) 'markdown-heading-6-atx)))))
+                  (intern (format "markdown-heading-%d-atx" atx-level)))))
        (match-data t)))))
 
 (defun markdown-syntax-propertize-comments (start end)
@@ -1910,31 +1905,36 @@ start which was previously propertized."
      ;; Nothing found
      (t nil))))
 
+(defvar markdown--syntax-properties
+  (list 'markdown-tilde-fence-begin nil
+        'markdown-tilde-fence-end nil
+        'markdown-fenced-code nil
+        'markdown-yaml-metadata-begin nil
+        'markdown-yaml-metadata-end nil
+        'markdown-yaml-metadata-section nil
+        'markdown-gfm-block-begin nil
+        'markdown-gfm-block-end nil
+        'markdown-gfm-code nil
+        'markdown-pre nil
+        'markdown-blockquote nil
+        'markdown-heading nil
+        'markdown-heading-1-setext nil
+        'markdown-heading-2-setext nil
+        'markdown-heading-1-atx nil
+        'markdown-heading-2-atx nil
+        'markdown-heading-3-atx nil
+        'markdown-heading-4-atx nil
+        'markdown-heading-5-atx nil
+        'markdown-heading-6-atx nil
+        'markdown-metadata-key nil
+        'markdown-metadata-value nil
+        'markdown-metadata-markup nil)
+  "Property list of all known markdown syntactic properties.")
+
 (defun markdown-syntax-propertize (start end)
   "See `syntax-propertize-function'."
-  (remove-text-properties start end '(markdown-tilde-fence-begin))
-  (remove-text-properties start end '(markdown-tilde-fence-end))
-  (remove-text-properties start end '(markdown-fenced-code))
-  (remove-text-properties start end '(markdown-yaml-metadata-begin))
-  (remove-text-properties start end '(markdown-yaml-metadata-end))
-  (remove-text-properties start end '(markdown-yaml-metadata-section))
-  (remove-text-properties start end '(markdown-gfm-block-begin))
-  (remove-text-properties start end '(markdown-gfm-block-end))
-  (remove-text-properties start end '(markdown-gfm-code))
-  (remove-text-properties start end '(markdown-pre))
-  (remove-text-properties start end '(markdown-blockquote))
-  (remove-text-properties start end '(markdown-heading))
-  (remove-text-properties start end '(markdown-heading-1-setext))
-  (remove-text-properties start end '(markdown-heading-2-setext))
-  (remove-text-properties start end '(markdown-heading-1-atx))
-  (remove-text-properties start end '(markdown-heading-2-atx))
-  (remove-text-properties start end '(markdown-heading-3-atx))
-  (remove-text-properties start end '(markdown-heading-4-atx))
-  (remove-text-properties start end '(markdown-heading-5-atx))
-  (remove-text-properties start end '(markdown-heading-6-atx))
-  (remove-text-properties start end '(markdown-metadata-key))
-  (remove-text-properties start end '(markdown-metadata-value))
-  (remove-text-properties start end '(markdown-metadata-markup))
+  (remove-text-properties start end markdown--syntax-properties)
+  
   (markdown-syntax-propertize-fenced-block-constructs start end)
   (markdown-syntax-propertize-yaml-metadata start end)
   (markdown-syntax-propertize-pre-blocks start end)
@@ -2209,106 +2209,103 @@ See `font-lock-syntactic-face-function' for details."
      (t nil))))
 
 (defvar markdown-mode-font-lock-keywords-basic
-  (list
-   (cons 'markdown-match-yaml-metadata-begin '((1 markdown-markup-face)))
-   (cons 'markdown-match-yaml-metadata-end '((1 markdown-markup-face)))
-   (cons 'markdown-match-yaml-metadata-key '((1 markdown-metadata-key-face)
-                                             (2 markdown-markup-face)
-                                             (3 markdown-metadata-value-face)))
-   (cons 'markdown-match-gfm-open-code-blocks
-         '((1 markdown-markup-face)
-           (2 markdown-language-keyword-face nil t)))
-   (cons 'markdown-match-gfm-close-code-blocks
-         '((1 markdown-markup-face)))
-   (cons 'markdown-match-gfm-code-blocks '((0 markdown-pre-face)))
-   (cons 'markdown-match-fenced-start-code-block
-         '((1 markdown-markup-face)
-           (2 markdown-language-keyword-face nil t)))
-   (cons 'markdown-match-fenced-end-code-block '((0 markdown-markup-face)))
-   (cons 'markdown-match-fenced-code-blocks '((0 markdown-pre-face)))
-   (cons 'markdown-match-pre-blocks '((0 markdown-pre-face)))
-   (cons 'markdown-match-blockquotes '((1 markdown-markup-face)
-                                       (2 markdown-blockquote-face)))
-   (cons 'markdown-match-heading-1-setext '((1 markdown-header-face-1)
-                                            (2 markdown-header-rule-face)))
-   (cons 'markdown-match-heading-2-setext '((1 markdown-header-face-2)
-                                            (3 markdown-header-rule-face)))
-   (cons 'markdown-match-heading-6-atx '((4 markdown-header-delimiter-face)
-                                         (5 markdown-header-face-6)
-                                         (6 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-5-atx '((4 markdown-header-delimiter-face)
-                                         (5 markdown-header-face-5)
-                                         (6 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-4-atx '((4 markdown-header-delimiter-face)
-                                         (5 markdown-header-face-4)
-                                         (6 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-3-atx '((4 markdown-header-delimiter-face)
-                                         (5 markdown-header-face-3)
-                                         (6 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-2-atx '((4 markdown-header-delimiter-face)
-                                         (5 markdown-header-face-2)
-                                         (6 markdown-header-delimiter-face)))
-   (cons 'markdown-match-heading-1-atx '((4 markdown-header-delimiter-face)
-                                         (5 markdown-header-face-1)
-                                         (6 markdown-header-delimiter-face)))
-   (cons 'markdown-match-multimarkdown-metadata '((1 markdown-metadata-key-face)
-                                                  (2 markdown-markup-face)
-                                                  (3 markdown-metadata-value-face)))
-   (cons 'markdown-match-pandoc-metadata '((1 markdown-markup-face)
-                                           (2 markdown-markup-face)
-                                           (3 markdown-metadata-value-face)))
-   (cons 'markdown-match-hr 'markdown-header-delimiter-face)
-   (cons 'markdown-match-code '((1 markdown-markup-face)
-                                (2 markdown-inline-code-face)
-                                (3 markdown-markup-face)))
-   (cons markdown-regex-kbd '((1 markdown-markup-face)
-                              (2 markdown-inline-code-face)
-                              (3 markdown-markup-face)))
-   (cons markdown-regex-angle-uri '((1 markdown-markup-face)
-                                    (2 markdown-link-face)
-                                    (3 markdown-markup-face)))
-   (cons markdown-regex-list '(2 markdown-list-face))
-   (cons markdown-regex-footnote '((1 markdown-markup-face)   ; [^
-                                   (2 markdown-footnote-face) ; label
-                                   (3 markdown-markup-face))) ; ]
-   (cons markdown-regex-link-inline '((1 markdown-markup-face nil t)     ; ! (optional)
-                                      (2 markdown-markup-face)           ; [
-                                      (3 markdown-link-face)             ; text
-                                      (4 markdown-markup-face)           ; ]
-                                      (5 markdown-markup-face)           ; (
-                                      (6 markdown-url-face)              ; url
-                                      (7 markdown-link-title-face nil t) ; "title" (optional)
-                                      (8 markdown-markup-face)))         ; )
-   (cons markdown-regex-link-reference '((1 markdown-markup-face nil t) ; ! (optional)
-                                         (2 markdown-markup-face)       ; [
-                                         (3 markdown-link-face)         ; text
-                                         (4 markdown-markup-face)       ; ]
-                                         (5 markdown-markup-face)       ; [
-                                         (6 markdown-reference-face)    ; label
-                                         (7 markdown-markup-face)))     ; ]
-   (cons markdown-regex-reference-definition '((1 markdown-markup-face)       ; [
-                                               (2 markdown-reference-face)    ; label
-                                               (3 markdown-markup-face)       ; ]
-                                               (4 markdown-markup-face)       ; :
-                                               (5 markdown-url-face)          ; url
-                                               (6 markdown-link-title-face))) ; "title" (optional)
-   ;; Math mode $..$
-   (cons 'markdown-match-math-single '((1 markdown-markup-face prepend)
-                                       (2 markdown-math-face append)
-                                       (3 markdown-markup-face prepend)))
-   ;; Math mode $$..$$
-   (cons 'markdown-match-math-double '((1 markdown-markup-face prepend)
-                                       (2 markdown-math-face append)
-                                       (3 markdown-markup-face prepend)))
-   (cons 'markdown-match-bold '((1 markdown-markup-face prepend)
-                                (2 markdown-bold-face append)
-                                (3 markdown-markup-face prepend)))
-   (cons 'markdown-match-italic '((1 markdown-markup-face prepend)
-                                  (2 markdown-italic-face append)
-                                  (3 markdown-markup-face prepend)))
-   (cons markdown-regex-uri 'markdown-link-face)
-   (cons markdown-regex-email 'markdown-link-face)
-   (cons markdown-regex-line-break '(1 markdown-line-break-face prepend)))
+  `((markdown-match-yaml-metadata-begin . ((1 markdown-markup-face)))
+    (markdown-match-yaml-metadata-end . ((1 markdown-markup-face)))
+    (markdown-match-yaml-metadata-key . ((1 markdown-metadata-key-face)
+                                         (2 markdown-markup-face)
+                                         (3 markdown-metadata-value-face)))
+    (markdown-match-gfm-open-code-blocks . ((1 markdown-markup-face)
+                                            (2 markdown-language-keyword-face nil t)))
+    (markdown-match-gfm-close-code-blocks . ((1 markdown-markup-face)))
+    (markdown-match-gfm-code-blocks . ((0 markdown-pre-face)))
+    (markdown-match-fenced-start-code-block . ((1 markdown-markup-face)
+                                               (2 markdown-language-keyword-face nil t)))
+    (markdown-match-fenced-end-code-block . ((0 markdown-markup-face)))
+    (markdown-match-fenced-code-blocks . ((0 markdown-pre-face)))
+    (markdown-match-pre-blocks . ((0 markdown-pre-face)))
+    (markdown-match-blockquotes . ((1 markdown-markup-face)
+                                   (2 markdown-blockquote-face)))
+    (markdown-match-heading-1-setext . ((1 markdown-header-face-1)
+                                        (2 markdown-header-rule-face)))
+    (markdown-match-heading-2-setext . ((1 markdown-header-face-2)
+                                        (3 markdown-header-rule-face)))
+    (markdown-match-heading-6-atx . ((4 markdown-header-delimiter-face)
+                                     (5 markdown-header-face-6)
+                                     (6 markdown-header-delimiter-face)))
+    (markdown-match-heading-5-atx . ((4 markdown-header-delimiter-face)
+                                     (5 markdown-header-face-5)
+                                     (6 markdown-header-delimiter-face)))
+    (markdown-match-heading-4-atx . ((4 markdown-header-delimiter-face)
+                                     (5 markdown-header-face-4)
+                                     (6 markdown-header-delimiter-face)))
+    (markdown-match-heading-3-atx . ((4 markdown-header-delimiter-face)
+                                     (5 markdown-header-face-3)
+                                     (6 markdown-header-delimiter-face)))
+    (markdown-match-heading-2-atx . ((4 markdown-header-delimiter-face)
+                                     (5 markdown-header-face-2)
+                                     (6 markdown-header-delimiter-face)))
+    (markdown-match-heading-1-atx . ((4 markdown-header-delimiter-face)
+                                     (5 markdown-header-face-1)
+                                     (6 markdown-header-delimiter-face)))
+    (markdown-match-multimarkdown-metadata . ((1 markdown-metadata-key-face)
+                                              (2 markdown-markup-face)
+                                              (3 markdown-metadata-value-face)))
+    (markdown-match-pandoc-metadata . ((1 markdown-markup-face)
+                                       (2 markdown-markup-face)
+                                       (3 markdown-metadata-value-face)))
+    (markdown-match-hr . markdown-header-delimiter-face)
+    (markdown-match-code . ((1 markdown-markup-face)
+                            (2 markdown-inline-code-face)
+                            (3 markdown-markup-face)))
+    (,markdown-regex-kbd . ((1 markdown-markup-face)
+                            (2 markdown-inline-code-face)
+                            (3 markdown-markup-face)))
+    (,markdown-regex-angle-uri . ((1 markdown-markup-face)
+                                  (2 markdown-link-face)
+                                  (3 markdown-markup-face)))
+    (,markdown-regex-list . (2 markdown-list-face))
+    (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
+                                 (2 markdown-footnote-face)        ; label
+                                 (3 markdown-markup-face)))        ; ]
+    (,markdown-regex-link-inline . ((1 markdown-markup-face nil t) ; ! (optional)
+                                    (2 markdown-markup-face)       ; [
+                                    (3 markdown-link-face)         ; text
+                                    (4 markdown-markup-face)       ; ]
+                                    (5 markdown-markup-face)       ; (
+                                    (6 markdown-url-face)          ; url
+                                    (7 markdown-link-title-face nil t) ; "title" (optional)
+                                    (8 markdown-markup-face)))         ; )
+    (,markdown-regex-link-reference . ((1 markdown-markup-face nil t) ; ! (optional)
+                                       (2 markdown-markup-face)       ; [
+                                       (3 markdown-link-face)         ; text
+                                       (4 markdown-markup-face)       ; ]
+                                       (5 markdown-markup-face)       ; [
+                                       (6 markdown-reference-face)    ; label
+                                       (7 markdown-markup-face)))     ; ]
+    (,markdown-regex-reference-definition . ((1 markdown-markup-face) ; [
+                                             (2 markdown-reference-face) ; label
+                                             (3 markdown-markup-face)    ; ]
+                                             (4 markdown-markup-face)    ; :
+                                             (5 markdown-url-face)       ; url
+                                             (6 markdown-link-title-face))) ; "title" (optional)
+    ;; Math mode $..$
+    (markdown-match-math-single . ((1 markdown-markup-face prepend)
+                                   (2 markdown-math-face append)
+                                   (3 markdown-markup-face prepend)))
+    ;; Math mode $$..$$
+    (markdown-match-math-double . ((1 markdown-markup-face prepend)
+                                   (2 markdown-math-face append)
+                                   (3 markdown-markup-face prepend)))
+    (markdown-match-bold . ((1 markdown-markup-face prepend)
+                            (2 markdown-bold-face append)
+                            (3 markdown-markup-face prepend)))
+    (markdown-match-italic . ((1 markdown-markup-face prepend)
+                              (2 markdown-italic-face append)
+                              (3 markdown-markup-face prepend)))
+    (,markdown-regex-uri . markdown-link-face)
+    (,markdown-regex-email . markdown-link-face)
+    (,markdown-regex-line-break . (1 markdown-line-break-face prepend)))
+
   "Syntax highlighting for Markdown files.")
 
 (defvar markdown-mode-font-lock-keywords nil
@@ -3306,10 +3303,10 @@ URL and TITLE are optional.  When given, the TITLE will
 be used to populate the title attribute when converted to XHTML."
   ;; END specifies where to leave the point upon return
   (let ((end (point)))
-    (cond
-     ((eq markdown-reference-location 'end) (goto-char (point-max)))
-     ((eq markdown-reference-location 'immediately) (markdown-end-of-block))
-     ((eq markdown-reference-location 'header) (markdown-end-of-defun)))
+    (cl-case markdown-reference-location
+      (end         (goto-char (point-max)))
+      (immediately (markdown-end-of-block))
+      (header      (markdown-end-of-defun)))
     (unless (markdown-cur-line-blank-p) (insert "\n"))
     (insert "\n[" label "]: ")
     (if url
@@ -5901,7 +5898,7 @@ live."
             (cl-case pt-or-sym
               (min (list (point-min) 0))
               (max (list (point-max) diff))
-              (t (list pt-or-sym diff)))
+              (t   (list pt-or-sym diff)))
           (set-window-start
            win (markdown-get-point-back-lines actual-pt actual-diff))
           (set-window-point win actual-pt))))))
