@@ -904,7 +904,7 @@
   "History of used reference labels.")
 
 (defvar markdown-live-preview-mode nil
-  "Sentinel variable for `markdown-live-preview-mode'.")
+  "Sentinel variable for command `markdown-live-preview-mode'.")
 
 (defvar markdown-gfm-language-history nil
   "History list of languages used in the current buffer in GFM code blocks.")
@@ -1116,36 +1116,38 @@ completion."
   :type 'boolean)
 
 (defcustom markdown-use-pandoc-style-yaml-metadata nil
-  "When non-nil, allow yaml metadata anywhere in the document, and allow
-ellipses to close a metadata region."
+  "When non-nil, allow yaml metadata anywhere in the document."
   :group 'markdown
   :type 'boolean)
 
 (defcustom markdown-live-preview-window-function
   'markdown-live-preview-window-eww
-  "Function to display preview of Markdown output within Emacs. Function must
-update the buffer containing the preview and return the buffer."
+  "Function to display preview of Markdown output within Emacs.
+Function must update the buffer containing the preview and return
+the buffer."
   :group 'markdown
   :type 'function)
 
 (defcustom markdown-live-preview-delete-export 'delete-on-destroy
-  "Delete exported html file when using `markdown-live-preview-export' on every
-export by setting to 'delete-on-export, when quitting
-`markdown-live-preview-mode' by setting to 'delete-on-destroy, or not at all
-when nil."
+  "Delete exported html file when using `markdown-live-preview-export'.
+If set to 'delete-on-export, delete on every export. When set to
+'delete-on-destroy delete when quitting from command
+`markdown-live-preview-mode'. Never delete if set to nil."
   :group 'markdown
   :type 'symbol)
 
 (defcustom markdown-list-indent-width 4
-  "Depth of indentation for markdown lists. Used in `markdown-demote-list-item'
-and `markdown-promote-list-item'."
+  "Depth of indentation for markdown lists.
+Used in `markdown-demote-list-item' and
+`markdown-promote-list-item'."
   :group 'markdown
   :type 'integer)
 
 (defcustom markdown-gfm-additional-languages nil
-  "Additional languages to make available when inserting GFM code
-blocks. Language strings must have be trimmed of whitespace and not contain any
-curly braces. They may be of arbitrary capitalization, though."
+  "Extra languages made available when inserting GFM code blocks.
+Language strings must have be trimmed of whitespace and not
+contain any curly braces. They may be of arbitrary
+capitalization, though."
   :group 'markdown
   :type '(repeat (string :validate markdown-validate-language-string)))
 
@@ -1155,7 +1157,8 @@ curly braces. They may be of arbitrary capitalization, though."
   :type 'boolean)
 
 (defcustom markdown-gfm-downcase-languages t
-  "Downcase suggested languages when inserting them to code blocks with
+  "If non-nil, downcase suggested languages.
+This applies to insertions done with
 `markdown-electric-backquote'."
   :group 'markdown
   :type 'boolean)
@@ -1415,7 +1418,9 @@ Groups 1 and 3 match the opening and closing delimiters.
 Group 2 matches the mathematical expression contained within.")
 
 (defsubst markdown-make-tilde-fence-regex (num-tildes &optional end-of-line)
-  "Return regexp which matches a Pandoc code fence at least NUM-TILDES long."
+  "Return regexp matching a Pandoc code fence at least NUM-TILDES long.
+END-OF-LINE is the regexp construct to indicate end of line; $ if
+missing."
   (format "%s%d%s%s" "^\\([~]\\{" num-tildes ",\\}\\)" (or end-of-line "$")))
 
 (defconst markdown-regex-tilde-fence-begin
@@ -1476,9 +1481,9 @@ Function is called repeatedly until it returns nil. For details, see
           (cons new-start new-end))))))
 
 (defun markdown-font-lock-extend-region-function (start end _)
-  "Used in `jit-lock-after-change-extend-region-functions'. Delegates to
-`markdown-syntax-propertize-extend-region'. START and END are the previous
-region to refontify."
+  "Used in `jit-lock-after-change-extend-region-functions'.
+Delegates to `markdown-syntax-propertize-extend-region'. START
+and END are the previous region to refontify."
   (let ((res (markdown-syntax-propertize-extend-region start end)))
     (when res
       (setq jit-lock-start (car res)
@@ -1544,16 +1549,17 @@ region to refontify."
     ((,markdown-regex-gfm-code-block-open markdown-gfm-block-begin)
      (,markdown-regex-gfm-code-block-close markdown-gfm-block-end)
      markdown-gfm-code))
-  "Mapping of regular expressions to \"fenced-block\" constructs. These
-constructs are distinguished by having a distinctive start and end pattern, both
-of which take up an entire line of text, but no special pattern to identify text
-within the fenced blocks (unlike blockquotes and indented-code sections).
+  "Mapping of regular expressions to \"fenced-block\" constructs.
+These constructs are distinguished by having a distinctive start
+and end pattern, both of which take up an entire line of text,
+but no special pattern to identify text within the fenced
+blocks (unlike blockquotes and indented-code sections).
 
 Each element within this list takes the form:
 
-((START-REGEX-OR-FUN START-PROPERTY)
- (END-REGEX-OR-FUN END-PROPERTY)
- MIDDLE-PROPERTY)
+  ((START-REGEX-OR-FUN START-PROPERTY)
+   (END-REGEX-OR-FUN END-PROPERTY)
+   MIDDLE-PROPERTY)
 
 Each *-REGEX-OR-FUN element can be a regular expression as a string, or a
 function which evaluates to same. Functions for START-REGEX-OR-FUN accept no
@@ -1579,10 +1585,10 @@ easier.")
   (cond ((functionp object)
          (if arg (funcall object arg) (funcall object)))
         ((stringp object) object)
-        (t (error "object cannot be turned into regex"))))
+        (t (error "Object cannot be turned into regex"))))
 
 (defsubst markdown-get-start-fence-regexp ()
-  "Returns regexp which finds all \"start\" sections of fenced block constructs.
+  "Return regexp to find all \"start\" sections of fenced block constructs.
 Which construct is actually contained in the match must be found separately."
   (mapconcat
    'identity
@@ -1600,8 +1606,9 @@ Which construct is actually contained in the match must be found separately."
   (cl-mapcar #'cl-third markdown-fenced-block-pairs))
 
 (defun markdown-find-previous-prop (prop &optional lim)
-  "Find previous place where property PROP is non-nil, up to LIM. Return a cons
-of (pos . property). pos is point if point contains non-nil PROP."
+  "Find previous place where property PROP is non-nil, up to LIM.
+Return a cons of (pos . property). pos is point if point contains
+non-nil PROP."
   (let ((res
          (if (get-text-property (point) prop) (point)
            (previous-single-property-change
@@ -1613,8 +1620,9 @@ of (pos . property). pos is point if point contains non-nil PROP."
     (when (and res (get-text-property res prop)) (cons res prop))))
 
 (defun markdown-find-next-prop (prop &optional lim)
-  "Find next place where property PROP is non-nil, up to LIM. Return a cons of
-(pos . property). pos is point if point contains non-nil PROP."
+  "Find next place where property PROP is non-nil, up to LIM.
+Return a cons of (POS . PROPERTY) where POS is point if point
+contains non-nil PROP."
   (let ((res
          (if (get-text-property (point) prop) (point)
            (next-single-property-change
@@ -1622,8 +1630,7 @@ of (pos . property). pos is point if point contains non-nil PROP."
     (when (and res (get-text-property res prop)) (cons res prop))))
 
 (defun markdown-min-of-seq (map-fn seq)
-  "After applying MAP-FN to SEQ, return element of SEQ which had the minimum
-value of MAP-FN."
+  "Apply MAP-FN to SEQ and return element of SEQ with minimum value of MAP-FN."
   (cl-loop for el in seq
            with min = 1.0e+INF          ; infinity
            with min-el = nil
@@ -1634,7 +1641,8 @@ value of MAP-FN."
            finally return min-el))
 
 (defun markdown-find-previous-block ()
-  "Detect whether `markdown-syntax-propertize-fenced-block-constructs' was
+  "Find previous block.
+Detect whether `markdown-syntax-propertize-fenced-block-constructs' was
 unable to propertize the entire block, but was able to propertize the beginning
 of the block. If so, return a cons of (pos . property) where the beginning of
 the block was propertized."
@@ -1745,9 +1753,10 @@ Return value is a list usable as `match-data'."
     (list begin-of-begin end-of-end)))
 
 (defun markdown-get-enclosing-fenced-block-construct (&optional pos)
-  "Get \"fake\" match data for block enclosing POS. Returns fake match data
-which encloses the start, middle, and end of the block construct enclosing POS,
-if it exists. Used in `markdown-code-block-at-pos'."
+  "Get \"fake\" match data for block enclosing POS.
+Returns fake match data which encloses the start, middle, and end
+of the block construct enclosing POS, if it exists. Used in
+`markdown-code-block-at-pos'."
   (save-excursion
     (when pos (goto-char pos))
     (beginning-of-line)
@@ -1938,7 +1947,8 @@ start which was previously propertized."
   "Property list of all known markdown syntactic properties.")
 
 (defun markdown-syntax-propertize (start end)
-  "See `syntax-propertize-function'."
+  "Function used as `syntax-propertize-function'.
+START and END delimit region to propertize."
   (remove-text-properties start end markdown--syntax-properties)
   (markdown-syntax-propertize-fenced-block-constructs start end)
   (markdown-syntax-propertize-yaml-metadata start end)
@@ -2206,7 +2216,7 @@ start which was previously propertized."
   :group 'markdown-faces)
 
 (defun markdown-syntactic-face (state)
-  "Returns a font-lock face for characters with given STATE.
+  "Return font-lock face for characters with given STATE.
 See `font-lock-syntactic-face-function' for details."
   (let ((in-comment (nth 4 state)))
     (cond
@@ -2845,7 +2855,9 @@ Return nil otherwise."
           (goto-char (1+ (match-end 0)))))))))
 
 (defun markdown-match-math-generic (regex last)
-  "Match quoted $..$ or $$..$$ math from point to LAST."
+  "Match REGEX from point to LAST.
+REGEX is either `markdown-regex-math-inline-single' for matching
+$..$ or `markdown-regex-math-inline-double' for matching $$..$$."
   (when (and markdown-enable-math (markdown-match-inline-generic regex last))
     (let ((begin (match-beginning 1)) (end (match-end 1)))
       (prog1
@@ -2986,8 +2998,9 @@ analysis."
      collect (list cur-result (match-data)))))
 
 (defvar markdown-conditional-search-function #'re-search-forward
-  "Conditional search function used in `markdown-search-until-condition'. Made
-into a variable to allow for dynamic let-binding.")
+  "Conditional search function used in `markdown-search-until-condition'.
+Made into a variable to allow for dynamic let-binding.")
+
 (defun markdown-search-until-condition (condition &rest args)
   (let (ret)
     (while (and (not ret) (apply markdown-conditional-search-function args))
@@ -2996,9 +3009,10 @@ into a variable to allow for dynamic let-binding.")
 
 (defun markdown-match-generic-metadata
     (regexp last &optional start-header end-header)
-  "Match generic metadata specified by REGEXP from the point to LAST."
-  ;; if start-header is nil, we assume metadata can only occur at the very top
-  ;; of a file ("\\`"). if end-header is nil, we assume it is "\n\n"
+  "Match generic metadata specified by REGEXP from the point to LAST.
+If START-HEADER is nil, we assume metadata can only occur at the
+very top of a file (\"\\`\"). If END-HEADER is nil, we assume it
+is \"\n\n\""
   (let* ((header-bounds
           (markdown-get-match-boundaries start-header end-header last))
          (enclosing-header
@@ -3739,8 +3753,9 @@ if three backquotes inserted at the beginning of line."
   "Language specifiers recognized by github's syntax highlighting features.")
 
 (defvar markdown-gfm-used-languages nil
-  "Languages used in the current buffer in GFM code blocks, which are not
-already in `markdown-gfm-recognized-languages' or
+  "Languages in GFM code blocks which are not explicitly declared.
+Known language are declared in
+`markdown-gfm-recognized-languages' and
 `markdown-gfm-additional-languages'.")
 (make-variable-buffer-local 'markdown-gfm-used-languages)
 (defvar markdown-gfm-last-used-language nil
@@ -5331,7 +5346,8 @@ With argument, repeats or can move backward if negative."
 
 (defun markdown-move-heading-common (move-fn &optional arg)
   "Wrapper for `outline-mode' functions to skip false positives.
-For example, headings inside preformatted code blocks may match
+MOVE-FN is a function and ARG is its argument. For example,
+headings inside preformatted code blocks may match
 `outline-regexp' but should not be considered as headings."
   (funcall move-fn arg)
   (let ((prev -1))
@@ -5341,13 +5357,15 @@ For example, headings inside preformatted code blocks may match
 
 (defun markdown-next-visible-heading (arg)
   "Move to the next visible heading line of any level.
-With argument, repeats or can move backward if negative."
+With argument, repeats or can move backward if negative. ARG is
+passed to `outline-next-visible-heading'."
   (interactive "p")
   (markdown-move-heading-common 'outline-next-visible-heading arg))
 
 (defun markdown-previous-visible-heading (arg)
   "Move to the previous visible heading line of any level.
-With argument, repeats or can move backward if negative."
+With argument, repeats or can move backward if negative. ARG is
+passed to `outline-previous-visible-heading'."
   (interactive "p")
   (markdown-move-heading-common 'outline-previous-visible-heading arg))
 
@@ -5557,8 +5575,10 @@ Calls `markdown-cycle' with argument t."
 
 (defun markdown-promote-subtree (&optional arg)
   "Promote the current subtree of ATX headings.
-Note that Markdown does not support heading levels higher than six
-and therefore level-six headings will not be promoted further."
+Note that Markdown does not support heading levels higher than
+six and therefore level-six headings will not be promoted
+further. If ARG is non-nil promote the heading, otherwise
+demote."
   (interactive "*P")
   (save-excursion
     (when (and (or (thing-at-point-looking-at markdown-regex-header-atx)
@@ -5837,8 +5857,8 @@ current filename, but with the extension removed and replaced with .html."
 (make-variable-buffer-local 'markdown-live-preview-buffer)
 
 (defvar markdown-live-preview-source-buffer nil
-  "Buffer with markdown source generating the source of the current
-buffer. Inverse of `markdown-live-preview-buffer'.")
+  "Source buffer from which current buffer was generated.
+This is the inverse of `markdown-live-preview-buffer'.")
 (make-variable-buffer-local 'markdown-live-preview-source-buffer)
 
 (defvar markdown-live-preview-currently-exporting nil)
@@ -5848,12 +5868,13 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
   (markdown-export-file-name ".html"))
 
 (defun markdown-live-preview-window-eww (file)
-  "A `markdown-live-preview-window-function' for previewing with eww."
+  "Preview FILE with eww.
+To be used with `markdown-live-preview-window-function'."
   (if (require 'eww nil t)
       (progn
         (eww-open-file file)
         (get-buffer "*eww*"))
-    (error "eww is not present or not loaded on this version of emacs")))
+    (error "EWW is not present or not loaded on this version of Emacs")))
 
 (defun markdown-visual-lines-between-points (beg end)
   (save-excursion
@@ -5865,8 +5886,7 @@ buffer. Inverse of `markdown-live-preview-buffer'.")
              finally return count)))
 
 (defun markdown-live-preview-window-serialize (buf)
-  "Get window point and scroll data for all windows displaying BUF if BUF is
-live."
+  "Get window point and scroll data for all windows displaying BUF."
   (when (buffer-live-p buf)
     (with-current-buffer buf
       (mapcar
@@ -5893,8 +5913,8 @@ live."
     (point)))
 
 (defun markdown-live-preview-window-deserialize (window-posns)
-  "Apply window point and scroll data from WINDOW-POSNS, given by
-`markdown-live-preview-window-serialize'."
+  "Apply window point and scroll data from WINDOW-POSNS.
+WINDOW-POSNS is provided by `markdown-live-preview-window-serialize'."
   (cl-destructuring-bind (win pt-or-sym diff) window-posns
     (when (window-live-p win)
       (with-current-buffer markdown-live-preview-buffer
@@ -5909,9 +5929,10 @@ live."
           (set-window-point win actual-pt))))))
 
 (defun markdown-live-preview-export ()
-  "Export to XHTML using `markdown-export' and browse the resulting file within
-Emacs using `markdown-live-preview-window-function' Return the buffer displaying
-the rendered output."
+  "Export to XHTML using `markdown-export'.
+Browse the resulting file within Emacs using
+`markdown-live-preview-window-function' Return the buffer
+displaying the rendered output."
   (interactive)
   (let* ((markdown-live-preview-currently-exporting t)
          (cur-buf (current-buffer))
@@ -5975,6 +5996,7 @@ the rendered output."
          (setq markdown-live-preview-source-buffer nil))))
 
 (defun markdown-live-preview-switch-to-output ()
+  "Switch to output buffer."
   (interactive)
   "Turn on `markdown-live-preview-mode' if not already on, and switch to its
 output buffer in another window."
@@ -5983,6 +6005,7 @@ output buffer in another window."
     (markdown-live-preview-mode))
 
 (defun markdown-live-preview-re-export ()
+  "Re export source buffer."
   (interactive)
   "If the current buffer is a buffer displaying the exported version of a
 `markdown-live-preview-mode' buffer, call `markdown-live-preview-export' and
@@ -6051,7 +6074,7 @@ not at a link or the link reference is not defined returns nil."
 ;;; WikiLink Following/Markup =================================================
 
 (defun markdown-wiki-link-p ()
-  "Return non-nil when wiki links are enabled and `point' is at a true wiki link.
+  "Return non-nil if wiki links are enabled and `point' is at a true wiki link.
 A true wiki link name matches `markdown-regex-wiki-link' but does
 not match the current file name after conversion.  This modifies
 the data returned by `match-data'.  Note that the potential wiki
@@ -6346,8 +6369,8 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     (markdown-setup-wiki-link-hooks)))
 
 (defun markdown-handle-local-variables ()
-  "Runs as a `hack-local-variables-hook' to update font lock rules.
-Checks to see if there is actually a markdown-mode file local variable
+  "Run in `hack-local-variables-hook' to update font lock rules.
+Checks to see if there is actually a ‘markdown-mode’ file local variable
 before regenerating font-lock rules for extensions."
   (when (and (boundp 'file-local-variables-alist)
              (assoc 'markdown-enable-wiki-links file-local-variables-alist)
@@ -6450,7 +6473,7 @@ if ARG is omitted or nil."
   'action #'markdown-toggle-gfm-checkbox)
 
 (defun markdown-toggle-gfm-checkbox (button)
-  "Toggle a GFM checkbox clicked on."
+  "Toggle GFM checkbox BUTTON on click."
   (save-match-data
     (save-excursion
       (goto-char (button-start button))
@@ -6471,7 +6494,8 @@ if ARG is omitted or nil."
 
 ;; Called when any modification is made to buffer text.
 (defun markdown-gfm-checkbox-after-change-function (beg end _)
-  "Add to `after-change-functions' to setup GFM checkboxes as buttons."
+  "Add to `after-change-functions' to setup GFM checkboxes as buttons.
+BEG and END are the limits of scanned region."
   (save-excursion
     (save-match-data
       ;; Rescan between start of line from `beg' and start of line after `end'.
