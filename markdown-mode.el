@@ -27,6 +27,7 @@
 ;; Copyright (C) 2015 Howard Melman <hmelman@gmail.com>
 ;; Copyright (C) 2015-2016 Danny McClanahan <danieldmcclanahan@gmail.com>
 ;; Copyright (C) 2015-2016 Syohei Yoshida <syohex@gmail.com>
+;; Copyright (C) 2016 Vitalie Spinu <spinuvit@gmail.com>
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -826,11 +827,16 @@
 ;;     a monetary contribution in June 2015.
 ;;   * Howard Melman <hmelman@gmail.com> for supporting GFM checkboxes
 ;;     as buttons.
-;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview mode,
-;;     completion of GFM programming language names, and `cl-lib' updates.
+;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview
+;;     mode, completion of GFM programming language names, improved
+;;     font lock for fenced code blocks and metadata blocks, `cl-lib'
+;;     updates, and numerous other improvements.
 ;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
-;;     and movement functions, improved italic font lock, and fixing adaptive
-;;     filling for hanging list items.
+;;     and movement functions, improved italic font lock, fixing adaptive
+;;     filling for hanging list items, more efficient fontification,
+;;     and numerous other improvements.
+;;   * Vitalie Spinu <spinuvit@gmail.com> for improvements to font
+;;     lock and source code aesthetics.
 
 ;;; Bugs:
 
@@ -1934,7 +1940,6 @@ start which was previously propertized."
 (defun markdown-syntax-propertize (start end)
   "See `syntax-propertize-function'."
   (remove-text-properties start end markdown--syntax-properties)
-  
   (markdown-syntax-propertize-fenced-block-constructs start end)
   (markdown-syntax-propertize-yaml-metadata start end)
   (markdown-syntax-propertize-pre-blocks start end)

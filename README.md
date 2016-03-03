@@ -781,11 +781,16 @@ following people:
     a monetary contribution in June 2015.
   * Howard Melman for supporting GFM checkboxes
     as buttons.
-  * Danny McClanahan for live preview mode,
-    completion of GFM programming language names, and `cl-lib` updates.
+  * Danny McClanahan for live preview
+    mode, completion of GFM programming language names, improved
+    font lock for fenced code blocks and metadata blocks, `cl-lib`
+    updates, and numerous other improvements.
   * Syohei Yoshida for better heading detection
-    and movement functions, improved italic font lock, and fixing adaptive
-    filling for hanging list items.
+    and movement functions, improved italic font lock, fixing adaptive
+    filling for hanging list items, more efficient fontification,
+    and numerous other improvements.
+  * Vitalie Spinu for improvements to font
+    lock and source code aesthetics.
 
 ## Bugs
 
