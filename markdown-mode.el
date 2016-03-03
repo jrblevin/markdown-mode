@@ -2344,14 +2344,9 @@ in XEmacs 21."
 ;; for an active region, with fallbacks for older Emacsen and XEmacs.
 (eval-and-compile
   (cond
-   ;; Emacs 23 and newer
+   ;; Emacs 24 and newer
    ((fboundp 'use-region-p)
     (defalias 'markdown-use-region-p 'use-region-p))
-   ;; Older Emacsen
-   ((and (boundp 'transient-mark-mode) (boundp 'mark-active))
-    (defun markdown-use-region-p ()
-      "Compatibility wrapper to provide `use-region-p'."
-      (and transient-mark-mode mark-active)))
    ;; XEmacs
    ((fboundp 'region-active-p)
     (defalias 'markdown-use-region-p 'region-active-p))))
@@ -2411,15 +2406,6 @@ If we are at the last line, then consider the next line to be blank."
       (save-excursion
         (forward-line 1)
         (markdown-cur-line-blank-p))))
-
-(defun markdown-prev-line-indent-p ()
-  "Return t if the previous line is indented and nil otherwise."
-  (save-excursion
-    (if (= (line-beginning-position) (point-min))
-        nil
-      (forward-line -1)
-      (goto-char (line-beginning-position))
-      (if (re-search-forward "^\\s " (line-end-position) t) t))))
 
 (defun markdown-prev-line-indent ()
   "Return the number of leading whitespace characters in the previous line.
