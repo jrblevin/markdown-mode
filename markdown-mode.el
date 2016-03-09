@@ -3494,9 +3494,10 @@ header will be inserted."
            (when (null markdown-asymmetric-header) (insert " " hdr)))))
   (markdown-ensure-blank-line-after)
   ;; Leave point at end of text
-  (if setext
-      (backward-char (1+ (string-width text)))
-    (backward-char (1+ level))))
+  (cond (setext
+         (backward-char (1+ (string-width text))))
+        ((null markdown-asymmetric-header)
+         (backward-char (1+ level)))))
 
 (defun markdown-insert-header-dwim (&optional arg setext)
   "Insert or replace header markup.
