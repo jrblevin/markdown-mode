@@ -2860,6 +2860,16 @@ only partially propertized."
             (point-min) (point-at-eol)
             'face (list markdown-bold-face)))))
 
+(ert-deftest test-markdown-parsing/inline-code ()
+  "Don't cause infinite loop for inline code just after metadata block
+Detail: https://github.com/jrblevin/markdown-mode/issues/115"
+  (markdown-test-string "---
+x: x
+---
+`x`
+"
+    (should (= (markdown-match-code (point-max)) (point-max)))))
+
 ;;; Reference Checking:
 
 (ert-deftest test-markdown-references/goto-line-button ()
