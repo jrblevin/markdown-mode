@@ -2805,7 +2805,7 @@ Return nil otherwise."
 (defun markdown-match-inline-generic (regex last)
   "Match inline REGEX from the point to LAST."
   (when (re-search-forward regex last t)
-    (let ((bounds (markdown-code-block-at-pos (match-beginning 0))))
+    (let ((bounds (markdown-code-block-at-pos (match-beginning 1))))
       (if (null bounds)
           ;; Not in a code block: keep match data and return t when in bounds
           (<= (match-end 0) last)
