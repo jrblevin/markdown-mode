@@ -5080,8 +5080,8 @@ increase the indentation by one level."
                                     (substring (match-string 2) 0 space-adjust)
                                   (or old-spacing ". "))))
               (insert (concat new-indent new-prefix new-spacing)))))
-         ;; Unordered list
-         ((string-match-p "[\\*\\+-]" marker)
+         ;; Unordered list, or ordered list with hash mark
+         ((string-match-p "[\\*\\+-]\\|#\\." marker)
           (insert new-indent marker)))))))
 
 (defun markdown-move-list-item-up ()
