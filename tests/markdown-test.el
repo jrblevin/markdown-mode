@@ -1110,6 +1110,15 @@ Test point position upon removal and insertion."
                         (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
                         (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/\n"))))
 
+(ert-deftest test-markdown-insertion/inline-to-reference-link-2 ()
+  "Inline link to reference link conversion with existing reference links.
+Regression test: adding a new reference link with
+`markdown-insert-reference-link-dwim' should not throw an 'args
+out of range' error when the existing reference label is a single
+character."
+  (markdown-test-string "[text](http://jblevins.org/ \"title\")\n\n[1]: https://www.gnu.org"
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 2 RET"))))
+
 (ert-deftest test-markdown-insertion/inline-link ()
   "Basic tests for `markdown-insert-link'."
   ;; Test empty markup insertion (leave point in square brackets)

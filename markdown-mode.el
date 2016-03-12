@@ -3359,8 +3359,7 @@ label is not defined, additionally prompt for the URL
 and (optional) title.  The reference definition is placed at the
 location determined by `markdown-reference-location'."
   (interactive)
-  (let* ((defined-labels (mapcar (lambda (x) (substring x 1 -1))
-                                 (markdown-get-defined-references)))
+  (let* ((defined-labels (markdown-get-defined-references))
          (switch (thing-at-point-looking-at markdown-regex-link-inline))
          (bounds (cond ((markdown-use-region-p)
                         (cons (region-beginning) (region-end)))
