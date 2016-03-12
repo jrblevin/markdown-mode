@@ -2245,6 +2245,12 @@ for (var i = 0; i < 10; i++) {
    (markdown-test-range-face-equals (point-min) (1- (point-max))
                                     markdown-comment-face)))
 
+(ert-deftest test-markdown-font-lock/comment-angle-bracket ()
+  "Regression test for GH-117."
+  (markdown-test-string "<!-- > test -->"
+   (markdown-test-range-face-equals (point-min) (1- (point-max))
+                                    markdown-comment-face)))
+
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."
   (markdown-test-string "Harvard[^1] [tuition][]"

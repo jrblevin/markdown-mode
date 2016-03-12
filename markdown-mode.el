@@ -1910,13 +1910,15 @@ start which was previously propertized."
       (let ((open-beg (match-beginning 0)))
         (put-text-property open-beg (1+ open-beg)
                            'syntax-table (string-to-syntax "<"))
-        (markdown-syntax-propertize-comments (1+ open-beg) end)))
+        (markdown-syntax-propertize-comments
+         (min (1+ (match-end 0)) end (point-max)) end)))
      ;; Comment end
      ((and in-comment
            (re-search-forward markdown-regex-comment-end end t))
       (put-text-property (1- (match-end 0)) (match-end 0)
                          'syntax-table (string-to-syntax ">"))
-      (markdown-syntax-propertize-comments (match-end 0) end))
+      (markdown-syntax-propertize-comments
+       (min (1+ (match-end 0)) end (point-max)) end))
      ;; Nothing found
      (t nil))))
 
