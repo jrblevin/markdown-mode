@@ -6634,8 +6634,6 @@ BEG and END are the limits of scanned region."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
-;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 
