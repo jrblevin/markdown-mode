@@ -837,6 +837,8 @@
 ;;     and numerous other improvements.
 ;;   * Vitalie Spinu <spinuvit@gmail.com> for improvements to font
 ;;     lock and source code aesthetics.
+;;   * Kévin Le Gouguec <kevin.legouguec@gmail.com> for improvements
+;;     related to ATX headings and Pandoc fancy lists.
 
 ;;; Bugs:
 
