@@ -1000,6 +1000,11 @@ Test point position upon removal and insertion."
                         (goto-char (point-max))
                         (call-interactively 'markdown-insert-list-item)
                         (should (string-equal (buffer-string) "6. foo\n7. ")))
+  ;; Following a fancy list item, on the next line
+  (markdown-test-string "#. foo"
+                        (goto-char (point-max))
+                        (call-interactively 'markdown-insert-list-item)
+                        (should (string-equal (buffer-string) "#. foo\n#. ")))
   ;; Following a nested ordered list item
   (markdown-test-string "6. foo\n    1. bar"
                         (goto-char (point-max))
