@@ -516,10 +516,12 @@ Test point position upon removal and insertion."
   (markdown-test-string "line one\nline two\n"
                         (forward-word)
                         (markdown-insert-header-atx-1)
+                        (should (= (point) 11))
                         (should (string-equal (buffer-substring (point-min) (point-max))
                                               "# line one #\n\nline two\n"))
                         (forward-line 2)
                         (markdown-insert-header-atx-2)
+                        (should (= (point) 26))
                         (should (string-equal (buffer-substring (point-min) (point-max))
                                               "# line one #\n\n## line two ##\n\n"))))
 
@@ -533,6 +535,7 @@ Test point position upon removal and insertion."
                         (should (string-equal (buffer-substring (region-beginning) (region-end))
                                               "one"))
                         (markdown-insert-header-atx-4)
+                        (should (= (point) 16))
                         (should (string-equal (buffer-substring (point-min) (point-max))
                                               "line \n\n#### one ####\n\nline two\n"))))
 
@@ -588,6 +591,15 @@ Test point position upon removal and insertion."
                         (markdown-insert-header-atx-5)
                         (should (string-equal (buffer-string) "##### replace #####\n\n"))
                         (should (looking-at " #####\n"))))
+
+(ert-deftest test-markdown-insertion/atx-asymmetric-point ()
+  "Test point after ATX header insertion with `markdown-asymmetric-header'."
+  (markdown-test-string
+   "Test"
+   (let ((markdown-asymmetric-header t))
+     (markdown-insert-header-atx-5)
+     (should (= (point) 11))
+     (should (string-equal (buffer-string) "##### Test")))))
 
 (ert-deftest test-markdown-insertion/setext-line ()
   "Test setext header insertion without region."
