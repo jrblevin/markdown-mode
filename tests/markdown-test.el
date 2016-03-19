@@ -1980,6 +1980,26 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face (point-min) (1- (point-max))
                                  markdown-pre-face)))
 
+(ert-deftest test-markdown-font-lock/no-bold-in-code ()
+  "Bold markers in inline code should not trigger bold."
+  (markdown-test-string
+   "`def __init__(self):`"
+   (markdown-test-range-has-face 8 11 markdown-inline-code-face))
+  (markdown-test-string
+   "`**foo` bar `baz**`"
+   (markdown-test-range-face-equals 2 6 markdown-inline-code-face)
+   (markdown-test-range-face-equals 9 11 nil)
+   (markdown-test-range-face-equals 14 18 markdown-inline-code-face)))
+
+(ert-deftest test-markdown-font-lock/no-bold-in-math ()
+  "Bold markers in math should not trigger bold."
+  (markdown-test-file "math.text"
+    (markdown-toggle-math t)
+    (funcall markdown-test-font-lock-function)
+    (markdown-test-range-has-face 279 299 markdown-math-face)
+    (markdown-test-range-has-face 301 308 nil)
+    (markdown-test-range-has-face 310 312 markdown-math-face)))
+
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
   (markdown-test-file "inline.text"
