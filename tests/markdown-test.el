@@ -2511,6 +2511,9 @@ returns nil."
    (should (equal (markdown-syntax-propertize-extend-region 496 502)
                   (cons 486 510)))
    (should (equal (markdown-syntax-propertize-extend-region 486 510)
+                  nil))
+   ;; Region that begins and ends with \n\n should not be extended
+   (should (equal (markdown-syntax-propertize-extend-region 157 355)
                   nil))))
 
 (defun markdown-test-check-match-limits (prop num begin end &optional pos)

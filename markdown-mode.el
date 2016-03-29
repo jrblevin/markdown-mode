@@ -1470,11 +1470,15 @@ Function is called repeatedly until it returns nil. For details, see
   (save-match-data
     (save-excursion
       (let* ((new-start (progn (goto-char start)
+                               (skip-chars-forward "\n")
                                (if (re-search-backward "\n\n" nil t)
-                                   (match-end 0) (point-min))))
+                                   (min start (match-end 0))
+                                 (point-min))))
              (new-end (progn (goto-char end)
+                             (skip-chars-backward "\n")
                              (if (re-search-forward "\n\n" nil t)
-                                 (match-beginning 0) (point-max))))
+                                 (max end (match-beginning 0))
+                               (point-max))))
              (code-match (markdown-code-block-at-pos new-start))
              (new-start (or (and code-match (cl-first code-match)) new-start))
              (code-match (markdown-code-block-at-pos end))
