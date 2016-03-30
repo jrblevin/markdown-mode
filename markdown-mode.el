@@ -1,4 +1,4 @@
-;;; markdown-mode.el --- Emacs Major mode for Markdown-formatted text files -*- lexical-binding: t; -*-
+;;; markdown-mode.el --- Major mode for Markdown-formatted text -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2007-2016 Jason R. Blevins <jrblevin@sdf.org>
 ;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
@@ -57,7 +57,7 @@
 ;;; Commentary:
 
 ;; markdown-mode is a major mode for editing [Markdown][]-formatted
-;; text files in GNU Emacs.  markdown-mode is free software, licensed
+;; text.  markdown-mode is free software, licensed
 ;; under the GNU GPL.
 ;;
 ;;  [Markdown]: http://daringfireball.net/projects/markdown/
