@@ -6527,6 +6527,46 @@ BEG and END are the limits of scanned region."
        (progn (goto-char end) (forward-line 1) (point))))))
 
 
+;;; Display inline image =================================================
+
+(defvar markdown-inline-image-overlays nil)
+(make-variable-buffer-local 'markdown-inline-image-overlays)
+
+(defun markdown-remove-inline-images ()
+  (interactive)
+  (mapc 'delete-overlay markdown-inline-image-overlays)
+  (setq markdown-inline-image-overlays nil))
+
+(defun markdown-display-inline-images ()
+  (interactive)
+  (unless (display-graphic-p)
+    (error "Cannot show images."))
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (while (re-search-forward markdown-regex-link-inline nil t)
+        (let ((start (match-beginning 0))
+              (end (match-end 0))
+              (file (match-string-no-properties 6)))
+          (when (file-exists-p file)
+            (let* ((abspath (if (file-name-absolute-p file)
+                                file
+                              (concat default-directory file)))
+                   (image (create-image abspath)))
+              (when image
+                (let ((ov (make-overlay start end)))
+                  (overlay-put ov 'display image)
+                  (overlay-put ov 'face 'default)
+                  (push ov markdown-inline-image-overlays))))))))))
+
+(defun markdown-toggle-inline-images ()
+  (interactive)
+  (if markdown-inline-image-overlays
+      (markdown-remove-inline-images)
+    (markdown-display-inline-images)))
+
+
 ;;; Mode Definition  ==========================================================
 
 (defun markdown-show-version ()
