@@ -196,6 +196,11 @@
 ;;     `C-c C-i I` behaves similarly and inserts a reference-style
 ;;     image.
 ;;
+;;     Local images associated with image links may be displayed
+;;     inline in the buffer by pressing `C-c C-i C-t`
+;;     (`markdown-toggle-inline-images'). This is a toggle command, so
+;;     pressing this once again will remove inline images.
+;;
 ;;   * Styles: `C-c C-s`
 ;;
 ;;     `C-c C-s e` inserts markup to make a region or word italic (`e`
@@ -4690,6 +4695,7 @@ See also `markdown-mode-map'.")
      ["Indent region" markdown-indent-region]
      ["Exdent region" markdown-exdent-region])
     "---"
+    ["Toggle inline images" markdown-toggle-inline-images]
     ["Check references" markdown-check-refs]
     ["Clean up list numbering" markdown-cleanup-list-numbers]
     ["Complete markup" markdown-complete-buffer]
@@ -6534,14 +6540,20 @@ BEG and END are the limits of scanned region."
 (make-variable-buffer-local 'markdown-inline-image-overlays)
 
 (defun markdown-remove-inline-images ()
+  "Remove inline image overlays from image links in the buffer.
+This can be toggled with `markdown-toggle-inline-images'
+or \\[markdown-toggle-inline-images]."
   (interactive)
   (mapc 'delete-overlay markdown-inline-image-overlays)
   (setq markdown-inline-image-overlays nil))
 
 (defun markdown-display-inline-images ()
+  "Add inline image overlays to image links in the buffer.
+This can be toggled with `markdown-toggle-inline-images'
+or \\[markdown-toggle-inline-images]."
   (interactive)
   (unless (display-graphic-p)
-    (error "Cannot show images."))
+    (error "Cannot show images"))
   (save-excursion
     (save-restriction
       (widen)
@@ -6562,6 +6574,7 @@ BEG and END are the limits of scanned region."
                   (push ov markdown-inline-image-overlays))))))))))
 
 (defun markdown-toggle-inline-images ()
+  "Toggle inline image overlays in the buffer."
   (interactive)
   (if markdown-inline-image-overlays
       (markdown-remove-inline-images)

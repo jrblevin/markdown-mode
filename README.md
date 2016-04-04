@@ -11,7 +11,7 @@
      markdown-mode.el. Make edits there, not here. -->
 
 markdown-mode is a major mode for editing [Markdown][]-formatted
-text files in GNU Emacs.  markdown-mode is free software, licensed
+text.  markdown-mode is free software, licensed
 under the GNU GPL.
 
  [Markdown]: http://daringfireball.net/projects/markdown/
@@ -149,6 +149,11 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     active region or the word at point, if any, as the alt text.
     <kbd>C-c C-i I</kbd> behaves similarly and inserts a reference-style
     image.
+
+    Local images associated with image links may be displayed
+    inline in the buffer by pressing <kbd>C-c C-i C-t</kbd>
+    (`markdown-toggle-inline-images`). This is a toggle command, so
+    pressing this once again will remove inline images.
 
   * Styles: <kbd>C-c C-s</kbd>
 
@@ -791,6 +796,8 @@ following people:
     and numerous other improvements.
   * Vitalie Spinu for improvements to font
     lock and source code aesthetics.
+  * Kévin Le Gouguec for improvements
+    related to ATX headings and Pandoc fancy lists.
 
 ## Bugs
 
