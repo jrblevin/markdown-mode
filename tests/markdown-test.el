@@ -1897,6 +1897,15 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 1 10 nil)
    (markdown-test-range-has-face 12 16 markdown-inline-code-face)))
 
+(ert-deftest test-markdown-font-lock/italics-and-code ()
+  "Test seeming italics mixed with code."
+  (markdown-test-string
+   "[lg]: twilight_sm.png\n[sm]: twilight_lg.png"
+   (markdown-test-range-has-face 7 21 markdown-url-face)
+   (markdown-test-range-has-face 22 22 nil)
+   (markdown-test-range-has-face 29 43 markdown-url-face)
+   (markdown-test-range-has-face 28 28 nil)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"

@@ -2862,6 +2862,11 @@ Return nil otherwise."
       (let ((begin (match-beginning 1)) (end (match-end 1)))
         (cond
          ((markdown-range-property-any
+           begin begin 'face (list markdown-url-face))
+          ;; Italics shouldn't begin inside a URL due to an underscore
+          (goto-char (min (1+ (match-end 0)) last))
+          (markdown-match-italic last))
+         ((markdown-range-property-any
            begin end 'face (list markdown-inline-code-face
                                  markdown-bold-face
                                  markdown-list-face
