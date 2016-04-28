@@ -468,6 +468,15 @@ provides an interface to all of the possible customizations:
     asymmetric header styling, placing header characters only on
     the left of headers (default: `nil`).
 
+  * `markdown-header-scaling` - set to a non-nil value to use
+    a variable-pitch font for headings where the size corresponds
+    to the level of the heading (default: `nil`).
+
+  * `markdown-header-scaling-values` - list of scaling values,
+    relative to baseline, for headers of levels one through six,
+    used when `markdown-header-scaling` is non-nil
+    (default: `(list 1.8 1.4 1.2 1.0 1.0 1.0)`).
+
   * `markdown-list-indent-width` - depth of indentation for lists
     when inserting, promoting, and demoting list items (default: 4).
 

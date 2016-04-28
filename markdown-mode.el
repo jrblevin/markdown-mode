@@ -514,6 +514,15 @@
 ;;     asymmetric header styling, placing header characters only on
 ;;     the left of headers (default: `nil').
 ;;
+;;   * `markdown-header-scaling' - set to a non-nil value to use
+;;     a variable-pitch font for headings where the size corresponds
+;;     to the level of the heading (default: `nil').
+;;
+;;   * `markdown-header-scaling-values' - list of scaling values,
+;;     relative to baseline, for headers of levels one through six,
+;;     used when `markdown-header-scaling' is non-nil
+;;     (default: `(list 1.8 1.4 1.2 1.0 1.0 1.0)`).
+;;
 ;;   * `markdown-list-indent-width' - depth of indentation for lists
 ;;     when inserting, promoting, and demoting list items (default: 4).
 ;;
@@ -2103,41 +2112,6 @@ START and END delimit region to propertize."
   "Base face for headers hash delimiter."
   :group 'markdown-faces)
 
-(defface markdown-header-face
-  '((t (:inherit font-lock-function-name-face :weight bold)))
-  "Base face for headers."
-  :group 'markdown-faces)
-
-(defface markdown-header-face-1
-  '((t (:inherit markdown-header-face)))
-  "Face for level-1 headers."
-  :group 'markdown-faces)
-
-(defface markdown-header-face-2
-  '((t (:inherit markdown-header-face)))
-  "Face for level-2 headers."
-  :group 'markdown-faces)
-
-(defface markdown-header-face-3
-  '((t (:inherit markdown-header-face)))
-  "Face for level-3 headers."
-  :group 'markdown-faces)
-
-(defface markdown-header-face-4
-  '((t (:inherit markdown-header-face)))
-  "Face for level-4 headers."
-  :group 'markdown-faces)
-
-(defface markdown-header-face-5
-  '((t (:inherit markdown-header-face)))
-  "Face for level-5 headers."
-  :group 'markdown-faces)
-
-(defface markdown-header-face-6
-  '((t (:inherit markdown-header-face)))
-  "Face for level-6 headers."
-  :group 'markdown-faces)
-
 (defface markdown-inline-code-face
   '((t (:inherit font-lock-constant-face)))
   "Face for inline code."
@@ -2227,6 +2201,68 @@ START and END delimit region to propertize."
   '((t (:inherit highlight)))
   "Face for mouse highlighting."
   :group 'markdown-faces)
+
+(defcustom markdown-header-scaling nil
+  "Whether to use variable-height faces for headers.
+When non-nil, `markdown-header-face' will inherit from
+`variable-pitch' and the scaling values in
+`markdown-header-scaling-values' will be applied to
+headers of levels one through six respectively."
+  :type 'boolean
+  :initialize 'custom-initialize-default
+  :set (lambda (symbol value)
+         (set-default symbol value)
+         (markdown-update-header-faces value))
+  :group 'markdown)
+
+(defcustom markdown-header-scaling-values
+  '(1.8 1.4 1.2 1.0 1.0 1.0)
+  "List of scaling values for headers of level one through six.
+Used when `markdown-header-scaling' is non-nil."
+  :type 'list
+  :initialize 'custom-initialize-default
+  :set (lambda (symbol value)
+         (set-default symbol value)
+         (markdown-update-header-faces markdown-header-scaling value))
+  :group 'markdown)
+
+(defun markdown-make-header-faces ()
+  "Build the faces used for Markdown headers."
+  (defface markdown-header-face
+    `((t (:inherit (,(when markdown-header-scaling 'variable-pitch)
+                     font-lock-function-name-face)
+                   :weight bold)))
+    "Base face for headers."
+    :group 'markdown-faces)
+  (dotimes (num 6)
+    (let* ((num1 (1+ num))
+           (face-name (intern (format "markdown-header-face-%s" num1)))
+           (scale (if markdown-header-scaling
+                      (float (nth num markdown-header-scaling-values))
+                    1.0)))
+      (eval
+       `(defface ,face-name
+          '((t (:inherit markdown-header-face :height ,scale)))
+          (format "Face for level %s headers.
+
+You probably don't want to customize this face directly. Instead
+you can customize the base face `markdown-header-face' or the
+variable-height variable `markdown-header-scaling'." ,num1)
+          :group 'markdown-faces)))))
+
+(markdown-make-header-faces)
+
+(defun markdown-update-header-faces (&optional scaling scaling-values)
+  "Update header faces, depending on if header SCALING is desired.
+If so, use given list of SCALING-VALUES relative to the baseline
+size of `markdown-header-face'."
+  (dotimes (num 6)
+    (let* ((face-name (intern (format "markdown-header-face-%s" (1+ num))))
+           (scale (cond ((not scaling) 1.0)
+                        (scaling-values (float (nth num scaling-values)))
+                        (t (float (nth num markdown-header-scaling-values))))))
+      (unless (get face-name 'saved-face) ; Don't update customized faces
+        (set-face-attribute face-name nil :height scale)))))
 
 (defun markdown-syntactic-face (state)
   "Return font-lock face for characters with given STATE.
