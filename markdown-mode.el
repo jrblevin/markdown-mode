@@ -2213,7 +2213,7 @@ headers of levels one through six respectively."
   :set (lambda (symbol value)
          (set-default symbol value)
          (markdown-update-header-faces value))
-  :group 'markdown)
+  :group 'markdown-faces)
 
 (defcustom markdown-header-scaling-values
   '(1.8 1.4 1.2 1.0 1.0 1.0)
@@ -2224,7 +2224,7 @@ Used when `markdown-header-scaling' is non-nil."
   :set (lambda (symbol value)
          (set-default symbol value)
          (markdown-update-header-faces markdown-header-scaling value))
-  :group 'markdown)
+  :group 'markdown-faces)
 
 (defun markdown-make-header-faces ()
   "Build the faces used for Markdown headers."
