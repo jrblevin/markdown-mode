@@ -3812,17 +3812,11 @@ if three backquotes inserted at the beginning of line."
     "Web-Ontology-Language" "WebIDL" "X10" "XC" "XML" "XPages" "XProc" "XQuery"
     "XS" "XSLT" "Xojo" "Xtend" "YAML" "Yacc" "Zephir" "Zimpl" "desktop" "eC" "edn"
     "fish" "mupad" "nesC" "ooc" "reStructuredText" "wisp" "xBase")
-  "Language specifiers recognized by github's syntax highlighting features.")
+  "Language specifiers recognized by GitHub's syntax highlighting features.")
 
 (defvar markdown-gfm-used-languages nil
-  "Languages in GFM code blocks which are not explicitly declared.
-Known language are declared in
-`markdown-gfm-recognized-languages' and
-`markdown-gfm-additional-languages'.")
+  "Language names used in GFM code blocks.")
 (make-variable-buffer-local 'markdown-gfm-used-languages)
-(defvar markdown-gfm-last-used-language nil
-  "Last language used in the current buffer in GFM code blocks.")
-(make-variable-buffer-local 'markdown-gfm-last-used-language)
 
 (defun markdown-trim-whitespace (str)
   (markdown-replace-regexp-in-string
@@ -3847,13 +3841,10 @@ Known language are declared in
      (if markdown-gfm-downcase-languages (cl-mapcar #'downcase given-corpus)
        given-corpus))))
 
-(defun markdown-add-language-if-new (lang)
-  (let* ((cleaned-lang (markdown-clean-language-string lang))
-         (find-result
-          (cl-find cleaned-lang (markdown-gfm-get-corpus)
-                   :test #'equal)))
-    (setq markdown-gfm-last-used-language cleaned-lang)
-    (unless find-result (push cleaned-lang markdown-gfm-used-languages))))
+(defun markdown-gfm-add-used-language (lang)
+  "Clean LANG and add to list of used languages."
+  (add-to-list 'markdown-gfm-used-languages
+               (markdown-clean-language-string lang)))
 
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
@@ -3867,12 +3858,12 @@ automatically in order to have the correct markup."
                (markdown-clean-language-string
                 (completing-read
                  (format "Programming language [%s]: "
-                         (or markdown-gfm-last-used-language "none"))
+                         (or (car markdown-gfm-used-languages) "none"))
                  (markdown-gfm-get-corpus)
                  nil 'confirm nil
                  'markdown-gfm-language-history))
              (quit "")))))
-  (unless (string= lang "") (markdown-add-language-if-new lang))
+  (unless (string= lang "") (markdown-gfm-add-used-language lang))
   (when (> (length lang) 0) (setq lang (concat " " lang)))
   (if (markdown-use-region-p)
       (let ((b (region-beginning)) (e (region-end)))
@@ -3911,7 +3902,7 @@ automatically in order to have the correct markup."
                       (when (and (match-beginning 2) (match-end 2))
                         (buffer-substring-no-properties
                          (match-beginning 2) (match-end 2)))))
-       do (progn (when lang (markdown-add-language-if-new lang))
+       do (progn (when lang (markdown-gfm-add-used-language lang))
                  (goto-char (next-single-property-change (point) prop)))))))
 
 

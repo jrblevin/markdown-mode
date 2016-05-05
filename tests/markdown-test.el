@@ -3741,6 +3741,8 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
   (markdown-test-string-gfm "line 1\nline 2\n"
    (end-of-line)
    (markdown-insert-gfm-code-block "elisp")
+   (should (equal (car markdown-gfm-used-languages) "elisp"))
+   (should (equal (car (markdown-gfm-get-corpus)) "elisp"))
    (should (string-equal (buffer-string)
                          "line 1\n\n``` elisp\n\n```\n\nline 2\n")))
   ;; Test with active region
@@ -3760,12 +3762,14 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
     (markdown-gfm-parse-buffer-for-languages)
     (should (equal markdown-gfm-used-languages
                    (list "MaDeUp" "LANGUAGES" "MADEUP")))
-    (should (equal markdown-gfm-last-used-language "MaDeUp"))
+    (should (equal (car markdown-gfm-used-languages) "MaDeUp"))
+    (should (equal (car (markdown-gfm-get-corpus)) "MaDeUp"))
     (goto-char (point-max))
     (markdown-insert-gfm-code-block "newlang")
     (should (equal markdown-gfm-used-languages
                    (list "newlang" "MaDeUp" "LANGUAGES" "MADEUP")))
-    (should (equal markdown-gfm-last-used-language "newlang"))
+    (should (equal (car markdown-gfm-used-languages) "newlang"))
+    (should (equal (car (markdown-gfm-get-corpus)) "newlang"))
     (let ((markdown-gfm-downcase-languages nil))
       (should
        (equal (markdown-gfm-get-corpus)
