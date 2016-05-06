@@ -6197,13 +6197,14 @@ If the link is a complete URL, open in browser with `browse-url'.
 Otherwise, open with `find-file' after stripping anchor and/or query string."
   (interactive)
   (if (markdown-link-p)
-      (let* ((link (markdown-link-link))
-             (struct (and (featurep 'url-parse) (url-generic-parse-url link))))
-        (if (or (null struct) (url-fullness struct))
-            ;; Open full URLs in browser
-            (browse-url link)
-          ;; Strip query string and open partial URLs in Emacs
-          (find-file (car (url-path-and-query struct)))))
+      (let* ((link (markdown-link-link)) (struct nil) (full t) (file link))
+        ;; Parse URL, determine fullness, strip query string
+        (when (featurep 'url-parse)
+          (setq struct (url-generic-parse-url link)
+                full (url-fullness struct)
+                file (car (url-path-and-query struct))))
+        ;; Open full URLs in browser, files in Emacs
+        (if full (browse-url link) (find-file file)))
     (error "Point is not at a Markdown link or URI")))
 
 
