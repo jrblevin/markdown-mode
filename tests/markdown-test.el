@@ -3349,9 +3349,24 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
       (call-interactively #'markdown-backward-same-level)
       (should (looking-at-p "## Header 2-1")))))
 
+;;; Link tests:
+
+(ert-deftest test-markdown-link/follow ()
+  "Test link following in a browser and in Emacs."
+  (markdown-test-string "[text](http://path?query=foo#id)"
+    (let* ((opened-url nil)
+           (browse-url-browser-function
+            (lambda (url &rest args) (setq opened-url url))))
+      (markdown-follow-thing-at-point nil)
+      (should (equal opened-url "http://path?query=foo#id"))))
+  (markdown-test-string "[text](path?query=foo#id)"
+    (markdown-follow-thing-at-point nil)
+    (should (equal (file-name-nondirectory (buffer-file-name)) "path"))
+    (kill-buffer)))
+
 ;;; Wiki link tests:
 
-(ert-deftest test-markdown-wiki-link/file-local-variabls ()
+(ert-deftest test-markdown-wiki-link/file-local-variables ()
   "Test enabling wiki links via file-local variables."
   (markdown-test-file "wiki-links.text"
    (should-not markdown-enable-wiki-links)

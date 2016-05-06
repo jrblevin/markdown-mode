@@ -942,6 +942,7 @@
 (require 'outline)
 (require 'thingatpt)
 (require 'cl-lib)
+(require 'url-parse)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -6191,9 +6192,18 @@ not at a link or the link reference is not defined returns nil."
    (t nil)))
 
 (defun markdown-follow-link-at-point ()
-  "Open the current non-wiki link in a browser."
+  "Open the current non-wiki link.
+If the link is a complete URL, open in browser with `browse-url'.
+Otherwise, open with `find-file' after stripping anchor and/or query string."
   (interactive)
-  (if (markdown-link-p) (browse-url (markdown-link-link))
+  (if (markdown-link-p)
+      (let* ((link (markdown-link-link))
+             (struct (url-generic-parse-url link)))
+        (if (url-fullness struct)
+            ;; Open full URLs in browser
+            (browse-url link)
+          ;; Strip query string and open partial URLs in Emacs
+          (find-file (car (url-path-and-query struct)))))
     (error "Point is not at a Markdown link or URI")))
 
 
