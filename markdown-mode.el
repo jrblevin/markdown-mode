@@ -6211,7 +6211,9 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                        (string-match "\\?" file))
               (setq file (substring file 0 (match-beginning 0))))))
         ;; Open full URLs in browser, files in Emacs
-        (if full (browse-url link) (when file (find-file file))))
+        (if full
+            (browse-url link)
+          (when (and file (> (length file) 0)) (find-file file))))
     (error "Point is not at a Markdown link or URI")))
 
 
