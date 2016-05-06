@@ -1488,9 +1488,17 @@ missing."
    3 "[ ]?\\([^[:space:]]+\\|{[^}]*}\\)?\\([[:space:]]*?\\)$")
   "Regular expression for matching Pandoc tildes.")
 
-(defconst markdown-regex-multimarkdown-metadata
-  "^\\([[:alpha:]][[:alpha:] _-]*?\\)\\(:[ \t]*\\)\\(.*\\)$"
-  "Regular expression for matching MultiMarkdown metadata.")
+(defconst markdown-regex-declarative-metadata
+  "^\\([[:alpha:]][[:alpha:] _-]*?\\)\\([:=][ \t]*\\)\\(.*\\)$"
+  "Regular expression for matching declarative metadata statements.
+This matches MultiMarkdown metadata as well as YAML and TOML
+assignments such as the following:
+
+    variable: value
+
+or
+
+    variable = value")
 
 (defconst markdown-regex-pandoc-metadata
   "^\\(%\\)\\([ \t]*\\)\\(.*\\(?:\n[ \t]+.*\\)*\\)"
@@ -1936,7 +1944,7 @@ start which was previously propertized."
   (save-excursion
     (goto-char start)
     (cl-loop
-     while (re-search-forward markdown-regex-multimarkdown-metadata end t)
+     while (re-search-forward markdown-regex-declarative-metadata end t)
      do (when (get-text-property (match-beginning 0)
                                  'markdown-yaml-metadata-section)
           (put-text-property (match-beginning 1) (match-end 1)
@@ -2355,7 +2363,7 @@ See `font-lock-syntactic-face-function' for details."
     (markdown-match-heading-1-atx . ((4 markdown-header-delimiter-face)
                                      (5 markdown-header-face-1)
                                      (6 markdown-header-delimiter-face)))
-    (markdown-match-multimarkdown-metadata . ((1 markdown-metadata-key-face)
+    (markdown-match-declarative-metadata . ((1 markdown-metadata-key-face)
                                               (2 markdown-markup-face)
                                               (3 markdown-metadata-value-face)))
     (markdown-match-pandoc-metadata . ((1 markdown-markup-face)
@@ -3150,9 +3158,9 @@ is \"\n\n\""
              t))
           (t nil))))
 
-(defun markdown-match-multimarkdown-metadata (last)
-  "Match MultiMarkdown metadata from the point to LAST."
-  (markdown-match-generic-metadata markdown-regex-multimarkdown-metadata last))
+(defun markdown-match-declarative-metadata (last)
+  "Match declarative metadata from the point to LAST."
+  (markdown-match-generic-metadata markdown-regex-declarative-metadata last))
 
 (defun markdown-match-pandoc-metadata (last)
   "Match Pandoc metadata from the point to LAST."

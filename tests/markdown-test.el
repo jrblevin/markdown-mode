@@ -2362,14 +2362,13 @@ body"
    (markdown-test-range-has-face 64 69 nil)))
 
 (ert-deftest test-markdown-font-lock/yaml-metadata ()
-  "Basic yaml metadata tests."
+  "Basic YAML metadata tests."
   (markdown-test-string
    "---
 layout: post
 date: 2015-08-13 11:35:25 EST
 ---
 "
-   ;; first section
    (markdown-test-range-has-face 1 3 markdown-markup-face)
    (markdown-test-range-has-face 5 10 markdown-metadata-key-face)
    (markdown-test-range-has-face 11 11 markdown-markup-face)
@@ -2378,6 +2377,23 @@ date: 2015-08-13 11:35:25 EST
    (markdown-test-range-has-face 22 22 markdown-markup-face)
    (markdown-test-range-has-face 24 46 markdown-metadata-value-face)
    (markdown-test-range-has-face 48 50 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/toml-metadata ()
+  "Basic TOML metadata tests."
+  (markdown-test-string
+   "---
+layout = post
+date = 2015-08-13 11:35:25 EST
+---
+"
+   (markdown-test-range-has-face 1 3 markdown-markup-face)
+   (markdown-test-range-has-face 5 10 markdown-metadata-key-face)
+   (markdown-test-range-has-face 12 12 markdown-markup-face)
+   (markdown-test-range-has-face 14 17 markdown-metadata-value-face)
+   (markdown-test-range-has-face 19 22 markdown-metadata-key-face)
+   (markdown-test-range-has-face 24 24 markdown-markup-face)
+   (markdown-test-range-has-face 26 48 markdown-metadata-value-face)
+   (markdown-test-range-has-face 50 52 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/pandoc-yaml-metadata ()
   "Basic yaml metadata tests, with pandoc syntax."
