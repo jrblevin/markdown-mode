@@ -942,7 +942,7 @@
 (require 'outline)
 (require 'thingatpt)
 (require 'cl-lib)
-(require 'url-parse)
+(require 'url-parse nil t)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -6198,8 +6198,8 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
   (interactive)
   (if (markdown-link-p)
       (let* ((link (markdown-link-link))
-             (struct (url-generic-parse-url link)))
-        (if (url-fullness struct)
+             (struct (and (featurep 'url-parse) (url-generic-parse-url link))))
+        (if (or (null struct) (url-fullness struct))
             ;; Open full URLs in browser
             (browse-url link)
           ;; Strip query string and open partial URLs in Emacs

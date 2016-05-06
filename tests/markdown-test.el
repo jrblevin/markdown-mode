@@ -3359,10 +3359,11 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
             (lambda (url &rest args) (setq opened-url url))))
       (markdown-follow-thing-at-point nil)
       (should (equal opened-url "http://path?query=foo#id"))))
-  (markdown-test-string "[text](path?query=foo#id)"
-    (markdown-follow-thing-at-point nil)
-    (should (equal (file-name-nondirectory (buffer-file-name)) "path"))
-    (kill-buffer)))
+  (when (featurep 'url-parse)
+    (markdown-test-string "[text](path?query=foo#id)"
+      (markdown-follow-thing-at-point nil)
+      (should (equal (file-name-nondirectory (buffer-file-name)) "path"))
+      (kill-buffer))))
 
 ;;; Wiki link tests:
 
