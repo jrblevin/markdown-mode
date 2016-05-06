@@ -350,10 +350,11 @@
 ;;   * Following Links: `C-c C-o`
 ;;
 ;;     Press `C-c C-o` when the point is on an inline or reference
-;;     link to open the URL in a browser.  When the point is at a
-;;     wiki link, open it in another buffer (in the current window,
-;;     or in the other window with the `C-u` prefix).  Use `M-p` and
-;;     `M-n` to quickly jump to the previous or next link of any type.
+;;     link to open the URL in a browser (or in the current window
+;;     with the `C-u` prefix). When the point is at a wiki link, open
+;;     it in another buffer (in the current window, or in the other
+;;     window with the `C-u` prefix). Use `M-p` and `M-n` to quickly
+;;     jump to the previous or next link of any type.
 ;;
 ;;   * Jumping: `C-c C-l`
 ;;
@@ -1233,6 +1234,12 @@ This applies to insertions done with
 (defconst markdown-regex-comment-end
   "--[ \t]*>"
   "Regular expression matches HTML comment closing.")
+
+(defconst markdown-regex-link-fragment
+  "\\([^#]*\\)#?\\(.*\\)"
+  "Regular expression matches URL fragments.
+Group 1 matches the URL before the fragment.
+Group 2 matches the fragment identifier.")
 
 (defconst markdown-regex-link-inline
   "\\(!\\)?\\(\\[\\)\\([^]^][^]]*\\|\\)\\(\\]\\)\\((\\)\\([^)]*?\\)\\(?:\\s-+\\(\"[^\"]*\"\\)\\)?\\()\\)"
@@ -6190,10 +6197,23 @@ not at a link or the link reference is not defined returns nil."
     (match-string-no-properties 2))
    (t nil)))
 
-(defun markdown-follow-link-at-point ()
-  "Open the current non-wiki link in a browser."
-  (interactive)
-  (if (markdown-link-p) (browse-url (markdown-link-link))
+(defun markdown-link-filename (name)
+  "Remove fragment from file links."
+  (string-match markdown-regex-link-fragment name)
+  (match-string 1 name))
+
+(defun markdown-follow-link (name &optional other)
+  "Follow the link NAME in a browser.
+Open the with `find-file' when OTHER is non-nil."
+  (if other (find-file (markdown-link-filename name))
+    (browse-url name)))
+
+(defun markdown-follow-link-at-point (&optional arg)
+  "Open the current non-wiki link in a browser.
+With prefix argument ARG, open the file with `find-file'.
+See `markdown-link-p' and `markdown-follow-link'."
+  (interactive "P")
+  (if (markdown-link-p) (markdown-follow-link (markdown-link-link) arg)
     (error "Point is not at a Markdown link or URI")))
 
 
@@ -6377,14 +6397,14 @@ Designed to be used with the `after-change-functions' hook."
 
 (defun markdown-follow-thing-at-point (arg)
   "Follow thing at point if possible, such as a reference link or wiki link.
-Opens inline and reference links in a browser.  Opens wiki links
-to other files in the current window, or the another window if
-ARG is non-nil.
+Opens inline and reference links in a browser, or with
+`find-file' if ARG is non-nil. Opens wiki links to other files in
+the current window, or the another window if ARG is non-nil.
 See `markdown-follow-link-at-point' and
 `markdown-follow-wiki-link-at-point'."
   (interactive "P")
   (cond ((markdown-link-p)
-         (markdown-follow-link-at-point))
+         (markdown-follow-link-at-point arg))
         ((markdown-wiki-link-p)
          (markdown-follow-wiki-link-at-point arg))
         (t
