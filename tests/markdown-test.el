@@ -3203,6 +3203,21 @@ x: x
      (should (eq (point) 159))
      (should (looking-at "^# Level one again")))))
 
+(ert-deftest test-markdown-outline/visibility-with-metadata ()
+  "Test outline visibility cycling with metadata blocks."
+  (markdown-test-string
+   "---
+layout = post
+date = 2015-08-13 11:35:25 EST
+---
+"
+   (let (last-command this-command)
+     ;; Cycle global visibility to "overview" mode
+     (setq this-command 'markdown-cycle)
+     (markdown-cycle t)
+     ;; Check that text is visible
+     (markdown-test-range-has-property (point-min) (point-max) 'invisible nil))))
+
 ;;; Movement tests:
 
 (ert-deftest test-markdown-movement/defun ()
