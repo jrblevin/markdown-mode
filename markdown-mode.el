@@ -6207,11 +6207,11 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                 full (url-fullness struct))
           (if (fboundp 'url-path-and-query)
               (setq file (car (url-path-and-query struct)))
-            (setq file (url-filename struct))
-            (when (string-match "\\?" file)
+            (when (and (setq file (url-filename struct))
+                       (string-match "\\?" file))
               (setq file (substring file 0 (match-beginning 0))))))
         ;; Open full URLs in browser, files in Emacs
-        (if full (browse-url link) (find-file file)))
+        (if full (browse-url link) (when file (find-file file))))
     (error "Point is not at a Markdown link or URI")))
 
 
