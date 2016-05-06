@@ -948,6 +948,9 @@
 (defvar jit-lock-end)
 
 (declare-function eww-open-file "eww")
+(declare-function url-generic-parse-url "url-parse")
+(declare-function url-fullness "url-parse")
+(declare-function url-path-and-query "url-parse")
 
 
 ;;; Constants =================================================================
