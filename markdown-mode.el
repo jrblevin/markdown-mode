@@ -942,14 +942,12 @@
 (require 'outline)
 (require 'thingatpt)
 (require 'cl-lib)
-(require 'url-parse nil t)
+(require 'url-parse)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
 
 (declare-function eww-open-file "eww")
-(declare-function url-generic-parse-url "url-parse")
-(declare-function url-fullness "url-parse")
 (declare-function url-path-and-query "url-parse")
 
 
@@ -6200,16 +6198,16 @@ If the link is a complete URL, open in browser with `browse-url'.
 Otherwise, open with `find-file' after stripping anchor and/or query string."
   (interactive)
   (if (markdown-link-p)
-      (let* ((link (markdown-link-link)) (struct nil) (full t) (file link))
+      (let* ((link (markdown-link-link))
+             (struct (url-generic-parse-url link))
+             (full (url-fullness struct))
+             (file link))
         ;; Parse URL, determine fullness, strip query string
-        (when (featurep 'url-parse)
-          (setq struct (url-generic-parse-url link)
-                full (url-fullness struct))
-          (if (fboundp 'url-path-and-query)
-              (setq file (car (url-path-and-query struct)))
-            (when (and (setq file (url-filename struct))
-                       (string-match "\\?" file))
-              (setq file (substring file 0 (match-beginning 0))))))
+        (if (fboundp 'url-path-and-query)
+            (setq file (car (url-path-and-query struct)))
+          (when (and (setq file (url-filename struct))
+                     (string-match "\\?" file))
+            (setq file (substring file 0 (match-beginning 0)))))
         ;; Open full URLs in browser, files in Emacs
         (if full
             (browse-url link)
