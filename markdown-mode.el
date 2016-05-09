@@ -1286,38 +1286,6 @@ Group 4 matches the opening hash marks of an atx heading.
 Group 5 matches the text, without surrounding whitespace, of an atx heading.
 Group 6 matches the closing hash marks of an atx heading.")
 
-(defconst markdown-regex-header-1-atx
-  "^\\(#\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 1 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-2-atx
-  "^\\(##\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 2 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-3-atx
-  "^\\(###\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 3 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-4-atx
-  "^\\(####\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 4 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-5-atx
-  "^\\(#####\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 5 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-6-atx
-  "^\\(######\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)$"
-  "Regular expression for level 6 atx-style (hash mark) headers.")
-
-(defconst markdown-regex-header-1-setext
-  "^\\(.*\\)\n\\(=+\\)$"
-  "Regular expression for level 1 setext-style (underline) headers.")
-
-(defconst markdown-regex-header-2-setext
-  "^\\(.*\\)\n\\(-+\\)$"
-  "Regular expression for level 2 setext-style (underline) headers.")
-
 (defconst markdown-regex-header-setext
   "^\\([^\r\n-].*\\)\n\\(=+\\|-+\\)$"
   "Regular expression for generic setext-style (underline) headers.")
