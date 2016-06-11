@@ -1455,7 +1455,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-complete/setext-header ()
   "Test `markdown-complete' for setext headers."
-  (markdown-test-string " test  \n=="
+  (markdown-test-string "test  \n=="
                         (call-interactively 'markdown-complete)
                         (should (string-equal (buffer-string) "test\n===="))))
 
