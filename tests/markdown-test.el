@@ -3990,6 +3990,25 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
                      (window-start) (window-point))
                     final-win-st-diff)))))))
 
+;; Tests for imenu
+
+(ert-deftest test-markdown-imenu/metadata ()
+  "Don't correct header like statement in metadata.
+https://github.com/jrblevin/markdown-mode/issues/145"
+  (markdown-test-string "---
+title = \"Blah\"
+comments = false
+---
+
+# Header1
+
+## Header2
+"
+    (let ((headers (mapcar #'car (markdown-imenu-create-flat-index))))
+      (should (member "Header1" headers))
+      (should (member "Header2" headers))
+      (should-not (member "comments = false" headers)))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here

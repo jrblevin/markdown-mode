@@ -4817,14 +4817,16 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (cond
-         ((setq heading (match-string-no-properties 1))
-          (setq pos (match-beginning 1)))
-         ((setq heading (match-string-no-properties 5))
-          (setq pos (match-beginning 4))))
-        (or (> (length heading) 0)
-            (setq heading empty-heading))
-        (setq index (append index (list (cons heading pos)))))
+        (when (and (not (markdown-code-block-at-point))
+                   (not (markdown-text-property-at-point 'markdown-yaml-metadata-begin)))
+          (cond
+           ((setq heading (match-string-no-properties 1))
+            (setq pos (match-beginning 1)))
+           ((setq heading (match-string-no-properties 5))
+            (setq pos (match-beginning 4))))
+          (or (> (length heading) 0)
+              (setq heading empty-heading))
+          (setq index (append index (list (cons heading pos))))))
       index)))
 
 
