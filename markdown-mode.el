@@ -5542,13 +5542,14 @@ setext header, but should not be folded."
     (goto-char (point-min))
     ;; Unhide any false positives in metadata blocks
     (when (markdown-text-property-at-point 'markdown-yaml-metadata-begin)
-      (let* ((body (progn (forward-line)
-                          (markdown-text-property-at-point
-                           'markdown-yaml-metadata-section)))
-             (end (progn (goto-char (cl-second body))
+      (let ((body (progn (forward-line)
                          (markdown-text-property-at-point
-                          'markdown-yaml-metadata-end))))
-        (outline-flag-region (point-min) (1+ (cl-second end)) nil)))
+                          'markdown-yaml-metadata-section))))
+        (when body
+          (let ((end (progn (goto-char (cl-second body))
+                            (markdown-text-property-at-point
+                             'markdown-yaml-metadata-end))))
+            (outline-flag-region (point-min) (1+ (cl-second end)) nil)))))
     ;; Hide any false positives in code blocks
     (unless (outline-on-heading-p)
       (outline-next-visible-heading 1))
