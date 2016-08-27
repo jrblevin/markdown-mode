@@ -6744,6 +6744,7 @@ or \\[markdown-toggle-inline-images]."
                 ; options really only handle paragraph-starting prefixes,
                 ; not paragraph-ending suffixes:
                 ".*  $" ; line ending in two spaces
+                "^#+"
                 "[ \t]*\\[\\^\\S-*\\]:[ \t]*$") ; just the start of a footnote def
               "\\|"))
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
