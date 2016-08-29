@@ -3595,6 +3595,16 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/79"
       (back-to-indentation)
       (should-not (looking-at-p "\\*foo")))))
 
+(ert-deftest test-markdown-filling/ignore-header ()
+  "# Test fill-paragraph for containing header line paragraph.
+https://github.com/jrblevin/markdown-mode/issues/159"
+  (markdown-test-string "# this is header line
+this is not header line
+"
+    (let ((fill-column 10))
+      (fill-paragraph)
+      (should (string= (buffer-substring (point) (line-end-position)) "# this is header line")))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
