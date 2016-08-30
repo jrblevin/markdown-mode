@@ -6421,9 +6421,9 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
       (forward-line 0)
       (1+ (count-lines start (point))))))
 
-(defun markdown-inside-link-text-p ()
-  "Return nil if not currently within link anchor text."
-  (looking-back "\\[[^]]*" nil))
+(defun markdown-inside-link-p ()
+  "Return t if point is within a link."
+  (thing-at-point-looking-at (markdown-make-regex-link-generic)))
 
 (defun markdown-line-is-reference-definition-p ()
   "Return whether the current line is a (non-footnote) reference defition."
@@ -6767,7 +6767,7 @@ or \\[markdown-toggle-inline-images]."
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
   (add-hook 'fill-nobreak-predicate
-            'markdown-inside-link-text-p nil t)
+            'markdown-inside-link-p nil t)
   (add-hook 'fill-nobreak-predicate
             'markdown-line-is-reference-definition-p nil t)
 
