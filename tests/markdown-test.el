@@ -3605,6 +3605,14 @@ this is not header line
       (fill-paragraph)
       (should (string= (buffer-substring (point) (line-end-position)) "# this is header line")))))
 
+(ert-deftest test-markdown-filling/unclosed-square-bracket ()
+  "Test fill-paragraph following an unclosed square bracket."
+  (markdown-test-string "```\n[3\n```\n\naaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbb"
+    (let ((fill-column 20))
+      (forward-line 4)
+      (fill-paragraph)
+      (should (looking-at "aaaaaaaaaaaaaaaa\nbbbbbbbbbbbbbbbb")))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
