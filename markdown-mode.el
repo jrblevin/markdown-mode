@@ -4298,14 +4298,16 @@ before the current point, then exdent the line one level.
 Otherwise, do normal delete by repeating
 `backward-delete-char-untabify' ARG times."
   (interactive "*p")
-  (let ((cur-pos (current-column))
-        (start-of-indention (save-excursion
-                              (back-to-indentation)
-                              (current-column)))
-        (positions (markdown-calc-indents)))
-    (if (and (> cur-pos 0) (= cur-pos start-of-indention))
-        (indent-line-to (markdown-exdent-find-next-position cur-pos positions))
-      (backward-delete-char-untabify arg))))
+  (if (use-region-p)
+      (backward-delete-char-untabify arg)
+    (let ((cur-pos (current-column))
+          (start-of-indention (save-excursion
+                                (back-to-indentation)
+                                (current-column)))
+          (positions (markdown-calc-indents)))
+      (if (and (> cur-pos 0) (= cur-pos start-of-indention))
+          (indent-line-to (markdown-exdent-find-next-position cur-pos positions))
+        (backward-delete-char-untabify arg)))))
 
 (defun markdown-find-leftmost-column (beg end)
   "Find the leftmost column in the region from BEG to END."
