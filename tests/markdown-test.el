@@ -3747,12 +3747,12 @@ this is not header line
    (markdown-test-range-has-face 219 223 markdown-math-face)
    (markdown-test-range-has-face 224 224 markdown-markup-face)
    (markdown-test-range-has-face 350 351 markdown-markup-face)
-   (markdown-test-range-has-face 352 354 markdown-math-face)
-   (markdown-test-range-has-face 355 356 markdown-markup-face)
-   (markdown-test-range-has-face 357 376 nil)
-   (markdown-test-range-has-face 377 378 markdown-markup-face)
-   (markdown-test-range-has-face 379 381 markdown-math-face)
-   (markdown-test-range-has-face 382 383 markdown-markup-face)))
+   (markdown-test-range-has-face 352 356 markdown-math-face)
+   (markdown-test-range-has-face 357 358 markdown-markup-face)
+   (markdown-test-range-has-face 359 391 nil)
+   (markdown-test-range-has-face 392 393 markdown-markup-face)
+   (markdown-test-range-has-face 394 398 markdown-math-face)
+   (markdown-test-range-has-face 399 400 markdown-markup-face)))
 
 (ert-deftest test-markdown-math/font-lock-italics ()
   "Test markdown math mode with underscores."
