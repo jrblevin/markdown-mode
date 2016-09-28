@@ -1442,7 +1442,7 @@ Groups 1 and 3 match opening and closing dollar signs.
 Group 3 matches the mathematical expression contained within.")
 
 (defconst markdown-regex-math-display
-  "^\\(\\\\\\[\\)\\(\\(?:.\\|\n\\)*\\)?\\(\\\\\\]\\)$"
+  "^\\(\\\\\\[\\)\\(\\(?:.\\|\n\\)*?\\)?\\(\\\\\\]\\)$"
   "Regular expression for itex \[..\] display mode expressions.
 Groups 1 and 3 match the opening and closing delimiters.
 Group 2 matches the mathematical expression contained within.")
@@ -6476,9 +6476,9 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     ;; Update font lock keywords with extensions
     (setq markdown-mode-font-lock-keywords
           (append
+           (markdown-mode-font-lock-keywords-math)
            markdown-mode-font-lock-keywords-basic
-           (markdown-mode-font-lock-keywords-wiki-links)
-           (markdown-mode-font-lock-keywords-math)))
+           (markdown-mode-font-lock-keywords-wiki-links)))
     ;; Update font lock defaults
     (setq font-lock-defaults
           '(markdown-mode-font-lock-keywords
