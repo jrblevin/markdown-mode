@@ -2307,21 +2307,21 @@ See `font-lock-syntactic-face-function' for details."
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
                                  (3 markdown-markup-face)))        ; ]
-    (markdown-match-inline-links . ((1 markdown-markup-face nil t) ; ! (optional)
-                                    (2 markdown-markup-face)       ; [
-                                    (3 markdown-link-face)         ; text
-                                    (4 markdown-markup-face)       ; ]
-                                    (5 markdown-markup-face)       ; (
-                                    (6 markdown-url-face)          ; url
+    (markdown-match-inline-links . ((1 markdown-markup-face nil t)     ; ! (optional)
+                                    (2 markdown-markup-face)           ; [
+                                    (3 markdown-link-face)             ; text
+                                    (4 markdown-markup-face)           ; ]
+                                    (5 markdown-markup-face)           ; (
+                                    (6 markdown-url-face)              ; url
                                     (7 markdown-link-title-face nil t) ; "title" (optional)
                                     (8 markdown-markup-face)))         ; )
-    (,markdown-regex-link-reference . ((1 markdown-markup-face nil t) ; ! (optional)
+    (markdown-match-reference-links . ((1 markdown-markup-face nil t) ; ! (optional)
                                        (2 markdown-markup-face)       ; [
                                        (3 markdown-link-face)         ; text
                                        (4 markdown-markup-face)       ; ]
                                        (5 markdown-markup-face)       ; [
                                        (6 markdown-reference-face)    ; label
-                                       (7 markdown-markup-face)))     ; ]
+                                       (8 markdown-markup-face)))     ; ]
     (,markdown-regex-reference-definition . ((1 markdown-markup-face) ; [
                                              (2 markdown-reference-face) ; label
                                              (3 markdown-markup-face)    ; ]
@@ -3087,13 +3087,21 @@ analysis."
         (set-match-data (list beg (point)))
         t))))
 
-(defun markdown-match-inline-links (last)
-  "Match inline links from point to LAST."
+(defun markdown-match-generic-links (last ref)
+  "Match inline links from point to LAST.
+When REF is non-nil, match reference links instead of standard
+links with URLs."
+  ;; Clear match data to test for a match after functions returns.
+  (set-match-data nil)
+  ;; Search for the next potential link (not in a code block).
+  (while (and (re-search-forward "\\(!\\)?\\(\\[\\)" last t)
+              (markdown-code-block-at-point)
+              (< (point) last)))
   ;; Match opening exclamation point (optional) and left bracket.
-  (when (re-search-forward "\\(!\\)?\\(\\[\\)" last t)
+  (when (match-beginning 2)
     (let* ((bang (match-beginning 1))
-           (square-begin (match-beginning 2))
-           ;; Find end of block to prevent matching across blocks
+           (first-begin (match-beginning 2))
+           ;; Find end of block to prevent matching across blocks.
            (end-of-block (save-excursion
                            (progn
                              (goto-char (match-beginning 2))
@@ -3101,60 +3109,69 @@ analysis."
                              (point))))
            ;; Move over balanced expressions to closing right bracket.
            ;; Catch unbalanced expression errors and return nil.
-           (square-end (condition-case nil
-                           (and (goto-char square-begin)
+           (first-end (condition-case nil
+                           (and (goto-char first-begin)
                                 (scan-sexps (point) 1))
                          (error nil)))
-           ;; Continue with point at CONT-POINT upon failure
-           (cont-point (min end-of-block last))
-           paren-begin paren-end url-begin url-end
+           ;; Continue with point at CONT-POINT upon failure.
+           (cont-point (min (1+ first-begin) last))
+           second-begin second-end url-begin url-end
            title-begin title-end)
-      ;; When bracket found, in range, and followed by a left paren...
-      (when (and square-end (< square-end end-of-block) (goto-char square-end)
-                 (char-equal (char-after (point)) ?\())
-        ;; Scan across balanced expressions for closing parenthesis.
-        (setq paren-begin (point)
-              paren-end (condition-case nil
+      ;; When bracket found, in range, and followed by a left paren/bracket...
+      (when (and first-end (< first-end end-of-block) (goto-char first-end)
+                 (char-equal (char-after (point)) (if ref ?\[ ?\()))
+        ;; Scan across balanced expressions for closing parenthesis/bracket.
+        (setq second-begin (point)
+              second-end (condition-case nil
                             (scan-sexps (point) 1)
                           (error nil)))
-        ;; Check that closing parenthesis is in range
-        (if (and paren-end (< paren-end end-of-block) (<= paren-end last))
+        ;; Check that closing parenthesis/bracket is in range.
+        (if (and second-end (<= second-end end-of-block) (<= second-end last))
             (progn
               ;; Search for (optional) title inside closing parenthesis
-              (when (search-forward "\"" paren-end t)
+              (when (and (not ref) (search-forward "\"" second-end t))
                 (setq title-begin (1- (point))
-                      title-end (and (goto-char paren-end)
+                      title-end (and (goto-char second-end)
                                      (search-backward "\"" (1+ title-begin) t))
                       title-end (and title-end (1+ title-end))))
-              ;; Store URL range
-              (setq url-begin (1+ paren-begin)
-                    url-end (1- (or title-begin paren-end)))
+              ;; Store URL/reference range
+              (setq url-begin (1+ second-begin)
+                    url-end (1- (or title-begin second-end)))
               ;; Set match data, move point beyond link, and return
               (set-match-data
-               (list (or bang square-begin) paren-end  ; 0 - all
+               (list (or bang first-begin) second-end  ; 0 - all
                      bang (and bang (1+ bang))         ; 1 - bang
-                     square-begin (1+ square-begin)    ; 2 - markup
-                     (1+ square-begin) (1- square-end) ; 3 - link text
-                     (1- square-end) square-end        ; 4 - markup
-                     paren-begin (1+ paren-begin)      ; 5 - markup
-                     url-begin url-end                 ; 6 - url
+                     first-begin (1+ first-begin)      ; 2 - markup
+                     (1+ first-begin) (1- first-end)   ; 3 - link text
+                     (1- first-end) first-end          ; 4 - markup
+                     second-begin (1+ second-begin)    ; 5 - markup
+                     url-begin url-end                 ; 6 - url/reference
                      title-begin title-end             ; 7 - title
-                     (1- paren-end) paren-end))        ; 8 - markup
+                     (1- second-end) second-end))      ; 8 - markup
               ;; Nullify cont-point and leave point at end and
               (setq cont-point nil)
-              (goto-char paren-end))
+              (goto-char second-end))
           ;; If no closing parenthesis in range, update continuation point
           (setq cont-point (min end-of-block last))))
       (cond
        ;; On failure, continue searching at cont-point
        ((and cont-point (< cont-point last))
+        ;;(message "Failure, starting over at cont-point = %d" cont-point)
         (goto-char cont-point)
-        (markdown-match-inline-links last))
+        (markdown-match-generic-links last ref))
        ;; No more text, return nil
        ((and cont-point (= cont-point last))
         nil)
        ;; Return t if a match occurred
        (t t)))))
+
+(defun markdown-match-inline-links (last)
+  "Match standard inline links from point to LAST."
+  (markdown-match-generic-links last nil))
+
+(defun markdown-match-reference-links (last)
+  "Match inline reference links from point to LAST."
+  (markdown-match-generic-links last t))
 
 (defun markdown-get-match-boundaries (start-header end-header last &optional pos)
   (save-excursion

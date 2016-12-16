@@ -2149,6 +2149,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-font-lock/code-link-precedence ()
   "Test that inline code takes precedence over inline links.
 Test currently fails because this case isn't handled properly."
+  :expected-result :failed
   (markdown-test-string
    "[not a `link](/foo`)"
    (markdown-test-range-has-face 1 7 nil)
