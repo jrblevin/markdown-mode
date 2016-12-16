@@ -2307,7 +2307,7 @@ See `font-lock-syntactic-face-function' for details."
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
                                  (3 markdown-markup-face)))        ; ]
-    (,markdown-regex-link-inline . ((1 markdown-markup-face nil t) ; ! (optional)
+    (markdown-match-inline-links . ((1 markdown-markup-face nil t) ; ! (optional)
                                     (2 markdown-markup-face)       ; [
                                     (3 markdown-link-face)         ; text
                                     (4 markdown-markup-face)       ; ]
@@ -3086,6 +3086,75 @@ analysis."
         (forward-char)
         (set-match-data (list beg (point)))
         t))))
+
+(defun markdown-match-inline-links (last)
+  "Match inline links from point to LAST."
+  ;; Match opening exclamation point (optional) and left bracket.
+  (when (re-search-forward "\\(!\\)?\\(\\[\\)" last t)
+    (let* ((bang (match-beginning 1))
+           (square-begin (match-beginning 2))
+           ;; Find end of block to prevent matching across blocks
+           (end-of-block (save-excursion
+                           (progn
+                             (goto-char (match-beginning 2))
+                             (markdown-end-of-text-block)
+                             (point))))
+           ;; Move over balanced expressions to closing right bracket.
+           ;; Catch unbalanced expression errors and return nil.
+           (square-end (condition-case nil
+                           (and (goto-char square-begin)
+                                (scan-sexps (point) 1))
+                         (error nil)))
+           ;; Continue with point at CONT-POINT upon failure
+           (cont-point (min end-of-block last))
+           paren-begin paren-end url-begin url-end
+           title-begin title-end)
+      ;; When bracket found, in range, and followed by a left paren...
+      (when (and square-end (< square-end end-of-block) (goto-char square-end)
+                 (char-equal (char-after (point)) ?\())
+        ;; Scan across balanced expressions for closing parenthesis.
+        (setq paren-begin (point)
+              paren-end (condition-case nil
+                            (scan-sexps (point) 1)
+                          (error nil)))
+        ;; Check that closing parenthesis is in range
+        (if (and paren-end (< paren-end end-of-block) (<= paren-end last))
+            (progn
+              ;; Search for (optional) title inside closing parenthesis
+              (when (search-forward "\"" paren-end t)
+                (setq title-begin (1- (point))
+                      title-end (and (goto-char paren-end)
+                                     (search-backward "\"" (1+ title-begin) t))
+                      title-end (and title-end (1+ title-end))))
+              ;; Store URL range
+              (setq url-begin (1+ paren-begin)
+                    url-end (1- (or title-begin paren-end)))
+              ;; Set match data, move point beyond link, and return
+              (set-match-data
+               (list (or bang square-begin) paren-end  ; 0 - all
+                     bang (and bang (1+ bang))         ; 1 - bang
+                     square-begin (1+ square-begin)    ; 2 - markup
+                     (1+ square-begin) (1- square-end) ; 3 - link text
+                     (1- square-end) square-end        ; 4 - markup
+                     paren-begin (1+ paren-begin)      ; 5 - markup
+                     url-begin url-end                 ; 6 - url
+                     title-begin title-end             ; 7 - title
+                     (1- paren-end) paren-end))        ; 8 - markup
+              ;; Nullify cont-point and leave point at end and
+              (setq cont-point nil)
+              (goto-char paren-end))
+          ;; If no closing parenthesis in range, update continuation point
+          (setq cont-point (min end-of-block last))))
+      (cond
+       ;; On failure, continue searching at cont-point
+       ((and cont-point (< cont-point last))
+        (goto-char cont-point)
+        (markdown-match-inline-links last))
+       ;; No more text, return nil
+       ((and cont-point (= cont-point last))
+        nil)
+       ;; Return t if a match occurred
+       (t t)))))
 
 (defun markdown-get-match-boundaries (start-header end-header last &optional pos)
   (save-excursion

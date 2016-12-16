@@ -2149,7 +2149,6 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-font-lock/code-link-precedence ()
   "Test that inline code takes precedence over inline links.
 Test currently fails because this case isn't handled properly."
-  :expected-result :failed
   (markdown-test-string
    "[not a `link](/foo`)"
    (markdown-test-range-has-face 1 7 nil)
@@ -2319,6 +2318,16 @@ for (var i = 0; i < 10; i++) {
    (markdown-test-range-has-face 932 949 markdown-url-face)
    (markdown-test-range-has-face 951 957 markdown-link-title-face)
    (markdown-test-range-has-face 958 958 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/inline-links-with-parentheses ()
+  "Test font lock for inline links with nested parentheses.
+See <https://github.com/jrblevin/markdown-mode/issues/170>."
+  (markdown-test-string "[foo](bar(baz)qux)"
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 4 markdown-link-face)
+   (markdown-test-range-has-face 5 6 markdown-markup-face)
+   (markdown-test-range-has-face 7 17 markdown-url-face)
+   (markdown-test-range-has-face 18 18 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
