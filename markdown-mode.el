@@ -884,7 +884,7 @@
 ;;   * Google's Open Source Programs Office for recognizing the project with
 ;;     a monetary contribution in June 2015.
 ;;   * Howard Melman <hmelman@gmail.com> for supporting GFM checkboxes
-;;     as buttons.
+;;     as buttons and several bug reports.
 ;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview
 ;;     mode, completion of GFM programming language names, improved
 ;;     font lock for fenced code blocks and metadata blocks, `cl-lib'
