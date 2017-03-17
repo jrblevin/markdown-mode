@@ -6637,7 +6637,7 @@ BEG and END are the limits of scanned region."
 This can be toggled with `markdown-toggle-inline-images'
 or \\[markdown-toggle-inline-images]."
   (interactive)
-  (mapc #delete-overlay markdown-inline-image-overlays)
+  (mapc #'delete-overlay markdown-inline-image-overlays)
   (setq markdown-inline-image-overlays nil))
 
 (defun markdown-display-inline-images ()
@@ -6729,7 +6729,7 @@ or \\[markdown-toggle-inline-images]."
   (set
    ;; Should match start of lines that start or separate paragraphs
    (make-local-variable 'paragraph-start)
-       (mapconcat #identity
+       (mapconcat #'identity
                   '(
                     "\f" ; starts with a literal line-feed
                     "[ \t\f]*$" ; space-only line
@@ -6743,7 +6743,7 @@ or \\[markdown-toggle-inline-images]."
    ;; Should match lines that separate paragraphs without being
    ;; part of any paragraph:
    (make-local-variable 'paragraph-separate)
-   (mapconcat 'identity
+   (mapconcat #'identity
               '("[ \t\f]*$" ; space-only line
                 ;; The following is not ideal, but the Fill customization
                 ;; options really only handle paragraph-starting prefixes,
