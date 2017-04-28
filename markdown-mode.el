@@ -1234,10 +1234,14 @@ Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
 
 (defconst markdown-regex-gfm-code-block-open
- "^[[:blank:]]*\\(```\\)[ ]?\\([^[:space:]]+\\|{[^}]*}\\)?\\([[:space:]]*?\\)$"
+ "^[[:blank:]]*\\(```\\)[[:blank:]]*\\({\\)?[[:blank:]]*\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?[[:blank:]]*\\(}\\)?[[:blank:]]*$"
  "Regular expression matching opening of GFM code blocks.
 Group 1 matches the opening three backticks.
-Group 2 matches the language identifier (optional).")
+Group 2 matches the opening brace (optional).
+Group 3 matches the language identifier (optional).
+Group 4 matches the info string (optional).
+Group 5 matches the closing brace (optional).
+Groups need to agree with `markdown-regex-tilde-fence-begin'.")
 
 (defconst markdown-regex-gfm-code-block-close
  "^[[:blank:]]*\\(```\\)\\s *?$"
@@ -1361,15 +1365,22 @@ Groups 1 and 3 match the opening and closing delimiters.
 Group 2 matches the mathematical expression contained within.")
 
 (defsubst markdown-make-tilde-fence-regex (num-tildes &optional end-of-line)
-  "Return regexp matching a Pandoc code fence at least NUM-TILDES long.
+  "Return regexp matching a tilde code fence at least NUM-TILDES long.
 END-OF-LINE is the regexp construct to indicate end of line; $ if
 missing."
-  (format "%s%d%s%s" "^\\([~]\\{" num-tildes ",\\}\\)" (or end-of-line "$")))
+  (format "%s%d%s%s" "^[[:blank:]]*\\([~]\\{" num-tildes ",\\}\\)"
+          (or end-of-line "$")))
 
 (defconst markdown-regex-tilde-fence-begin
   (markdown-make-tilde-fence-regex
-   3 "[ ]?\\([^[:space:]]+\\|{[^}]*}\\)?\\([[:space:]]*?\\)$")
-  "Regular expression for matching Pandoc tildes.")
+   3 "[[:blank:]]*\\({\\)?[[:blank:]]*\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?[[:blank:]]*\\(}\\)?[[:blank:]]*$")
+  "Regular expression for matching tilde-fenced code blocks.
+Group 1 matches the opening tildes.
+Group 2 matches the opening brace (optional).
+Group 3 matches the language identifier (optional).
+Group 4 matches the info string (optional).
+Group 5 matches the closing brace (optional).
+Groups need to agree with `markdown-regex-gfm-code-block-open'.")
 
 (defconst markdown-regex-declarative-metadata
   "^\\([[:alpha:]][[:alpha:] _-]*?\\)\\([:=][ \t]*\\)\\(.*\\)$"
@@ -1971,6 +1982,9 @@ START and END delimit region to propertize."
 (defvar markdown-language-keyword-face 'markdown-language-keyword-face
   "Face name to use for programming language identifiers.")
 
+(defvar markdown-language-info-face 'markdown-language-info-face
+  "Face name to use for programming info strings.")
+
 (defvar markdown-link-face 'markdown-link-face
   "Face name to use for links.")
 
@@ -2071,6 +2085,11 @@ START and END delimit region to propertize."
 (defface markdown-language-keyword-face
   '((t (:inherit font-lock-type-face)))
   "Face for programming language identifiers."
+  :group 'markdown-faces)
+
+(defface markdown-language-info-face
+  '((t (:inherit font-lock-string-face)))
+  "Face for programming language info strings."
   :group 'markdown-faces)
 
 (defface markdown-link-face
@@ -2215,11 +2234,17 @@ See `font-lock-syntactic-face-function' for details."
                                          (2 markdown-markup-face)
                                          (3 markdown-metadata-value-face)))
     (markdown-match-gfm-open-code-blocks . ((1 markdown-markup-face)
-                                            (2 markdown-language-keyword-face nil t)))
+                                            (2 markdown-markup-face nil t)
+                                            (3 markdown-language-keyword-face nil t)
+                                            (4 markdown-language-info-face nil t)
+                                            (5 markdown-markup-face nil t)))
     (markdown-match-gfm-close-code-blocks . ((1 markdown-markup-face)))
     (markdown-match-gfm-code-blocks . ((0 markdown-pre-face)))
     (markdown-match-fenced-start-code-block . ((1 markdown-markup-face)
-                                               (2 markdown-language-keyword-face nil t)))
+                                               (2 markdown-markup-face nil t)
+                                               (3 markdown-language-keyword-face nil t)
+                                               (4 markdown-language-info-face nil t)
+                                               (5 markdown-markup-face nil t)))
     (markdown-match-fenced-end-code-block . ((0 markdown-markup-face)))
     (markdown-match-fenced-code-blocks . ((0 markdown-pre-face)))
     (markdown-match-pre-blocks . ((0 markdown-pre-face)))
@@ -3938,9 +3963,11 @@ automatically in order to have the correct markup."
                     (goto-char (car pos-prop))
                     (save-match-data
                       (set-match-data (get-text-property (point) prop))
-                      (when (and (match-beginning 2) (match-end 2))
+                      ;; Note: Hard-coded group number assumes tilde
+                      ;; and GFM fenced code regexp groups agree.
+                      (when (and (match-beginning 3) (match-end 3))
                         (buffer-substring-no-properties
-                         (match-beginning 2) (match-end 2)))))
+                         (match-beginning 3) (match-end 3)))))
        do (progn (when lang (markdown-gfm-add-used-language lang))
                  (goto-char (next-single-property-change (point) prop)))))))
 

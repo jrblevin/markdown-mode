@@ -2259,7 +2259,10 @@ puts markdown.to_html
   "Test GFM-style fenced code blocks (2)."
   (markdown-test-string "```{r sum}\n2+2\n```"
    (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
-   (markdown-test-range-has-face 4 10 markdown-language-keyword-face) ; {r sum}
+   (markdown-test-range-has-face 4 4 markdown-markup-face) ; {
+   (markdown-test-range-has-face 5 5 markdown-language-keyword-face) ; r
+   (markdown-test-range-has-face 7 9 markdown-language-info-face) ; sum
+   (markdown-test-range-has-face 10 10 markdown-markup-face) ; }
    (markdown-test-range-has-face 12 14 markdown-pre-face) ; 2+2
    (markdown-test-range-has-face 16 18 markdown-markup-face))) ; ```
 
@@ -2276,6 +2279,15 @@ for (var i = 0; i < 10; i++) {
     (markdown-test-range-has-face 14 15 markdown-language-keyword-face) ; js
     (markdown-test-range-has-face 17 68 markdown-pre-face)
     (markdown-test-range-has-face 70 72 markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/gfm-fenced-4 ()
+  "Test GFM-style fenced code blocks (2)."
+  (markdown-test-string "```scalaFiddle libraries=\"Java8 Time-0.1.0\"\nimport java.time._\n\nval hour = LocalTime.now().getHour()\n\nprintln(hour)\n```"
+   (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
+   (markdown-test-range-has-face 4 14 markdown-language-keyword-face) ; scalaFiddle
+   (markdown-test-range-has-face 16 43 markdown-language-info-face) ; libraries="Java8 Time-0.1.0"
+   (markdown-test-range-has-face 45 115 markdown-pre-face) ; [code]
+   (markdown-test-range-has-face 117 119 markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
@@ -2636,7 +2648,7 @@ echo \"Hello, world v2!\"
               (marker-position end-top-1) (marker-position start-top-1)))
      ;; check top language specifier
      (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 2 (marker-position start-lang-1)
+              'markdown-tilde-fence-begin 3 (marker-position start-lang-1)
               (marker-position end-lang-1) (marker-position start-lang-1)))
      ;; check text in between
      (should (markdown-test-check-match-limits
@@ -2663,7 +2675,7 @@ echo \"Hello, world v2!\"
               'markdown-tilde-fence-begin 1 (marker-position start-top-2)
               (marker-position end-top-2) (marker-position start-top-2)))
      (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 2 (marker-position start-lang-2)
+              'markdown-tilde-fence-begin 3 (marker-position start-lang-2)
               (marker-position end-lang-2) (marker-position start-lang-2)))
      (should (markdown-test-check-match-limits
               'markdown-fenced-code 0 (marker-position start-mid-2)
@@ -2682,7 +2694,7 @@ echo \"Hello, world v2!\"
               'markdown-tilde-fence-begin 1 (marker-position start-top-1)
               (marker-position end-top-1) (marker-position start-top-1)))
      (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 2 (marker-position start-lang-1)
+              'markdown-tilde-fence-begin 3 (marker-position start-lang-1)
               (marker-position end-lang-1) (marker-position start-lang-1)))
      (should (markdown-test-check-match-limits
               'markdown-fenced-code 0 (marker-position start-mid-1)
@@ -2698,7 +2710,7 @@ echo \"Hello, world v2!\"
               'markdown-tilde-fence-begin 1 (marker-position start-top-2)
               (marker-position end-top-2) (marker-position start-top-2)))
      (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 2 (marker-position start-lang-2)
+              'markdown-tilde-fence-begin 3 (marker-position start-lang-2)
               (marker-position end-lang-2) (marker-position start-lang-2)))
      (should (markdown-test-check-match-limits
               'markdown-fenced-code 0 (marker-position start-mid-2)
@@ -2728,7 +2740,7 @@ echo \"Hello, world!\"
              'markdown-tilde-fence-begin 1 1 4 1))
     ;; check language
     (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-begin 2 5 10 5))
+             'markdown-tilde-fence-begin 3 5 10 5))
     ;; middle should not be propertized
     (should-not (get-text-property 11 'markdown-fenced-code))
     ;; neither should end
@@ -2739,7 +2751,7 @@ echo \"Hello, world!\"
     (should (markdown-test-check-match-limits
              'markdown-tilde-fence-begin 1 1 4 1))
     (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-begin 2 5 10 5))
+             'markdown-tilde-fence-begin 3 5 10 5))
     ;; check middle
     (should (markdown-test-check-match-limits 'markdown-fenced-code 0 10 43 10))
     ;; check ending tildes
@@ -3853,10 +3865,14 @@ this is not header line
       (markdown-test-range-has-face 119 152 markdown-header-face-1)
       (markdown-test-range-has-face 129 129 markdown-markup-face)
       (markdown-test-range-has-face 136 136 markdown-markup-face)
+
       (markdown-test-range-has-face 174 177 markdown-markup-face)
-      (markdown-test-range-has-face 179 188 markdown-language-keyword-face)
+      (markdown-test-range-has-face 179 179 markdown-markup-face)
+      (markdown-test-range-has-face 180 187 markdown-language-keyword-face)
+      (markdown-test-range-has-face 188 188 markdown-markup-face)
       (markdown-test-range-has-face 190 211 markdown-pre-face)
       (markdown-test-range-has-face 212 215 markdown-markup-face)
+
       (markdown-test-range-has-face 218 218 markdown-markup-face)
       (markdown-test-range-has-face 219 223 markdown-math-face)
       (markdown-test-range-has-face 224 224 markdown-markup-face)
