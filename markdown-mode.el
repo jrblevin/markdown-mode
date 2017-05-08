@@ -921,10 +921,11 @@ promotion and demotion functions."
   :type 'boolean)
 
 (defcustom markdown-asymmetric-header nil
-  "Determines if header style will be asymmetric.
-Set to non-nil to only have header characters to the left of the title.
-The default will ensure header characters are placed to the left and right
-of the title."
+  "Determines if atx header style will be asymmetric.
+Set to a non-nil value to use asymmetric header styling, placing
+header markup only at the beginning of the line. By default,
+balanced markup will be inserted at the beginning and end of the
+line around the header title."
   :group 'markdown
   :type 'boolean)
 
