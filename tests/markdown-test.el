@@ -3301,6 +3301,15 @@ date = 2015-08-13 11:35:25 EST
    (markdown-beginning-of-block)
    (should (= (point) (point-min)))))
 
+(ert-deftest test-markdown-movement/blockquote-paragraphs ()
+  "Test filling of blockquotes containing multiple paragraphs."
+  (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n>\n> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n"
+    (forward-paragraph)
+    (should (looking-at "^>$"))
+    (should (= (point) 128))
+    (forward-paragraph)
+    (should (= (point) (point-max)))))
+
 (ert-deftest test-markdown-movement/reference-definition ()
   "Test jumping to reference definitions."
   ;; Jumping to explicit reference definition
@@ -3460,6 +3469,13 @@ See `adaptive-fill-first-line-regexp'."
   (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
    (fill-paragraph)
    (should (string-equal (buffer-string) "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\n> eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
+
+(ert-deftest test-markdown-filling/blockquote-paragraphs ()
+  "Test filling of blockquotes containing multiple paragraphs."
+  (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n>\n> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n"
+   (forward-paragraph)
+   (fill-paragraph)
+   (should (string-equal (buffer-string) "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n>\n> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris\n> nisi ut aliquip ex ea commodo consequat.\n"))))
 
 (ert-deftest test-markdown-filling/space-after-list-marker ()
   "`fill-paragraph' should preserve more than one space after a list marker,

@@ -6615,6 +6615,7 @@ or \\[markdown-toggle-inline-images]."
                   '(
                     "\f" ; starts with a literal line-feed
                     "[ \t\f]*$" ; space-only line
+                    "\\(?:[ \t]*>\\)+[ \t\f]*$"; empty line in blockquote
                     "[ \t]*[*+-][ \t]+" ; unordered list item
                     "[ \t]*\\(?:[0-9]+\\|#\\)\\.[ \t]+" ; ordered list item
                     "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
@@ -6627,6 +6628,7 @@ or \\[markdown-toggle-inline-images]."
    (make-local-variable 'paragraph-separate)
    (mapconcat #'identity
               '("[ \t\f]*$" ; space-only line
+                "\\(?:[ \t]*>\\)+[ \t\f]*$"; empty line in blockquote
                 ;; The following is not ideal, but the Fill customization
                 ;; options really only handle paragraph-starting prefixes,
                 ;; not paragraph-ending suffixes:
