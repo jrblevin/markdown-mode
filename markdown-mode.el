@@ -1,33 +1,7 @@
 ;;; markdown-mode.el --- Major mode for Markdown-formatted text -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2007-2016 Jason R. Blevins <jrblevin@sdf.org>
-;; Copyright (C) 2007, 2009 Edward O'Connor <ted@oconnor.cx>
-;; Copyright (C) 2007 Conal Elliott <conal@conal.net>
-;; Copyright (C) 2008 Greg Bognar <greg_bognar@hms.harvard.edu>
-;; Copyright (C) 2008 Dmitry Dzhus <mail@sphinx.net.ru>
-;; Copyright (C) 2008 Bryan Kyle <bryan.kyle@gmail.com>
-;; Copyright (C) 2008 Ben Voui <intrigeri@boum.org>
-;; Copyright (C) 2009 Ankit Solanki <ankit.solanki@gmail.com>
-;; Copyright (C) 2009 Hilko Bengen <bengen@debian.org>
-;; Copyright (C) 2009 Peter Williams <pezra@barelyenough.org>
-;; Copyright (C) 2010 George Ogata <george.ogata@gmail.com>
-;; Copyright (C) 2011 Eric Merritt <ericbmerritt@gmail.com>
-;; Copyright (C) 2011 Philippe Ivaldi <pivaldi@sfr.fr>
-;; Copyright (C) 2011 Jeremiah Dodds <jeremiah.dodds@gmail.com>
-;; Copyright (C) 2011 Christopher J. Madsen <cjm@cjmweb.net>
-;; Copyright (C) 2011 Shigeru Fukaya <shigeru.fukaya@gmail.com>
-;; Copyright (C) 2011 Joost Kremers <joostkremers@fastmail.fm>
-;; Copyright (C) 2011-2012 Donald Ephraim Curtis <dcurtis@milkbox.net>
-;; Copyright (C) 2012 Akinori Musha <knu@idaemons.org>
-;; Copyright (C) 2012 Zhenlei Jia <zhenlei.jia@gmail.com>
-;; Copyright (C) 2012 Peter Jones <pjones@pmade.com>
-;; Copyright (C) 2013 Matus Goljer <dota.keys@gmail.com>
-;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
-;; Copyright (C) 2015 Antonis Kanouras <antonis@metadosis.gr>
-;; Copyright (C) 2015 Howard Melman <hmelman@gmail.com>
-;; Copyright (C) 2015-2016 Danny McClanahan <danieldmcclanahan@gmail.com>
-;; Copyright (C) 2015-2016 Syohei Yoshida <syohex@gmail.com>
-;; Copyright (C) 2016 Vitalie Spinu <spinuvit@gmail.com>
+;; Copyright (C) 2007-2017 Jason R. Blevins and markdown-mode
+;; contributors (see the commit log for details).
 
 ;; Author: Jason R. Blevins <jrblevin@sdf.org>
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
@@ -796,107 +770,12 @@
 
 ;;; Acknowledgments:
 
-;; markdown-mode has benefited greatly from the efforts of the
-;; following people:
+;; markdown-mode has benefited greatly from the efforts of the many
+;; volunteers who have sent patches, test cases, bug reports,
+;; suggestions, helped with packaging, etc.  Thank you for your
+;; contributions!  See the [contributors graph][contrib] for details.
 ;;
-;;   * Cyril Brulebois <cyril.brulebois@enst-bretagne.fr> for Debian packaging.
-;;   * Conal Elliott <conal@conal.net> for a font-lock regexp patch.
-;;   * Edward O'Connor <hober0@gmail.com> for a font-lock regexp fix and
-;;     GitHub Flavored Markdown mode (`gfm-mode').
-;;   * Greg Bognar <greg_bognar@hms.harvard.edu> for menus and running
-;;     `markdown' with an active region.
-;;   * Daniel Burrows <dburrows@debian.org> for filing Debian bug #456592.
-;;   * Peter S. Galbraith <psg@debian.org> for maintaining `emacs-goodies-el`.
-;;   * Dmitry Dzhus <mail@sphinx.net.ru> for undefined reference checking.
-;;   * Carsten Dominik <carsten@orgmode.org> for `org-mode', from which the
-;;     visibility cycling functionality was derived, and for a bug fix
-;;     related to `orgtbl-mode'.
-;;   * Bryan Kyle <bryan.kyle@gmail.com> for indentation code.
-;;   * Ben Voui <intrigeri@boum.org> for font-lock face customizations.
-;;   * Ankit Solanki <ankit.solanki@gmail.com> for `longlines.el`
-;;     compatibility and custom CSS.
-;;   * Hilko Bengen <bengen@debian.org> for proper XHTML output.
-;;   * Jose A. Ortega Ruiz <jao@gnu.org> for Emacs 23 fixes.
-;;   * Nelson Minar <nelson@santafe.edu> for `html-helper-mode', from which
-;;     comment matching functions were derived.
-;;   * Alec Resnick <alec@sproutward.org> for bug reports.
-;;   * Joost Kremers <joostkremers@fastmail.fm> for footnote-handling
-;;     functions, bug reports regarding indentation, and
-;;     fixes for byte-compilation warnings.
-;;   * Peter Williams <pezra@barelyenough.org> for `fill-paragraph'
-;;     enhancements.
-;;   * George Ogata <george.ogata@gmail.com> for fixing several
-;;     byte-compilation warnings.
-;;   * Eric Merritt <ericbmerritt@gmail.com> for wiki link features.
-;;   * Philippe Ivaldi <pivaldi@sfr.fr> for XHTML preview
-;;     customizations and XHTML export.
-;;   * Jeremiah Dodds <jeremiah.dodds@gmail.com> for supporting
-;;     Markdown processors which do not accept input from stdin.
-;;   * Werner Dittmann <werner.dittmann@t-online.de> for bug reports
-;;     regarding the `cl` dependency and `auto-fill-mode' and indentation.
-;;   * Scott Pfister <scott.pfister@gmail.com> for generalizing the space
-;;     substitution character for mapping wiki links to filenames.
-;;   * Marcin Kasperski <marcin.kasperski@mekk.waw.pl> for a patch to
-;;     escape shell commands.
-;;   * Christopher J. Madsen <cjm@cjmweb.net> for patches to fix a match
-;;     data bug and to prefer `visual-line-mode' in `gfm-mode'.
-;;   * Shigeru Fukaya <shigeru.fukaya@gmail.com> for better adherence to
-;;     Emacs Lisp coding conventions.
-;;   * Donald Ephraim Curtis <dcurtis@milkbox.net> for fixing the `fill-paragraph'
-;;     regexp, refactoring the compilation and preview functions,
-;;     heading font-lock generalizations, list renumbering,
-;;     and kill ring save.
-;;   * Kevin Porter <kportertx@gmail.com> for wiki link handling in `gfm-mode'.
-;;   * Max Penet <max.penet@gmail.com> and Peter Eisentraut <peter_e@gmx.net>
-;;     for an autoload token for `gfm-mode'.
-;;   * Ian Yang <me@iany.me> for improving the reference definition regex.
-;;   * Akinori Musha <knu@idaemons.org> for an imenu index function.
-;;   * Michael Sperber <sperber@deinprogramm.de> for XEmacs fixes.
-;;   * Francois Gannaz <francois.gannaz@free.fr> for suggesting charset
-;;     declaration in XHTML output.
-;;   * Zhenlei Jia <zhenlei.jia@gmail.com> for smart exdention function.
-;;   * Matus Goljer <dota.keys@gmail.com> for improved wiki link following
-;;     and GFM code block insertion.
-;;   * Peter Jones <pjones@pmade.com> for link following functions.
-;;   * Bryan Fink <bryan.fink@gmail.com> for a bug report regarding
-;;     externally modified files.
-;;   * Vegard Vesterheim <vegard.vesterheim@uninett.no> for a bug fix
-;;     related to `orgtbl-mode'.
-;;   * Makoto Motohashi <mkt.motohashi@gmail.com> for before- and after-
-;;     export hooks, unit test improvements, and updates to support
-;;     wide characters.
-;;   * Michael Dwyer <mdwyer@ehtech.in> for `gfm-mode' underscore regexp.
-;;   * Chris Lott <chris@chrislott.org> for suggesting reference label
-;;     completion.
-;;   * Gunnar Franke <Gunnar.Franke@gmx.de> for a completion bug report.
-;;   * David Glasser <glasser@meteor.com> for a `paragraph-separate' fix.
-;;   * Daniel Brotsky <dev@brotsky.com> for better auto-fill defaults.
-;;   * Samuel Freilich <sfreilich@google.com> for improved filling
-;;     behavior regarding list items, footnotes, and reference
-;;     definitions, improved killing of footnotes, and numerous other
-;;     tests and bug fixes.
-;;   * Antonis Kanouras <antonis@metadosis.gr> for strikethrough support.
-;;   * Tim Visher <tim.visher@gmail.com> for multiple CSS files and other
-;;     general improvements.
-;;   * Matt McClure <matthewlmcclure@gmail.com> for a patch to prevent
-;;     overwriting source files with .html extensions upon export.
-;;   * Roger Bolsius <roger.bolsius@gmail.com> for ordered list improvements.
-;;   * Google's Open Source Programs Office for recognizing the project with
-;;     a monetary contribution in June 2015.
-;;   * Howard Melman <hmelman@gmail.com> for supporting GFM checkboxes
-;;     as buttons and several bug reports.
-;;   * Danny McClanahan <danieldmcclanahan@gmail.com> for live preview
-;;     mode, completion of GFM programming language names, improved
-;;     font lock for fenced code blocks and metadata blocks, `cl-lib'
-;;     updates, and numerous other improvements.
-;;   * Syohei Yoshida <syohex@gmail.com> for better heading detection
-;;     and movement functions, improved italic font lock, fixing adaptive
-;;     filling for hanging list items, more efficient fontification,
-;;     and numerous other improvements.
-;;   * Vitalie Spinu <spinuvit@gmail.com> for improvements to font
-;;     lock and source code aesthetics.
-;;   * Kévin Le Gouguec <kevin.legouguec@gmail.com> for improvements
-;;     related to ATX headings and Pandoc fancy lists.
+;;  [contrib]: https://github.com/jrblevin/markdown-mode/graphs/contributors
 
 ;;; Bugs:
 
