@@ -1065,6 +1065,18 @@ completion."
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-split-window-direction 'any
+  "Preference for splitting windows for static and live preview.
+The default value is 'any, which instructs Emacs to use
+`split-window-sensibly' to automatically choose how to split
+windows based on the values of `split-width-threshold' and
+`split-height-threshold' and the available windows.  To force
+vertically split (left and right) windows, set this to 'vertical
+or 'right.  To force horizontally split (top and bottom) windows,
+set this to 'horizontal or 'below."
+  :group 'markdown
+  :type 'symbol)
+
 (defcustom markdown-live-preview-window-function
   'markdown-live-preview-window-eww
   "Function to display preview of Markdown output within Emacs.
@@ -6006,7 +6018,14 @@ displaying the rendered output."
         (delete-file outfile-name)))))
 
 (defun markdown-display-buffer-other-window (buf)
-  (let ((cur-buf (current-buffer)))
+  (let ((cur-buf (current-buffer))
+        split-width-threshold split-height-threshold)
+    (cond ((memq markdown-split-window-direction '(vertical below))
+           (setq split-width-threshold nil)
+           (setq split-height-threshold 0))
+          ((memq markdown-split-window-direction '(horizontal right))
+           (setq split-width-threshold 0)
+           (setq split-height-threshold nil)))
     (switch-to-buffer-other-window buf)
     (set-buffer cur-buf)))
 
