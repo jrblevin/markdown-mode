@@ -275,7 +275,9 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     side-by-side with the source Markdown. **For all export commands,
     the output file will be overwritten without notice.**
     `markdown-live-preview-window-function` can be customized to open
-    in a browser other than `eww`.
+    in a browser other than `eww`.  If you want to force the
+    preview window to appear at the bottom or right, you can
+    customize `markdown-split-window-direction`.
 
     To summarize:
 
