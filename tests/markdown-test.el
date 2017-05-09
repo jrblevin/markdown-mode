@@ -1405,6 +1405,49 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (should (looking-at "\\[link 1\\]")) ; back in main buffer
    (should (= (point) 11))))
 
+;;; Yanking tests:
+
+(ert-deftest test-markdown-yank/inline-link-text ()
+  "Test yanking text as an inline link."
+  (let ((kill-ring '("killed text")))
+    (markdown-test-string
+     ""
+     (call-interactively 'markdown-yank-inline-link)
+     (should (string-equal (buffer-string) "[killed text]()")))))
+
+(ert-deftest test-markdown-yank/blockquote-text ()
+  "Test yanking text as a blockquote."
+  (let ((kill-ring '("killed text")))
+    (markdown-test-string
+     ""
+     (call-interactively 'markdown-yank-blockquote)
+     (should (string-equal (buffer-string) "> killed text")))))
+
+(ert-deftest test-markdown-yank/footnote-text ()
+  "Test yanking text as a footnote."
+  (let ((kill-ring '("killed text")))
+    (markdown-test-string
+     "foo"
+     (end-of-line)
+     (call-interactively 'markdown-yank-footnote)
+     (should (string-equal (buffer-string) "foo[^1]\n\n[^1]: killed text")))))
+
+(ert-deftest test-markdown-yank/gfm-code-block-text ()
+  "Test yanking text as a GFM code block."
+  (let ((kill-ring '("killed text")))
+    (markdown-test-string
+     ""
+     (execute-kbd-macro (read-kbd-macro "M-x markdown-yank-gfm-code-block RET Text RET"))
+     (should (string-equal (buffer-string) "``` Text\nkilled text\n```")))))
+
+(ert-deftest test-markdown-yank/pre-text ()
+  "Test yanking text as a preformatted block."
+  (let ((kill-ring '("killed text")))
+    (markdown-test-string
+     ""
+     (call-interactively 'markdown-yank-pre)
+     (should (string-equal (buffer-string) "    killed text")))))
+
 ;;; Element removal tests:
 
 (ert-deftest test-markdown-kill/simple ()

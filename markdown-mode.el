@@ -4169,6 +4169,43 @@ NIL is returned instead."
         (append result (list (point)))))))
 
 
+;;; Yanking ===================================================================
+
+(defun markdown-yank-inline-link ()
+  "Yank last killed text as an inline link."
+  (interactive)
+  (let ((text (current-kill 0)))
+    (cond ((string-match (concat "^" markdown-regex-uri "$") text)
+           (markdown-insert-inline-link nil text))
+          ((string-match (concat "^" markdown-regex-angle-uri "$") text)
+           (markdown-insert-inline-link nil (match-string 2 text)))
+          (t (markdown-insert-inline-link text nil)))))
+
+(defun markdown-yank-blockquote ()
+  "Yank last killed text as a blockquote."
+  (interactive)
+  (yank)
+  (markdown-blockquote-region (region-beginning) (region-end)))
+
+(defun markdown-yank-footnote ()
+  "Yank last killed text as a footnote."
+  (interactive)
+  (markdown-insert-footnote)
+  (yank))
+
+(defun markdown-yank-gfm-code-block ()
+  "Yank last killed text as a GFM code block."
+  (interactive)
+  (call-interactively 'markdown-insert-gfm-code-block)
+  (yank))
+
+(defun markdown-yank-pre ()
+  "Yank last killed text as a preformatted block."
+  (interactive)
+  (yank)
+  (markdown-pre-region (region-beginning) (region-end)))
+
+
 ;;; Element Removal ===========================================================
 
 (defun markdown-kill-thing-at-point ()
@@ -4671,6 +4708,12 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-s\C-p" 'markdown-pre-region)
     (define-key map "\C-c\C-sP" 'markdown-insert-gfm-code-block)
     (define-key map "\C-c-" 'markdown-insert-hr)
+    ;; Yanking
+    (define-key map "\C-c\C-y\C-a" 'markdown-yank-inline-link)
+    (define-key map "\C-c\C-y\C-b" 'markdown-yank-blockquote)
+    (define-key map "\C-c\C-y\C-f" 'markdown-yank-footnote)
+    (define-key map "\C-c\C-y\C-g" 'markdown-yank-gfm-code-block)
+    (define-key map "\C-c\C-y\C-p" 'markdown-yank-pre)
     ;; Element insertion (deprecated)
     (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-tt" 'markdown-insert-header-setext-1)
