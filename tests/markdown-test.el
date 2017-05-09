@@ -2140,6 +2140,13 @@ Test currently fails because this case isn't handled properly."
      (should (looking-at "[*+-]"))
      (markdown-test-range-has-face loc loc markdown-list-face))))
 
+(ert-deftest test-markdown-font-lock/definition-list ()
+  "A simple definition list marker font lock test."
+  (markdown-test-file "definition-list.text"
+    (markdown-test-range-has-face 7 7 'markdown-list-face)
+    (markdown-test-range-has-face 29 52 'markdown-pre-face)
+    (markdown-test-range-has-face 55 55 'markdown-list-face)))
+
 (ert-deftest test-markdown-font-lock/pre-1 ()
   "Nested list and pre block font lock test."
   (markdown-test-file "nested-list.text"
@@ -3497,6 +3504,24 @@ spaces after the list marker for a total indentation of four."
     (let ((fill-column 35))
       (fill-paragraph)
       (should (string-equal (buffer-string) str))))))
+
+(ert-deftest test-markdown-filling/definition-list-add-leading-spaces ()
+  "`fill-paragraph' should adapt to spaces after list marker."
+  (markdown-test-string
+   ":   This list item is continued on the next line"
+   (let ((fill-column 35))
+     (fill-paragraph)
+     (should (string-equal
+              (buffer-string)
+              ":   This list item is continued on\n    the next line")))))
+
+(ert-deftest test-markdown-filling/definition-list-preserve-leading-spaces ()
+  "`fill-paragraph' should preserve spaces after list marker."
+  (let ((str ":   This list item is continued on\n    the next line")
+        (fill-column 35))
+    (markdown-test-string
+     str (fill-paragraph)
+     (should (string-equal (buffer-string) str)))))
 
 (ert-deftest test-markdown-filling/list-item-plus ()
   "Test filling of list items with plus sign markers.

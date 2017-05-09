@@ -1219,7 +1219,7 @@ Group 1 matches the closing three backticks.")
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+-]\\)\\([ \t]+\\)"
+  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+:-]\\)\\([ \t]+\\)"
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
@@ -6323,7 +6323,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
   "Return prefix for filling paragraph or nil if not determined."
   (cond
    ;; List item inside blockquote
-   ((looking-at "^[ \t]*>[ \t]*\\(\\(?:[0-9]+\\|#\\)\\.\\|[*+-]\\)[ \t]+")
+   ((looking-at "^[ \t]*>[ \t]*\\(\\(?:[0-9]+\\|#\\)\\.\\|[*+:-]\\)[ \t]+")
     (markdown-replace-regexp-in-string
      "[0-9\\.*+-]" " " (match-string-no-properties 0)))
    ;; Blockquote
