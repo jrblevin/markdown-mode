@@ -935,6 +935,7 @@
 (require 'url-parse)
 (require 'button)
 (require 'color)
+(require 'mm-url)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -7569,6 +7570,20 @@ and disable it otherwise."
       (message "markdown-mode URL hiding enabled")
     (message "markdown-mode URL hiding disabled"))
   (markdown-reload-extensions))
+
+(defun markdown-retrieve-html-title (url)
+  "Retrieve URL and parse HTML to determine the page title."
+  (let ((buf (ignore-errors (url-retrieve-synchronously url t t))))
+    (when buf
+      (with-current-buffer buf
+        (goto-char (point-min))
+        (when (re-search-forward "<title>\\([^<]*\\)</title>" nil t 1)
+          (let ((title (match-string 1)) charset)
+            (goto-char (point-min))
+            (re-search-forward "charset=\\([-0-9a-zA-Z]*\\)" nil t 1)
+            (setq charset (intern (downcase (match-string 1))))
+            (mm-url-decode-entities-string
+             (decode-coding-string title charset))))))))
 
 
 ;;; WikiLink Following/Markup =================================================
