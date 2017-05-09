@@ -3256,17 +3256,64 @@ place the cursor in between them."
         (markdown-unwrap-thing-at-point nil 0 2)
       (markdown-wrap-or-insert "<kbd>" "</kbd>" 'word nil nil))))
 
-(defun markdown-insert-link ()
-  "Insert an inline link, using region or word as link text if possible.
-If there is an active region, use the region as the link text.  If the
-point is at a word, use the word as the link text.  In these cases, the
-point will be left at the position for inserting a URL.  If there is no
-active region and the point is not at word, simply insert link markup and
-place the point in the position to enter link text."
+(defun markdown-insert-inline-link (text url &optional title)
+  "Insert an inline link with TEXT pointing to URL.
+Optionally, the user can provide a TITLE."
+  (let ((cur (point)))
+    (setq title (and title (concat " \"" title "\"")))
+    (insert (concat "[" text "](" url title ")"))
+    (cond ((not text) (goto-char (+ 1 cur)))
+          ((not url) (goto-char (+ 3 (length text) cur))))))
+
+(defun markdown-insert-inline-link-dwim ()
+  "Insert an inline link of the form [link](url) at point.
+If there is an active region, the text in the region will be used
+as the URL, if it appears to be a URL, or else as the link text.
+If the point is at a URL, use it to create a new link. If the
+point is at a reference link, convert it to an inline link. If
+the point is at a word, use the word as the link text. In these
+cases, the point will be left at the position for inserting a
+URL. If there is no active region and the point is not at word,
+simply insert link markup and place the point in the position to
+enter link text."
   (interactive)
-  (let ((bounds (markdown-wrap-or-insert "[" "]()")))
-    (when bounds
-      (goto-char (- (cdr bounds) 1)))))
+  (cond
+   ;; If there is an active region, remove existing links in the
+   ;; region and use resulting region as link text for a new link.
+   ((markdown-use-region-p)
+    (let* ((bounds (markdown-unwrap-things-in-region
+                    (region-beginning) (region-end)
+                    markdown-regex-link-inline 0 3))
+           (text (buffer-substring (car bounds) (cdr bounds))))
+      (delete-region (car bounds) (cdr bounds))
+      (markdown-insert-inline-link text nil)))
+   ;; If there is an inline link at the point, remove it and add the
+   ;; link text to the kill ring.
+   ((thing-at-point-looking-at markdown-regex-link-inline)
+    (kill-new (match-string 3))
+    (delete-region (match-beginning 0) (match-end 0)))
+   ;; If there is an angle URL at the point, use it for a new link.
+   ((thing-at-point-looking-at markdown-regex-angle-uri)
+    (let ((url (match-string 2)))
+      (delete-region (match-beginning 0) (match-end 0))
+      (markdown-insert-inline-link nil url)))
+   ;; If there is a plain URL at the point, use it for a new link.
+   ((thing-at-point-looking-at markdown-regex-uri)
+    (let ((url (match-string 0)))
+      (delete-region (match-beginning 0) (match-end 0))
+      (markdown-insert-inline-link nil url)))
+   ;; If there is a reference link at point, convert to inline link.
+   ((thing-at-point-looking-at markdown-regex-link-reference)
+    (let ((beg (match-beginning 0))
+          (end (match-end 0))
+          (text (match-string 3))
+          (url (markdown-link-link)))
+      (delete-region beg end)
+      (markdown-insert-inline-link text url)))
+   ;; Otherwise, insert a link
+   (t (let ((bounds (markdown-wrap-or-insert "[" "]()")))
+        (when bounds
+          (goto-char (- (cdr bounds) 1)))))))
 
 (defun markdown-insert-reference-link (text label &optional url title)
   "Insert a reference link and, optionally, a reference definition.
@@ -4462,7 +4509,7 @@ Assumes match data is available for `markdown-regex-italic'."
 (defvar markdown-mode-map
   (let ((map (make-keymap)))
     ;; Element insertion
-    (define-key map "\C-c\C-al" 'markdown-insert-link)
+    (define-key map "\C-c\C-al" 'markdown-insert-inline-link-dwim)
     (define-key map "\C-c\C-aL" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-au" 'markdown-insert-uri)
     (define-key map "\C-c\C-af" 'markdown-insert-footnote)
@@ -4605,7 +4652,7 @@ See also `markdown-mode-map'.")
     ["Preformatted" markdown-insert-pre]
     ["Code" markdown-insert-code]
     "---"
-    ["Insert inline link" markdown-insert-link]
+    ["Insert inline link" markdown-insert-inline-link-dwim]
     ["Insert reference link" markdown-insert-reference-link-dwim]
     ["Insert URL" markdown-insert-uri]
     ["Insert inline image" markdown-insert-image]
