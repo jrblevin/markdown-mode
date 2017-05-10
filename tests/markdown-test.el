@@ -2822,6 +2822,21 @@ takes precedence)."
       (markdown-test-range-has-face 20 20 markdown-reference-face) ; 2
       (markdown-test-range-has-face 22 49 nil)))) ; [ ]and[ ]
 
+(ert-deftest test-markdown-font-lock/subscripts ()
+  "Test font lock for subscripts."
+  (markdown-test-string "H~2~0"
+    (markdown-test-range-has-face 2 2 'markdown-markup-face) ; First ~
+    (markdown-test-range-has-face 3 3 nil) ; 2
+    (markdown-test-range-has-face 4 4 'markdown-markup-face))) ; Second ~
+
+(ert-deftest test-markdown-font-lock/superscripts ()
+  "Test font lock for subscripts."
+  (markdown-test-string "334^10^"
+    (markdown-test-range-has-face 1 3 nil) ; 334
+    (markdown-test-range-has-face 4 4 'markdown-markup-face) ; First ^
+    (markdown-test-range-has-face 5 6 nil) ; 10
+    (markdown-test-range-has-face 7 7 'markdown-markup-face))) ; Second ^
+
 (ert-deftest test-markdown-font-lock/hidden-urls-inline ()
   "Test URL hiding and toggling."
   (markdown-test-file "inline.text"

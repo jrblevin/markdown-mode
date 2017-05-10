@@ -92,6 +92,9 @@
         display, <kbd>C-c C-x C-i</kbd>.
     -   Support Leanpub blocks (asides, info blocks, warnings, etc.).
         These are simple extensions of the usual blockquote syntax.
+    -   Font lock, with markup hiding, for subscripts (e.g., `H~2~0`)
+        and superscripts (e.g., `334^10^`).  Thanks to Syohei Yoshida
+        for a patch on which this is based.  ([GH-134][])
 
 *   Improvements:
 
@@ -115,6 +118,7 @@
 
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130
+  [gh-134]: https://github.com/jrblevin/markdown-mode/issues/134
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
 

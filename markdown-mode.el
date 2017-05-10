@@ -955,6 +955,11 @@
 (defconst markdown-output-buffer-name "*markdown-output*"
   "Name of temporary buffer for markdown command output.")
 
+(defconst markdown-sub-superscript-display
+  '(((raise -0.3) (height 0.7))         ; subscript
+    ((raise 0.3) (height 0.7)))         ; superscript
+  "Parameters for sub- and superscript formatting.")
+
 
 ;;; Global Variables ==========================================================
 
@@ -1622,6 +1627,17 @@ or
   (if markdown-use-pandoc-style-yaml-metadata
       markdown-regex-yaml-pandoc-metadata-end-border
     markdown-regex-yaml-metadata-border))
+
+(defconst markdown-regex-sub-superscript
+  "\\(?:^\\|[^\\~^]\\)\\(\\([~^]\\)\\([[:alnum:]]+\\)\\(\\2\\)\\)"
+  "The regular expression matching a sub- or superscript.
+The leading un-numbered group matches the character before the
+opening tilde or carat, if any, ensuring that it is not a
+backslash escape, carat, or tilde.
+Group 1 matches the entire expression, including markup.
+Group 2 matches the opening markup--a tilde or carat.
+Group 3 matches the text inside the delimiters.
+Group 4 matches the closing markup--a tilde or carat.")
 
 
 ;;; Syntax ====================================================================
@@ -2619,6 +2635,7 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-plain-uris)
     (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
+    (markdown-fontify-sub-superscripts)
     (markdown-fontify-blockquotes))
   "Syntax highlighting for Markdown files.")
 
@@ -3666,6 +3683,25 @@ is \"\n\n\""
                 `(display ,(make-string
                             (window-body-width) markdown-hr-display-char)))))
      t))
+
+(defun markdown-fontify-sub-superscripts (last)
+  "Apply text properties to sub- and superscripts from point to LAST."
+  (when (markdown-search-until-condition
+         (lambda () (and (not (markdown-code-block-at-point-p))
+                         (not (markdown-inline-code-at-point-p))
+                         (not (markdown-in-comment-p))))
+         markdown-regex-sub-superscript last t)
+    (let* ((subscript-p (string= (match-string 2) "~"))
+           (index (if subscript-p 0 1))
+           (mp (list 'face 'markdown-markup-face
+                     'invisible 'markdown-markup)))
+      (when markdown-hide-markup
+        (put-text-property (match-beginning 3) (match-end 3)
+                           'display
+                           (nth index markdown-sub-superscript-display)))
+      (add-text-properties (match-beginning 2) (match-end 2) mp)
+      (add-text-properties (match-beginning 4) (match-end 4) mp)
+      t)))
 
 
 ;;; Syntax Table ==============================================================
