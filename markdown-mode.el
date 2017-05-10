@@ -6430,6 +6430,7 @@ before regenerating font-lock rules for extensions."
              (assoc 'markdown-enable-math file-local-variables-alist))
     (markdown-reload-extensions)))
 
+
 ;;; Wiki Links ================================================================
 
 (defun markdown-toggle-wiki-links (&optional arg)
@@ -6478,6 +6479,7 @@ hooks in `markdown-setup-wiki-link-hooks' for fontification instead."
     (list
      (cons markdown-regex-wiki-link '((1 markdown-link-face prepend))))))
 
+
 ;;; Math Support ==============================================================
 
 (make-obsolete 'markdown-enable-math 'markdown-toggle-math "v2.1")
