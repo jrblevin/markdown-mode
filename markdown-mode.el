@@ -4618,77 +4618,102 @@ See also `markdown-mode-map'.")
 (easy-menu-define markdown-mode-menu markdown-mode-map
   "Menu for Markdown mode"
   '("Markdown"
+    "---"
+    ("Movement"
+     ["Jump" markdown-jump]
+     ["Follow Link" markdown-follow-thing-at-point]
+     ["Next Link" markdown-next-link]
+     ["Previous Link" markdown-previous-link]
+     "---"
+     ["Next Visible Heading" markdown-next-visible-heading]
+     ["Previous Visible Heading" markdown-previous-visible-heading]
+     ["Forward Same Level" markdown-forward-same-level]
+     ["Backward Same Level" markdown-backward-same-level]
+     ["Up to Parent Heading" markdown-up-heading]
+     "---"
+     ["Forward Paragraph" markdown-forward-paragraph]
+     ["Backward Paragraph" markdown-backward-paragraph])
     ("Show/Hide"
-     ["Cycle visibility" markdown-cycle (markdown-on-heading-p)]
-     ["Cycle global visibility" markdown-shifttab])
+     ["Cycle Visibility" markdown-cycle (markdown-on-heading-p)]
+     ["Cycle Visibility Globally" markdown-shifttab])
     "---"
-    ["Compile" markdown-other-window]
-    ["Preview" markdown-preview]
-    ["Export" markdown-export]
-    ["Export & View" markdown-export-and-preview]
-    ["Open" markdown-open]
-    ["Live Export" markdown-live-preview-mode
-     :style toggle :selected markdown-live-preview-mode]
-    ["Kill ring save" markdown-kill-ring-save]
-    "---"
-    ("Headings"
-     ["Automatic" markdown-insert-header-dwim]
-     ["Automatic (prefer setext)" markdown-insert-header-setext-dwim]
+    ("Headings & Structure"
+     ["Automatic Heading" markdown-insert-header-dwim]
+     ["Automatic Heading (Setext)" markdown-insert-header-setext-dwim]
+     ("Specific Heading (atx)"
+      ["First Level Setext" markdown-insert-header-setext-1]
+      ["Second Level Setext" markdown-insert-header-setext-2])
+     ("Specific Heading (Setext)"
+      ["First Level atx" markdown-insert-header-atx-1]
+      ["Second Level atx" markdown-insert-header-atx-2]
+      ["Third Level atx" markdown-insert-header-atx-3]
+      ["Fourth Level atx" markdown-insert-header-atx-4]
+      ["Fifth Level atx" markdown-insert-header-atx-5]
+      ["Sixth Level atx" markdown-insert-header-atx-6])
+     ["Horizontal Rule" markdown-insert-hr]
      "---"
-     ["First level setext" markdown-insert-header-setext-1]
-     ["Second level setext" markdown-insert-header-setext-2]
+     ["Promote Header" markdown-promote]
+     ["Demote Header" markdown-demote]
+     ["Promote Subtree" markdown-promote-subtree]
+     ["Demote Subtree" markdown-demote-subtree]
+     ["Move Subtree Up" markdown-move-subtree-up]
+     ["Move Subtree Down" markdown-move-subtree-down])
+    ("Region Editing"
+     ["Indent Region" markdown-indent-region]
+     ["Exdent Region" markdown-exdent-region])
+    ("Lists"
+     ["Insert List Item" markdown-insert-list-item]
+     ["Indent List Item" markdown-demote]
+     ["Exdent List Item" markdown-promote]
+     ["Move List Item Up" markdown-move-up]
+     ["Move List Item Down" markdown-move-down]
+     ["Renumber List" markdown-cleanup-list-numbers])
+    ("Links & Images"
+     ["Plain URL" markdown-insert-uri]
+     ["Inline Link" markdown-insert-inline-link-dwim]
+     ["Inline Image" markdown-insert-image]
+     ["Reference Link" markdown-insert-reference-link-dwim]
+     ["Reference Image" markdown-insert-reference-image]
+     ["Footnote" markdown-insert-footnote]
+     ["Wiki Link" markdown-insert-wiki-link]
      "---"
-     ["First level atx" markdown-insert-header-atx-1]
-     ["Second level atx" markdown-insert-header-atx-2]
-     ["Third level atx" markdown-insert-header-atx-3]
-     ["Fourth level atx" markdown-insert-header-atx-4]
-     ["Fifth level atx" markdown-insert-header-atx-5]
-     ["Sixth level atx" markdown-insert-header-atx-6])
+     ["Check References" markdown-check-refs]
+     ["Toggle Inline Images" markdown-toggle-inline-images
+      :style toggle :selected markdown-inline-image-overlays])
+    ("Styles"
+     ["Bold" markdown-insert-bold]
+     ["Italic" markdown-insert-italic]
+     ["Code" markdown-insert-code]
+     ["Strikethrough" markdown-insert-strike-through]
+     ["Keyboard" markdown-insert-kbd]
+     "---"
+     ["Blockquote" markdown-insert-blockquote]
+     ["Preformatted" markdown-insert-pre]
+     ["GFM Code Block" markdown-insert-gfm-code-block]
+     "---"
+     ["Blockquote Region" markdown-blockquote-region]
+     ["Preformatted Region" markdown-pre-region])
     "---"
-    ["Bold" markdown-insert-bold]
-    ["Italic" markdown-insert-italic]
-    ["Strikethrough" markdown-insert-strike-through]
-    ["Blockquote" markdown-insert-blockquote]
-    ["Preformatted" markdown-insert-pre]
-    ["Code" markdown-insert-code]
+    ("Preview & Export"
+     ["Compile" markdown-other-window]
+     ["Preview" markdown-preview]
+     ["Export" markdown-export]
+     ["Export & View" markdown-export-and-preview]
+     ["Open" markdown-open]
+     ["Live Export" markdown-live-preview-mode
+      :style toggle :selected markdown-live-preview-mode]
+     ["Kill ring save" markdown-kill-ring-save])
+    ("Markup Completion and Cycling"
+     ["Complete Markup" markdown-complete]
+     ["Promote Element" markdown-promote]
+     ["Demote Element" markdown-demote])
     "---"
-    ["Insert inline link" markdown-insert-inline-link-dwim]
-    ["Insert reference link" markdown-insert-reference-link-dwim]
-    ["Insert URL" markdown-insert-uri]
-    ["Insert inline image" markdown-insert-image]
-    ["Insert reference image" markdown-insert-reference-image]
-    ["Insert list item" markdown-insert-list-item]
-    ["Insert horizontal rule" markdown-insert-hr]
-    ["Insert footnote" markdown-insert-footnote]
-    ["Kill element" markdown-kill-thing-at-point]
+    ["Kill Element" markdown-kill-thing-at-point]
     "---"
-    ["Jump" markdown-jump]
-    ["Follow link" markdown-follow-thing-at-point]
-    ("Outline"
-     ["Next visible heading" markdown-next-visible-heading]
-     ["Previous visible heading" markdown-previous-visible-heading]
-     ["Forward same level" markdown-forward-same-level]
-     ["Backward same level" markdown-backward-same-level]
-     ["Up to parent heading" markdown-up-heading])
-    "---"
-    ("Completion and Cycling"
-     ["Complete" markdown-complete]
-     ["Promote" markdown-promote]
-     ["Demote" markdown-demote])
-    ("List editing"
-     ["Indent list item" markdown-demote]
-     ["Exdent list item" markdown-promote])
-    ("Region shifting"
-     ["Indent region" markdown-indent-region]
-     ["Exdent region" markdown-exdent-region])
-    "---"
-    ["Toggle inline images" markdown-toggle-inline-images]
-    ["Check references" markdown-check-refs]
-    ["Clean up list numbering" markdown-cleanup-list-numbers]
-    ["Complete markup" markdown-complete-buffer]
-    "---"
-    ["Version" markdown-show-version]
-    ))
+    ("Documentation"
+     ["Version" markdown-show-version]
+     ["Homepage" markdown-mode-info]
+     ["Describe Mode" (describe-function 'markdown-mode)])))
 
 
 ;;; imenu =====================================================================
@@ -6612,6 +6637,11 @@ or \\[markdown-toggle-inline-images]."
   "Show the version number in the minibuffer."
   (interactive)
   (message "markdown-mode, version %s" markdown-mode-version))
+
+(defun markdown-mode-info ()
+  "Open the `markdown-mode' homepage."
+  (interactive)
+  (browse-url "http://jblevins.org/projects/markdown-mode/"))
 
 ;;;###autoload
 (define-derived-mode markdown-mode text-mode "Markdown"
