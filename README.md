@@ -717,7 +717,9 @@ by `markdown-mode` and `gfm-mode` as described below.
   (Emacs buttons) in both `markdown-mode` and `gfm-mode` when
   `markdown-make-gfm-checkboxes-buttons` is set to a non-nil value
   (and it is set to t by default).  These checkboxes can be
-  toggled by clicking `mouse-1` or pressing <kbd>RET</kbd> over the button.
+  toggled by clicking `mouse-1`, pressing <kbd>RET</kbd> over the button,
+  or by pressing <kbd>C-c C-x C-x</kbd> with the point anywhere in the task
+  list item.
 
 * **Wiki links:** Generic wiki links are supported in
   `markdown-mode`, but in `gfm-mode` specifically they will be

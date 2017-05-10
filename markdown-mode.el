@@ -737,7 +737,9 @@
 ;;   (Emacs buttons) in both `markdown-mode' and `gfm-mode' when
 ;;   `markdown-make-gfm-checkboxes-buttons' is set to a non-nil value
 ;;   (and it is set to t by default).  These checkboxes can be
-;;   toggled by clicking `mouse-1` or pressing `RET` over the button.
+;;   toggled by clicking `mouse-1`, pressing `RET` over the button,
+;;   or by pressing `C-c C-x C-x` with the point anywhere in the task
+;;   list item.
 ;;
 ;; * **Wiki links:** Generic wiki links are supported in
 ;;   `markdown-mode', but in `gfm-mode' specifically they will be
@@ -4600,6 +4602,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-x l") 'markdown-promote)
     (define-key map (kbd "C-c C-x r") 'markdown-demote)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item)
+    (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
     map)
   "Keymap for Markdown major mode.")
 
@@ -4667,7 +4670,8 @@ See also `markdown-mode-map'.")
      ["Exdent List Item" markdown-promote]
      ["Move List Item Up" markdown-move-up]
      ["Move List Item Down" markdown-move-down]
-     ["Renumber List" markdown-cleanup-list-numbers])
+     ["Renumber List" markdown-cleanup-list-numbers]
+     ["Toggle Task List Item" markdown-toggle-gfm-checkbox])
     ("Links & Images"
      ["Plain URL" markdown-insert-uri]
      ["Inline Link" markdown-insert-inline-link-dwim]
@@ -6542,7 +6546,7 @@ if ARG is omitted or nil."
                                                            (3 markdown-markup-face))))))
 
 
-;;; GFM Checkboxes as Buttons =================================================
+;;; GFM Checkboxes ============================================================
 
 (require 'button)
 
@@ -6550,17 +6554,30 @@ if ARG is omitted or nil."
   'follow-link t
   'face 'markdown-gfm-checkbox-face
   'mouse-face 'markdown-highlight-face
-  'action #'markdown-toggle-gfm-checkbox)
+  'action #'markdown-toggle-gfm-checkbox-button)
 
-(defun markdown-toggle-gfm-checkbox (button)
+(defun markdown-toggle-gfm-checkbox ()
+  "Toggle GFM checkbox at point."
+  (interactive)
+  (save-match-data
+    (save-excursion
+      (let ((bounds (markdown-cur-list-item-bounds)))
+        (when bounds
+          ;; Move to beginning of task list item
+          (goto-char (cl-first bounds))
+          ;; Advance to column of first non-whitespace after marker
+          (forward-char (cl-fourth bounds))
+          (cond ((looking-at "\\[ \\]")
+                 (replace-match "[x]" nil t))
+                ((looking-at "\\[[xX]\\]")
+                 (replace-match "[ ]" nil t))))))))
+
+(defun markdown-toggle-gfm-checkbox-button (button)
   "Toggle GFM checkbox BUTTON on click."
   (save-match-data
     (save-excursion
       (goto-char (button-start button))
-      (cond ((looking-at "\\[ \\]")
-             (replace-match "[x]" nil t))
-            ((looking-at "\\[[xX]\\]")
-             (replace-match "[ ]" nil t))))))
+      (markdown-toggle-gfm-checkbox))))
 
 (defun markdown-make-gfm-checkboxes-buttons (start end)
   "Make GFM checkboxes buttons in region between START and END."
