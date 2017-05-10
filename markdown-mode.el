@@ -582,6 +582,11 @@
 ;;     underscores when inserting italic text instead of asterisks
 ;;     (default: `nil').
 ;;
+;;   * `markdown-use-electric-markup' - use
+;;     `markdown-electric-asterisk', `markdown-electric-underscore'
+;;     and `markdown-electric-backquote' for interactive insertion of
+;;     asterisks, underscores, and code blocks (default: `t`).
+;;
 ;;   * `markdown-asymmetric-header' - set to a non-nil value to use
 ;;     asymmetric header styling, placing header characters only on
 ;;     the left of headers (default: `nil').
@@ -1033,6 +1038,11 @@ promotion and demotion functions."
 
 (defcustom markdown-italic-underscore nil
   "Use underscores when inserting italic text instead of asterisks."
+  :group 'markdown
+  :type 'boolean)
+
+(defcustom markdown-use-electric-markup t
+  "Automatically insert paired asterisks, underscores, and backquotes."
   :group 'markdown
   :type 'boolean)
 
@@ -4061,6 +4071,30 @@ prefixed with an integer from 1 to the length of
          (insert (car markdown-hr-strings))))
   (markdown-ensure-blank-line-after))
 
+(defun markdown-electric-asterisk (arg)
+  "Insert an asterisk and attempt to auto-complete markup.
+After an asterisk is typed, insert another for paired italic or
+bold markup. The numeric prefix argument ARG says how many times
+to repeat the insertion."
+  (interactive "*P")
+  (self-insert-command (prefix-numeric-value arg))
+  (when markdown-use-electric-markup
+    (insert "*") (backward-char 1)))
+
+(defun markdown-electric-underscore (arg)
+  "Insert an underscore and attempt to auto-complete markup.
+The numeric prefix argument ARG says how many times to repeat the
+insertion.  After an underscore is typed, insert another for paired
+italic or bold markup."
+  (interactive "*P")
+  (self-insert-command (prefix-numeric-value arg))
+  ;; Assume we only want to insert a matching pair if whitespace
+  ;; precedes the first underscore.
+  (when (and markdown-use-electric-markup
+             (looking-back "\\s-_" (- (point) 2)))
+    (insert "_")
+    (backward-char 1)))
+
 (defun markdown-insert-bold ()
   "Insert markup to make a region or word bold.
 If there is an active region, make the region bold.  If the point
@@ -4598,15 +4632,30 @@ Arguments BEG and END specify the beginning and end of the region."
     (markdown-block-region beg end indent)))
 
 (defun markdown-electric-backquote (arg)
-  "Insert a backquote.
+  "Insert a backquote and attempt to auto-complete markup.
 The numeric prefix argument ARG says how many times to repeat the insertion.
-Call `markdown-insert-gfm-code-block' interactively
-if three backquotes inserted at the beginning of line."
+Call `markdown-insert-gfm-code-block' interactively if three
+backquotes inserted at the beginning of line."
   (interactive "*P")
   (self-insert-command (prefix-numeric-value arg))
-  (when (and markdown-gfm-use-electric-backquote (looking-back "^```" nil))
+  (cond
+   ;; First backquote: insert matching pair
+   ((and markdown-use-electric-markup
+         (not (char-equal (char-before (1- (point))) ?`)))
+    (insert "`")
+    (backward-char 1))
+   ;; Second backquote: skip over the automatically inserted one
+   ((and markdown-use-electric-markup
+         (eq last-command this-command)
+         (looking-back "\\(^\\|[^`]\\)``" (point-at-bol))
+         (looking-at "`"))
+    (delete-char 1))
+   ;; Third backquote: convert to GFM code block
+   ((and markdown-use-electric-markup
+         markdown-gfm-use-electric-backquote
+         (save-excursion (back-to-indentation) (looking-at "```")))
     (replace-match "")
-    (call-interactively #'markdown-insert-gfm-code-block)))
+    (call-interactively #'markdown-insert-gfm-code-block))))
 
 (defconst markdown-gfm-recognized-languages
   ;; To reproduce/update, evaluate the let-form in
@@ -5496,6 +5545,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-s\C-p" 'markdown-pre-region)
     (define-key map "\C-c\C-sP" 'markdown-insert-gfm-code-block)
     (define-key map "\C-c-" 'markdown-insert-hr)
+    (define-key map (kbd "*") 'markdown-electric-asterisk)
+    (define-key map (kbd "_") 'markdown-electric-underscore)
+    (define-key map (kbd "`") 'markdown-electric-backquote)
     ;; Element insertion (deprecated)
     (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-tt" 'markdown-insert-header-setext-1)

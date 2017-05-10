@@ -566,6 +566,11 @@ provides an interface to all of the possible customizations:
     underscores when inserting italic text instead of asterisks
     (default: `nil`).
 
+  * `markdown-use-electric-markup` - use
+    `markdown-electric-asterisk`, `markdown-electric-underscore`
+    and `markdown-electric-backquote` for interactive insertion of
+    asterisks, underscores, and code blocks (default: <kbd>t</kbd>).
+
   * `markdown-asymmetric-header` - set to a non-nil value to use
     asymmetric header styling, placing header characters only on
     the left of headers (default: `nil`).
