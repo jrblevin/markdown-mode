@@ -6579,6 +6579,11 @@ handles filling itself, it always returns t so that
   t)
 
 (defun markdown-fill-forward-paragraph-function (&optional arg)
+  "Function used by `fill-paragraph' to move over ARG paragraphs.
+This is a `fill-forward-paragraph-function' for `markdown-mode'.
+It is called with a single argument specifying the number of
+paragraphs to move.  Just like `forward-paragraph', it should
+return the number of paragraphs left to move."
   (let* ((arg (or arg 1))
          (paragraphs-remaining (forward-paragraph arg))
          (start (point)))
