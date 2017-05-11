@@ -3798,8 +3798,8 @@ if three backquotes inserted at the beginning of line."
 
 (defun markdown-gfm-add-used-language (lang)
   "Clean LANG and add to list of used languages."
-  (add-to-list 'markdown-gfm-used-languages
-               (markdown-clean-language-string lang)))
+  (setq markdown-gfm-used-languages
+          (cons lang (remove lang markdown-gfm-used-languages))))
 
 (defun markdown-insert-gfm-code-block (&optional lang)
   "Insert GFM code block for language LANG.
@@ -3812,10 +3812,9 @@ automatically in order to have the correct markup."
            (condition-case nil
                (markdown-clean-language-string
                 (completing-read
-                 (format "Programming language [%s]: "
-                         (or (car markdown-gfm-used-languages) "none"))
+                 "Programming language: "
                  (markdown-gfm-get-corpus)
-                 nil 'confirm nil
+                 nil 'confirm (car markdown-gfm-used-languages)
                  'markdown-gfm-language-history))
              (quit "")))))
   (unless (string= lang "") (markdown-gfm-add-used-language lang))
