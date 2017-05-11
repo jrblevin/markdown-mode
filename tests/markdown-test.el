@@ -3715,6 +3715,13 @@ this is not header line
         (fill-paragraph)
         (should (string-equal (buffer-string) text))))))
 
+(ert-deftest test-markdown-filling/long-paragraph-with-link ()
+  "Test `fill-paragraph' on a long paragraph with a long link."
+  (markdown-test-string
+   "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."
+   (fill-paragraph)
+   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa\naaa aaa aaa aaa."))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
