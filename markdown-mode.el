@@ -667,6 +667,8 @@
 ;; is also non-nil, Markdown Mode will highlight wiki links with
 ;; missing target file in a different color.  By default, Markdown
 ;; Mode only searches for target files in the current directory.
+;; Search in subdirectories can be enabled by setting
+;; `markdown-wiki-link-search-subdirectories' to a non-nil value.
 ;; Sequential parent directory search (as in [Ikiwiki][]) can be
 ;; enabled by setting `markdown-wiki-link-search-parent-directories'
 ;; to a non-nil value.
@@ -747,6 +749,8 @@
 ;;   in filenames and the first letter of the filename will be
 ;;   capitalized.  For example, `[[wiki link]]' will map to a file
 ;;   named `Wiki-link` with the same extension as the current file.
+;;   If a file with this name does not exist in the current directory,
+;;   the first match in a subdirectory, if any, will be used instead.
 ;;
 ;; * **Newlines:** Neither `markdown-mode' nor `gfm-mode' do anything
 ;;   specifically with respect to newline behavior.  If you use
@@ -957,6 +961,14 @@ function or \\[markdown-toggle-wiki-links]."
 (defcustom markdown-wiki-link-alias-first t
   "When non-nil, treat aliased wiki links like [[alias text|PageName]].
 Otherwise, they will be treated as [[PageName|alias text]]."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp)
+
+(defcustom markdown-wiki-link-search-subdirectories nil
+  "When non-nil, search for wiki link targets in subdirectories.
+This is the default search behavior for GitHub and is
+automatically set to t in `gfm-mode'."
   :group 'markdown
   :type 'boolean
   :safe 'booleanp)
@@ -6201,30 +6213,36 @@ The location of the alias component depends on the value of
   "Generate a filename from the wiki link NAME.
 Spaces in NAME are replaced with `markdown-link-space-sub-char'.
 When in `gfm-mode', follow GitHub's conventions where [[Test Test]]
-and [[test test]] both map to Test-test.ext."
-  (let ((basename (markdown-replace-regexp-in-string
-                   "[[:space:]\n]" markdown-link-space-sub-char name)))
-    (when (eq major-mode 'gfm-mode)
-      (setq basename (concat (upcase (substring basename 0 1))
-                             (downcase (substring basename 1 nil)))))
-    (let* ((default
-            (concat basename
-                    (if (and (buffer-file-name)
-                             (file-name-extension (buffer-file-name)))
-                        (concat "."
-                                (file-name-extension (buffer-file-name))))))
-           (current default))
-      (catch 'done
-        (condition-case nil
-            (cl-loop
-             (if (or (not markdown-wiki-link-search-parent-directories)
-                     (file-exists-p current))
-                 (throw 'done current))
-             (if (string-equal (expand-file-name current)
-                               (concat "/" default))
-                 (throw 'done default))
-             (setq current (concat "../" current)))
-          (error default))))))
+and [[test test]] both map to Test-test.ext.  Look in the current
+directory first, then in subdirectories if
+`markdown-wiki-link-search-subdirectories' is non-nil, and then
+in parent directories if
+`markdown-wiki-link-search-parent-directories' is non-nil."
+  (let* ((basename (markdown-replace-regexp-in-string
+                    "[[:space:]\n]" markdown-link-space-sub-char name))
+         (basename (if (eq major-mode 'gfm-mode)
+                       (concat (upcase (substring basename 0 1))
+                               (downcase (substring basename 1 nil)))
+                     basename))
+         (extension (file-name-extension (buffer-file-name)))
+         (default (concat basename
+                          (when extension (concat "." extension))))
+         candidates dir)
+    (cond
+     ;; Look in current directory first.
+     ((file-exists-p default) default)
+     ;; Possibly search in parent directories, next.
+     ((and markdown-wiki-link-search-subdirectories
+           (setq candidates
+                 (directory-files-recursively
+                  "." (concat "^" default "$"))))
+      (car candidates))
+     ;; Possibly search in parent directories as a last resort.
+     ((and markdown-wiki-link-search-parent-directories
+           (setq dir (locate-dominating-file "." default)))
+      (concat dir default))
+     ;; If nothing is found, return default in current directory.
+     (t default))))
 
 (defun markdown-follow-wiki-link (name &optional other)
   "Follow the wiki link NAME.
@@ -6840,6 +6858,7 @@ or \\[markdown-toggle-inline-images]."
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
   (setq markdown-link-space-sub-char "-")
+  (setq markdown-wiki-link-search-subdirectories t)
   (set (make-local-variable 'font-lock-defaults)
        '(gfm-font-lock-keywords))
   ;; do the initial link fontification

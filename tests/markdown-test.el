@@ -3997,24 +3997,42 @@ this is not header line
     (markdown-indent-region (line-beginning-position) (line-end-position) nil)
     (should (string-equal (buffer-string) " #. abc\n    def\n"))))
 
-(ert-deftest test-markdown-ext/ikiwiki ()
+(ert-deftest test-markdown-ext/wiki-link-rules ()
+  "Test wiki link search rules and font lock for missing pages."
   (let ((markdown-enable-wiki-links t)
         (markdown-wiki-link-fontify-missing t)
+        (markdown-wiki-link-search-subdirectories t)
         (markdown-wiki-link-search-parent-directories t))
     (progn
-      (find-file "ikiwiki/root")
+      (find-file "wiki/root")
       (unwind-protect
           (progn
             (markdown-mode)
+            ;; search rules
+            (should (string-match-p
+                     "/sub/foo$"
+                     (markdown-convert-wiki-link-to-filename "foo")))
+            (should (string-equal
+                     (markdown-convert-wiki-link-to-filename "doesnotexist")
+                     "doesnotexist"))
             ;; font lock
             (markdown-test-range-has-property 1 11 'font-lock-face markdown-link-face)
-            (markdown-test-range-has-property 14 33 'font-lock-face markdown-missing-link-face))
+            (markdown-test-range-has-property 14 33 'font-lock-face markdown-missing-link-face)
+            (markdown-test-range-has-property 36 42 'font-lock-face markdown-link-face)
+            (markdown-test-range-has-property 45 60 'font-lock-face markdown-missing-link-face))
         (kill-buffer)))
     (progn
-      (find-file "ikiwiki/sub/foo")
+      (find-file "wiki/sub/foo")
       (unwind-protect
           (progn
             (markdown-mode)
+            ;; search rules
+            (should (string-match-p
+                     "/wiki/root$"
+                     (markdown-convert-wiki-link-to-filename "root")))
+            (should (string-equal
+                     (markdown-convert-wiki-link-to-filename "doesnotexist")
+                     "doesnotexist"))
             ;; font lock
             (markdown-test-range-has-property 1 16 'font-lock-face markdown-missing-link-face)
             (markdown-test-range-has-property 19 26 'font-lock-face markdown-link-face))

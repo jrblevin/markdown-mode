@@ -647,6 +647,8 @@ are also supported.  Since some wikis reverse these components, set
 is also non-nil, Markdown Mode will highlight wiki links with
 missing target file in a different color.  By default, Markdown
 Mode only searches for target files in the current directory.
+Search in subdirectories can be enabled by setting
+`markdown-wiki-link-search-subdirectories` to a non-nil value.
 Sequential parent directory search (as in [Ikiwiki][]) can be
 enabled by setting `markdown-wiki-link-search-parent-directories`
 to a non-nil value.
@@ -727,6 +729,8 @@ by `markdown-mode` and `gfm-mode` as described below.
   in filenames and the first letter of the filename will be
   capitalized.  For example, `[[wiki link]]` will map to a file
   named `Wiki-link` with the same extension as the current file.
+  If a file with this name does not exist in the current directory,
+  the first match in a subdirectory, if any, will be used instead.
 
 * **Newlines:** Neither `markdown-mode` nor `gfm-mode` do anything
   specifically with respect to newline behavior.  If you use
