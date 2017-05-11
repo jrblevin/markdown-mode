@@ -6429,6 +6429,23 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
    ;; No match
    (t nil)))
 
+(defun markdown-fill-paragraph (&optional justify)
+  "Fill paragraph at or after point.
+This function is like \\[fill-paragraph], but it skips Markdown
+code blocks.  If the point is in a code block, or just before one,
+do not fill.  Otherwise, call `fill-paragraph' as usual. If
+JUSTIFY is non-nil, justify text as well.  Since this function
+handles filling itself, it always returns t so that
+`fill-paragraph' doesn't run."
+  (interactive "P")
+  (unless (or (markdown-code-block-at-point-p)
+              (save-excursion
+                (back-to-indentation)
+                (skip-syntax-forward "-")
+                (markdown-code-block-at-point-p)))
+    (fill-paragraph justify))
+  t)
+
 (defun markdown-fill-forward-paragraph-function (&optional arg)
   (let* ((arg (or arg 1))
          (paragraphs-remaining (forward-paragraph arg))
@@ -6721,6 +6738,8 @@ or \\[markdown-toggle-inline-images]."
   (set (make-local-variable 'end-of-defun-function)
        'markdown-end-of-defun)
   ;; Paragraph filling
+  (set (make-local-variable 'fill-paragraph-function)
+       'markdown-fill-paragraph)
   (set
    ;; Should match start of lines that start or separate paragraphs
    (make-local-variable 'paragraph-start)

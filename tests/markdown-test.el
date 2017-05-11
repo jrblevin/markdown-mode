@@ -3706,6 +3706,15 @@ this is not header line
       (fill-paragraph)
       (should (looking-at "aaaaaaaaaaaaaaaa\nbbbbbbbbbbbbbbbb")))))
 
+(ert-deftest test-markdown-filling/skip-code-blocks ()
+  "Test `markdown-fill-paragraph' on code blocks."
+  (let ((text "test\n\n```\nhello\nworld\n```"))
+    (markdown-test-string text
+      (dotimes (n 5)
+        ;; Fill at each line; buffer should not change.
+        (fill-paragraph)
+        (should (string-equal (buffer-string) text))))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
