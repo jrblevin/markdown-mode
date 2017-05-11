@@ -1833,8 +1833,8 @@ start which was previously propertized."
      ;; Comment start
      ((and (not in-comment)
            (re-search-forward markdown-regex-comment-start end t)
-           (save-match-data (not (markdown-code-at-point-p)))
-           (save-match-data (not (markdown-code-block-at-point))))
+           (not (markdown-inline-code-at-point-p))
+           (not (markdown-code-block-at-point-p)))
       (let ((open-beg (match-beginning 0)))
         (put-text-property open-beg (1+ open-beg)
                            'syntax-table (string-to-syntax "<"))
@@ -2686,7 +2686,7 @@ intact additional processing."
           (cl-pushnew target refs :test #'equal)))
       (reverse refs))))
 
-(defun markdown-code-at-point-p ()
+(defun markdown-inline-code-at-point ()
   "Return non-nil if the point is at an inline code fragment.
 Return nil otherwise.  Set match data according to
 `markdown-match-code' upon success.
@@ -2699,7 +2699,6 @@ The match data is set as follows:
 Group 1 matches the opening backticks.
 Group 2 matches the code fragment itself, without backticks.
 Group 3 matches the closing backticks."
-  (interactive)
   (save-excursion
     (let ((old-point (point))
           (end-of-block (progn (markdown-end-of-block) (point)))
@@ -2711,6 +2710,15 @@ Group 3 matches the closing backticks."
       (and found                              ; matched something
            (<= (match-beginning 0) old-point) ; match contains old-point
            (>= (match-end 0) old-point)))))
+
+(defun markdown-inline-code-at-point-p ()
+  "Return non-nil if there is inline code at the point.
+This is a predicate function counterpart to
+`markdown-inline-code-at-point' which does not modify the match
+data.  See `markdown-code-block-at-point-p' for code blocks."
+  (save-match-data (markdown-inline-code-at-point)))
+
+(make-obsolete 'markdown-code-at-point-p 'markdown-inline-code-at-point-p "2017-05-10")
 
 (defun markdown-code-block-at-pos (pos)
   "Return match data list if there is a code block at POS.
@@ -2729,6 +2737,14 @@ quoted code blocks.  Return nil otherwise."
 This includes pre blocks, tilde-fenced code blocks, and
 GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
   (markdown-code-block-at-pos (point)))
+
+(defun markdown-code-block-at-point-p ()
+  "Return non-nil if there is a code block at the point.
+This includes pre blocks, tilde-fenced code blocks, and GFM
+quoted code blocks.  This is a predicate function counterpart to
+`markdown-code-block-at-point' which does not modify the match
+data. See `markdown-inline-code-at-point-p' for inline code."
+  (save-match-data (markdown-code-block-at-point)))
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
@@ -3237,7 +3253,7 @@ place the cursor in between them."
                      markdown-regex-code 1 3)))
         (markdown-wrap-or-insert "`" "`" nil (car bounds) (cdr bounds)))
     ;; Code markup removal, code markup for word, or empty markup insertion
-    (if (markdown-code-at-point-p)
+    (if (markdown-inline-code-at-point)
         (markdown-unwrap-thing-at-point nil 0 2)
       (markdown-wrap-or-insert "`" "`" 'word nil nil))))
 
@@ -4069,7 +4085,7 @@ text to kill ring), and list items."
   (let (val)
     (cond
      ;; Inline code
-     ((markdown-code-at-point-p)
+     ((markdown-inline-code-at-point)
       (kill-new (match-string 2))
       (delete-region (match-beginning 0) (match-end 0)))
      ;; ATX header

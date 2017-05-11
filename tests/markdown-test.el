@@ -2820,6 +2820,12 @@ only partially propertized."
                      'markdown-tilde-fence-begin)
                     (list 1 8)))
      (should (equal (markdown-code-block-at-point) (list 1 8)))
+
+     ;; markdown-code-block-at-point-p should not modify match data
+     (set-match-data (list 1 2 3 4))
+     (should (markdown-code-block-at-point-p))
+     (should (equal (match-data) (list 1 2 3 4)))
+
      (goto-char 5)
      (set-match-data (markdown-text-property-at-point
                       'markdown-tilde-fence-end))
@@ -2890,17 +2896,17 @@ only partially propertized."
 
 (defun markdown-test-test-region (beg end)
   (goto-char (1- beg))
-  (should-not (markdown-code-at-point-p))
+  (should-not (markdown-inline-code-at-point-p))
   (goto-char (1+ end))
-  (should-not (markdown-code-at-point-p))
+  (should-not (markdown-inline-code-at-point-p))
   (dolist (loc (number-sequence beg end))
     (goto-char loc)
-    (should (markdown-code-at-point-p))
+    (should (markdown-inline-code-at-point))
     (should (equal (match-beginning 0) beg))
     (should (equal (match-end 0) end))))
 
-(ert-deftest test-markdown-parsing/code-at-point-inline ()
-  "Test `markdown-code-at-point-p'."
+(ert-deftest test-markdown-parsing/inline-code-at-point ()
+  "Test `markdown-inline-code-at-point'."
   (markdown-test-file "inline.text"
     (markdown-test-test-region 45 51) ; Regular code span
     (markdown-test-test-region 61 90) ; Code containing backticks
@@ -2912,48 +2918,53 @@ only partially propertized."
     (markdown-test-test-region 806 815) ; Three backquotes across lines
     ))
 
-(ert-deftest test-markdown-parsing/code-at-point-one-space ()
-  "Test `markdown-code-at-point-p' with multiple code spans in a row."
+(ert-deftest test-markdown-parsing/inline-code-at-point-one-space ()
+  "Test `markdown-inline-code-at-point' with multiple code spans in a row."
   (markdown-test-string "`foo` `bar` `baz`"
     (dolist (loc (number-sequence 1 6))
       (goto-char loc)
-      (should (markdown-code-at-point-p))
-      (should (equal (match-data) (list 1 6 1 2 2 5 5 6))))
+      ;; markdown-inline-code-at-point should set match data
+      (should (markdown-inline-code-at-point))
+      (should (equal (match-data) (list 1 6 1 2 2 5 5 6)))
+      ;; markdown-inline-code-at-point-p should not modify match data
+      (set-match-data (list 1 2 3 4))
+      (should (markdown-inline-code-at-point-p))
+      (should (equal (match-data) (list 1 2 3 4))))
     (dolist (loc (number-sequence 7 12))
       (goto-char loc)
-      (should (markdown-code-at-point-p))
+      (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 7 12 7 8 8 11 11 12))))
     (dolist (loc (number-sequence 13 18))
       (goto-char loc)
-      (should (markdown-code-at-point-p))
+      (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 13 18 13 14 14 17 17 18))))))
 
-(ert-deftest test-markdown-parsing/code-at-point-no-space ()
-  "Test `markdown-code-at-point-p' with multiple code spans in a row."
+(ert-deftest test-markdown-parsing/inline-code-at-point-no-space ()
+  "Test `markdown-inline-code-at-point' with multiple code spans in a row.."
   (markdown-test-string "a`foo`b`bar`c`baz`d"
     (goto-char 1)                       ; "a"
-    (should-not (markdown-code-at-point-p))
+    (should-not (markdown-inline-code-at-point-p))
     (dolist (loc (number-sequence 2 7)) ; "`foo`b"
       (goto-char loc)
-      (should (markdown-code-at-point-p))
+      (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 2 7 2 3 3 6 6 7))))
     (dolist (loc (number-sequence 8 13)) ; "`bar`c"
       (goto-char loc)
-      (should (markdown-code-at-point-p))
+      (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 8 13 8 9 9 12 12 13))))
     (dolist (loc (number-sequence 14 19)) ; "`baz`d"
       (goto-char loc)
-      (should (markdown-code-at-point-p))
+      (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 14 19 14 15 15 18 18 19))))))
 
 (ert-deftest test-markdown-parsing/code-at-point-blank-line ()
-  "Test `markdown-code-at-point-p' at beginning of block."
+  "Test `markdown-inline-code-at-point-p' at beginning of block."
   (markdown-test-string "----------\n\n## foo\n"
-   (should-not (markdown-code-at-point-p))
+   (should-not (markdown-inline-code-at-point-p))
    (forward-line)
-   (should-not (markdown-code-at-point-p))
+   (should-not (markdown-inline-code-at-point-p))
    (forward-line)
-   (should-not (markdown-code-at-point-p))))
+   (should-not (markdown-inline-code-at-point-p))))
 
 (ert-deftest test-markdown-parsing/match-comments ()
   "Test `markdown-match-comments'."
