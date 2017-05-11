@@ -6401,7 +6401,8 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
 
 (defun markdown-inside-link-p ()
   "Return t if point is within a link."
-  (thing-at-point-looking-at (markdown-make-regex-link-generic)))
+  (save-match-data
+    (thing-at-point-looking-at (markdown-make-regex-link-generic))))
 
 (defun markdown-line-is-reference-definition-p ()
   "Return whether the current line is a (non-footnote) reference defition."
