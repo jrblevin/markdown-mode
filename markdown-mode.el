@@ -2363,6 +2363,47 @@ in XEmacs 21."
         'outline-hide-subtree
       'hide-subtree)))
 
+;; Provide directory-name-p to Emacs 24
+(defsubst markdown-directory-name-p (name)
+  "Return non-nil if NAME ends with a directory separator character.
+Taken from `directory-name-p' from Emacs 25 and provided here for
+backwards compatibility."
+  (let ((len (length name))
+        (lastc ?.))
+    (if (> len 0)
+        (setq lastc (aref name (1- len))))
+    (or (= lastc ?/)
+        (and (memq system-type '(windows-nt ms-dos))
+             (= lastc ?\\)))))
+
+;; Provide a function to find files recursively Emacs 24
+(if (fboundp 'directory-files-recursively)
+    (defalias 'markdown-directory-files-recursively 'directory-files-recursively)
+  (defun markdown-directory-files-recursively (dir regexp)
+    "Return list of all files under DIR that have file names matching REGEXP.
+This function works recursively.  Files are returned in \"depth first\"
+order, and files from each directory are sorted in alphabetical order.
+Each file name appears in the returned list in its absolute form.
+Based on `directory-files-recursively' from Emacs 25 and provided
+here for backwards compatibility."
+    (let ((result nil)
+          (files nil)
+          ;; When DIR is "/", remote file names like "/method:" could
+          ;; also be offered.  We shall suppress them.
+          (tramp-mode (and tramp-mode (file-remote-p (expand-file-name dir)))))
+      (dolist (file (sort (file-name-all-completions "" dir)
+                          'string<))
+        (unless (member file '("./" "../"))
+          (if (markdown-directory-name-p file)
+              (let* ((leaf (substring file 0 (1- (length file))))
+                     (full-file (expand-file-name leaf dir)))
+                (setq result
+                      (nconc result (markdown-directory-files-recursively
+                                     full-file regexp))))
+            (when (string-match regexp file)
+              (push (expand-file-name file dir) files)))))
+      (nconc result (nreverse files)))))
+
 
 ;;; Markdown Parsing Functions ================================================
 
@@ -6234,7 +6275,7 @@ in parent directories if
      ;; Possibly search in parent directories, next.
      ((and markdown-wiki-link-search-subdirectories
            (setq candidates
-                 (directory-files-recursively
+                 (markdown-directory-files-recursively
                   "." (concat "^" default "$"))))
       (car candidates))
      ;; Possibly search in parent directories as a last resort.
