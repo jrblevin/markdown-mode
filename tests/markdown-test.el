@@ -2049,15 +2049,6 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-face-equals 9 11 nil)
    (markdown-test-range-face-equals 14 18 markdown-inline-code-face)))
 
-(ert-deftest test-markdown-font-lock/no-bold-in-math ()
-  "Bold markers in math should not trigger bold."
-  (markdown-test-file "math.text"
-    (markdown-toggle-math t)
-    (funcall markdown-test-font-lock-function)
-    (markdown-test-range-has-face 279 299 markdown-math-face)
-    (markdown-test-range-has-face 301 308 nil)
-    (markdown-test-range-has-face 310 312 markdown-math-face)))
-
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
   (markdown-test-file "inline.text"
@@ -3831,65 +3822,71 @@ this is not header line
 
 (ert-deftest test-markdown-math/reload ()
   "Test enabling math mode via function `markdown-enable-math'."
-  (markdown-test-file "math.text"
-    (markdown-toggle-math t)
-    ;; Flag should be set to t
-    (should markdown-enable-math)
-    ;; Font-lock keywords should be updated
-    (should (member (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
-                                                        (2 markdown-math-face append)
-                                                        (3 markdown-markup-face prepend)))
-                    markdown-mode-font-lock-keywords))))
+  (let ((markdown-enable-math t))
+    (markdown-test-file "math.text"
+      ;; Flag should be set to t
+      (should markdown-enable-math)
+      ;; Font-lock keywords should be updated
+      (should (member (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
+                                                          (2 markdown-math-face append)
+                                                          (3 markdown-markup-face prepend)))
+                      markdown-mode-font-lock-keywords)))))
 
 (ert-deftest test-markdown-math/font-lock ()
   "Test markdown math mode."
-  (markdown-test-file "math.text"
-   (markdown-toggle-math t)
-   (funcall markdown-test-font-lock-function)
-   (markdown-test-range-has-face 1 32 nil)
-   (markdown-test-range-has-face 33 33 markdown-markup-face)
-   (markdown-test-range-has-face 34 45 markdown-math-face)
-   (markdown-test-range-has-face 46 46 markdown-markup-face)
-   (markdown-test-range-has-face 47 49 nil)
-   (markdown-test-range-has-face 50 51 markdown-markup-face)
-   (markdown-test-range-has-face 52 63 markdown-math-face)
-   (markdown-test-range-has-face 64 65 markdown-markup-face)
-   (markdown-test-range-has-face 66 98 nil)
-   (markdown-test-range-has-face 99 100 markdown-markup-face)
-   (markdown-test-range-has-face 101 112 markdown-math-face)
-   (markdown-test-range-has-face 113 114 markdown-markup-face)
-   (markdown-test-range-has-face 113 114 markdown-markup-face)
-   (markdown-test-range-has-face 117 117 markdown-header-delimiter-face)
-   (markdown-test-range-has-face 119 152 markdown-header-face-1)
-   (markdown-test-range-has-face 129 129 markdown-markup-face)
-   (markdown-test-range-has-face 136 136 markdown-markup-face)
-   (markdown-test-range-has-face 174 177 markdown-markup-face)
-   (markdown-test-range-has-face 179 188 markdown-language-keyword-face)
-   (markdown-test-range-has-face 190 211 markdown-pre-face)
-   (markdown-test-range-has-face 212 215 markdown-markup-face)
-   (markdown-test-range-has-face 218 218 markdown-markup-face)
-   (markdown-test-range-has-face 219 223 markdown-math-face)
-   (markdown-test-range-has-face 224 224 markdown-markup-face)
-   (markdown-test-range-has-face 350 351 markdown-markup-face)
-   (markdown-test-range-has-face 352 356 markdown-math-face)
-   (markdown-test-range-has-face 357 358 markdown-markup-face)
-   (markdown-test-range-has-face 359 391 nil)
-   (markdown-test-range-has-face 392 393 markdown-markup-face)
-   (markdown-test-range-has-face 394 398 markdown-math-face)
-   (markdown-test-range-has-face 399 400 markdown-markup-face)))
+  (let ((markdown-enable-math t))
+    (markdown-test-file "math.text"
+      (markdown-test-range-has-face 1 32 nil)
+      (markdown-test-range-has-face 33 33 markdown-markup-face)
+      (markdown-test-range-has-face 34 45 markdown-math-face)
+      (markdown-test-range-has-face 46 46 markdown-markup-face)
+      (markdown-test-range-has-face 47 49 nil)
+      (markdown-test-range-has-face 50 51 markdown-markup-face)
+      (markdown-test-range-has-face 52 63 markdown-math-face)
+      (markdown-test-range-has-face 64 65 markdown-markup-face)
+      (markdown-test-range-has-face 66 98 nil)
+      (markdown-test-range-has-face 99 100 markdown-markup-face)
+      (markdown-test-range-has-face 101 112 markdown-math-face)
+      (markdown-test-range-has-face 113 114 markdown-markup-face)
+      (markdown-test-range-has-face 113 114 markdown-markup-face)
+      (markdown-test-range-has-face 117 117 markdown-header-delimiter-face)
+      (markdown-test-range-has-face 119 152 markdown-header-face-1)
+      (markdown-test-range-has-face 129 129 markdown-markup-face)
+      (markdown-test-range-has-face 136 136 markdown-markup-face)
+      (markdown-test-range-has-face 174 177 markdown-markup-face)
+      (markdown-test-range-has-face 179 188 markdown-language-keyword-face)
+      (markdown-test-range-has-face 190 211 markdown-pre-face)
+      (markdown-test-range-has-face 212 215 markdown-markup-face)
+      (markdown-test-range-has-face 218 218 markdown-markup-face)
+      (markdown-test-range-has-face 219 223 markdown-math-face)
+      (markdown-test-range-has-face 224 224 markdown-markup-face)
+      (markdown-test-range-has-face 350 351 markdown-markup-face)
+      (markdown-test-range-has-face 352 356 markdown-math-face)
+      (markdown-test-range-has-face 357 358 markdown-markup-face)
+      (markdown-test-range-has-face 359 391 nil)
+      (markdown-test-range-has-face 392 393 markdown-markup-face)
+      (markdown-test-range-has-face 394 398 markdown-math-face)
+      (markdown-test-range-has-face 399 400 markdown-markup-face))))
 
 (ert-deftest test-markdown-math/font-lock-italics ()
   "Test markdown math mode with underscores."
-  (markdown-test-file "math.text"
-   (markdown-toggle-math t)
-   (funcall markdown-test-font-lock-function)
-   (markdown-test-range-has-face 227 227 markdown-markup-face)
-   (markdown-test-range-has-face 228 233 markdown-math-face)
-   (markdown-test-range-has-face 234 234 markdown-markup-face)
-   (markdown-test-range-has-face 235 270 nil)
-   (markdown-test-range-has-face 271 271 markdown-markup-face)
-   (markdown-test-range-has-face 272 274 markdown-math-face)
-   (markdown-test-range-has-face 275 275 markdown-markup-face)))
+  (let ((markdown-enable-math t))
+    (markdown-test-file "math.text"
+      (markdown-test-range-has-face 227 227 markdown-markup-face)
+      (markdown-test-range-has-face 228 233 markdown-math-face)
+      (markdown-test-range-has-face 234 234 markdown-markup-face)
+      (markdown-test-range-has-face 235 270 nil)
+      (markdown-test-range-has-face 271 271 markdown-markup-face)
+      (markdown-test-range-has-face 272 274 markdown-math-face)
+      (markdown-test-range-has-face 275 275 markdown-markup-face))))
+
+(ert-deftest test-markdown-math/font-lock-no-bold ()
+  "Bold markers in math should not trigger bold."
+  (let ((markdown-enable-math t))
+    (markdown-test-file "math.text"
+      (markdown-test-range-has-face 279 299 markdown-math-face)
+      (markdown-test-range-has-face 301 308 nil)
+      (markdown-test-range-has-face 310 312 markdown-math-face))))
 
 ;;; gfm-mode tests:
 
