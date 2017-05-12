@@ -528,8 +528,8 @@ provides an interface to all of the possible customizations:
     indentation (default: `markdown-indent-line`).
 
   * `markdown-indent-on-enter` - set to a non-nil value to
-    automatically indent new lines when the enter key is pressed
-    (default: <kbd>t</kbd>)
+    automatically indent new lines and/or continue lists when the
+    enter key is pressed (default: <kbd>t</kbd>)
 
   * `markdown-enable-wiki-links` - syntax highlighting for wiki
     links (default: `nil`).  Set this to a non-nil value to turn on

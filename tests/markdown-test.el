@@ -1780,8 +1780,23 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    "  * item 1"
    (end-of-line)
    (markdown-enter-key)
-   (should (string-equal (buffer-string) "  * item 1\n  "))
-   (should (eq (point) 14))))
+   (should (string-equal (buffer-string) "  * item 1\n  * "))
+   (should (eq (point) 16))
+   (markdown-enter-key)
+   (should (string-equal (buffer-string) "  * item 1\n\n"))
+   (should (eq (point) 13))))
+
+(ert-deftest test-markdown-indentation/indent-nested-list ()
+  "Test `markdown-enter-key' with a nested list item."
+  (markdown-test-string
+   "* foo\n* bar\n  * baz"
+   (goto-char (point-max))
+   (markdown-enter-key)
+   (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n  * "))
+   (should (eq (point) 25))
+   (markdown-enter-key)
+   (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n\n"))
+   (should (eq (point) 22))))
 
 (ert-deftest test-markdown-indentation/indent-pre ()
   "Test `markdown-indent-line' with a pre block."

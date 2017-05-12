@@ -548,8 +548,8 @@
 ;;     indentation (default: `markdown-indent-line').
 ;;
 ;;   * `markdown-indent-on-enter' - set to a non-nil value to
-;;     automatically indent new lines when the enter key is pressed
-;;     (default: `t')
+;;     automatically indent new lines and/or continue lists when the
+;;     enter key is pressed (default: `t')
 ;;
 ;;   * `markdown-enable-wiki-links' - syntax highlighting for wiki
 ;;     links (default: `nil').  Set this to a non-nil value to turn on
@@ -941,11 +941,13 @@ line around the header title."
   :type 'function)
 
 (defcustom markdown-indent-on-enter t
-  "Automatically indent new lines when enter key is pressed.
+  "Indent new lines and continue lists when enter is pressed.
 When this variable is set to t, pressing RET will call
-`newline-and-indent'.  When set to nil, define RET to call
-`newline' as usual.  In the latter case, you can still use
-auto-indentation by pressing \\[newline-and-indent]."
+`newline-and-indent' and will continue a list.  When set to nil,
+define RET to call `newline' as usual.  In the latter case, you
+can still use auto-indentation by pressing
+\\[newline-and-indent] or continue lists with
+\\[markdown-insert-list-item]."
   :group 'markdown
   :type 'boolean)
 
@@ -4286,11 +4288,30 @@ duplicate positions, which are handled up by calling functions."
     (reverse positions)))
 
 (defun markdown-enter-key ()
-  "Handle RET according to to the value of `markdown-indent-on-enter'."
+  "Handle RET according to customized settings.
+When `markdown-indent-on-enter' is nil, this is equivalent to
+`newline'.  Otherwise, indent following RET and when the point is
+in a list item, start a new item with the same indentation.  If
+the point is in an empty list item, remove it."
   (interactive)
-  (newline)
-  (when markdown-indent-on-enter
-    (markdown-indent-line)))
+  (if (not markdown-indent-on-enter)
+      (newline)
+    (let ((bounds (markdown-cur-list-item-bounds)))
+      (if bounds
+          (let ((beg (cl-first bounds))
+                (end (cl-second bounds))
+                (length (cl-fourth bounds)))
+            ;; Point is in a list item
+            (if (= (- end beg) length)
+                ;; Delete blank list
+                (progn
+                  (delete-region beg end)
+                  (newline)
+                  (markdown-indent-line))
+              (call-interactively #'markdown-insert-list-item)))
+        ;; Point is not in a list
+        (newline)
+        (markdown-indent-line)))))
 
 (defun markdown-exdent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
