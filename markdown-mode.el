@@ -6265,22 +6265,26 @@ in parent directories if
                        (concat (upcase (substring basename 0 1))
                                (downcase (substring basename 1 nil)))
                      basename))
-         (extension (file-name-extension (buffer-file-name)))
-         (default (concat basename
+         directory extension default candidates dir)
+    (when buffer-file-name
+      (setq directory (file-name-directory buffer-file-name)
+            extension (file-name-extension buffer-file-name)))
+    (setq default (concat basename
                           (when extension (concat "." extension))))
-         candidates dir)
     (cond
      ;; Look in current directory first.
-     ((file-exists-p default) default)
-     ;; Possibly search in parent directories, next.
+     ((or (null buffer-file-name)
+          (file-exists-p default))
+      default)
+     ;; Possibly search in subdirectories, next.
      ((and markdown-wiki-link-search-subdirectories
            (setq candidates
                  (markdown-directory-files-recursively
-                  "." (concat "^" default "$"))))
+                  directory (concat "^" default "$"))))
       (car candidates))
      ;; Possibly search in parent directories as a last resort.
      ((and markdown-wiki-link-search-parent-directories
-           (setq dir (locate-dominating-file "." default)))
+           (setq dir (locate-dominating-file directory default)))
       (concat dir default))
      ;; If nothing is found, return default in current directory.
      (t default))))
