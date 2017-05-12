@@ -6295,12 +6295,15 @@ Convert the name to a file name and call `find-file'.  Ensure that
 the new buffer remains in `markdown-mode'.  Open the link in another
 window when OTHER is non-nil."
   (let ((filename (markdown-convert-wiki-link-to-filename name))
-        (wp (file-name-directory buffer-file-name)))
-    (when other (other-window 1))
-    (let ((default-directory wp))
-      (find-file filename)))
-  (when (not (eq major-mode 'markdown-mode))
-    (markdown-mode)))
+        (wp (when buffer-file-name
+              (file-name-directory buffer-file-name))))
+    (if (not wp)
+        (error "Must be visiting a file")
+      (when other (other-window 1))
+      (let ((default-directory wp))
+        (find-file filename)))
+    (when (not (eq major-mode 'markdown-mode))
+      (markdown-mode))))
 
 (defun markdown-follow-wiki-link-at-point (&optional arg)
   "Find Wiki Link at point.
