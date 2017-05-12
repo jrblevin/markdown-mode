@@ -2165,8 +2165,8 @@ Used when `markdown-header-scaling' is non-nil."
 (defun markdown-make-header-faces ()
   "Build the faces used for Markdown headers."
   (defface markdown-header-face
-    `((t (:inherit (,(when markdown-header-scaling 'variable-pitch)
-                     font-lock-function-name-face)
+    `((t (:inherit (,@(when markdown-header-scaling 'variable-pitch)
+                    font-lock-function-name-face)
                    :weight bold)))
     "Base face for headers."
     :group 'markdown-faces)
