@@ -645,7 +645,8 @@
 ;;   * `markdown-reference-location' - where to insert reference
 ;;     definitions (default: `header`).  The possible locations are
 ;;     the end of the document (`end`), after the current block
-;;     (`immediately`), before the next header (`header`).
+;;     (`immediately`), the end of the current subtree (`subtree'),
+;;     or before the next header (`header`).
 ;;
 ;;   * `markdown-footnote-location' - where to insert footnote text
 ;;     (default: `end`).  The set of location options is the same as
@@ -1113,6 +1114,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type '(choice (const :tag "At the end of the document" end)
                  (const :tag "Immediately after the current block" immediately)
+                 (const :tag "At the end of the subtree" subtree)
                  (const :tag "Before next header" header)))
 
 (defcustom markdown-footnote-location 'end
@@ -1120,6 +1122,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type '(choice (const :tag "At the end of the document" end)
                  (const :tag "Immediately after the current block" immediately)
+                 (const :tag "At the end of the subtree" subtree)
                  (const :tag "Before next header" header)))
 
 (defcustom markdown-unordered-list-item-prefix "  * "
@@ -3671,6 +3674,7 @@ be used to populate the title attribute when converted to XHTML."
     (cl-case markdown-reference-location
       (end         (goto-char (point-max)))
       (immediately (markdown-end-of-text-block))
+      (subtree     (markdown-end-of-subtree))
       (header      (markdown-end-of-defun)))
     (unless (markdown-cur-line-blank-p) (insert "\n"))
     (insert "\n[" label "]: ")
@@ -4222,6 +4226,7 @@ automatically in order to have the correct markup."
   (cond
    ((eq markdown-footnote-location 'end) (goto-char (point-max)))
    ((eq markdown-footnote-location 'immediately) (markdown-end-of-text-block))
+   ((eq markdown-footnote-location 'subtree) (markdown-end-of-subtree))
    ((eq markdown-footnote-location 'header) (markdown-end-of-defun))))
 
 (defun markdown-footnote-kill ()

@@ -627,7 +627,8 @@ provides an interface to all of the possible customizations:
   * `markdown-reference-location` - where to insert reference
     definitions (default: `header`).  The possible locations are
     the end of the document (`end`), after the current block
-    (`immediately`), before the next header (`header`).
+    (`immediately`), the end of the current subtree (`subtree`),
+    or before the next header (`header`).
 
   * `markdown-footnote-location` - where to insert footnote text
     (default: `end`).  The set of location options is the same as

@@ -1294,6 +1294,20 @@ Point should be left inside parentheses."
                           (should (string-equal (buffer-string)
                                                 "par one\n\npar two\n\n### header\n")))))
 
+(ert-deftest test-markdown-footnote/basic-subtree ()
+  "Basic footnote insertion and deletion tests for 'subtree location."
+  (let ((markdown-footnote-location 'subtree))
+    (markdown-test-string "# h1\n\nfoo\n\n## h2\n\nbar\n"
+      ;; new buffer with no footnotes
+      (should (= markdown-footnote-counter 0))
+      ;; footnote insertion
+      (forward-line 2)
+      (end-of-line)
+      (markdown-insert-footnote)
+      (should (= (point) 34))
+      (should (= markdown-footnote-counter 1))
+      (should (looking-back "\\[^1\\]: " nil)))))
+
 (ert-deftest test-markdown-footnote/kill-empty-text ()
   "Test killing a footnote with marker but no text."
   (markdown-test-string "no text[^1]\n\n[^1]: \n"
