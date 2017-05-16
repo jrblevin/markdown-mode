@@ -2183,12 +2183,13 @@ Used when `markdown-header-scaling' is non-nil."
 
 (defun markdown-make-header-faces ()
   "Build the faces used for Markdown headers."
-  (defface markdown-header-face
-    `((t (:inherit (,@(when markdown-header-scaling 'variable-pitch)
-                    font-lock-function-name-face)
-                   :weight bold)))
-    "Base face for headers."
-    :group 'markdown-faces)
+  (let ((inherit-faces '(font-lock-function-name-face)))
+    (when markdown-header-scaling
+      (setq inherit-faces (cons 'variable-pitch inherit-faces)))
+    (defface markdown-header-face
+      `((t (:inherit ,inherit-faces :weight bold)))
+      "Base face for headers."
+      :group 'markdown-faces))
   (dotimes (num 6)
     (let* ((num1 (1+ num))
            (face-name (intern (format "markdown-header-face-%s" num1)))
