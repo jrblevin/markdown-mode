@@ -5762,10 +5762,10 @@ Calls `markdown-cycle' with argument t."
 (defun markdown-outline-level ()
   "Return the depth to which a statement is nested in the outline."
   (cond
-   ((markdown-code-block-at-point) 7)
+   ((markdown-code-block-at-point-p) 7) ;; Only 6 header levels are defined.
    ((match-end 2) 1)
    ((match-end 3) 2)
-   ((- (match-end 4) (match-beginning 4)))))
+   ((match-end 4) (- (match-end 4) (match-beginning 4)))))
 
 (defun markdown-promote-subtree (&optional arg)
   "Promote the current subtree of ATX headings.

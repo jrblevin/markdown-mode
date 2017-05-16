@@ -3304,6 +3304,20 @@ date = 2015-08-13 11:35:25 EST
      ;; Check that text is visible
      (markdown-test-range-has-property (point-min) (point-max) 'invisible nil))))
 
+(ert-deftest test-markdown-outline/level ()
+  "Test `markdown-outline-level'."
+  (markdown-test-file "outline.text"
+    (markdown-next-heading)
+    (should (= (markdown-outline-level) 1))
+    (markdown-forward-same-level 1)
+    (should (= (markdown-outline-level) 1))
+    (markdown-next-heading)
+    (should (= (markdown-outline-level) 2))
+    (markdown-next-heading)
+    (should (= (markdown-outline-level) 1))
+    (markdown-next-heading)
+    (should (= (markdown-outline-level) 2))))
+
 ;;; Movement tests:
 
 (ert-deftest test-markdown-movement/defun ()
