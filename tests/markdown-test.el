@@ -1073,12 +1073,12 @@ Test point position upon removal and insertion."
   ;; Full link without title (leave point after link)
   (markdown-test-string ""
                         (markdown-insert-reference-link "link" "label" "http://jblevins.org/")
-                        (should (string-equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/\n"))
+                        (should (string-equal (buffer-string) "[link][label]\n\n[label]: http://jblevins.org/"))
                         (should (= (point) 14)))
   ;; Full link without label or title (leave point after link)
   (markdown-test-string ""
                         (markdown-insert-reference-link "link" "" "http://jblevins.org/")
-                        (should (string-equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/\n"))
+                        (should (string-equal (buffer-string) "[link][]\n\n[link]: http://jblevins.org/"))
                         (should (= (point) 9)))
   ;; Link only with no label, URL, or title (leave point after link)
   (markdown-test-string ""
@@ -1122,10 +1122,10 @@ Test point position upon removal and insertion."
   "Inline link to reference link conversion."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")"
                         (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n")))
+                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"")))
   (markdown-test-string "[text](http://jblevins.org/)"
                         (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/\n"))))
+                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/"))))
 
 (ert-deftest test-markdown-insertion/inline-to-reference-link-2 ()
   "Inline link to reference link conversion with existing reference links.
@@ -3615,7 +3615,7 @@ date = 2015-08-13 11:35:25 EST
   (markdown-test-string "[a][]\n"
    (markdown-reference-goto-definition)
    (should (= (point) 13))
-   (should (string-equal (buffer-string) "[a][]\n\n[a]: \n"))))
+   (should (string-equal (buffer-string) "[a][]\n\n[a]: "))))
 
 (ert-deftest test-markdown-movement/back-to-same-level-over-code-block ()
   "`markdown-backward-same-level' over code block which contains header

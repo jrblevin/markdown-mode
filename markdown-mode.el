@@ -3684,16 +3684,18 @@ be used to populate the title attribute when converted to XHTML."
       (immediately (markdown-end-of-text-block))
       (subtree     (markdown-end-of-subtree))
       (header      (markdown-next-heading)))
-    (unless (markdown-cur-line-blank-p) (insert "\n"))
-    (insert "\n[" label "]: ")
+    (markdown-ensure-blank-line-before)
+    (unless (markdown-cur-line-blank-p)
+      (insert "\n")
+      (forward-char -1))
+    (insert "[" label "]: ")
     (if url
         (insert url)
       ;; When no URL is given, leave cursor at END following the colon
       (setq end (point)))
     (when (> (length title) 0)
       (insert " \"" title "\""))
-    (unless (looking-at-p "\n")
-      (insert "\n"))
+    (markdown-ensure-blank-line-after)
     (goto-char end)
     (when url
       (message
@@ -4225,7 +4227,8 @@ automatically in order to have the correct markup."
     (markdown-footnote-text-find-new-location)
     (markdown-ensure-blank-line-before)
     (unless (markdown-cur-line-blank-p)
-      (insert "\n"))
+      (insert "\n")
+      (forward-char -1))
     (insert (format "[^%d]: " fn))
     (markdown-ensure-blank-line-after)))
 
