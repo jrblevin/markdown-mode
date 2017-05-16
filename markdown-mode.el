@@ -5592,6 +5592,7 @@ Stop at the first and last headings of a superior heading."
   "Move to the visible heading line of which the present line is a subheading.
 With argument, move up ARG levels."
   (interactive "p")
+  (or (eq last-command 'markdown-up-heading) (push-mark))
   (markdown-move-heading-common 'outline-up-heading arg))
 
 (defun markdown-back-to-heading (&optional invisible-ok)

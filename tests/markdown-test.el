@@ -3202,7 +3202,16 @@ x: x
    ;; Navigate backward by four visible headings
    (markdown-previous-visible-heading 4)
    (should (eq (point) 69))
-   (should (looking-at "^## A second-level header$"))))
+   (should (looking-at "^## A second-level header$"))
+   ;; Navigate up the hierarchy (atx)
+   (markdown-up-heading 1)
+   (should (looking-at "^# A top-level header"))
+   (should (eq (mark) 69))
+   ;; Navigate up the hierarchy (setext)
+   (goto-char 516)
+   (markdown-up-heading 1)
+   (should (looking-at "^An underline-style header$"))
+   (should (eq (mark) 516))))
 
 (ert-deftest test-markdown-outline/navigation-with-code ()
   "Test outline navigation functions with code blocks."
