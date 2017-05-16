@@ -5505,22 +5505,6 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
       (goto-char opoint)
       nil)))
 
-(defun markdown-next-heading ()
-  "Move to the next heading line of any level.
-With argument, repeats or can move backward if negative."
-  (let ((pos (outline-next-heading)))
-    (while (markdown-code-block-at-point)
-      (setq pos (outline-next-heading)))
-    pos))
-
-(defun markdown-previous-heading ()
-  "Move to the previous heading line of any level.
-With argument, repeats or can move backward if negative."
-  (let ((pos (outline-previous-heading)))
-    (while (markdown-code-block-at-point)
-      (setq pos (outline-previous-heading)))
-    pos))
-
 
 ;;; Outline ===================================================================
 
@@ -5529,11 +5513,12 @@ With argument, repeats or can move backward if negative."
 MOVE-FN is a function and ARG is its argument. For example,
 headings inside preformatted code blocks may match
 `outline-regexp' but should not be considered as headings."
-  (funcall move-fn arg)
+  (if arg (funcall move-fn arg) (funcall move-fn))
   (let ((prev -1))
     (while (and (/= prev (point)) (markdown-code-block-at-point))
       (setq prev (point))
-      (funcall move-fn arg))))
+      (if arg (funcall move-fn arg) (funcall move-fn))))
+  (if (< (point) (point-max)) (point) nil))
 
 (defun markdown-next-visible-heading (arg)
   "Move to the next visible heading line of any level.
@@ -5548,6 +5533,14 @@ With argument, repeats or can move backward if negative. ARG is
 passed to `outline-previous-visible-heading'."
   (interactive "p")
   (markdown-move-heading-common 'outline-previous-visible-heading arg))
+
+(defun markdown-next-heading ()
+  "Move to the next heading line of any level."
+  (markdown-move-heading-common 'outline-next-heading))
+
+(defun markdown-previous-heading ()
+  "Move to the previous heading line of any level."
+  (markdown-move-heading-common 'outline-previous-heading))
 
 (defun markdown-forward-same-level (arg)
   "Move forward to the ARG'th heading at same level as this one.
