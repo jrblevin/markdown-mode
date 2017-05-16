@@ -5513,12 +5513,12 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
 MOVE-FN is a function and ARG is its argument. For example,
 headings inside preformatted code blocks may match
 `outline-regexp' but should not be considered as headings."
-  (if arg (funcall move-fn arg) (funcall move-fn))
-  (let ((prev -1))
+  (let ((prev -1) (start (point)))
+    (if arg (funcall move-fn arg) (funcall move-fn))
     (while (and (/= prev (point)) (markdown-code-block-at-point))
       (setq prev (point))
-      (if arg (funcall move-fn arg) (funcall move-fn))))
-  (if (< (point) (point-max)) (point) nil))
+      (if arg (funcall move-fn arg) (funcall move-fn)))
+    (if (= (point) start) nil (point))))
 
 (defun markdown-next-visible-heading (arg)
   "Move to the next visible heading line of any level.
@@ -5607,9 +5607,9 @@ non-nil.
 Derived from `org-end-of-subtree'."
   (markdown-back-to-heading invisible-OK)
   (let ((first t)
-        (level (funcall outline-level)))
+        (level (markdown-outline-level)))
     (while (and (not (eobp))
-                (or first (> (funcall outline-level) level)))
+                (or first (> (markdown-outline-level) level)))
       (setq first nil)
       (markdown-next-heading))
     (if (memq (preceding-char) '(?\n ?\^M))
