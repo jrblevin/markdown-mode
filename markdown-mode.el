@@ -2418,7 +2418,7 @@ backwards compatibility."
         (and (memq system-type '(windows-nt ms-dos))
              (= lastc ?\\)))))
 
-;; Provide a function to find files recursively Emacs 24
+;; Provide a function to find files recursively in Emacs 24.
 (defalias 'markdown-directory-files-recursively
   (if (fboundp 'directory-files-recursively)
       'directory-files-recursively
