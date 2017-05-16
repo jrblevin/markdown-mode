@@ -2419,9 +2419,11 @@ backwards compatibility."
              (= lastc ?\\)))))
 
 ;; Provide a function to find files recursively Emacs 24
-;; In Emacs 25, this can be replaced by directory-files-recursively.
-(defun markdown-directory-files-recursively (dir regexp)
-  "Return list of all files under DIR that have file names matching REGEXP.
+(defalias 'markdown-directory-files-recursively
+  (if (fboundp 'directory-files-recursively)
+      'directory-files-recursively
+    (lambda (dir regexp)
+    "Return list of all files under DIR that have file names matching REGEXP.
 This function works recursively.  Files are returned in \"depth first\"
 order, and files from each directory are sorted in alphabetical order.
 Each file name appears in the returned list in its absolute form.
@@ -2443,7 +2445,7 @@ here for backwards compatibility."
                                    full-file regexp))))
           (when (string-match regexp file)
             (push (expand-file-name file dir) files)))))
-    (nconc result (nreverse files))))
+    (nconc result (nreverse files))))))
 
 
 ;;; Markdown Parsing Functions ================================================
