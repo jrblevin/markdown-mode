@@ -4789,21 +4789,21 @@ See also `markdown-mode-map'.")
       ["Sixth Level atx" markdown-insert-header-atx-6])
      ["Horizontal Rule" markdown-insert-hr]
      "---"
-     ["Promote Header" markdown-promote]
-     ["Demote Header" markdown-demote]
-     ["Promote Subtree" markdown-promote-subtree]
-     ["Demote Subtree" markdown-demote-subtree]
-     ["Move Subtree Up" markdown-move-subtree-up]
-     ["Move Subtree Down" markdown-move-subtree-down])
+     ["Move Subtree Up" markdown-move-subtree-up :keys "M-S-<up>"]
+     ["Move Subtree Down" markdown-move-subtree-down :keys "M-S-<down>"]
+     ["Promote Subtree" markdown-promote-subtree :keys "M-S-<left>"]
+     ["Demote Subtree" markdown-demote-subtree :keys "M-S-<right>"]
+     ["Promote Header" markdown-promote :keys "M-<left>"]
+     ["Demote Header" markdown-demote :keys "M-<right>"])
     ("Region Editing"
      ["Indent Region" markdown-indent-region]
      ["Exdent Region" markdown-exdent-region])
     ("Lists"
      ["Insert List Item" markdown-insert-list-item]
-     ["Indent List Item" markdown-demote]
-     ["Exdent List Item" markdown-promote]
-     ["Move List Item Up" markdown-move-up]
-     ["Move List Item Down" markdown-move-down]
+     ["Move List Item Up" markdown-move-up :keys "M-<up>"]
+     ["Move List Item Down" markdown-move-down :keys "M-<down>"]
+     ["Exdent List Item" markdown-promote :keys "M-<left>"]
+     ["Indent List Item" markdown-demote :keys "M-<right>"]
      ["Renumber List" markdown-cleanup-list-numbers]
      ["Toggle Task List Item" markdown-toggle-gfm-checkbox])
     ("Links & Images"
@@ -4831,7 +4831,11 @@ See also `markdown-mode-map'.")
      ["GFM Code Block" markdown-insert-gfm-code-block]
      "---"
      ["Blockquote Region" markdown-blockquote-region]
-     ["Preformatted Region" markdown-pre-region])
+     ["Preformatted Region" markdown-pre-region]
+     "---"
+     ["Enable LaTeX math" markdown-toggle-math
+      :style radio
+      :selected markdown-enable-math])
     "---"
     ("Preview & Export"
      ["Compile" markdown-other-window]
