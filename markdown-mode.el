@@ -4817,7 +4817,8 @@ See also `markdown-mode-map'.")
      "---"
      ["Check References" markdown-check-refs]
      ["Toggle Inline Images" markdown-toggle-inline-images
-      :style toggle :selected markdown-inline-image-overlays])
+      :style radio
+      :selected markdown-inline-image-overlays])
     ("Styles"
      ["Bold" markdown-insert-bold]
      ["Italic" markdown-insert-italic]
@@ -4839,7 +4840,8 @@ See also `markdown-mode-map'.")
      ["Export & View" markdown-export-and-preview]
      ["Open" markdown-open]
      ["Live Export" markdown-live-preview-mode
-      :style toggle :selected markdown-live-preview-mode]
+      :style radio
+      :selected markdown-live-preview-mode]
      ["Kill ring save" markdown-kill-ring-save])
     ("Markup Completion and Cycling"
      ["Complete Markup" markdown-complete]
