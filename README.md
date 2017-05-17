@@ -704,7 +704,7 @@ by `markdown-mode` and `gfm-mode` as described below.
   variable names such as `a_test_variable` will not trigger
   emphasis (italics).
 
-* **Fenced code blocks:** Code blocks quoted with backticks, with
+* **Fenced code blocks:** Code blocks quoted with backquotes, with
   optional programming language keywords, are highlighted in
   both `markdown-mode` and `gfm-mode`.  They can be inserted with
   <kbd>C-c C-s P</kbd>.  If there is an active region, the text in the

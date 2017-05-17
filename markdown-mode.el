@@ -724,7 +724,7 @@
 ;;   variable names such as `a_test_variable` will not trigger
 ;;   emphasis (italics).
 ;;
-;; * **Fenced code blocks:** Code blocks quoted with backticks, with
+;; * **Fenced code blocks:** Code blocks quoted with backquotes, with
 ;;   optional programming language keywords, are highlighted in
 ;;   both `markdown-mode' and `gfm-mode'.  They can be inserted with
 ;;   `C-c C-s P`.  If there is an active region, the text in the
@@ -1215,10 +1215,10 @@ Group 6 matches the closing hash marks of an atx heading.")
   "\\(?:\\`\\|[^\\]\\)\\(\\(`+\\)\\(\\(?:.\\|\n[^\n]\\)*?[^`]\\)\\(\\2\\)\\)\\(?:[^`]\\|\\'\\)"
   "Regular expression for matching inline code fragments.
 
-Group 1 matches the entire code fragment including the backticks.
-Group 2 matches the opening backticks.
-Group 3 matches the code fragment itself, without backticks.
-Group 4 matches the closing backticks.
+Group 1 matches the entire code fragment including the backquotes.
+Group 2 matches the opening backquotes.
+Group 3 matches the code fragment itself, without backquotes.
+Group 4 matches the closing backquotes.
 
 The leading, unnumbered group ensures that the leading backquote
 character is not escaped.
@@ -1236,7 +1236,7 @@ Group 2 matches the key sequence.")
 (defconst markdown-regex-gfm-code-block-open
  "^[[:blank:]]*\\(```\\)[[:blank:]]*\\({\\)?[[:blank:]]*\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?[[:blank:]]*\\(}\\)?[[:blank:]]*$"
  "Regular expression matching opening of GFM code blocks.
-Group 1 matches the opening three backticks.
+Group 1 matches the opening three backquotes.
 Group 2 matches the opening brace (optional).
 Group 3 matches the language identifier (optional).
 Group 4 matches the info string (optional).
@@ -1246,7 +1246,7 @@ Groups need to agree with `markdown-regex-tilde-fence-begin'.")
 (defconst markdown-regex-gfm-code-block-close
  "^[[:blank:]]*\\(```\\)\\s *?$"
  "Regular expression matching closing of GFM code blocks.
-Group 1 matches the closing three backticks.")
+Group 1 matches the closing three backquotes.")
 
 (defconst markdown-regex-pre
   "^\\(    \\|\t\\).*$"
@@ -2794,9 +2794,9 @@ because `thing-at-point-looking-at' does not work reliably with
 `markdown-regex-code'.
 
 The match data is set as follows:
-Group 1 matches the opening backticks.
-Group 2 matches the code fragment itself, without backticks.
-Group 3 matches the closing backticks."
+Group 1 matches the opening backquotes.
+Group 2 matches the code fragment itself, without backquotes.
+Group 3 matches the closing backquotes."
   (save-excursion
     (let ((old-point (point))
           (end-of-block (progn (markdown-end-of-block) (point)))
