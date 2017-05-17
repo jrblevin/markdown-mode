@@ -1430,13 +1430,13 @@ Function is called repeatedly until it returns nil. For details, see
   (save-match-data
     (save-excursion
       (let* ((new-start (progn (goto-char start)
-                               (skip-chars-forward "\n")
-                               (if (re-search-backward "\n\n" nil t)
+                               (if (re-search-backward
+                                    markdown-regex-block-separator nil t)
                                    (min start (match-end 0))
                                  (point-min))))
              (new-end (progn (goto-char end)
-                             (skip-chars-backward "\n")
-                             (if (re-search-forward "\n\n" nil t)
+                             (if (re-search-forward
+                                  markdown-regex-block-separator nil t)
                                  (max end (match-beginning 0))
                                (point-max))))
              (code-match (markdown-code-block-at-pos new-start))
@@ -1918,13 +1918,15 @@ start which was previously propertized."
 (defun markdown-syntax-propertize (start end)
   "Function used as `syntax-propertize-function'.
 START and END delimit region to propertize."
-  (remove-text-properties start end markdown--syntax-properties)
-  (markdown-syntax-propertize-fenced-block-constructs start end)
-  (markdown-syntax-propertize-yaml-metadata start end)
-  (markdown-syntax-propertize-pre-blocks start end)
-  (markdown-syntax-propertize-blockquotes start end)
-  (markdown-syntax-propertize-headings start end)
-  (markdown-syntax-propertize-comments start end))
+  (with-silent-modifications
+    (save-excursion
+      (remove-text-properties start end markdown--syntax-properties)
+      (markdown-syntax-propertize-fenced-block-constructs start end)
+      (markdown-syntax-propertize-yaml-metadata start end)
+      (markdown-syntax-propertize-pre-blocks start end)
+      (markdown-syntax-propertize-blockquotes start end)
+      (markdown-syntax-propertize-headings start end)
+      (markdown-syntax-propertize-comments start end))))
 
 
 ;;; Font Lock =================================================================
@@ -6943,6 +6945,9 @@ or \\[markdown-toggle-inline-images]."
     (make-local-hook 'after-change-functions)
     (make-local-hook 'font-lock-extend-region-functions)
     (make-local-hook 'window-configuration-change-hook))
+
+  ;; Initial syntax analysis
+  (markdown-syntax-propertize (point-min) (point-max))
 
   ;; Make checkboxes buttons
   (when markdown-make-gfm-checkboxes-buttons
