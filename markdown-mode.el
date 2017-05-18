@@ -1441,7 +1441,7 @@ Function is called repeatedly until it returns nil. For details, see
                                (point-max))))
              (code-match (markdown-code-block-at-pos new-start))
              (new-start (or (and code-match (cl-first code-match)) new-start))
-             (code-match (markdown-code-block-at-pos end))
+             (code-match (and (< end (point-max)) (markdown-code-block-at-pos end)))
              (new-end (or (and code-match (cl-second code-match)) new-end)))
         (unless (and (eq new-start start) (eq new-end end))
           (cons new-start (min new-end (point-max))))))))
@@ -1452,6 +1452,11 @@ Delegates to `markdown-syntax-propertize-extend-region'. START
 and END are the previous region to refontify."
   (let ((res (markdown-syntax-propertize-extend-region start end)))
     (when res
+      ;; syntax-propertize-function is not called when character at
+      ;; (point-max) is deleted, but font-lock-extend-region-functions
+      ;; are called.  Force a syntax property update in that case.
+      (when (= end (point-max))
+        (markdown-syntax-propertize (car res) (cdr res)))
       (setq jit-lock-start (car res)
             jit-lock-end (cdr res)))))
 
