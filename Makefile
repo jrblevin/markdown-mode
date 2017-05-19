@@ -17,6 +17,8 @@ all: $(COMPILED)
 .PHONY: dist test
 
 test:
+	SELECTOR=$(SELECTOR)
+	export SELECTOR
 	make -C tests test
 
 clean:

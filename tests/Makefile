@@ -14,7 +14,7 @@ test: compile-all checkdoc
 	$(EMACS) -Q --batch $(CL) \
 	    --eval '(setq byte-compile-warnings (quote (not cl-functions)))' \
 	    -l ert -l ../markdown-mode.elc -l markdown-test.elc \
-	    -f ert-run-tests-batch-and-exit
+	    --eval '(ert-run-tests-batch-and-exit $(SELECTOR))'
 
 checkdoc:
 	$(EMACS) -Q --batch $(CL) -l checkdoc-batch.el 2>&1 | \
