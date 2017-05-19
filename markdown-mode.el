@@ -2842,19 +2842,15 @@ quoted code blocks.  Return nil otherwise."
       (and (bound-and-true-p poly-markdown-mode)
            (get-text-property pos 'chunkmode))))
 
-(defun markdown-code-block-at-point ()
-  "Return match data if the point is inside a code block.
-This includes pre blocks, tilde-fenced code blocks, and
-GFM quoted code blocks.  Calls `markdown-code-block-at-pos'."
-  (markdown-code-block-at-pos (point)))
+;; Function was renamed to emphasize that it does not modify match-data.
+(defalias 'markdown-code-block-at-point 'markdown-code-block-at-point-p)
 
 (defun markdown-code-block-at-point-p ()
   "Return non-nil if there is a code block at the point.
 This includes pre blocks, tilde-fenced code blocks, and GFM
-quoted code blocks.  This is a predicate function counterpart to
-`markdown-code-block-at-point' which does not modify the match
-data. See `markdown-inline-code-at-point-p' for inline code."
-  (save-match-data (markdown-code-block-at-point)))
+quoted code blocks.  This function does not modify the match
+data.  See `markdown-inline-code-at-point-p' for inline code."
+  (save-match-data (markdown-code-block-at-pos (point))))
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
@@ -3061,7 +3057,7 @@ analysis."
   "Match horizontal rules comments from the point to LAST."
   (while (and (re-search-forward markdown-regex-hr last t)
               (or (markdown-on-heading-p)
-                  (markdown-code-block-at-point))
+                  (markdown-code-block-at-point-p))
               (< (match-end 0) last))
     (forward-line))
   (beginning-of-line)
@@ -4881,7 +4877,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (unless (markdown-code-block-at-point)
+        (unless (markdown-code-block-at-point-p)
           (cond
            ((match-string-no-properties 2) ;; level 1 setext
             (setq heading (match-string-no-properties 1))
@@ -4926,7 +4922,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (when (and (not (markdown-code-block-at-point))
+        (when (and (not (markdown-code-block-at-point-p))
                    (not (markdown-text-property-at-point 'markdown-yaml-metadata-begin)))
           (cond
            ((setq heading (match-string-no-properties 1))
@@ -5485,7 +5481,7 @@ See `markdown-wiki-link-p' and `markdown-previous-wiki-link'."
       (goto-char (+ (match-end 0) 1)))
     ;; Search for the next wiki link and move to the beginning.
     (while (and (re-search-forward (markdown-make-regex-link-generic) nil t)
-                (markdown-code-block-at-point)
+                (markdown-code-block-at-point-p)
                 (< (point) (point-max))))
     (if (and (not (eq (point) opoint))
              (or (markdown-link-p) (markdown-wiki-link-p)))
@@ -5502,7 +5498,7 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
   (interactive)
   (let ((opoint (point)))
     (while (and (re-search-backward (markdown-make-regex-link-generic) nil t)
-                (markdown-code-block-at-point)
+                (markdown-code-block-at-point-p)
                 (> (point) (point-min))))
     (if (and (not (eq (point) opoint))
              (or (markdown-link-p) (markdown-wiki-link-p)))
@@ -5520,7 +5516,7 @@ headings inside preformatted code blocks may match
 `outline-regexp' but should not be considered as headings."
   (let ((prev -1) (start (point)))
     (if arg (funcall move-fn arg) (funcall move-fn))
-    (while (and (/= prev (point)) (markdown-code-block-at-point))
+    (while (and (/= prev (point)) (markdown-code-block-at-point-p))
       (setq prev (point))
       (if arg (funcall move-fn arg) (funcall move-fn)))
     (if (= (point) start) nil (point))))
@@ -5556,7 +5552,7 @@ Stop at the first and last headings of a superior heading."
 (defun markdown-back-to-heading-over-code-block (&optional invisible-ok)
   (beginning-of-line)
   (or (and (outline-on-heading-p invisible-ok)
-           (not (markdown-code-block-at-point)))
+           (not (markdown-code-block-at-point-p)))
       (let ((header-re (concat "^\\(?:" outline-regexp "\\)"))
             found)
         (save-excursion
@@ -5564,7 +5560,7 @@ Stop at the first and last headings of a superior heading."
             (let (finish)
               (while (and (not finish) (re-search-backward header-re nil t))
                 (when (and (or invisible-ok (not (outline-invisible-p)))
-                           (not (markdown-code-block-at-point)))
+                           (not (markdown-code-block-at-point-p)))
                   (setq finish t)))
               (if (not finish)
                   (error "Before first heading")
@@ -5648,7 +5644,7 @@ setext header, but should not be folded."
     (unless (outline-on-heading-p)
       (outline-next-visible-heading 1))
     (while (< (point) (point-max))
-      (when (markdown-code-block-at-point)
+      (when (markdown-code-block-at-point-p)
         (outline-flag-region (1- (point-at-bol)) (point-at-eol) t))
       (outline-next-visible-heading 1))))
 
@@ -5659,7 +5655,7 @@ setext header, but should not be folded."
   (let (finish)
     (while (and (not finish) (re-search-forward (concat "\n\\(?:" outline-regexp "\\)")
                                                 nil 'move))
-      (unless (markdown-code-block-at-point)
+      (unless (markdown-code-block-at-point-p)
         (goto-char (match-beginning 0))
         (setq finish t))))
   (when (and (bolp) (or outline-blank-line (eobp)) (not (bobp)))
@@ -5776,7 +5772,7 @@ demote."
   (save-excursion
     (when (and (or (thing-at-point-looking-at markdown-regex-header-atx)
                    (re-search-backward markdown-regex-header-atx nil t))
-               (not (markdown-code-block-at-point)))
+               (not (markdown-code-block-at-point-p)))
       (let ((level (length (match-string 1)))
             (promote-or-demote (if arg 1 -1))
             (remove 't))
@@ -6241,7 +6237,7 @@ update this buffer's contents."
 See `markdown-wiki-link-p' for more information."
   (let ((case-fold-search nil))
     (and (not (markdown-wiki-link-p))
-         (not (markdown-code-block-at-point))
+         (not (markdown-code-block-at-point-p))
          (or (thing-at-point-looking-at markdown-regex-link-inline)
              (thing-at-point-looking-at markdown-regex-link-reference)
              (thing-at-point-looking-at markdown-regex-uri)
@@ -6299,7 +6295,7 @@ link name must be available via `match-string'."
   (when markdown-enable-wiki-links
     (let ((case-fold-search nil))
       (and (thing-at-point-looking-at markdown-regex-wiki-link)
-           (not (markdown-code-block-at-point))
+           (not (markdown-code-block-at-point-p))
            (or (not buffer-file-name)
                (not (string-equal (buffer-file-name)
                                   (markdown-convert-wiki-link-to-filename
@@ -6406,7 +6402,7 @@ and highlight accordingly."
   (goto-char from)
   (save-match-data
     (while (re-search-forward markdown-regex-wiki-link to t)
-      (when (not (markdown-code-block-at-point))
+      (when (not (markdown-code-block-at-point-p))
         (let ((highlight-beginning (match-beginning 1))
               (highlight-end (match-end 1))
               (file-name

@@ -2838,7 +2838,7 @@ only partially propertized."
      (should (equal (markdown-get-fenced-block-from-start
                      'markdown-tilde-fence-begin)
                     (list 1 8)))
-     (should (equal (markdown-code-block-at-point) (list 1 8)))
+     (should (equal (markdown-code-block-at-pos (point)) (list 1 8)))
 
      ;; markdown-code-block-at-point-p should not modify match data
      (set-match-data (list 1 2 3 4))
@@ -2851,7 +2851,7 @@ only partially propertized."
      (should (equal (markdown-get-fenced-block-from-end
                      'markdown-tilde-fence-end)
                     (list 1 8)))
-     (should (equal (markdown-code-block-at-point) (list 1 8))))
+     (should (equal (markdown-code-block-at-pos (point)) (list 1 8))))
     (markdown-test-string
      "~~~
 
@@ -2862,20 +2862,20 @@ only partially propertized."
      (should (equal (markdown-get-fenced-block-from-start
                      'markdown-tilde-fence-begin)
                     (list 1 9)))
-     (should (equal (markdown-code-block-at-point) (list 1 9)))
+     (should (equal (markdown-code-block-at-pos (point)) (list 1 9)))
      (goto-char 5)
      (set-match-data (markdown-text-property-at-point 'markdown-fenced-code))
      (should (equal (markdown-get-fenced-block-from-middle
                      'markdown-fenced-code)
                     (list 1 9)))
-     (should (equal (markdown-code-block-at-point) (list 1 9)))
+     (should (equal (markdown-code-block-at-pos (point)) (list 1 9)))
      (goto-char 6)
      (set-match-data (markdown-text-property-at-point
                       'markdown-tilde-fence-end))
      (should (equal (markdown-get-fenced-block-from-end
                      'markdown-tilde-fence-end)
                     (list 1 9)))
-     (should (equal (markdown-code-block-at-point) (list 1 9))))))
+     (should (equal (markdown-code-block-at-pos (point)) (list 1 9))))))
 
 (ert-deftest test-markdown-parsing/reference-definition-basic ()
   "Test reference definition function."
