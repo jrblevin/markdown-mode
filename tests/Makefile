@@ -38,3 +38,5 @@ evm:
 	$(MAKE) test EMACS="$(shell evm bin emacs-24.3)" CL=""
 	$(MAKE) test EMACS="$(shell evm bin emacs-24.4)" CL=""
 	$(MAKE) test EMACS="$(shell evm bin emacs-24.5)" CL=""
+	$(MAKE) test EMACS="$(shell evm bin emacs-25.1)" CL=""
+	$(MAKE) test EMACS="$(shell evm bin emacs-25.2)" CL=""
