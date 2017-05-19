@@ -1342,8 +1342,12 @@ Group 6 matches the closing square brackets.")
 Group 1 matches the text to become a button.")
 
 (defconst markdown-regex-block-separator
-  "\\(\\`\\|\\(\n[ \t]*\n\\)[^\n \t]\\)"
+  "\n[\n\t\f ]*\n"
   "Regular expression for matching block boundaries.")
+
+(defconst markdown-regex-block-separator-noindent
+  (concat "\\(\\`\\|\\(" markdown-regex-block-separator "\\)[^\n\t\f ]\\)")
+  "Regexp for block separators before lines with no indentation.")
 
 (defconst markdown-regex-math-inline-single
   "\\(?:^\\|[^\\]\\)\\(\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\)"
@@ -1430,12 +1434,12 @@ Function is called repeatedly until it returns nil. For details, see
     (save-excursion
       (let* ((new-start (progn (goto-char start)
                                (if (re-search-backward
-                                    markdown-regex-block-separator nil t)
+                                    markdown-regex-block-separator-noindent nil t)
                                    (min start (match-end 0))
                                  (point-min))))
              (new-end (progn (goto-char end)
                              (if (re-search-forward
-                                  markdown-regex-block-separator nil t)
+                                  markdown-regex-block-separator-noindent nil t)
                                  (max end (match-beginning 0))
                                (point-max))))
              (code-match (markdown-code-block-at-pos new-start))
@@ -1494,14 +1498,14 @@ and END are the previous region to refontify."
          ((looking-at markdown-regex-list)
           (setq levels (markdown-update-list-levels
                         (match-string 2) (current-indentation) levels))
-          (markdown-end-of-block-element))
+          (markdown-end-of-text-block))
          ;; If this is the end of the indentation level, adjust levels accordingly.
          ;; Only match end of indentation level if levels is not the empty list.
          ((and (car levels) (looking-at-p close-regexp))
           (setq levels (markdown-update-list-levels
                         nil (current-indentation) levels))
-          (markdown-end-of-block-element))
-         (t (markdown-end-of-block-element))))
+          (markdown-end-of-text-block))
+         (t (markdown-end-of-text-block))))
 
       (when (and open close)
         ;; Set text property data
@@ -2526,7 +2530,7 @@ Return nil if the current line is not the beginning of a list item."
   (end-of-line)
   (let (stop)
     (while (not (or stop (bobp)))
-      (re-search-backward markdown-regex-block-separator nil t)
+      (re-search-backward markdown-regex-block-separator-noindent nil t)
       (when (match-end 2)
         (goto-char (match-end 2))
         (cond
@@ -2803,9 +2807,9 @@ Group 2 matches the code fragment itself, without backquotes.
 Group 3 matches the closing backquotes."
   (save-excursion
     (let ((old-point (point))
-          (end-of-block (progn (markdown-end-of-block) (point)))
+          (end-of-block (progn (markdown-end-of-text-block) (point)))
           found)
-      (markdown-beginning-of-block)
+      (markdown-beginning-of-text-block)
       (while (and (markdown-match-code end-of-block)
                   (setq found t)
                   (< (match-end 0) old-point)))
@@ -3459,7 +3463,7 @@ be used to populate the title attribute when converted to XHTML."
   (let ((end (point)))
     (cl-case markdown-reference-location
       (end         (goto-char (point-max)))
-      (immediately (markdown-end-of-block))
+      (immediately (markdown-end-of-text-block))
       (header      (markdown-end-of-defun)))
     (unless (markdown-cur-line-blank-p) (insert "\n"))
     (insert "\n[" label "]: ")
@@ -4010,7 +4014,7 @@ automatically in order to have the correct markup."
   "Position the cursor at the proper location for a new footnote text."
   (cond
    ((eq markdown-footnote-location 'end) (goto-char (point-max)))
-   ((eq markdown-footnote-location 'immediately) (markdown-end-of-block))
+   ((eq markdown-footnote-location 'immediately) (markdown-end-of-text-block))
    ((eq markdown-footnote-location 'header) (markdown-end-of-defun))))
 
 (defun markdown-footnote-kill ()
@@ -5419,22 +5423,36 @@ move back to the ARG-th preceding section."
     (goto-char (point-max)))
   (skip-syntax-backward "-"))
 
-(defun markdown-beginning-of-block ()
-  "Move the point to the start of the previous text block."
-  (interactive)
-  (if (re-search-backward markdown-regex-block-separator nil t)
-      (goto-char (or (match-end 2) (match-end 0)))
-    (goto-char (point-min))))
+(make-obsolete 'markdown-beginning-of-block 'markdown-beginning-of-text-block "2017-05-18")
 
-(defun markdown-end-of-block ()
-  "Move the point to the start of the next text block."
-  (interactive)
+(defun markdown-beginning-of-text-block ()
+  "Move backward to previous beginning of a plain text block.
+This function simply looks for blank lines without considering
+the surrounding context in light of Markdown syntax.  For that, see
+`markdown-beginning-of-block-element'."
+  (let ((start (point)))
+    (if (re-search-backward markdown-regex-block-separator nil t)
+        (goto-char (match-end 0))
+      (goto-char (point-min)))
+    (when (and (= start (point)) (not (bobp)))
+      (forward-line -1)
+      (if (re-search-backward markdown-regex-block-separator nil t)
+          (goto-char (match-end 0))
+        (goto-char (point-min))))))
+
+(make-obsolete 'markdown-end-of-block 'markdown-end-of-text-block "2017-05-18")
+
+(defun markdown-end-of-text-block ()
+  "Move forward to next beginning of a plain text block.
+This function simply looks for blank lines without considering
+the surrounding context in light of Markdown syntax.  For that, see
+`markdown-end-of-block-element'."
   (beginning-of-line)
   (skip-syntax-forward "-")
   (when (= (point) (point-min))
     (forward-char))
   (if (re-search-forward markdown-regex-block-separator nil t)
-      (goto-char (or (match-end 2) (match-end 0)))
+      (goto-char (match-end 0))
     (goto-char (point-max)))
   (skip-syntax-backward "-")
   (forward-line))
