@@ -3037,6 +3037,17 @@ x: x
         (should (markdown-list-item-at-point-p))
         (should (equal (match-data) orig-match-data))))))
 
+(ert-deftest test-markdown-parsing/heading-at-point ()
+  "Test `markdown-heading-at-point'."
+  (save-match-data
+    (markdown-test-file "outline.text"
+      (should-not (markdown-heading-at-point))
+      (markdown-test-goto-heading "An underline-style header")
+      (forward-line -1)
+      (should (markdown-heading-at-point))
+      (should (equal (match-data t) (get-text-property (point) 'markdown-heading)))
+      (should (equal (match-data t) (get-text-property (point) 'markdown-heading-1-setext))))))
+
 ;;; Reference Checking:
 
 (ert-deftest test-markdown-references/goto-line-button ()

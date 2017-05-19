@@ -1863,7 +1863,8 @@ start which was previously propertized."
   (while (re-search-forward markdown-regex-header end t)
     (unless (markdown-code-block-at-pos (match-beginning 0))
       (put-text-property
-       (match-beginning 0) (match-end 0) 'markdown-heading t)
+       (match-beginning 0) (match-end 0) 'markdown-heading
+       (match-data t))
       (put-text-property
        (match-beginning 0) (match-end 0)
        (cond ((match-string-no-properties 2) 'markdown-heading-1-setext)
@@ -2851,6 +2852,14 @@ This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  This function does not modify the match
 data.  See `markdown-inline-code-at-point-p' for inline code."
   (save-match-data (markdown-code-block-at-pos (point))))
+
+(defun markdown-heading-at-point ()
+  "Return non-nil if there is a heading at the point.
+Set match data for `markdown-regex-header'."
+  (let ((match-data (get-text-property (point) 'markdown-heading)))
+    (when match-data
+      (set-match-data match-data)
+      t)))
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
