@@ -415,6 +415,9 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     items, headings, horizontal rules, or plain text paragraphs
     separated by whitespace.  Instead, they are bound to
     `markdown-forward-block` and `markdown-backward-block`.
+    To mark or narrow to a block, you can use <kbd>M-h</kbd>
+    (`markdown-mark-block`) and <kbd>C-x n b</kbd>
+    (`markdown-narrow-to-block`).
 
   * Movement by Defun: <kbd>C-M-a</kbd>, <kbd>C-M-e</kbd>, and <kbd>C-M-h</kbd>
 

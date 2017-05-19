@@ -435,6 +435,9 @@
 ;;     items, headings, horizontal rules, or plain text paragraphs
 ;;     separated by whitespace.  Instead, they are bound to
 ;;     `markdown-forward-block' and `markdown-backward-block'.
+;;     To mark or narrow to a block, you can use `M-h`
+;;     (`markdown-mark-block') and `C-x n b`
+;;     (`markdown-narrow-to-block').
 ;;
 ;;   * Movement by Defun: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
@@ -4745,6 +4748,8 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Blocks
     (define-key map (kbd "M-{") 'markdown-backward-block)
     (define-key map (kbd "M-}") 'markdown-forward-block)
+    (define-key map (kbd "M-h") 'markdown-mark-block)
+    (define-key map (kbd "C-x n b") 'markdown-narrow-to-block)
     ;; Movement
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
@@ -5888,6 +5893,36 @@ demote."
   "Move the current subtree of ATX headings down."
   (interactive)
   (outline-move-subtree-down 1))
+
+
+;;; Marking and Narrowing =====================================================
+
+(defun markdown-mark-block ()
+  "Put mark at end of this block, point at beginning.
+The block marked is the one that contains point or follows point.
+
+Interactively, if this command is repeated or (in Transient Mark
+mode) if the mark is active, it marks the next block after the
+ones already marked."
+  (interactive)
+  (if (or (and (eq last-command this-command) (mark t))
+          (and transient-mark-mode mark-active))
+      (set-mark
+       (save-excursion
+         (goto-char (mark))
+         (markdown-forward-block)
+         (point)))
+    (let ((beginning-of-defun-function 'markdown-backward-block)
+          (end-of-defun-function 'markdown-forward-block))
+      (mark-defun))))
+
+(defun markdown-narrow-to-block ()
+  "Make text outside current block invisible.
+The current block is the one that contains point or follows point."
+  (interactive)
+  (let ((beginning-of-defun-function 'markdown-backward-block)
+        (end-of-defun-function 'markdown-forward-block))
+    (narrow-to-defun)))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
