@@ -411,8 +411,10 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     These keys are usually bound to `forward-paragraph` and
     `backward-paragraph`, but those built-in Emacs functions are
     based on simple regular expressions and can fail in Markdown.
-    Instead, they are bound to `markdown-forward-block` and
-    `markdown-backward-block`.
+    Blocks in `markdown-mode` are code blocks, blockquotes, list
+    items, headings, horizontal rules, or plain text paragraphs
+    separated by whitespace.  Instead, they are bound to
+    `markdown-forward-block` and `markdown-backward-block`.
 
   * Movement by Defun: <kbd>C-M-a</kbd>, <kbd>C-M-e</kbd>, and <kbd>C-M-h</kbd>
 

@@ -431,8 +431,10 @@
 ;;     These keys are usually bound to `forward-paragraph' and
 ;;     `backward-paragraph', but those built-in Emacs functions are
 ;;     based on simple regular expressions and can fail in Markdown.
-;;     Instead, they are bound to `markdown-forward-block' and
-;;     `markdown-backward-block'.
+;;     Blocks in `markdown-mode' are code blocks, blockquotes, list
+;;     items, headings, horizontal rules, or plain text paragraphs
+;;     separated by whitespace.  Instead, they are bound to
+;;     `markdown-forward-block' and `markdown-backward-block'.
 ;;
 ;;   * Movement by Defun: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
