@@ -426,15 +426,13 @@
 ;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
-;;   * Movement by Paragraph: `M-{` and `M-}`
+;;   * Movement by Paragraph or Block: `M-{` and `M-}`
 ;;
-;;     The definition of a "paragraph" is slightly different in
-;;     markdown-mode than, say, text-mode, because markdown-mode
-;;     supports filling for list items and respects hard line breaks,
-;;     both of which break paragraphs.  Therefore, the usual the usual
-;;     paragraph movement commands `M-{` and `M-}`
-;;     (`backward-paragraph` and `forward-paragraph`) will move by the
-;;     same units.  To mark a "paragraph", use `M-h` (`mark-paragraph`).
+;;     These keys are usually bound to `forward-paragraph' and
+;;     `backward-paragraph', but those built-in Emacs functions are
+;;     based on simple regular expressions and can fail in Markdown.
+;;     Instead, they are bound to `markdown-forward-block' and
+;;     `markdown-backward-block'.
 ;;
 ;;   * Movement by Defun: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
@@ -4742,9 +4740,10 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-S-<down>") 'markdown-move-subtree-down)
     (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
     (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
+    ;; Blocks
+    (define-key map (kbd "M-{") 'markdown-backward-block)
+    (define-key map (kbd "M-}") 'markdown-forward-block)
     ;; Movement
-    (define-key map (kbd "C-c {") 'markdown-backward-block)
-    (define-key map (kbd "C-c }") 'markdown-forward-block)
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Alternative keys (in case of problems with the arrow keys)
@@ -4783,7 +4782,10 @@ See also `markdown-mode-map'.")
      ["Previous Visible Heading" markdown-previous-visible-heading]
      ["Forward Same Level" markdown-forward-same-level]
      ["Backward Same Level" markdown-backward-same-level]
-     ["Up to Parent Heading" markdown-up-heading])
+     ["Up to Parent Heading" markdown-up-heading]
+     "---"
+     ["Forward Block" markdown-forward-block]
+     ["Backward Block" markdown-backward-block])
     ("Show/Hide"
      ["Cycle Visibility" markdown-cycle (markdown-on-heading-p)]
      ["Cycle Visibility Globally" markdown-shifttab])

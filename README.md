@@ -406,15 +406,13 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     at the point.  Finally, <kbd>C-c C-u</kbd> will move up to a lower-level
     (higher precedence) visible heading.
 
-  * Movement by Paragraph: <kbd>M-{</kbd> and <kbd>M-}</kbd>
+  * Movement by Paragraph or Block: <kbd>M-{</kbd> and <kbd>M-}</kbd>
 
-    The definition of a "paragraph" is slightly different in
-    markdown-mode than, say, text-mode, because markdown-mode
-    supports filling for list items and respects hard line breaks,
-    both of which break paragraphs.  Therefore, the usual the usual
-    paragraph movement commands <kbd>M-{</kbd> and <kbd>M-}</kbd>
-    (`backward-paragraph` and `forward-paragraph`) will move by the
-    same units.  To mark a "paragraph", use <kbd>M-h</kbd> (`mark-paragraph`).
+    These keys are usually bound to `forward-paragraph` and
+    `backward-paragraph`, but those built-in Emacs functions are
+    based on simple regular expressions and can fail in Markdown.
+    Instead, they are bound to `markdown-forward-block` and
+    `markdown-backward-block`.
 
   * Movement by Defun: <kbd>C-M-a</kbd>, <kbd>C-M-e</kbd>, and <kbd>C-M-h</kbd>
 
