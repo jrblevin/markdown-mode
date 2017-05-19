@@ -2747,6 +2747,10 @@ Leave match data intact for `markdown-regex-list'."
                    nonlist-indent)
           (list prev-begin prev-end indent nonlist-indent marker))))))
 
+(defun markdown-list-item-at-point-p ()
+  "Return t if there is a list item at the point and nil otherwise."
+  (save-match-data (markdown-cur-list-item-bounds)))
+
 (defun markdown-bounds-of-thing-at-point (thing)
   "Call `bounds-of-thing-at-point' for THING with slight modifications.
 Does not include trailing newlines when THING is 'line.  Handles the

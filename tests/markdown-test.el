@@ -3016,6 +3016,27 @@ x: x
 "
     (should (= (markdown-match-code (point-max)) (point-max)))))
 
+(ert-deftest test-markdown-parsing/list-item-at-point ()
+  "Test `markdown-list-item-at-point-p'."
+  (markdown-test-file "lists.text"
+    (let ((orig-match-data '(1 2 3 4))
+          (not-list-points '(273 399 512 3615))
+          (list-points '(1063 1063 1176 1283 1659 1830 1919 2150
+                              2393 2484 2762 2853 3097 3188 3700
+                              3903 4009)))
+      ;; markdown-inline-code-at-point-p should not modify match data
+      (set-match-data orig-match-data)
+      ;; Not list items
+      (dolist (pos not-list-points)
+        (goto-char pos)
+        (should-not (markdown-list-item-at-point-p))
+        (should (equal (match-data) orig-match-data)))
+      ;; List items
+      (dolist (pos list-points)
+        (goto-char pos)
+        (should (markdown-list-item-at-point-p))
+        (should (equal (match-data) orig-match-data))))))
+
 ;;; Reference Checking:
 
 (ert-deftest test-markdown-references/goto-line-button ()
