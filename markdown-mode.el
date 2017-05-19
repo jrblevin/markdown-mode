@@ -426,16 +426,15 @@
 ;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
-;;   * Movement by Paragraph or Block: `M-{` and `M-}`
+;;   * Movement by Paragraph: `M-{` and `M-}`
 ;;
 ;;     The definition of a "paragraph" is slightly different in
 ;;     markdown-mode than, say, text-mode, because markdown-mode
 ;;     supports filling for list items and respects hard line breaks,
-;;     both of which break paragraphs.  So, markdown-mode overrides
-;;     the usual paragraph navigation commands `M-{` and `M-}` so that
-;;     with a `C-u` prefix, these commands jump to the beginning or
-;;     end of an entire block of text, respectively, where "blocks"
-;;     are separated by one or more lines.
+;;     both of which break paragraphs.  Therefore, the usual the usual
+;;     paragraph movement commands `M-{` and `M-}`
+;;     (`backward-paragraph` and `forward-paragraph`) will move by the
+;;     same units.  To mark a "paragraph", use `M-h` (`mark-paragraph`).
 ;;
 ;;   * Movement by Defun: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
@@ -4731,8 +4730,6 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
     (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
     ;; Movement
-    (define-key map (kbd "M-{") 'markdown-backward-paragraph)
-    (define-key map (kbd "M-}") 'markdown-forward-paragraph)
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Alternative keys (in case of problems with the arrow keys)
@@ -4771,10 +4768,7 @@ See also `markdown-mode-map'.")
      ["Previous Visible Heading" markdown-previous-visible-heading]
      ["Forward Same Level" markdown-forward-same-level]
      ["Backward Same Level" markdown-backward-same-level]
-     ["Up to Parent Heading" markdown-up-heading]
-     "---"
-     ["Forward Paragraph" markdown-forward-paragraph]
-     ["Backward Paragraph" markdown-backward-paragraph])
+     ["Up to Parent Heading" markdown-up-heading])
     ("Show/Hide"
      ["Cycle Visibility" markdown-cycle (markdown-on-heading-p)]
      ["Cycle Visibility Globally" markdown-shifttab])
@@ -5444,30 +5438,6 @@ move back to the ARG-th preceding section."
     (goto-char (point-max)))
   (skip-syntax-backward "-")
   (forward-line))
-
-(defun markdown-forward-paragraph (arg)
-  "Move forward one or more paragraphs or by one block.
-When ARG is nil or a numeric prefix, call `forward-paragraph'
-with ARG.  When called with \\[universal-argument], call
-`markdown-end-of-block' instead."
-  (interactive "P")
-  (or arg (setq arg 1))
-  (cond ((integerp arg)
-         (forward-paragraph arg))
-        ((equal arg '(4))
-         (markdown-end-of-block))))
-
-(defun markdown-backward-paragraph (arg)
-  "Move backward one or more paragraphs or by one block.
-When ARG is nil or a numeric prefix, call `backward-paragraph'
-with ARG.  When called with \\[universal-argument], call
-`markdown-beginning-of-block' instead."
-  (interactive "P")
-  (or arg (setq arg 1))
-  (cond ((integerp arg)
-         (backward-paragraph arg))
-        ((equal arg '(4))
-         (markdown-beginning-of-block))))
 
 (defun markdown-end-of-block-element ()
   "Move the point to the start of the next block unit.

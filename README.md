@@ -406,16 +406,15 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     at the point.  Finally, <kbd>C-c C-u</kbd> will move up to a lower-level
     (higher precedence) visible heading.
 
-  * Movement by Paragraph or Block: <kbd>M-{</kbd> and <kbd>M-}</kbd>
+  * Movement by Paragraph: <kbd>M-{</kbd> and <kbd>M-}</kbd>
 
     The definition of a "paragraph" is slightly different in
     markdown-mode than, say, text-mode, because markdown-mode
     supports filling for list items and respects hard line breaks,
-    both of which break paragraphs.  So, markdown-mode overrides
-    the usual paragraph navigation commands <kbd>M-{</kbd> and <kbd>M-}</kbd> so that
-    with a <kbd>C-u</kbd> prefix, these commands jump to the beginning or
-    end of an entire block of text, respectively, where "blocks"
-    are separated by one or more lines.
+    both of which break paragraphs.  Therefore, the usual the usual
+    paragraph movement commands <kbd>M-{</kbd> and <kbd>M-}</kbd>
+    (`backward-paragraph` and `forward-paragraph`) will move by the
+    same units.  To mark a "paragraph", use <kbd>M-h</kbd> (`mark-paragraph`).
 
   * Movement by Defun: <kbd>C-M-a</kbd>, <kbd>C-M-e</kbd>, and <kbd>C-M-h</kbd>
 
