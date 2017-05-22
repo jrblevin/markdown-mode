@@ -3224,9 +3224,9 @@ x: x
 
 (ert-deftest test-markdown-lists/toggle-gfm-checkbox ()
   (markdown-test-string "   -   [X] GFM task list item"
-    (markdown-toggle-gfm-checkbox)
+    (should (string-equal (markdown-toggle-gfm-checkbox) "[ ]"))
     (should (string-equal (buffer-string) "   -   [ ] GFM task list item"))
-    (markdown-toggle-gfm-checkbox)
+    (should (string-equal (markdown-toggle-gfm-checkbox) "[x]"))
     (should (string-equal (buffer-string) "   -   [x] GFM task list item"))))
 
 ;;; Outline minor mode tests:

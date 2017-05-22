@@ -6962,7 +6962,9 @@ if ARG is omitted or nil."
   'action #'markdown-toggle-gfm-checkbox-button)
 
 (defun markdown-toggle-gfm-checkbox ()
-  "Toggle GFM checkbox at point."
+  "Toggle GFM checkbox at point.
+Returns the resulting status as a string, either \"[x]\" or \"[ ]\".
+Returns nil if there is no task list item at the point."
   (interactive)
   (save-match-data
     (save-excursion
@@ -6973,9 +6975,11 @@ if ARG is omitted or nil."
           ;; Advance to column of first non-whitespace after marker
           (forward-char (cl-fourth bounds))
           (cond ((looking-at "\\[ \\]")
-                 (replace-match "[x]" nil t))
+                 (replace-match "[x]" nil t)
+                 (match-string-no-properties 0))
                 ((looking-at "\\[[xX]\\]")
-                 (replace-match "[ ]" nil t))))))))
+                 (replace-match "[ ]" nil t)
+                 (match-string-no-properties 0))))))))
 
 (defun markdown-toggle-gfm-checkbox-button (button)
   "Toggle GFM checkbox BUTTON on click."
