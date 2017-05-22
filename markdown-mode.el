@@ -2729,7 +2729,28 @@ If the point is not in a list item, do nothing."
 
 (defun markdown-cur-list-item-bounds ()
   "Return bounds and indentation of the current list item.
-Return a list of the form (begin end indent nonlist-indent marker).
+Return a list of the following form:
+
+    (begin end indent nonlist-indent marker checkbox)
+
+The named components are:
+
+  - begin: Position of beginning of list item, including leading indentation.
+  - end: Position of the end of the list item, including list item text.
+  - indent: Number of characters of indentation before list marker (an integer).
+  - nonlist-indent: Number characters of indentation, list
+    marker, and whitespace following list marker (an integer).
+  - marker: String containing the list marker and following whitespace
+            (e.g., \"- \" or \"* \").
+
+As an example, for the following unordered list item
+
+   - item
+
+the returned list would be
+
+    (1 14 3 5 \"- \")
+
 If the point is not inside a list item, return nil.
 Leave match data intact for `markdown-regex-list'."
   (let (cur prev-begin prev-end indent nonlist-indent marker)
@@ -2740,9 +2761,10 @@ Leave match data intact for `markdown-regex-list'."
       (end-of-line)
       (when (re-search-backward markdown-regex-list nil t)
         (setq prev-begin (match-beginning 0))
-        (setq indent (length (match-string 1)))
+        (setq indent (length (match-string-no-properties 1)))
         (setq nonlist-indent (length (match-string 0)))
-        (setq marker (concat (match-string 2) (match-string 3)))
+        (setq marker (concat (match-string-no-properties 2)
+                             (match-string-no-properties 3)))
         (save-match-data
           (markdown-cur-list-item-end nonlist-indent)
           (setq prev-end (point)))
