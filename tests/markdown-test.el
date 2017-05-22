@@ -3229,6 +3229,13 @@ x: x
     (should (string-equal (markdown-toggle-gfm-checkbox) "[x]"))
     (should (string-equal (buffer-string) "   -   [x] GFM task list item"))))
 
+(ert-deftest test-markdown-lists/toggle-gfm-checkbox ()
+  (markdown-test-string "   -   [X] item"
+    (end-of-line)
+    (call-interactively #'markdown-enter-key)
+    (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
+    (should (= (point) 28))))
+
 ;;; Outline minor mode tests:
 
 (ert-deftest test-markdown-outline/navigation ()

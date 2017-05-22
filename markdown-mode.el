@@ -5355,6 +5355,12 @@ increase the indentation by one level."
         ;; Compute indentation and marker for new list item
         (setq cur-indent (nth 2 bounds))
         (setq marker (nth 4 bounds))
+        ;; Is this a GFM checkbox?
+        (when (save-excursion
+                (goto-char (cl-first bounds))
+                (forward-char (cl-fourth bounds))
+                (looking-at "\\(\\[\\)[xX ]\\(\\]\\s-*\\)"))
+          (setq marker (concat marker (match-string 1) " " (match-string 2))))
         (cond
          ;; Dedent: decrement indentation, find previous marker.
          ((= arg 4)
@@ -5397,7 +5403,7 @@ increase the indentation by one level."
                                     (substring (match-string 2) 0 space-adjust)
                                   (or old-spacing ". "))))
               (insert (concat new-indent new-prefix new-spacing)))))
-         ;; Unordered list, or ordered list with hash mark
+         ;; Unordered list, GFM task list, or ordered list with hash mark
          ((string-match-p "[\\*\\+-]\\|#\\." marker)
           (insert new-indent marker)))))))
 
