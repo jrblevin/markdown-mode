@@ -40,6 +40,27 @@
 ;; [Markdown]: http://daringfireball.net/projects/markdown/
 ;; [release notes]: http://jblevins.org/projects/markdown-mode/rev-2-1
 
+;;; Documentation:
+
+;; Documentation for Markdown Mode is available below, but Emacs is also
+;; a self-documenting editor.  That means that the source code itself
+;; contains additional documentation: each function has its own docstring
+;; available via `C-h f` (`describe-function'), individual keybindings
+;; can be investigated with `C-h k` (`describe-key'), and a complete list
+;; of keybindings is available using `C-h m` (`describe-mode').
+
+;; Additionally, to celebrate Markdown Mode's 10th birthday the package
+;; creator is writing a [Guide to Markdown Mode for Emacs][guide].  This
+;; ebook will supplement the existing documentation with in-depth
+;; discussion of advanced movement and editing commands, configuration
+;; examples, tips and tricks, and a survey of other packages that work
+;; with Markdown Mode.  It will be [published at Leanpub][guide] and
+;; possibly available through other channels.  Please visit
+;; the [book homepage][guide] to sign up to be notified when it is ready
+;; and to help determine the price.
+
+;;  [guide]: https://leanpub.com/markdown-mode
+
 ;;; Installation:
 
 ;; The recommended way to install markdown-mode is to install the package
