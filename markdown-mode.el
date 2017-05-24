@@ -1951,13 +1951,15 @@ start which was previously propertized."
 (defun markdown-syntax-propertize (start end)
   "Function used as `syntax-propertize-function'.
 START and END delimit region to propertize."
-  (remove-text-properties start end markdown--syntax-properties)
-  (markdown-syntax-propertize-fenced-block-constructs start end)
-  (markdown-syntax-propertize-yaml-metadata start end)
-  (markdown-syntax-propertize-pre-blocks start end)
-  (markdown-syntax-propertize-blockquotes start end)
-  (markdown-syntax-propertize-headings start end)
-  (markdown-syntax-propertize-comments start end))
+  (with-silent-modifications
+    (save-excursion
+      (remove-text-properties start end markdown--syntax-properties)
+      (markdown-syntax-propertize-fenced-block-constructs start end)
+      (markdown-syntax-propertize-yaml-metadata start end)
+      (markdown-syntax-propertize-pre-blocks start end)
+      (markdown-syntax-propertize-blockquotes start end)
+      (markdown-syntax-propertize-headings start end)
+      (markdown-syntax-propertize-comments start end))))
 
 
 ;;; Font Lock =================================================================
