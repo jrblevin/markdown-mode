@@ -39,8 +39,8 @@ cat markdown-mode.el |\
     #sed -e 's/\(\[\[[^]\n]*\]\]\)/\\\1/g' |\
     # Use Markdown-style backticks for single-quoted lisp code
     sed -e 's/`\([^'\'']*\)'\''/`\1`/g' |\
-    # Use <kbd> tags for single character, unprefixed keybindings
-    sed -e 's/`\([^`]\)`/<kbd>\1<\/kbd>/g' |\
+    # Use <kbd> tags for single characters (except `t`)
+    sed -e 's/`\([^`t]\)`/<kbd>\1<\/kbd>/g' |\
     # Use <kbd> tags for TAB and RET keys
     sed -e 's/`TAB`/<kbd>TAB<\/kbd>/g' |\
     sed -e 's/`RET`/<kbd>RET<\/kbd>/g' |\

@@ -503,11 +503,11 @@ provides an interface to all of the possible customizations:
     `markdown`).  This variable may be customized to pass
     command-line options to your Markdown processor of choice.
 
-  * `markdown-command-needs-filename` - set to <kbd>t</kbd> if
+  * `markdown-command-needs-filename` - set to `t` if
     `markdown-command` does not accept standard input (default:
     `nil`).  When `nil`, `markdown-mode` will pass the Markdown
     content to `markdown-command` using standard input (`stdin`).
-    When set to <kbd>t</kbd>, `markdown-mode` will pass the name of the file
+    When set to `t`, `markdown-mode` will pass the name of the file
     as the final command-line argument to `markdown-command`.  Note
     that in the latter case, you will only be able to run
     `markdown-command` from buffers which are visiting a file.
@@ -556,7 +556,7 @@ provides an interface to all of the possible customizations:
 
   * `markdown-indent-on-enter` - set to a non-nil value to
     automatically indent new lines and/or continue lists when the
-    enter key is pressed (default: <kbd>t</kbd>)
+    enter key is pressed (default: `t`)
 
   * `markdown-enable-wiki-links` - syntax highlighting for wiki
     links (default: `nil`).  Set this to a non-nil value to turn on
@@ -565,14 +565,14 @@ provides an interface to all of the possible customizations:
 
   * `markdown-wiki-link-alias-first` - set to a non-nil value to
     treat aliased wiki links like `[[link text|PageName]]`
-    (default: <kbd>t</kbd>).  When set to nil, they will be treated as
+    (default: `t`).  When set to nil, they will be treated as
     `[[PageName|link text]]`.
 
   * `markdown-uri-types` - a list of protocol schemes (e.g., "http")
     for URIs that `markdown-mode` should highlight.
 
   * `markdown-enable-math` - syntax highlighting for LaTeX
-    fragments (default: `nil`).  Set this to <kbd>t</kbd> to turn on math
+    fragments (default: `nil`).  Set this to `t` to turn on math
     support by default.  Math support can be enabled, disabled, or
     toggled later using the function `markdown-toggle-math`."
 
@@ -621,7 +621,7 @@ provides an interface to all of the possible customizations:
     for `markdown-reference-location`.
 
   * `markdown-nested-imenu-heading-index` - Use nested imenu
-    heading instead of a flat index (default: <kbd>t</kbd>).  A nested
+    heading instead of a flat index (default: `t`).  A nested
     index may provide more natural browsing from the menu, but a
     flat list may allow for faster keyboard navigation via tab
     completion.
@@ -644,7 +644,7 @@ provides an interface to all of the possible customizations:
 
   * `markdown-gfm-use-electric-backquote` - use
     `markdown-electric-backquote` for interactive insertion of GFM
-    code blocks when backquote is pressed three times (default: <kbd>t</kbd>).
+    code blocks when backquote is pressed three times (default: `t`).
 
   * `markdown-make-gfm-checkboxes-buttons` - Whether GitHub
     Flavored Markdown style task lists (checkboxes) should be
