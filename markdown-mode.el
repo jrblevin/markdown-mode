@@ -639,7 +639,7 @@
 ;;     for `markdown-reference-location'.
 ;;
 ;;   * `markdown-nested-imenu-heading-index' - Use nested imenu
-;;     heading instead of a flat index (default: `nil').  A nested
+;;     heading instead of a flat index (default: `t').  A nested
 ;;     index may provide more natural browsing from the menu, but a
 ;;     flat list may allow for faster keyboard navigation via tab
 ;;     completion.
@@ -1088,7 +1088,7 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type 'string)
 
-(defcustom markdown-nested-imenu-heading-index nil
+(defcustom markdown-nested-imenu-heading-index t
   "Use nested or flat imenu heading index.
 A nested index may provide more natural browsing from the menu,
 but a flat list may allow for faster keyboard navigation via tab

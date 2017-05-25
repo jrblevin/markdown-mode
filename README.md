@@ -621,7 +621,7 @@ provides an interface to all of the possible customizations:
     for `markdown-reference-location`.
 
   * `markdown-nested-imenu-heading-index` - Use nested imenu
-    heading instead of a flat index (default: `nil`).  A nested
+    heading instead of a flat index (default: <kbd>t</kbd>).  A nested
     index may provide more natural browsing from the menu, but a
     flat list may allow for faster keyboard navigation via tab
     completion.
