@@ -4970,7 +4970,10 @@ See also `markdown-mode-map'.")
      ["Check References" markdown-check-refs]
      ["Toggle Inline Images" markdown-toggle-inline-images
       :style radio
-      :selected markdown-inline-image-overlays])
+      :selected markdown-inline-image-overlays]
+     ["Toggle Wiki Links" markdown-toggle-wiki-links
+      :style radio
+      :selected markdown-enable-wiki-links])
     ("Styles"
      ["Bold" markdown-insert-bold]
      ["Italic" markdown-insert-italic]
