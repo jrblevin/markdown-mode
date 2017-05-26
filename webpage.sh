@@ -54,6 +54,8 @@ cat markdown-mode.el |\
     sed -e 's/`RET`/<kbd>RET<\/kbd>/g' |\
     # Use <kbd> tags for keybindings prefixed by C, M, or S
     sed -e 's/`\([CMS]-[^`]*\)`/<kbd>\1<\/kbd>/g' |\
+    # checkdoc wants Lisp to always be capitalized
+    sed -e 's/^\([ ]*\)``` Lisp$/\1```lisp/' |\
     # Remove email addresses
     sed -e 's/ <[^>]*@[^<]*> / /g' \
     | tee -a README.md >> index.text

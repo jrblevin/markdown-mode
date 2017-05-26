@@ -13,16 +13,18 @@
      markdown-mode.el. Make edits there, not here. -->
 
 markdown-mode is a major mode for editing [Markdown][]-formatted
-text. The latest stable version is markdown-mode 2.1, released on
-January 9, 2016. See the [release notes][] for details.
-markdown-mode is free software, licensed under the GNU GPL.
+text. The latest stable version is markdown-mode 2.2, released on
+May 26, 2017. See the [release notes][] for details.
+markdown-mode is free software, licensed under the GNU GPL v2.
 
 ![Markdown Mode Screenshot](http://jblevins.org/projects/markdown-mode/screenshots/20160108-001.png)
 
 [Markdown]: http://daringfireball.net/projects/markdown/
-[release notes]: http://jblevins.org/projects/markdown-mode/rev-2-1
+[release notes]: http://jblevins.org/projects/markdown-mode/rev-2-2
 
 ## Documentation
+
+<a href="https://leanpub.com/markdown-mode"><img src="http://jblevins.org/projects/markdown-mode/guide-v2.2.png" align="right" height="350" width="252"></a>
 
 Documentation for Markdown Mode is available below, but Emacs is also
 a self-documenting editor.  That means that the source code itself
@@ -51,10 +53,12 @@ using `package.el`. First, configure `package.el` and the MELPA Stable
 repository by adding the following to your `.emacs`, `init.el`,
 or equivalent startup file:
 
-    (require 'package)
-    (add-to-list 'package-archives
-                 '("melpa-stable" . "https://stable.melpa.org/packages/"))
-    (package-initialize)
+```lisp
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+(package-initialize)
+```
 
 Then, after restarting Emacs or evaluating the above statements, issue
 the following command: <kbd>M-x package-install RET markdown-mode RET</kbd>.
@@ -67,13 +71,15 @@ then you can automatically install and configure `markdown-mode` by
 adding a declaration such as this one to your init file (as an
 example; adjust settings as desired):
 
-    (use-package markdown-mode
-      :ensure t
-      :commands (markdown-mode gfm-mode)
-      :mode (("README\\.md\\'" . gfm-mode)
-             ("\\.md\\'" . markdown-mode)
-             ("\\.markdown\\'" . markdown-mode))
-      :init (setq markdown-command "multimarkdown"))
+```lisp
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+```
 
 [MELPA Stable]: http://stable.melpa.org/
 [use-package]: https://github.com/jwiegley/use-package
@@ -86,14 +92,16 @@ save the file where Emacs can find it (i.e., a directory in your
 `load-path`). You can then configure `markdown-mode` and `gfm-mode`
 to load automatically by adding the following to your init file:
 
-    (autoload 'markdown-mode "markdown-mode"
-       "Major mode for editing Markdown files" t)
-    (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-    (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+```lisp
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-    (autoload 'gfm-mode "markdown-mode"
-       "Major mode for editing GitHub Flavored Markdown files" t)
-    (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+(autoload 'gfm-mode "markdown-mode"
+   "Major mode for editing GitHub Flavored Markdown files" t)
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+```
 
 [markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
 
@@ -103,7 +111,9 @@ To follow or contribute to markdown-mode development, you can
 browse or clone the Git repository
 [on GitHub](https://github.com/jrblevin/markdown-mode):
 
-    git clone https://github.com/jrblevin/markdown-mode.git
+```
+git clone https://github.com/jrblevin/markdown-mode.git
+```
 
 If you prefer to install and use the development version, which may
 become unstable at some times, you can either clone the Git
@@ -113,7 +123,9 @@ repository as above or install markdown-mode from
 If you clone the repository directly, then make sure that Emacs can
 find it by adding the following line to your startup file:
 
-    (add-to-list 'load-path "/path/to/markdown-mode/repository")
+```lisp
+(add-to-list 'load-path "/path/to/markdown-mode/repository")
+```
 
 **Packaged Installation**
 
@@ -546,7 +558,7 @@ provides an interface to all of the possible customizations:
   * `markdown-header-scaling-values` - list of scaling values,
     relative to baseline, for headers of levels one through six,
     used when `markdown-header-scaling` is non-nil
-    (default: `(list 1.8 1.4 1.2 1.0 1.0 1.0)`).
+    (default: `(1.8 1.4 1.2 1.0 1.0 1.0)`).
 
   * `markdown-list-indent-width` - depth of indentation for lists
     when inserting, promoting, and demoting list items (default: 4).
@@ -557,7 +569,7 @@ provides an interface to all of the possible customizations:
   * `markdown-indent-on-enter` - Set to a non-nil value to
     automatically indent new lines when <kbd>RET</kbd> is pressed.
     Set to `indent-and-new-item` to additionally continue lists
-    when <kbd>RET</kbd> is pressed (default: `indent`).
+    when <kbd>RET</kbd> is pressed (default: `t`).
 
   * `markdown-enable-wiki-links` - syntax highlighting for wiki
     links (default: `nil`).  Set this to a non-nil value to turn on
@@ -689,7 +701,9 @@ then you can set `markdown-command` to `"markdown | smartypants"`.
 You can do this either by using <kbd>M-x customize-group markdown</kbd>
 or by placing the following in your `.emacs` file:
 
-    (setq markdown-command "markdown | smartypants")
+```lisp
+(setq markdown-command "markdown | smartypants")
+```
 
 [SmartyPants]: http://daringfireball.net/projects/smartypants/
 
@@ -768,10 +782,12 @@ by `markdown-mode` and `gfm-mode` as described below.
   for line wrapping in buffers.  You can do this with a
   `gfm-mode-hook` as follows:
 
-        ;; Use visual-line-mode in gfm-mode
-        (defun my-gfm-mode-hook ()
-          (visual-line-mode 1))
-        (add-hook 'gfm-mode-hook 'my-gfm-mode-hook)
+    ```lisp
+    ;; Use visual-line-mode in gfm-mode
+    (defun my-gfm-mode-hook ()
+      (visual-line-mode 1))
+    (add-hook 'gfm-mode-hook 'my-gfm-mode-hook)
+    ```
 
 * **Preview:** GFM-specific preview can be powered by setting
   `markdown-command` to use [Docter][].  This may also be
@@ -817,6 +833,7 @@ first version was released on May 24, 2007.
   * 2013-01-25: [Version 1.9][]
   * 2013-03-24: [Version 2.0][]
   * 2016-01-09: [Version 2.1][]
+  * 2016-05-26: [Version 2.2][]
 
 [Version 1.1]: http://jblevins.org/projects/markdown-mode/rev-1-1
 [Version 1.2]: http://jblevins.org/projects/markdown-mode/rev-1-2
@@ -830,4 +847,5 @@ first version was released on May 24, 2007.
 [Version 1.9]: http://jblevins.org/projects/markdown-mode/rev-1-9
 [Version 2.0]: http://jblevins.org/projects/markdown-mode/rev-2-0
 [Version 2.1]: http://jblevins.org/projects/markdown-mode/rev-2-1
+[Version 2.2]: http://jblevins.org/projects/markdown-mode/rev-2-2
 
