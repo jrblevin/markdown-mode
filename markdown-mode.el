@@ -5096,7 +5096,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
     (let* ((text (match-string-no-properties 3))
            (reference (match-string-no-properties 6))
            (target (downcase (if (string= reference "") text reference)))
-           (loc (cadr (markdown-reference-definition target))))
+           (loc (cadr (save-match-data (markdown-reference-definition target)))))
       (if loc
           (goto-char loc)
         (goto-char (match-beginning 0))
