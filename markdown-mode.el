@@ -2526,7 +2526,7 @@ here for backwards compatibility."
               (setq result
                     (nconc result (markdown-directory-files-recursively
                                    full-file regexp))))
-          (when (string-match regexp file)
+          (when (string-match-p regexp file)
             (push (expand-file-name file dir) files)))))
     (nconc result (nreverse files))))))
 
