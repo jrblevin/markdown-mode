@@ -6268,10 +6268,11 @@ Standalone XHTML output is identified by an occurrence of
 `markdown-xhtml-standalone-regexp' in the first five lines of output."
   (save-excursion
     (goto-char (point-min))
-    (re-search-forward
-     markdown-xhtml-standalone-regexp
-     (save-excursion (goto-char (point-min)) (forward-line 4) (point))
-     t)))
+    (save-match-data
+      (re-search-forward
+       markdown-xhtml-standalone-regexp
+       (save-excursion (goto-char (point-min)) (forward-line 4) (point))
+       t))))
 
 (defun markdown-stylesheet-link-string (stylesheet-path)
   (concat "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
