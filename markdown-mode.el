@@ -1133,7 +1133,9 @@ vertically split (left and right) windows, set this to 'vertical
 or 'right.  To force horizontally split (top and bottom) windows,
 set this to 'horizontal or 'below."
   :group 'markdown
-  :type 'symbol)
+  :type '(choice (const :tag "Automatic" any)
+                 (const :tag "Right (vertical)" right)
+                 (const :tag "Below (horizontal)" below)))
 
 (defcustom markdown-live-preview-window-function
   'markdown-live-preview-window-eww
@@ -1144,12 +1146,15 @@ the buffer."
   :type 'function)
 
 (defcustom markdown-live-preview-delete-export 'delete-on-destroy
-  "Delete exported html file when using `markdown-live-preview-export'.
+  "Delete exported HTML file when using `markdown-live-preview-export'.
 If set to 'delete-on-export, delete on every export. When set to
 'delete-on-destroy delete when quitting from command
 `markdown-live-preview-mode'. Never delete if set to nil."
   :group 'markdown
-  :type 'symbol)
+  :type '(choice
+          (const :tag "Delete on every export" delete-on-export)
+          (const :tag "Delete when quitting live preview" delete-on-destroy)
+          (const :tag "Never delete" nil)))
 
 (defcustom markdown-list-indent-width 4
   "Depth of indentation for markdown lists.
