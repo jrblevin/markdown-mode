@@ -968,7 +968,7 @@ line around the header title."
 
 (defcustom markdown-indent-on-enter t
   "Determines indentation behavior when pressing \\[newline].
-Possible settings are nil, t, 'indent, and 'indent-and-new-item.
+Possible settings are nil, t, and 'indent-and-new-item.
 
 When non-nil, pressing \\[newline] will call `newline-and-indent'
 to indent the following line according to the context using
@@ -989,7 +989,9 @@ non-nil (enabled).  When it is *disabled*, the behavior of
 \\[newline] and `\\[electric-newline-and-maybe-indent]' are
 reversed."
   :group 'markdown
-  :type 'boolean)
+  :type '(choice (const :tag "Don't automatically indent" nil)
+                 (const :tag "Automatically indent" t)
+                 (const :tag "Automatically indent and insert new list items" indent-and-new-item)))
 
 (defcustom markdown-enable-wiki-links nil
   "Syntax highlighting for wiki links.
