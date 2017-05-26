@@ -1554,7 +1554,7 @@ and END are the previous region to refontify."
          ;; Move past blank lines
          ((markdown-cur-line-blank) (forward-line))
          ;; At headers and horizontal rules, reset levels
-         ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+         ((markdown-new-baseline) (forward-line) (setq levels nil))
          ;; If the current line has sufficient indentation, mark out pre block
          ;; The opening should be preceded by a blank line.
          ((and (looking-at pre-regexp)
@@ -2606,15 +2606,15 @@ Return nil if the current line is not the beginning of a list item."
     (forward-line -1)
     (markdown-cur-non-list-indent)))
 
-(defun markdown-new-baseline-p ()
+(defun markdown-new-baseline ()
   "Determine if the current line begins a new baseline level."
   (save-excursion
     (beginning-of-line)
-    (or (looking-at-p markdown-regex-header)
-        (looking-at-p markdown-regex-hr)
+    (or (looking-at markdown-regex-header)
+        (looking-at markdown-regex-hr)
         (and (null (markdown-cur-non-list-indent))
              (= (current-indentation) 0)
-             (markdown-prev-line-blank-p)))))
+             (markdown-prev-line-blank)))))
 
 (defun markdown-search-backward-baseline ()
   "Search backward baseline point with no indentation and not a list item."
@@ -2625,7 +2625,7 @@ Return nil if the current line is not the beginning of a list item."
       (when (match-end 2)
         (goto-char (match-end 2))
         (cond
-         ((markdown-new-baseline-p)
+         ((markdown-new-baseline)
           (setq stop t))
          ((looking-at-p markdown-regex-list)
           (setq stop nil))
@@ -2680,7 +2680,7 @@ immediately  after a list item, return nil."
         (beginning-of-line)
         (cond
          ;; Make sure this is not a header or hr
-         ((markdown-new-baseline-p) (setq levels nil))
+         ((markdown-new-baseline) (setq levels nil))
          ;; Make sure this is not a line from a pre block
          ((looking-at-p pre-regexp))
          ;; If not, then update levels
