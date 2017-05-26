@@ -1552,15 +1552,15 @@ and END are the previous region to refontify."
          ;; If not at the beginning of a line, move forward
          ((not (bolp)) (forward-line))
          ;; Move past blank lines
-         ((markdown-cur-line-blank-p) (forward-line))
+         ((markdown-cur-line-blank) (forward-line))
          ;; At headers and horizontal rules, reset levels
          ((markdown-new-baseline-p) (forward-line) (setq levels nil))
          ;; If the current line has sufficient indentation, mark out pre block
          ;; The opening should be preceded by a blank line.
          ((and (looking-at pre-regexp)
-               (save-match-data (markdown-prev-line-blank-p)))
+               (markdown-prev-line-blank-p))
           (setq open (match-beginning 0))
-          (while (and (or (looking-at-p pre-regexp) (markdown-cur-line-blank-p))
+          (while (and (or (looking-at-p pre-regexp) (markdown-cur-line-blank))
                       (not (eobp)))
             (forward-line))
           (skip-syntax-backward "-")
@@ -2533,27 +2533,45 @@ here for backwards compatibility."
 
 ;;; Markdown Parsing Functions ================================================
 
-(defun markdown-cur-line-blank-p ()
-  "Return t if the current line is blank and nil otherwise."
+(defun markdown-cur-line-blank (&optional predicate)
+  "Return t if the current line is blank and nil otherwise.
+When PREDICATE is non-nil, don't modify the match data."
   (save-excursion
     (beginning-of-line)
-    (looking-at-p "^\\s *$")))
+    (let ((regexp "^\\s *$"))
+      (if predicate
+          (looking-at-p regexp)
+        (looking-at regexp)))))
 
-(defun markdown-prev-line-blank-p ()
+(defun markdown-cur-line-blank-p ()
+  "Same as `markdown-cur-line-blank', but does not change the match data."
+  (markdown-cur-line-blank t))
+
+(defun markdown-prev-line-blank (&optional predicate)
   "Return t if the previous line is blank and nil otherwise.
-If we are at the first line, then consider the previous line to be blank."
+If we are at the first line, then consider the previous line to be blank.
+When PREDICATE is non-nil, don't modify the match data."
   (or (= (line-beginning-position) (point-min))
       (save-excursion
         (forward-line -1)
-        (markdown-cur-line-blank-p))))
+        (markdown-cur-line-blank predicate))))
 
-(defun markdown-next-line-blank-p ()
+(defun markdown-prev-line-blank-p ()
+  "Same as `markdown-prev-line-blank', but does not change the match data."
+  (markdown-prev-line-blank t))
+
+(defun markdown-next-line-blank (&optional predicate)
   "Return t if the next line is blank and nil otherwise.
-If we are at the last line, then consider the next line to be blank."
+If we are at the last line, then consider the next line to be blank.
+When PREDICATE is non-nil, don't modify the match data."
   (or (= (line-end-position) (point-max))
       (save-excursion
         (forward-line 1)
-        (markdown-cur-line-blank-p))))
+        (markdown-cur-line-blank predicate))))
+
+(defun markdown-next-line-blank-p ()
+  "Same as `markdown-next-line-blank', but does not change the match data."
+  (markdown-next-line-blank t))
 
 (defun markdown-prev-line-indent ()
   "Return the number of leading whitespace characters in the previous line.
