@@ -1809,6 +1809,13 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (should (eq (point) 62))
    (should (looking-back "^    "))))
 
+(ert-deftest test-markdown-indentation/continue-gfm-task-lists ()
+  (markdown-test-string "   -   [X] item"
+    (end-of-line)
+    (call-interactively #'markdown-enter-key)
+    (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
+    (should (= (point) 28))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
@@ -3227,13 +3234,6 @@ x: x
     (should (string-equal (buffer-string) "   -   [ ] GFM task list item"))
     (should (string-equal (markdown-toggle-gfm-checkbox) "[x]"))
     (should (string-equal (buffer-string) "   -   [x] GFM task list item"))))
-
-(ert-deftest test-markdown-lists/toggle-gfm-checkbox ()
-  (markdown-test-string "   -   [X] item"
-    (end-of-line)
-    (call-interactively #'markdown-enter-key)
-    (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
-    (should (= (point) 28))))
 
 ;;; Outline minor mode tests:
 
