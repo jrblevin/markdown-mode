@@ -572,9 +572,10 @@
 ;;   * `markdown-indent-function' - the function to use for automatic
 ;;     indentation (default: `markdown-indent-line').
 ;;
-;;   * `markdown-indent-on-enter' - set to a non-nil value to
-;;     automatically indent new lines and/or continue lists when the
-;;     enter key is pressed (default: `t')
+;;   * `markdown-indent-on-enter' - Set to a non-nil value to
+;;     automatically indent new lines when `RET' is pressed.
+;;     Set to `indent-and-new-item' to additionally continue lists
+;;     when `RET' is pressed (default: `indent').
 ;;
 ;;   * `markdown-enable-wiki-links' - syntax highlighting for wiki
 ;;     links (default: `nil').  Set this to a non-nil value to turn on
@@ -966,13 +967,27 @@ line around the header title."
   :type 'function)
 
 (defcustom markdown-indent-on-enter t
-  "Indent new lines and continue lists when enter is pressed.
-When this variable is set to t, pressing RET will call
-`newline-and-indent' and will continue a list.  When set to nil,
-define RET to call `newline' as usual.  In the latter case, you
-can still use auto-indentation by pressing
-\\[newline-and-indent] or continue lists with
-\\[markdown-insert-list-item]."
+  "Determines indentation behavior when pressing \\[newline].
+Possible settings are nil, t, 'indent, and 'indent-and-new-item.
+
+When non-nil, pressing \\[newline] will call `newline-and-indent'
+to indent the following line according to the context using
+`markdown-indent-function'.  In this case, note that
+\\[electric-newline-and-maybe-indent] can still be used to insert
+a newline without indentation.
+
+When set to 'indent-and-new-item and the point is in a list item
+when \\[newline] is pressed, the list will be continued on the next
+line, where a new item will be inserted.
+
+When set to nil, simply call `newline' as usual.  In this case,
+you can still indent lines using \\[markdown-cycle] and continue
+lists with \\[markdown-insert-list-item].
+
+Note that this assumes the variable `electric-indent-mode' is
+non-nil (enabled).  When it is *disabled*, the behavior of
+\\[newline] and `\\[electric-newline-and-maybe-indent]' are
+reversed."
   :group 'markdown
   :type 'boolean)
 
@@ -4482,16 +4497,19 @@ duplicate positions, which are handled up by calling functions."
     (reverse positions)))
 
 (defun markdown-enter-key ()
-  "Handle RET according to customized settings.
-When `markdown-indent-on-enter' is nil, this is equivalent to
-`newline'.  Otherwise, indent following RET and when the point is
-in a list item, start a new item with the same indentation.  If
-the point is in an empty list item, remove it."
+  "Handle RET according to value of `markdown-indent-on-enter'.
+When it is nil, simply call `newline'.  Otherwise, indent the next line
+following RET using `markdown-indent-line'.  Furthermore, when it
+is set to 'indent-and-new-item and the point is in a list item,
+start a new item with the same indentation. If the point is in an
+empty list item, remove it (so that pressing RET twice when in a
+list simply adds a blank line)."
   (interactive)
   (if (not markdown-indent-on-enter)
       (newline)
-    (let ((bounds (markdown-cur-list-item-bounds)))
-      (if bounds
+    (let (bounds)
+      (if (and (memq markdown-indent-on-enter '(indent-and-new-item))
+               (setq bounds (markdown-cur-list-item-bounds)))
           (let ((beg (cl-first bounds))
                 (end (cl-second bounds))
                 (length (cl-fourth bounds)))

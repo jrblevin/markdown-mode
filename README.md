@@ -554,9 +554,10 @@ provides an interface to all of the possible customizations:
   * `markdown-indent-function` - the function to use for automatic
     indentation (default: `markdown-indent-line`).
 
-  * `markdown-indent-on-enter` - set to a non-nil value to
-    automatically indent new lines and/or continue lists when the
-    enter key is pressed (default: `t`)
+  * `markdown-indent-on-enter` - Set to a non-nil value to
+    automatically indent new lines when <kbd>RET</kbd> is pressed.
+    Set to `indent-and-new-item` to additionally continue lists
+    when <kbd>RET</kbd> is pressed (default: `indent`).
 
   * `markdown-enable-wiki-links` - syntax highlighting for wiki
     links (default: `nil`).  Set this to a non-nil value to turn on

@@ -1776,27 +1776,27 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-indentation/indent-list-single ()
   "Test `markdown-indent-line' with single list item."
-  (markdown-test-string
-   "  * item 1"
-   (end-of-line)
-   (markdown-enter-key)
-   (should (string-equal (buffer-string) "  * item 1\n  * "))
-   (should (eq (point) 16))
-   (markdown-enter-key)
-   (should (string-equal (buffer-string) "  * item 1\n\n"))
-   (should (eq (point) 13))))
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (markdown-test-string "  * item 1"
+      (end-of-line)
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "  * item 1\n  * "))
+      (should (eq (point) 16))
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "  * item 1\n\n"))
+      (should (eq (point) 13)))))
 
 (ert-deftest test-markdown-indentation/indent-nested-list ()
   "Test `markdown-enter-key' with a nested list item."
-  (markdown-test-string
-   "* foo\n* bar\n  * baz"
-   (goto-char (point-max))
-   (markdown-enter-key)
-   (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n  * "))
-   (should (eq (point) 25))
-   (markdown-enter-key)
-   (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n\n"))
-   (should (eq (point) 22))))
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (markdown-test-string "* foo\n* bar\n  * baz"
+      (goto-char (point-max))
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n  * "))
+      (should (eq (point) 25))
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n\n"))
+      (should (eq (point) 22)))))
 
 (ert-deftest test-markdown-indentation/indent-pre ()
   "Test `markdown-indent-line' with a pre block."
@@ -1812,7 +1812,8 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-indentation/continue-gfm-task-lists ()
   (markdown-test-string "   -   [X] item"
     (end-of-line)
-    (call-interactively #'markdown-enter-key)
+    (let ((markdown-indent-on-enter 'indent-and-new-item))
+      (call-interactively #'markdown-enter-key))
     (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
     (should (= (point) 28))))
 
