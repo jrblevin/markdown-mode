@@ -4998,9 +4998,15 @@ See also `markdown-mode-map'.")
      "---"
      ["Forward Block" markdown-forward-block]
      ["Backward Block" markdown-backward-block])
-    ("Show/Hide"
-     ["Cycle Visibility" markdown-cycle (markdown-on-heading-p)]
-     ["Cycle Visibility Globally" markdown-shifttab])
+    ("Show & Hide"
+     ["Cycle Heading Visibility" markdown-cycle (markdown-on-heading-p)]
+     ["Cycle Heading Visibility (Global)" markdown-shifttab]
+     "---"
+     ["Narrow to Region" narrow-to-region]
+     ["Narrow to Block" markdown-narrow-to-block]
+     ["Narrow to Section" narrow-to-defun]
+     ["Narrow to Subtree" markdown-narrow-to-subtree]
+     ["Widen" widen (buffer-narrowed-p)])
     "---"
     ("Headings & Structure"
      ["Automatic Heading" markdown-insert-header-dwim]
@@ -5023,9 +5029,13 @@ See also `markdown-mode-map'.")
      ["Demote Subtree" markdown-demote-subtree :keys "M-S-<right>"]
      ["Promote Header" markdown-promote :keys "M-<left>"]
      ["Demote Header" markdown-demote :keys "M-<right>"])
-    ("Region Editing"
+    ("Region & Mark"
      ["Indent Region" markdown-indent-region]
-     ["Exdent Region" markdown-exdent-region])
+     ["Exdent Region" markdown-exdent-region]
+     "--"
+     ["Mark Block" markdown-mark-block]
+     ["Mark Section" mark-defun]
+     ["Mark Subtree" markdown-mark-subtree])
     ("Lists"
      ["Insert List Item" markdown-insert-list-item]
      ["Move List Item Up" markdown-move-up :keys "M-<up>"]
