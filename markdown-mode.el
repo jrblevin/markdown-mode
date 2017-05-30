@@ -4943,6 +4943,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-S-<down>") 'markdown-move-subtree-down)
     (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
     (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
+    (define-key map (kbd "C-c C-M-h") 'markdown-mark-subtree)
     ;; Blocks
     (define-key map [remap backward-paragraph] 'markdown-backward-block)
     (define-key map [remap forward-paragraph] 'markdown-forward-block)
@@ -6207,6 +6208,19 @@ The current section is the one that contains point or follows point."
   (let ((beginning-of-defun-function 'markdown-backward-page)
         (end-of-defun-function 'markdown-forward-page))
     (narrow-to-defun)))
+
+(defun markdown-mark-subtree ()
+  "Mark the current subtree.
+This puts point at the start of the current subtree, and mark at the end."
+  (interactive)
+  (let ((beg))
+    (if (markdown-heading-at-point)
+	(beginning-of-line)
+      (markdown-previous-visible-heading 1))
+    (setq beg (point))
+    (markdown-end-of-subtree)
+    (push-mark (point) nil t)
+    (goto-char beg)))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============

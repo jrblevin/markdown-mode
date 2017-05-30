@@ -1667,7 +1667,22 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         (markdown-move-subtree-down)
                         (should (string-equal (buffer-string) "# 1 #\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n# 2 #\n"))))
 
-;(ert-deftest test-markdown-subtree/move-down ()
+(ert-deftest test-markdown-subtree/mark ()
+  "Test `markdown-mark-subtree'."
+  (markdown-test-file "outline.text"
+    (markdown-next-visible-heading 1)
+    (should-not mark-active)
+    (markdown-mark-subtree)
+    (should (= (point) 19))
+    (should (= (mark) 349))
+    (should mark-active)
+    (deactivate-mark)
+    (should-not mark-active)
+    (markdown-forward-same-level 1)
+    (markdown-mark-subtree)
+    (should (= (point) 351))
+    (should (= (mark) 515))
+    (should mark-active)))
 
 ;;; Cycling:
 
