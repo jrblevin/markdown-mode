@@ -2983,7 +2983,7 @@ data.  See `markdown-inline-code-at-point-p' for inline code."
 (defun markdown-heading-at-point ()
   "Return non-nil if there is a heading at the point.
 Set match data for `markdown-regex-header'."
-  (let ((match-data (get-text-property (point) 'markdown-heading)))
+  (let ((match-data (get-text-property (point-at-bol) 'markdown-heading)))
     (when match-data
       (set-match-data match-data)
       t)))
@@ -3863,22 +3863,25 @@ header will be inserted."
       (when (and setext (string-match-p "^[ \t]*$" text))
         (setq text (read-string "Header text: "))))
     (setq text (markdown-compress-whitespace-string text)))
-  ;; Insertion with given text
-  (markdown-ensure-blank-line-before)
-  (let (hdr)
+  (let ((start (point)))
+    ;; Insertion with given text
+    (markdown-ensure-blank-line-before)
+    (let (hdr)
+      (cond (setext
+             (setq hdr (make-string (string-width text) (if (= level 2) ?- ?=)))
+             (insert text "\n" hdr))
+            (t
+             (setq hdr (make-string level ?#))
+             (insert hdr " " text)
+             (when (null markdown-asymmetric-header) (insert " " hdr)))))
+    (markdown-ensure-blank-line-after)
+    ;; Propertize
+    (markdown-syntax-propertize start (point))
+    ;; Leave point at end of text
     (cond (setext
-           (setq hdr (make-string (string-width text) (if (= level 2) ?- ?=)))
-           (insert text "\n" hdr))
-          (t
-           (setq hdr (make-string level ?#))
-           (insert hdr " " text)
-           (when (null markdown-asymmetric-header) (insert " " hdr)))))
-  (markdown-ensure-blank-line-after)
-  ;; Leave point at end of text
-  (cond (setext
-         (backward-char (1+ (string-width text))))
-        ((null markdown-asymmetric-header)
-         (backward-char (1+ level)))))
+           (backward-char (1+ (string-width text))))
+          ((null markdown-asymmetric-header)
+           (backward-char (1+ level))))))
 
 (defun markdown-insert-header-dwim (&optional arg setext)
   "Insert or replace header markup.
@@ -4814,50 +4817,45 @@ match."
 
 ;;; Markup Cycling ============================================================
 
-(defun markdown-cycle-atx (arg &optional remove)
-  "Cycle ATX header markup.
-Promote header (decrease level) when ARG is 1 and demote
-header (increase level) if arg is -1.  When REMOVE is non-nil,
-remove the header when the level reaches zero and stop cycling
-when it reaches six.  Otherwise, perform a proper cycling through
-levels one through six.  Assumes match data is available for
-`markdown-regex-header-atx'."
-  (let* ((old-level (length (match-string 1)))
-         (new-level (+ old-level arg))
-         (text (match-string 2)))
-    (when (not remove)
-      (setq new-level (% new-level 6))
-      (setq new-level (cond ((= new-level 0) 6)
-                            ((< new-level 0) (+ new-level 6))
-                            (t new-level))))
-    (cond
-     ((= new-level 0)
-      (markdown-unwrap-thing-at-point nil 0 2))
-     ((<= new-level 6)
-      (goto-char (match-beginning 0))
-      (delete-region (match-beginning 0) (match-end 0))
-      (markdown-insert-header new-level text nil)))))
+(make-obsolete 'markdown-cycle-atx 'markdown-cycle-heading "v2.3")
+(make-obsolete 'markdown-cycle-setext 'markdown-cycle-heading "v2.3")
 
-(defun markdown-cycle-setext (arg &optional remove)
-  "Cycle setext header markup.
-Promote header (increase level) when ARG is 1 and demote
-header (decrease level or remove) if arg is -1.  When demoting a
-level-two setext header, replace with a level-three atx header.
-When REMOVE is non-nil, remove the header when the level reaches
-zero.  Otherwise, cycle back to a level six atx header.  Assumes
-match data is available for `markdown-regex-header-setext'."
-  (let* ((char (char-after (match-beginning 2)))
-         (old-level (if (char-equal char ?=) 1 2))
-         (new-level (+ old-level arg)))
-    (when (and (not remove) (= new-level 0))
-      (setq new-level 6))
-    (cond
-     ((= new-level 0)
-      (markdown-unwrap-thing-at-point nil 0 1))
-     ((<= new-level 2)
-      (markdown-insert-header new-level nil t))
-     ((<= new-level 6)
-      (markdown-insert-header new-level nil nil)))))
+(defun markdown-cycle-heading (arg &optional remove)
+  "Cycle heading markup.
+Demote headings (increase level, e.g., H1 to H2) when ARG is 1
+and promote headings (decrease level) if arg is -1.  When REMOVE
+is non-nil, remove the heading when the level reaches zero.
+Otherwise, cycle back to a level-six atx header.  When moving from
+level three to level two, uses atx headings.  Assumes match data
+is available for `markdown-regex-header' and that the point is on
+the heading line."
+  (save-excursion
+    (let* ((atx (markdown-on-atx-heading-p))
+           (old-level (markdown-outline-level))
+           (new-level (+ old-level arg))
+           (text (match-string (if atx 5 1))))
+      (when (not remove)
+        (setq new-level (% new-level 6))
+        (setq new-level (cond ((= new-level 0) 6)
+                              ((< new-level 0) (+ new-level 6))
+                              (t new-level))))
+      (cond
+     ;; atx
+       ((and atx (= new-level 0))
+        (markdown-unwrap-thing-at-point nil 0 2)
+        (markdown-syntax-propertize (point-at-bol) (point-at-eol)))
+       ((and atx (<= new-level 6))
+        (goto-char (match-beginning 0))
+        (delete-region (match-beginning 0) (match-end 0))
+        (markdown-insert-header new-level text nil))
+       ;; Setext
+       ((= new-level 0)
+        (markdown-unwrap-thing-at-point nil 0 1)
+        (markdown-syntax-propertize (point-at-bol) (point-at-eol)))
+       ((<= new-level 2)
+        (markdown-insert-header new-level nil t))
+       ((<= new-level 6)
+        (markdown-insert-header new-level nil nil))))))
 
 (defun markdown-cycle-hr (arg &optional remove)
   "Cycle string used for horizontal rule from `markdown-hr-strings'.
@@ -6001,7 +5999,17 @@ Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
 
 (defun markdown-on-heading-p ()
   "Return non-nil if point is on a heading line."
-  (get-text-property (point) 'markdown-heading))
+  (get-text-property (point-at-bol) 'markdown-heading))
+
+(defun markdown-on-setext-heading-p ()
+  "Return t if point is on a setext heading line."
+  (or (get-text-property (point-at-bol) 'markdown-heading-1-setext)
+      (get-text-property (point-at-bol) 'markdown-heading-2-setext)))
+
+(defun markdown-on-atx-heading-p ()
+  "Return t if point is on an atx heading line."
+  (and (markdown-on-heading-p)
+       (not (markdown-on-setext-heading-p))))
 
 (defun markdown-end-of-subtree (&optional invisible-OK)
   "Move to the end of the current subtree.
@@ -6165,27 +6173,25 @@ Calls `markdown-cycle' with argument t."
    ((match-end 4) (- (match-end 4) (match-beginning 4)))))
 
 (defun markdown-promote-subtree (&optional arg)
-  "Promote the current subtree of ATX headings.
+  "Promote the current heading subtree.
 Note that Markdown does not support heading levels higher than
 six and therefore level-six headings will not be promoted
 further. If ARG is non-nil promote the heading, otherwise
 demote."
   (interactive "*P")
   (save-excursion
-    (when (and (or (thing-at-point-looking-at markdown-regex-header-atx)
-                   (re-search-backward markdown-regex-header-atx nil t))
-               (not (markdown-code-block-at-point-p)))
-      (let ((level (length (match-string 1)))
+    (when (markdown-back-to-heading-over-code-block)
+      (let ((level (markdown-outline-level)))
             (promote-or-demote (if arg 1 -1))
             (remove 't))
-        (markdown-cycle-atx promote-or-demote remove)
+        (markdown-cycle-heading promote-or-demote remove)
         (catch 'end-of-subtree
           (while (markdown-next-heading)
             ;; Exit if this not a higher level heading; promote otherwise.
-            (if (and (looking-at markdown-regex-header-atx)
-                     (<= (length (match-string-no-properties 1)) level))
+            (if (and (looking-at markdown-regex-header)
+                     (<= (markdown-outline-level) level))
                 (throw 'end-of-subtree nil)
-              (markdown-cycle-atx promote-or-demote remove))))))))
+              (markdown-cycle-heading promote-or-demote remove))))))))
 
 (defun markdown-demote-subtree ()
   "Demote the current subtree of ATX headings."
@@ -6301,18 +6307,13 @@ Calls `markdown-move-list-item-down'."
   (markdown-move-list-item-down))
 
 (defun markdown-promote ()
-  "Either promote header or list item at point or cycle markup.
-See `markdown-cycle-atx', `markdown-cycle-setext', and
-`markdown-promote-list-item'."
+  "Promote element (e.g., heading or list item) or cycle markup."
   (interactive)
   (let (bounds)
     (cond
-     ;; Promote atx header
-     ((thing-at-point-looking-at markdown-regex-header-atx)
-      (markdown-cycle-atx -1))
-     ;; Promote setext header
-     ((thing-at-point-looking-at markdown-regex-header-setext)
-      (markdown-cycle-setext -1))
+     ;; Promote heading
+     ((markdown-heading-at-point)
+      (markdown-cycle-heading -1))
      ;; Promote horizonal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (markdown-cycle-hr -1))
@@ -6329,18 +6330,13 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
       (error "Nothing to promote at point")))))
 
 (defun markdown-demote ()
-  "Either demote header or list item at point or cycle or remove markup.
-See `markdown-cycle-atx', `markdown-cycle-setext', and
-`markdown-demote-list-item'."
+  "Demote element (e.g., heading or list item) or cycle or remove markup."
   (interactive)
   (let (bounds)
     (cond
-     ;; Demote atx header
-     ((thing-at-point-looking-at markdown-regex-header-atx)
-      (markdown-cycle-atx 1))
-     ;; Demote setext header
-     ((thing-at-point-looking-at markdown-regex-header-setext)
-      (markdown-cycle-setext 1))
+     ;; Demote heading
+     ((markdown-heading-at-point)
+      (markdown-cycle-heading 1))
      ;; Demote horizonal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (markdown-cycle-hr 1))

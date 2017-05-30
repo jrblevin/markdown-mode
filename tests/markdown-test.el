@@ -1550,15 +1550,33 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-demote/atx-header ()
   "Test `markdown-demote' for atx headers."
   (markdown-test-string "# test #"
+
+(message "BUFFER-STRING: %s" (buffer-string))
+
                         (markdown-demote)
+
+(message "BUFFER-STRING: %s" (buffer-string))
+
                         (should (string-equal (buffer-string) "## test ##"))
                         (markdown-demote)
+
+(message "BUFFER-STRING: %s" (buffer-string))
+
                         (should (string-equal (buffer-string) "### test ###"))
                         (markdown-demote)
+
+(message "BUFFER-STRING: %s" (buffer-string))
+
                         (should (string-equal (buffer-string) "#### test ####"))
                         (markdown-demote)
+
+(message "BUFFER-STRING: %s" (buffer-string))
+
                         (should (string-equal (buffer-string) "##### test #####"))
                         (markdown-demote)
+
+(message "BUFFER-STRING: %s" (buffer-string))
+
                         (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-promote/setext-header ()
