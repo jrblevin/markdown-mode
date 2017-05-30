@@ -1018,7 +1018,8 @@ Support can be toggled later using the `markdown-toggle-wiki-links'
 function or \\[markdown-toggle-wiki-links]."
   :group 'markdown
   :type 'boolean
-  :safe 'booleanp)
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-wiki-link-alias-first t
   "When non-nil, treat aliased wiki links like [[alias text|PageName]].
@@ -1033,14 +1034,16 @@ This is the default search behavior for GitHub and is
 automatically set to t in `gfm-mode'."
   :group 'markdown
   :type 'boolean
-  :safe 'booleanp)
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-wiki-link-search-parent-directories nil
   "When non-nil, search for wiki link targets in parent directories.
 This is the default search behavior of Ikiwiki."
   :group 'markdown
   :type 'boolean
-  :safe 'booleanp)
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-wiki-link-fontify-missing nil
   "When non-nil, change wiki link face according to existence of target files.
@@ -1049,7 +1052,8 @@ changes or the user switches windows.  It is disabled by default because it may
 cause lag when typing on slower machines."
   :group 'markdown
   :type 'boolean
-  :safe 'booleanp)
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-uri-types
   '("acap" "cid" "data" "dav" "fax" "file" "ftp" "gopher" "http" "https"
@@ -1129,7 +1133,9 @@ A nested index may provide more natural browsing from the menu,
 but a flat list may allow for faster keyboard navigation via tab
 completion."
   :group 'markdown
-  :type 'boolean)
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-make-gfm-checkboxes-buttons t
   "When non-nil, make GFM checkboxes into buttons."
@@ -1153,7 +1159,8 @@ set this to 'horizontal or 'below."
   :group 'markdown
   :type '(choice (const :tag "Automatic" any)
                  (const :tag "Right (vertical)" right)
-                 (const :tag "Below (horizontal)" below)))
+                 (const :tag "Below (horizontal)" below))
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-live-preview-window-function
   'markdown-live-preview-window-eww
@@ -2243,7 +2250,8 @@ headers of levels one through six respectively."
   :set (lambda (symbol value)
          (set-default symbol value)
          (markdown-update-header-faces value))
-  :group 'markdown-faces)
+  :group 'markdown-faces
+  :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-header-scaling-values
   '(1.8 1.4 1.2 1.0 1.0 1.0)
