@@ -4944,6 +4944,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
     (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
     (define-key map (kbd "C-c C-M-h") 'markdown-mark-subtree)
+    (define-key map (kbd "C-x n s") 'markdown-narrow-to-subtree)
     ;; Blocks
     (define-key map [remap backward-paragraph] 'markdown-backward-block)
     (define-key map [remap forward-paragraph] 'markdown-forward-block)
@@ -6221,6 +6222,18 @@ This puts point at the start of the current subtree, and mark at the end."
     (markdown-end-of-subtree)
     (push-mark (point) nil t)
     (goto-char beg)))
+
+(defun markdown-narrow-to-subtree ()
+  "Narrow buffer to the current subtree."
+  (interactive)
+  (save-excursion
+    (save-match-data
+      (narrow-to-region
+       (progn (markdown-back-to-heading-over-code-block t) (point))
+       (progn (markdown-end-of-subtree)
+	      (if (and (markdown-heading-at-point) (not (eobp)))
+		  (backward-char 1))
+	      (point))))))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============

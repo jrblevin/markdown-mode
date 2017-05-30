@@ -1684,6 +1684,18 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
     (should (= (mark) 515))
     (should mark-active)))
 
+(ert-deftest test-markdown-subtree/narrow ()
+  "Test `markdown-narrow-to-subtree'."
+  (markdown-test-file "outline.text"
+    (markdown-next-visible-heading 1)
+    (markdown-forward-same-level 1)
+    (widen)
+    (should (= (point-min) 1))
+    (should (= (point-max) 553))
+    (markdown-narrow-to-subtree)
+    (should (= (point-min) 351))
+    (should (= (point-max) 515))))
+
 ;;; Cycling:
 
 (ert-deftest test-markdown-cycle/atx-header ()
