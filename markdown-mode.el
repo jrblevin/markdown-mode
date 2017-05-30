@@ -4944,9 +4944,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
     (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
     ;; Blocks
-    (define-key map (kbd "M-{") 'markdown-backward-block)
-    (define-key map (kbd "M-}") 'markdown-forward-block)
-    (define-key map (kbd "M-h") 'markdown-mark-block)
+    (define-key map [remap backward-paragraph] 'markdown-backward-block)
+    (define-key map [remap forward-paragraph] 'markdown-forward-block)
+    (define-key map [remap mark-paragraph] 'markdown-mark-block)
     (define-key map (kbd "C-x n b") 'markdown-narrow-to-block)
     ;; Movement
     (define-key map (kbd "M-n") 'markdown-next-link)
