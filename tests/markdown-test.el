@@ -3437,40 +3437,20 @@ date = 2015-08-13 11:35:25 EST
 ;;; Movement tests:
 
 (ert-deftest test-markdown-movement/defun ()
-  "Test defun navigation."
+  "Test subtree defun navigation."
   (markdown-test-file "outline.text"
-   ;; end-of-defun should go to point-max and stop.
+   ;; end-of-defun should eventually go to point-max and stop.
    (end-of-defun 10)
-   (should (= (point) (point-max)))
-   ;; ;; end-of-defun should stop just before the next header.
-   ;; (goto-char (point-min))
-   ;; (end-of-defun)
-   ;; (should (looking-at "\n# A top-level header"))
-   ;; (end-of-defun)
-   ;; (should (looking-at "\n## A second-level header"))
-   ;; (end-of-defun)
-   ;; (should (looking-at "\n### Third level ###"))
-   ;; (end-of-defun)
-   ;; (should (looking-at "\n### Third level number two ###"))
-   ;; ;; beginning-of-defun should move to the start of the previous header
-   ;; (beginning-of-defun)
-   ;; (should (looking-at "### Third level ###"))
-   ;; (beginning-of-defun)
-   ;; (should (looking-at "## A second-level header"))
-   ;; (beginning-of-defun)
-   ;; (should (looking-at "# A top-level header"))
-   ;; (beginning-of-defun)
-   ;; ;; beginning-of-defun should move up to point-min
-   ;; (should (= (point) (point-min)))
-   ;; ;; (beginning-of-defun -1)  should move to the start of the next header
-   ;; (forward-line 2)
-   ;; (beginning-of-defun -1)
-   ;; (should (looking-at "## A second-level header"))
-   ;; (beginning-of-defun -1)
-   ;; (should (looking-at "### Third level ###"))
-   ;; (beginning-of-defun -1)
-   ;; (should (looking-at "### Third level number two ###"))
-))
+   (should (eobp))
+   ;; Point is before first heading, so end-of-defun should move to
+   ;; first heading and stop.
+   (goto-char (point-min))
+   (end-of-defun)
+   (should (looking-at "# A top-level header"))
+   ;; When at a top-level heading, end-of-defun should move to
+   ;; the end of the subtree.
+   (end-of-defun)
+   (should (looking-at "\nAn underline-style header\n==="))))
 
 (ert-deftest test-markdown-movement/text-block ()
   "Test plain text block movement."
