@@ -4948,7 +4948,12 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map [remap forward-paragraph] 'markdown-forward-block)
     (define-key map [remap mark-paragraph] 'markdown-mark-block)
     (define-key map (kbd "C-x n b") 'markdown-narrow-to-block)
-    ;; Movement
+    ;; Pages (top-level sections)
+    (define-key map [remap backward-page] 'markdown-backward-page)
+    (define-key map [remap forward-page] 'markdown-forward-page)
+    (define-key map [remap mark-page] 'markdown-mark-page)
+    (define-key map [remap narrow-to-page] 'markdown-narrow-to-page)
+    ;; Link Movement
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Alternative keys (in case of problems with the arrow keys)
@@ -5772,6 +5777,39 @@ ARG = -N means move backward N blocks."
          ;; Other
          (t (markdown-end-of-text-block)))))))
 
+(defun markdown-backward-page (&optional count)
+  "Move backward to boundary of the current toplevel section.
+With COUNT, repeat, or go forward if negative."
+  (interactive "p")
+  (or count (setq count 1))
+  (if (< count 0)
+      (markdown-forward-page (- count))
+    (skip-syntax-backward "-")
+    (or (markdown-back-to-heading-over-code-block t t)
+        (goto-char (point-min)))
+    (when (looking-at markdown-regex-header)
+      (let ((level (markdown-outline-level)))
+        (when (> level 1) (markdown-up-heading level))
+        (when (> count 1)
+          (condition-case nil
+              (markdown-backward-same-level (1- count))
+            (error (goto-char (point-min)))))))))
+
+(defun markdown-forward-page (&optional count)
+  "Move forward to boundary of the current toplevel section.
+With COUNT, repeat, or go backward if negative."
+  (interactive "p")
+  (or count (setq count 1))
+  (if (< count 0)
+      (markdown-backward-page (- count))
+    (if (markdown-back-to-heading-over-code-block t t)
+        (let ((level (markdown-outline-level)))
+          (when (> level 1) (markdown-up-heading level))
+          (condition-case nil
+              (markdown-forward-same-level count)
+            (error (goto-char (point-max)))))
+      (markdown-next-visible-heading 1))))
+
 (defun markdown-next-link ()
   "Jump to next inline, reference, or wiki link.
 If successful, return point.  Otherwise, return nil.
@@ -6140,6 +6178,34 @@ The current block is the one that contains point or follows point."
   (interactive)
   (let ((beginning-of-defun-function 'markdown-backward-block)
         (end-of-defun-function 'markdown-forward-block))
+    (narrow-to-defun)))
+
+(defun markdown-mark-page ()
+  "Put mark at end of this top level section, point at beginning.
+The top level section marked is the one that contains point or
+follows point.
+
+Interactively, if this command is repeated or (in Transient Mark
+mode) if the mark is active, it marks the next page after the
+ones already marked."
+  (interactive)
+  (if (or (and (eq last-command this-command) (mark t))
+          (and transient-mark-mode mark-active))
+      (set-mark
+       (save-excursion
+         (goto-char (mark))
+         (markdown-forward-page)
+         (point)))
+    (let ((beginning-of-defun-function 'markdown-backward-page)
+          (end-of-defun-function 'markdown-forward-page))
+      (mark-defun))))
+
+(defun markdown-narrow-to-page ()
+  "Make text outside current top level section invisible.
+The current section is the one that contains point or follows point."
+  (interactive)
+  (let ((beginning-of-defun-function 'markdown-backward-page)
+        (end-of-defun-function 'markdown-forward-page))
     (narrow-to-defun)))
 
 

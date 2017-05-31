@@ -3530,6 +3530,26 @@ date = 2015-08-13 11:35:25 EST
    (markdown-backward-block)
    (should (= (point) (point-min)))))
 
+(ert-deftest test-markdown-movement/page ()
+  "Test Markdown page movement."
+  (markdown-test-file "outline.text"
+   (markdown-forward-page)
+   (should (looking-at "# A top-level header"))
+   (markdown-forward-page)
+   (should (looking-at "An underline-style header"))
+   (markdown-forward-page)
+   (should (looking-at "# Level one"))
+   (markdown-forward-page)
+   (should (eobp))
+   (markdown-backward-page)
+   (should (looking-at "# Level one"))
+   (markdown-backward-page)
+   (should (looking-at "An underline-style header"))
+   (markdown-backward-page)
+   (should (looking-at "# A top-level header"))
+   (markdown-backward-page)
+   (should (bobp))))
+
 (ert-deftest test-markdown-movement/blockquote-paragraphs ()
   "Test filling of blockquotes containing multiple paragraphs."
   (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n>\n> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n"
