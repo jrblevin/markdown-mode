@@ -5948,7 +5948,7 @@ Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
 (defalias 'markdown-end-of-heading 'outline-end-of-heading)
 
 (defun markdown-on-heading-p ()
-  "Return t if point is on a (visible) heading line."
+  "Return non-nil if point is on a heading line."
   (get-text-property (point) 'markdown-heading))
 
 (defun markdown-end-of-subtree (&optional invisible-OK)
