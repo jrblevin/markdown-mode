@@ -5821,6 +5821,10 @@ headings inside preformatted code blocks may match
     (while (and (/= prev (point)) (markdown-code-block-at-point-p))
       (setq prev (point))
       (if arg (funcall move-fn arg) (funcall move-fn)))
+    ;; Adjust point for setext headings
+    (save-match-data
+      (when (thing-at-point-looking-at markdown-regex-header-setext)
+        (goto-char (match-beginning 0))))
     (if (= (point) start) nil (point))))
 
 (defun markdown-next-visible-heading (arg)
@@ -5845,12 +5849,6 @@ passed to `outline-previous-visible-heading'."
   "Move to the previous heading line of any level."
   (markdown-move-heading-common 'outline-previous-heading))
 
-(defun markdown-forward-same-level (arg)
-  "Move forward to the ARG'th heading at same level as this one.
-Stop at the first and last headings of a superior heading."
-  (interactive "p")
-  (markdown-move-heading-common 'outline-forward-same-level arg))
-
 (defun markdown-back-to-heading-over-code-block (&optional invisible-ok no-error)
   "Move back to the beginning of the previous heading.
 Returns t if the point is at a heading, the location if a heading
@@ -5874,12 +5872,20 @@ Leaves match data intact for `markdown-regex-header'."
             (setq found (point))))
         (when found (goto-char found)))))
 
+(defun markdown-forward-same-level (arg)
+  "Move forward to the ARG'th heading at same level as this one.
+Stop at the first and last headings of a superior heading."
+  (interactive "p")
+  (markdown-back-to-heading-over-code-block)
+  (markdown-move-heading-common 'outline-forward-same-level arg))
+
 (defun markdown-backward-same-level (arg)
   "Move backward to the ARG'th heading at same level as this one.
 Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-back-to-heading-over-code-block)
   (while (> arg 0)
+    ;; outline-get-last-sibling needs match-data set for outline-regexp.
     (let ((point-to-move-to (save-excursion
                               (outline-get-last-sibling))))
       (if point-to-move-to

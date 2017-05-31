@@ -3247,8 +3247,8 @@ x: x
    (should (looking-at "^# A top-level header"))
    ;; Navigate forward at the same level
    (markdown-forward-same-level 1)
-   (should (eq (point) 377))
-   (should (looking-at "^=+$"))
+   (should (eq (point) 351))
+   (should (looking-at "^An underline-style header$"))
    ;; Navigate backward by four visible headings
    (markdown-previous-visible-heading 4)
    (should (eq (point) 69))
@@ -3261,7 +3261,11 @@ x: x
    (goto-char 516)
    (call-interactively #'markdown-up-heading)
    (should (looking-at "^An underline-style header$"))
-   (should (eq (mark) 516))))
+   (should (eq (mark) 516))
+   ;; Navigate back in the outline (setext to atx)
+   (forward-line) ;; move to setext underline
+   (markdown-backward-same-level 1)
+   (should (looking-at "^# A top-level header"))))
 
 (ert-deftest test-markdown-outline/navigation-with-code ()
   "Test outline navigation functions with code blocks."
