@@ -5851,24 +5851,28 @@ Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-move-heading-common 'outline-forward-same-level arg))
 
-(defun markdown-back-to-heading-over-code-block (&optional invisible-ok)
+(defun markdown-back-to-heading-over-code-block (&optional invisible-ok no-error)
+  "Move back to the beginning of the previous heading.
+Returns t if the point is at a heading, the location if a heading
+was found, and nil otherwise.
+Only visible heading lines are considered, unless INVISIBLE-OK is
+non-nil.  Throw an error if there is no previous heading unless
+NO-ERROR is non-nil.
+Leaves match data intact for `markdown-regex-header'."
   (beginning-of-line)
-  (or (and (outline-on-heading-p invisible-ok)
+  (or (and (markdown-heading-at-point)
            (not (markdown-code-block-at-point-p)))
-      (let ((header-re (concat "^\\(?:" outline-regexp "\\)"))
-            found)
+      (let (found)
         (save-excursion
-          (while (not found)
-            (let (finish)
-              (while (and (not finish) (re-search-backward header-re nil t))
-                (when (and (or invisible-ok (not (outline-invisible-p)))
-                           (not (markdown-code-block-at-point-p)))
-                  (setq finish t)))
-              (if (not finish)
-                  (error "Before first heading")
-                (setq found (point))))))
-        (goto-char found)
-        found)))
+          (while (and (not found)
+                      (re-search-backward markdown-regex-header nil t))
+            (when (and (or invisible-ok (not (outline-invisible-p)))
+                       (not (markdown-code-block-at-point-p)))
+              (setq found (point))))
+          (if (not found)
+              (unless no-error (error "Before first heading"))
+            (setq found (point))))
+        (when found (goto-char found)))))
 
 (defun markdown-backward-same-level (arg)
   "Move backward to the ARG'th heading at same level as this one.

@@ -3271,6 +3271,27 @@ x: x
    (should (eq (point) 159))
    (should (looking-at "^# Level one again"))))
 
+(ert-deftest test-markdown-outline/back-to-heading-over-code-block ()
+  "Test `markdown-back-to-heading-over-code-block' over."
+  (markdown-test-file "outline-code.text"
+    ;; Initialize match data to known quantity.
+    (set-match-data '(1 2 3 4))
+    (should (equal (match-data t) '(1 2 3 4)))
+    ;; Function should navigate back over code blocks.
+    (re-search-forward "^# In a code block")
+    (should (= (markdown-back-to-heading-over-code-block) 69))
+    ;; Match data should be set for markdown-regex-header.
+    (should (equal (match-data t) (get-text-property (point) 'markdown-heading)))
+    ;; Function should return t when at a heading.
+    (should (equal (markdown-back-to-heading-over-code-block) t))
+    ;; Insert some text before the first heading.
+    (goto-char (point-min))
+    (save-excursion (insert "foo\n\n"))
+    ;; Function should throw an error if no previous heading.
+    (should-error (markdown-back-to-heading-over-code-block))
+    ;; Function should return nil without error if NO-ERROR is non-nil.
+    (should-not (markdown-back-to-heading-over-code-block t t))))
+
 (ert-deftest test-markdown-outline/visibility-atx ()
   "Test outline visibility cycling for ATX-style headers."
   (markdown-test-file "outline.text"
