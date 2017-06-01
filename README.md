@@ -441,20 +441,20 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     at the point.  Finally, <kbd>C-c C-u</kbd> will move up to a lower-level
     (higher precedence) visible heading.
 
-  * Movement by Paragraph or Block: <kbd>M-{</kbd> and <kbd>M-}</kbd>
+  * Movement by Markdown Blocks: <kbd>M-{</kbd> and <kbd>M-}</kbd>
 
     These keys are usually bound to `forward-paragraph` and
     `backward-paragraph`, but those built-in Emacs functions are
     based on simple regular expressions and can fail in Markdown.
     Blocks in `markdown-mode` are code blocks, blockquotes, list
-    items, headings, horizontal rules, or plain text paragraphs
-    separated by whitespace.  Instead, they are bound to
-    `markdown-forward-block` and `markdown-backward-block`.
-    To mark or narrow to a block, you can use <kbd>M-h</kbd>
-    (`markdown-mark-block`) and <kbd>C-x n b</kbd>
+    items (which may contain other blocks), headings, horizontal
+    rules, or plain text paragraphs separated by whitespace.
+    Instead, they are bound to `markdown-forward-block` and
+    `markdown-backward-block`.  To mark or narrow to a block, you
+    can use <kbd>M-h</kbd> (`markdown-mark-block`) and <kbd>C-x n b</kbd>
     (`markdown-narrow-to-block`).
 
-  * Movement by Defun: <kbd>C-M-a</kbd>, <kbd>C-M-e</kbd>, and <kbd>C-M-h</kbd>
+  * Movement by Defuns: <kbd>C-M-a</kbd>, <kbd>C-M-e</kbd>, and <kbd>C-M-h</kbd>
 
     The usual Emacs commands can be used to move by defuns
     (top-level major definitions).  In markdown-mode, a defun is a
@@ -462,6 +462,16 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     beginning of the current or preceding defun, <kbd>C-M-e</kbd> will move
     to the end of the current or following defun, and <kbd>C-M-h</kbd> will
     put the region around the entire defun.
+
+  * Movement by Plain Text Blocks: <kbd>C-M-{</kbd> and <kbd>C-M-}</kbd>
+
+    While the block and defun movement commands respect Markdown
+    syntax, these commands simply move over whitespace-separated
+    plain text blocks without regard for the context.  You can use
+    these commands to move over entire lists, whitespace separated
+    segments of code, etc.  To move backward use <kbd>C-M-{</kbd>
+    (`markdown-beginning-of-text-block`) and to move forward use
+    <kbd>C-M-}</kbd> (`markdown-end-of-text-block`).
 
 As noted, many of the commands above behave differently depending
 on whether Transient Mark mode is enabled or not.  When it makes

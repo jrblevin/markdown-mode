@@ -459,20 +459,20 @@
 ;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
-;;   * Movement by Paragraph or Block: `M-{` and `M-}`
+;;   * Movement by Markdown Blocks: `M-{` and `M-}`
 ;;
 ;;     These keys are usually bound to `forward-paragraph' and
 ;;     `backward-paragraph', but those built-in Emacs functions are
 ;;     based on simple regular expressions and can fail in Markdown.
 ;;     Blocks in `markdown-mode' are code blocks, blockquotes, list
-;;     items, headings, horizontal rules, or plain text paragraphs
-;;     separated by whitespace.  Instead, they are bound to
-;;     `markdown-forward-block' and `markdown-backward-block'.
-;;     To mark or narrow to a block, you can use `M-h`
-;;     (`markdown-mark-block') and `C-x n b`
+;;     items (which may contain other blocks), headings, horizontal
+;;     rules, or plain text paragraphs separated by whitespace.
+;;     Instead, they are bound to `markdown-forward-block' and
+;;     `markdown-backward-block'.  To mark or narrow to a block, you
+;;     can use `M-h` (`markdown-mark-block') and `C-x n b`
 ;;     (`markdown-narrow-to-block').
 ;;
-;;   * Movement by Defun: `C-M-a`, `C-M-e`, and `C-M-h`
+;;   * Movement by Defuns: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
 ;;     The usual Emacs commands can be used to move by defuns
 ;;     (top-level major definitions).  In markdown-mode, a defun is a
@@ -480,6 +480,16 @@
 ;;     beginning of the current or preceding defun, `C-M-e` will move
 ;;     to the end of the current or following defun, and `C-M-h` will
 ;;     put the region around the entire defun.
+;;
+;;   * Movement by Plain Text Blocks: `C-M-{` and `C-M-}`
+;;
+;;     While the block and defun movement commands respect Markdown
+;;     syntax, these commands simply move over whitespace-separated
+;;     plain text blocks without regard for the context.  You can use
+;;     these commands to move over entire lists, whitespace separated
+;;     segments of code, etc.  To move backward use `C-M-{`
+;;     (`markdown-beginning-of-text-block`) and to move forward use
+;;     `C-M-}` (`markdown-end-of-text-block`).
 ;;
 ;; As noted, many of the commands above behave differently depending
 ;; on whether Transient Mark mode is enabled or not.  When it makes
@@ -4955,6 +4965,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map [remap forward-paragraph] 'markdown-forward-block)
     (define-key map [remap mark-paragraph] 'markdown-mark-block)
     (define-key map (kbd "C-x n b") 'markdown-narrow-to-block)
+    ;; Text Blocks (contextually unaware)
+    (define-key map (kbd "C-M-{") 'markdown-beginning-of-text-block)
+    (define-key map (kbd "C-M-}") 'markdown-end-of-text-block)
     ;; Pages (top-level sections)
     (define-key map [remap backward-page] 'markdown-backward-page)
     (define-key map [remap forward-page] 'markdown-forward-page)
@@ -5680,6 +5693,7 @@ move back to the ARG-th preceding section."
 This function simply looks for blank lines without considering
 the surrounding context in light of Markdown syntax.  For that, see
 `markdown-backward-block'."
+  (interactive)
   (let ((start (point)))
     (if (re-search-backward markdown-regex-block-separator nil t)
         (goto-char (match-end 0))
@@ -5697,6 +5711,7 @@ the surrounding context in light of Markdown syntax.  For that, see
 This function simply looks for blank lines without considering
 the surrounding context in light of Markdown syntax.  For that, see
 `markdown-forward-block'."
+  (interactive)
   (beginning-of-line)
   (skip-syntax-forward "-")
   (when (= (point) (point-min))
