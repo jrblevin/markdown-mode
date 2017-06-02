@@ -2470,10 +2470,6 @@ in XEmacs 21."
    ((fboundp 'region-active-p)
     (defalias 'markdown-use-region-p 'region-active-p))))
 
-(defun markdown-use-buttons-p ()
-  "Determine whether this Emacs supports buttons."
-  (or (featurep 'button) (locate-library "button")))
-
 ;; Use new names for outline-mode functions in Emacs 25 and later.
 (eval-and-compile
   (defalias 'markdown-hide-sublevels
@@ -5291,74 +5287,67 @@ BUFFER-NAME is the name of the main buffer being visited."
       (erase-buffer))
     linkbuf))
 
-(when (markdown-use-buttons-p)
-  ;; Add an empty Markdown reference definition to buffer
-  ;; specified in the 'target-buffer property.  The reference name is
-  ;; the button's label.
-  (define-button-type 'markdown-undefined-reference-button
-    'help-echo "mouse-1, RET: create definition for undefined reference"
-    'follow-link t
-    'face 'bold
-    'action (lambda (b)
-              (let ((buffer (button-get b 'target-buffer))
-                    (line (button-get b 'target-line))
-                    (label (button-label b)))
-                (switch-to-buffer-other-window buffer)
-                (goto-char (point-min))
-                (forward-line line)
-                (markdown-insert-reference-definition label)
-                (markdown-check-refs t))))
+;; Add an empty Markdown reference definition to buffer
+;; specified in the 'target-buffer property.  The reference name is
+;; the button's label.
+(define-button-type 'markdown-undefined-reference-button
+  'help-echo "mouse-1, RET: create definition for undefined reference"
+  'follow-link t
+  'face 'bold
+  'action (lambda (b)
+            (let ((buffer (button-get b 'target-buffer))
+                  (line (button-get b 'target-line))
+                  (label (button-label b)))
+              (switch-to-buffer-other-window buffer)
+              (goto-char (point-min))
+              (forward-line line)
+              (markdown-insert-reference-definition label)
+              (markdown-check-refs t))))
 
-  ;; Jump to line in buffer specified by 'target-buffer property.
-  ;; Line number is button's 'line property.
-  (define-button-type 'markdown-goto-line-button
-    'help-echo "mouse-1, RET: go to line"
-    'follow-link t
-    'face 'italic
-    'action (lambda (b)
-              (message (button-get b 'buffer))
-              (switch-to-buffer-other-window (button-get b 'target-buffer))
-              ;; use call-interactively to silence compiler
-              (let ((current-prefix-arg (button-get b 'target-line)))
-                (call-interactively 'goto-line))))
+;; Jump to line in buffer specified by 'target-buffer property.
+;; Line number is button's 'line property.
+(define-button-type 'markdown-goto-line-button
+  'help-echo "mouse-1, RET: go to line"
+  'follow-link t
+  'face 'italic
+  'action (lambda (b)
+            (message (button-get b 'buffer))
+            (switch-to-buffer-other-window (button-get b 'target-buffer))
+            ;; use call-interactively to silence compiler
+            (let ((current-prefix-arg (button-get b 'target-line)))
+              (call-interactively 'goto-line))))
 
-  ;; Jumps to a particular link at location given by 'target-char
-  ;; property in buffer given by 'target-buffer property.
-  (define-button-type 'markdown-link-button
-    'help-echo "mouse-1, RET: jump to location of link"
-    'follow-link t
-    'face 'bold
-    'action (lambda (b)
-              (let ((target (button-get b 'target-buffer))
-                    (loc (button-get b 'target-char)))
-                (kill-buffer-and-window)
-                (switch-to-buffer target)
-                (goto-char loc)))))
+;; Jumps to a particular link at location given by 'target-char
+;; property in buffer given by 'target-buffer property.
+(define-button-type 'markdown-link-button
+  'help-echo "mouse-1, RET: jump to location of link"
+  'follow-link t
+  'face 'bold
+  'action (lambda (b)
+            (let ((target (button-get b 'target-buffer))
+                  (loc (button-get b 'target-char)))
+              (kill-buffer-and-window)
+              (switch-to-buffer target)
+              (goto-char loc))))
 
 (defun markdown-insert-undefined-reference-button (reference oldbuf)
   "Insert a button for creating REFERENCE in buffer OLDBUF.
 REFERENCE should be a list of the form (reference . occurrences),
 as by `markdown-get-undefined-refs'."
   (let ((label (car reference)))
-    (if (markdown-use-buttons-p)
-        ;; Create a reference button in Emacs 22
-        (insert-button label
-                       :type 'markdown-undefined-reference-button
-                       'target-buffer oldbuf
-                       'target-line (cdr (car (cdr reference))))
-      ;; Insert reference as text in Emacs < 22
-      (insert label))
+    ;; Create a reference button
+    (insert-button label
+                   :type 'markdown-undefined-reference-button
+                   'target-buffer oldbuf
+                   'target-line (cdr (car (cdr reference))))
     (insert " (")
     (dolist (occurrence (cdr reference))
       (let ((line (cdr occurrence)))
-        (if (markdown-use-buttons-p)
-            ;; Create a line number button in Emacs 22
-            (insert-button (number-to-string line)
-                           :type 'markdown-goto-line-button
-                           'target-buffer oldbuf
-                           'target-line line)
-          ;; Insert line number as text in Emacs < 22
-          (insert (number-to-string line)))
+        ;; Create a line number button
+        (insert-button (number-to-string line)
+                       :type 'markdown-goto-line-button
+                       'target-buffer oldbuf
+                       'target-line line)
         (insert " ")))
     (delete-char -1)
     (insert ")")
@@ -5371,14 +5360,11 @@ the link text, location, and line number."
   (let ((label (cl-first link))
         (char (cl-second link))
         (line (cl-third link)))
-    (if (markdown-use-buttons-p)
-        ;; Create a reference button in Emacs 22
-        (insert-button label
-                       :type 'markdown-link-button
-                       'target-buffer oldbuf
-                       'target-char char)
-      ;; Insert reference as text in Emacs < 22
-      (insert label))
+    ;; Create a reference button
+    (insert-button label
+                   :type 'markdown-link-button
+                   'target-buffer oldbuf
+                   'target-char char)
     (insert (format " (line %d)\n" line))))
 
 (defun markdown-reference-goto-link (&optional reference)
