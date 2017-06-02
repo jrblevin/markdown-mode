@@ -2391,13 +2391,7 @@ See `font-lock-syntactic-face-function' for details."
                                  (2 markdown-footnote-face)        ; label
                                  (3 markdown-markup-face)))        ; ]
     (markdown-fontify-inline-links)
-    (markdown-match-reference-links . ((1 markdown-markup-face nil t) ; ! (optional)
-                                       (2 markdown-markup-face)       ; [
-                                       (3 markdown-link-face)         ; text
-                                       (4 markdown-markup-face)       ; ]
-                                       (5 markdown-markup-face)       ; [
-                                       (6 markdown-reference-face)    ; label
-                                       (8 markdown-markup-face)))     ; ]
+    (markdown-fontify-reference-links)
     (,markdown-regex-reference-definition . ((1 markdown-markup-face) ; [
                                              (2 markdown-reference-face) ; label
                                              (3 markdown-markup-face)    ; ]
@@ -6784,6 +6778,37 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
       (when link-start (add-text-properties link-start link-end lp))
       (when url-start (add-text-properties url-start url-end up))
       (when title-start (add-text-properties title-start title-end tp))
+      t)))
+
+(defun markdown-fontify-reference-links (last)
+  "Add text properties to next reference link from point to LAST."
+  (when (markdown-match-generic-links last t)
+    (let* ((link-start (match-beginning 3))
+           (link-end (match-end 3))
+           (ref-start (match-beginning 6))
+           (ref-end (match-end 6))
+           ;; Markup part
+           (mp (list 'face 'markdown-markup-face
+                     'font-lock-multiline t))
+           ;; Link part
+           (lp (list 'keymap markdown-mode-mouse-map
+                     'face markdown-link-face
+                     'mouse-face 'markdown-highlight-face
+                     'font-lock-multiline t
+                     'help-echo (lambda (_ __ pos)
+                                  (save-match-data
+                                    (save-excursion
+                                      (goto-char pos)
+                                      (or (markdown-link-url)
+                                          "Undefined reference"))))))
+           ;; Reference part
+           (rp (list 'face 'markdown-reference-face
+                     'font-lock-multiline t)))
+      (dolist (g '(1 2 4 5 8))
+        (when (match-end g)
+          (add-text-properties (match-beginning g) (match-end g) mp)))
+      (when link-start (add-text-properties link-start link-end lp))
+      (when ref-start (add-text-properties ref-start ref-end rp))
       t)))
 
 
