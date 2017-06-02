@@ -3214,7 +3214,7 @@ links with URLs."
                 ;; Clear match data to test for a match after functions returns.
                 (set-match-data nil)
                 (re-search-forward "\\(!\\)?\\(\\[\\)" last 'limit))
-              (markdown-code-block-at-point)
+              (markdown-code-block-at-point-p)
               (< (point) last)))
   ;; Match opening exclamation point (optional) and left bracket.
   (when (match-beginning 2)
