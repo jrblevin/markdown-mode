@@ -3209,10 +3209,11 @@ analysis."
   "Match inline links from point to LAST.
 When REF is non-nil, match reference links instead of standard
 links with URLs."
-  ;; Clear match data to test for a match after functions returns.
-  (set-match-data nil)
   ;; Search for the next potential link (not in a code block).
-  (while (and (re-search-forward "\\(!\\)?\\(\\[\\)" last t)
+  (while (and (progn
+                ;; Clear match data to test for a match after functions returns.
+                (set-match-data nil)
+                (re-search-forward "\\(!\\)?\\(\\[\\)" last 'limit))
               (markdown-code-block-at-point)
               (< (point) last)))
   ;; Match opening exclamation point (optional) and left bracket.

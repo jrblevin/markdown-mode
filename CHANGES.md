@@ -33,6 +33,7 @@
         have customized `{forward,backward,mark}-paragraph` bindings.
     -   Adjust point so that it is left at beginning of setext
         headings in heading navigation commands.
+    -   Prevent inline link matching in code blocks.
 
 *   Bug fixes:
 
