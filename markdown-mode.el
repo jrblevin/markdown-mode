@@ -886,6 +886,7 @@
 (require 'thingatpt)
 (require 'cl-lib)
 (require 'url-parse)
+(require 'button)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -5319,7 +5320,7 @@ BUFFER-NAME is the name of the main buffer being visited."
 
 ;; Jumps to a particular link at location given by 'target-char
 ;; property in buffer given by 'target-buffer property.
-(define-button-type 'markdown-link-button
+(define-button-type 'markdown-location-button
   'help-echo "mouse-1, RET: jump to location of link"
   'follow-link t
   'face 'bold
@@ -5362,7 +5363,7 @@ the link text, location, and line number."
         (line (cl-third link)))
     ;; Create a reference button
     (insert-button label
-                   :type 'markdown-link-button
+                   :type 'markdown-location-button
                    'target-buffer oldbuf
                    'target-char char)
     (insert (format " (line %d)\n" line))))
@@ -7172,8 +7173,6 @@ if ARG is omitted or nil."
 
 
 ;;; GFM Checkboxes ============================================================
-
-(require 'button)
 
 (define-button-type 'markdown-gfm-checkbox-button
   'follow-link t
