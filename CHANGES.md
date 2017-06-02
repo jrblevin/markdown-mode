@@ -4,6 +4,9 @@
 
 *   **Breaking changes:**
 
+    -   Rename internal `markdown-link-link` to `markdown-link-url`
+        for clarity.
+
 *   New features:
 
     -   Add "page" movement, marking, and narrowing commands, where a
