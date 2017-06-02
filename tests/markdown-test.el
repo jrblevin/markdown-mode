@@ -3106,6 +3106,17 @@ x: x
       (should (equal (match-data t) (get-text-property (point) 'markdown-heading)))
       (should (equal (match-data t) (get-text-property (point) 'markdown-heading-1-setext))))))
 
+(ert-deftest test-markdown-parsing/inline-link-in-code-block ()
+  "Test `markdown-match-generic-links'."
+  :expected-result :failed
+  (markdown-test-string "    **bold**
+    _italic_
+    <!-- comment -->
+    [link](url)
+    * list"
+    (goto-char (point-min))
+    (should-not (markdown-match-generic-links (point-max) nil))))
+
 ;;; Reference Checking:
 
 (ert-deftest test-markdown-references/goto-line-button ()
