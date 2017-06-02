@@ -889,6 +889,7 @@
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
+(defvar flyspell-generic-check-word-predicate)
 
 (declare-function eww-open-file "eww")
 (declare-function url-path-and-query "url-parse")
@@ -2538,6 +2539,15 @@ here for backwards compatibility."
           (when (string-match-p regexp file)
             (push (expand-file-name file dir) files)))))
     (nconc result (nreverse files))))))
+
+(defun markdown-flyspell-check-word-p ()
+  "Return t if `flyspell' should check word just before point.
+Used for `flyspell-generic-check-word-predicate'."
+  (save-excursion
+    (goto-char (1- (point)))
+    (not (or (markdown-code-block-at-point-p)
+             (markdown-inline-code-at-point-p)
+             (memq 'markdown-url-face (get-text-property (point) 'face))))))
 
 
 ;;; Markdown Parsing Functions ================================================
@@ -7389,6 +7399,10 @@ or \\[markdown-toggle-inline-images]."
 
   ;; Indentation
   (setq indent-line-function markdown-indent-function)
+
+  ;; Flyspell
+  (set (make-local-variable 'flyspell-generic-check-word-predicate)
+       'markdown-flyspell-check-word-p)
 
   ;; Backwards compatibility with markdown-css-path
   (when (boundp 'markdown-css-path)
