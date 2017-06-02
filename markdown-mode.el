@@ -2390,14 +2390,7 @@ See `font-lock-syntactic-face-function' for details."
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
                                  (3 markdown-markup-face)))        ; ]
-    (markdown-match-inline-links . ((1 markdown-markup-face nil t)     ; ! (optional)
-                                    (2 markdown-markup-face)           ; [
-                                    (3 markdown-link-face)             ; text
-                                    (4 markdown-markup-face)           ; ]
-                                    (5 markdown-markup-face)           ; (
-                                    (6 markdown-url-face)              ; url
-                                    (7 markdown-link-title-face nil t) ; "title" (optional)
-                                    (8 markdown-markup-face)))         ; )
+    (markdown-fontify-inline-links)
     (markdown-match-reference-links . ((1 markdown-markup-face nil t) ; ! (optional)
                                        (2 markdown-markup-face)       ; [
                                        (3 markdown-link-face)         ; text
@@ -4995,6 +4988,13 @@ Assumes match data is available for `markdown-regex-italic'."
     map)
   "Keymap for Markdown major mode.")
 
+(defvar markdown-mode-mouse-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [follow-link] 'mouse-face)
+    (define-key map [mouse-2] 'markdown-follow-link-at-point)
+    map)
+  "Keymap for following links with mouse.")
+
 (defvar gfm-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map markdown-mode-map)
@@ -6749,6 +6749,42 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
             (browse-url url)
           (when (and file (> (length file) 0)) (find-file file))))
     (error "Point is not at a Markdown link or URL")))
+
+(defun markdown-fontify-inline-links (last)
+  "Add text properties to next inline link from point to LAST."
+  (when (markdown-match-generic-links last nil)
+    (let* ((link-start (match-beginning 3))
+           (link-end (match-end 3))
+           (url-start (match-beginning 6))
+           (url-end (match-end 6))
+           (url (match-string-no-properties 6))
+           (title-start (match-beginning 7))
+           (title-end (match-end 7))
+           (title (match-string-no-properties 7))
+           ;; Markup part
+           (mp (list 'face 'markdown-markup-face
+                     'font-lock-multiline t))
+           ;; Link part
+           (lp (list 'keymap markdown-mode-mouse-map
+                     'face markdown-link-face
+                     'mouse-face 'markdown-highlight-face
+                     'font-lock-multiline t
+                     'help-echo (if title (concat title "\n" url) url)))
+           ;; URL part
+           (up (list 'keymap markdown-mode-mouse-map
+                     'face 'markdown-url-face
+                     'mouse-face 'markdown-highlight-face
+                     'font-lock-multiline t))
+           ;; Title part
+           (tp (list 'face markdown-link-title-face
+                     'font-lock-multiline t)))
+      (dolist (g '(1 2 4 5 8))
+        (when (match-end g)
+          (add-text-properties (match-beginning g) (match-end g) mp)))
+      (when link-start (add-text-properties link-start link-end lp))
+      (when url-start (add-text-properties url-start url-end up))
+      (when title-start (add-text-properties title-start title-end tp))
+      t)))
 
 
 ;;; WikiLink Following/Markup =================================================
