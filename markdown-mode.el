@@ -3224,7 +3224,7 @@ links with URLs."
   (while (and (progn
                 ;; Clear match data to test for a match after functions returns.
                 (set-match-data nil)
-                (re-search-forward "\\(!\\)?\\(\\[\\)" last t))
+                (re-search-forward "\\(!\\)?\\(\\[\\)" last 'limit))
               (markdown-code-block-at-point)
               (< (point) last)))
   ;; Match opening exclamation point (optional) and left bracket.

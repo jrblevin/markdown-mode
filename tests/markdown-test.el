@@ -3108,7 +3108,6 @@ x: x
 
 (ert-deftest test-markdown-parsing/inline-link-in-code-block ()
   "Test `markdown-match-generic-links'."
-  :expected-result :failed
   (markdown-test-string "    **bold**
     _italic_
     <!-- comment -->
