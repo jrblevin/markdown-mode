@@ -2384,9 +2384,7 @@ See `font-lock-syntactic-face-function' for details."
     (,markdown-regex-kbd . ((1 markdown-markup-face)
                             (2 markdown-inline-code-face)
                             (3 markdown-markup-face)))
-    (,markdown-regex-angle-uri . ((1 markdown-markup-face)
-                                  (2 markdown-link-face)
-                                  (3 markdown-markup-face)))
+    (markdown-fontify-angle-uris)
     (,markdown-regex-list . (2 markdown-list-face))
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
@@ -2416,7 +2414,6 @@ See `font-lock-syntactic-face-function' for details."
     (,markdown-regex-uri . markdown-link-face)
     (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend)))
-
   "Syntax highlighting for Markdown files.")
 
 (defvar markdown-mode-font-lock-keywords nil
@@ -3289,6 +3286,11 @@ links with URLs."
 (defun markdown-match-reference-links (last)
   "Match inline reference links from point to LAST."
   (markdown-match-generic-links last t))
+
+(defun markdown-match-angle-uris (last)
+  "Match angle bracket URIs from point to LAST."
+  (when (markdown-match-inline-generic markdown-regex-angle-uri last)
+    (goto-char (1+ (match-end 0)))))
 
 (defun markdown-get-match-boundaries (start-header end-header last &optional pos)
   (save-excursion
@@ -6804,6 +6806,24 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
           (add-text-properties (match-beginning g) (match-end g) mp)))
       (when link-start (add-text-properties link-start link-end lp))
       (when ref-start (add-text-properties ref-start ref-end rp))
+      t)))
+
+(defun markdown-fontify-angle-uris (last)
+  "Add text properties to angle URIs from point to LAST."
+  (when (markdown-match-angle-uris last)
+    (let* ((url-start (match-beginning 2))
+           (url-end (match-end 2))
+           ;; Markup part
+           (mp (list 'face 'markdown-markup-face
+                     'font-lock-multiline t))
+           ;; URI part
+           (up (list 'keymap markdown-mode-mouse-map
+                     'face markdown-link-face
+                     'mouse-face 'markdown-highlight-face
+                     'font-lock-multiline t)))
+      (dolist (g '(1 3))
+        (add-text-properties (match-beginning g) (match-end g) mp))
+      (add-text-properties url-start url-end up)
       t)))
 
 
