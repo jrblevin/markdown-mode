@@ -3652,7 +3652,7 @@ enter link text."
     (let ((beg (match-beginning 0))
           (end (match-end 0))
           (text (match-string 3))
-          (url (markdown-link-link)))
+          (url (markdown-link-url)))
       (delete-region beg end)
       (markdown-insert-inline-link text url)))
    ;; Otherwise, insert a link
@@ -6707,8 +6707,10 @@ See `markdown-wiki-link-p' for more information."
              (thing-at-point-looking-at markdown-regex-uri)
              (thing-at-point-looking-at markdown-regex-angle-uri)))))
 
-(defun markdown-link-link ()
-  "Return the link part of the regular (non-wiki) link at point.
+(make-obsolete 'markdown-link-link 'markdown-link-url "v2.3")
+
+(defun markdown-link-url ()
+  "Return the URL part of the regular (non-wiki) link at point.
 Works with both inline and reference style links.  If point is
 not at a link or the link reference is not defined returns nil."
   (cond
@@ -6731,10 +6733,10 @@ If the link is a complete URL, open in browser with `browse-url'.
 Otherwise, open with `find-file' after stripping anchor and/or query string."
   (interactive)
   (if (markdown-link-p)
-      (let* ((link (markdown-link-link))
-             (struct (url-generic-parse-url link))
+      (let* ((url (markdown-link-url))
+             (struct (url-generic-parse-url url))
              (full (url-fullness struct))
-             (file link))
+             (file url))
         ;; Parse URL, determine fullness, strip query string
         (if (fboundp 'url-path-and-query)
             (setq file (car (url-path-and-query struct)))
@@ -6743,9 +6745,9 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
             (setq file (substring file 0 (match-beginning 0)))))
         ;; Open full URLs in browser, files in Emacs
         (if full
-            (browse-url link)
+            (browse-url url)
           (when (and file (> (length file) 0)) (find-file file))))
-    (error "Point is not at a Markdown link or URI")))
+    (error "Point is not at a Markdown link or URL")))
 
 (defun markdown-fontify-inline-links (last)
   "Add text properties to next inline link from point to LAST."
