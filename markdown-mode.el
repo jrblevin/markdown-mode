@@ -239,49 +239,55 @@
 ;;     (`markdown-toggle-inline-images'). This is a toggle command, so
 ;;     pressing this once again will remove inline images.
 ;;
-;;   * Styles: `C-c C-s`
+;;   * Text Styles: `C-c C-s`
 ;;
-;;     `C-c C-s e` inserts markup to make a region or word italic (`e`
-;;     for `<em>` or emphasis).  If there is an active region, make
-;;     the region italic.  If the point is at a non-italic word, make
-;;     the word italic.  If the point is at an italic word or phrase,
-;;     remove the italic markup.  Otherwise, simply insert italic
-;;     delimiters and place the cursor in between them.  Similarly,
-;;     use `C-c C-s s` for bold (`<strong>`), `C-c C-s c` for
-;;     inline code (`<code>`), and `C-c C-s k` for inserting `<kbd>`
-;;     tags.
+;;     `C-c C-s i` inserts markup to make a region or word italic. If
+;;     there is an active region, make the region italic.  If the point
+;;     is at a non-italic word, make the word italic.  If the point is
+;;     at an italic word or phrase, remove the italic markup.
+;;     Otherwise, simply insert italic delimiters and place the cursor
+;;     in between them.  Similarly, use `C-c C-s b` for bold, `C-c C-s c`
+;;     for inline code, and `C-c C-s k` for inserting `<kbd>` tags.
 ;;
-;;     `C-c C-s b` inserts a blockquote using the active region, if any,
-;;     or starts a new blockquote.  `C-c C-s C-b` is a variation which
-;;     always operates on the region, regardless of whether it is
-;;     active or not.  The appropriate amount of indentation, if any,
-;;     is calculated automatically given the surrounding context, but
-;;     may be adjusted later using the region indentation commands.
+;;     `C-c C-s q` inserts a blockquote using the active region, if
+;;     any, or starts a new blockquote. `C-c C-s Q` is a variation
+;;     which always operates on the region, regardless of whether it
+;;     is active or not (i.e., when `transient-mark-mode` is off but
+;;     the mark is set).  The appropriate amount of indentation, if
+;;     any, is calculated automatically given the surrounding context,
+;;     but may be adjusted later using the region indentation
+;;     commands.
 ;;
 ;;     `C-c C-s p` behaves similarly for inserting preformatted code
-;;     blocks, with `C-c C-s C-p` being the region-only counterpart.
+;;     blocks (with `C-c C-s P` being the region-only counterpart)
+;;     and `C-c C-s C` inserts a GFM style backquote fenced code block.
 ;;
-;;   * Headings: `C-c C-t`
+;;   * Headings: `C-c C-s`
 ;;
-;;     All heading insertion commands use the text in the active
-;;     region, if any, as the heading text.  Otherwise, if the current
-;;     line is not blank, they use the text on the current line.
-;;     Finally, the setext commands will prompt for heading text if
-;;     there is no active region and the current line is blank.
+;;     To insert or replace headings, there are two options.  You can
+;;     insert a specific level heading directly or you can have
+;;     `markdown-mode' determine the level for you based on the previous
+;;     heading.  As with the other markup commands, the heading
+;;     insertion commands use the text in the active region, if any,
+;;     as the heading text.  Otherwise, if the current line is not
+;;     blank, they use the text on the current line.  Finally, the
+;;     setext commands will prompt for heading text if there is no
+;;     active region and the current line is blank.
 ;;
-;;     `C-c C-t h` inserts a heading with automatically chosen type and
-;;     level (both determined by the previous heading).  `C-c C-t H`
+;;     `C-c C-s h` inserts a heading with automatically chosen type and
+;;     level (both determined by the previous heading).  `C-c C-s H`
 ;;     behaves similarly, but uses setext (underlined) headings when
 ;;     possible, still calculating the level automatically.
 ;;     In cases where the automatically-determined level is not what
 ;;     you intended, the level can be quickly promoted or demoted
 ;;     (as described below).  Alternatively, a `C-u` prefix can be
-;;     given to insert a heading promoted by one level or a `C-u C-u`
-;;     prefix can be given to insert a heading demoted by one level.
+;;     given to insert a heading _promoted_ (lower number) by one
+;;     level or a `C-u C-u` prefix can be given to insert a heading
+;;     demoted (higher number) by one level.
 ;;
-;;     To insert a heading of a specific level and type, use `C-c C-t 1`
-;;     through `C-c C-t 6` for atx (hash mark) headings and `C-c C-t !` or
-;;     `C-c C-t @` for setext headings of level one or two, respectively.
+;;     To insert a heading of a specific level and type, use `C-c C-s 1`
+;;     through `C-c C-s 6` for atx (hash mark) headings and `C-c C-s !` or
+;;     `C-c C-s @` for setext headings of level one or two, respectively.
 ;;     Note that `!` is `S-1` and `@` is `S-2`.
 ;;
 ;;     If the point is at a heading, these commands will replace the
@@ -290,24 +296,24 @@
 ;;     press `C-c C-k` to kill the heading and press `C-y` to yank the
 ;;     heading text back into the buffer.
 ;;
-;;   * Horizontal Rules: `C-c -`
+;;   * Horizontal Rules: `C-c C-s -`
 ;;
-;;     `C-c -` inserts a horizontal rule.  By default, insert the
+;;     `C-c C-s -` inserts a horizontal rule.  By default, insert the
 ;;     first string in the list `markdown-hr-strings' (the most
 ;;     prominent rule).  With a `C-u` prefix, insert the last string.
 ;;     With a numeric prefix `N`, insert the string in position `N`
 ;;     (counting from 1).
 ;;
-;;   * Footnotes: `C-c C-a f`
+;;   * Footnotes: `C-c C-s f`
 ;;
-;;     `C-c C-a f` inserts a footnote marker at the point, inserts a
+;;     `C-c C-s f` inserts a footnote marker at the point, inserts a
 ;;     footnote definition below, and positions the point for
 ;;     inserting the footnote text.  Note that footnotes are an
 ;;     extension to Markdown and are not supported by all processors.
 ;;
-;;   * Wiki Links: `C-c C-a f`
+;;   * Wiki Links: `C-c C-s w`
 ;;
-;;     `C-c C-a w` inserts a wiki link of the form `[[WikiLink]]`.  If
+;;     `C-c C-s w` inserts a wiki link of the form `[[WikiLink]]`.  If
 ;;     there is an active region, use the region as the link text.  If the
 ;;     point is at a word, use the word as the link text.  If there is
 ;;     no active region and the point is not at word, simply insert
@@ -508,7 +514,7 @@
 ;; As noted, many of the commands above behave differently depending
 ;; on whether Transient Mark mode is enabled or not.  When it makes
 ;; sense, if Transient Mark mode is on and the region is active, the
-;; command applies to the text in the region (e.g., `C-c C-s s` makes the
+;; command applies to the text in the region (e.g., `C-c C-s b` makes the
 ;; region bold).  For users who prefer to work outside of Transient
 ;; Mark mode, since Emacs 22 it can be enabled temporarily by pressing
 ;; `C-SPC C-SPC`.  When this is not the case, many commands then
@@ -517,15 +523,15 @@
 ;; When applicable, commands that specifically act on the region even
 ;; outside of Transient Mark mode have the same keybinding as their
 ;; standard counterpart, but the letter is uppercase.  For example,
-;; `markdown-insert-blockquote' is bound to `C-c C-s b` and only acts on
+;; `markdown-insert-blockquote' is bound to `C-c C-s q` and only acts on
 ;; the region in Transient Mark mode while `markdown-blockquote-region'
-;; is bound to `C-c C-s B` and always applies to the region (when nonempty).
+;; is bound to `C-c C-s Q` and always applies to the region (when nonempty).
 ;;
 ;; Note that these region-specific functions are useful in many
 ;; cases where it may not be obvious.  For example, yanking text from
 ;; the kill ring sets the mark at the beginning of the yanked text
 ;; and moves the point to the end.  Therefore, the (inactive) region
-;; contains the yanked text.  So, `C-y` followed by `C-c C-s C-b` will
+;; contains the yanked text.  So, `C-y` followed by `C-c C-s Q` will
 ;; yank text and turn it into a blockquote.
 ;;
 ;; markdown-mode attempts to be flexible in how it handles
@@ -830,23 +836,22 @@
 ;; * **Fenced code blocks:** Code blocks quoted with backquotes, with
 ;;   optional programming language keywords, are highlighted in
 ;;   both `markdown-mode' and `gfm-mode'.  They can be inserted with
-;;   `C-c C-s P`.  If there is an active region, the text in the
+;;   `C-c C-s C`.  If there is an active region, the text in the
 ;;   region will be placed inside the code block.  You will be
 ;;   prompted for the name of the language, but may press enter to
 ;;   continue without naming a language.
 ;;
 ;; * **Strikethrough:** Strikethrough text is supported in both
 ;;   `markdown-mode' and `gfm-mode'.  It can be inserted (and toggled)
-;;   using `C-c C-s d`.  Following the mnemonics for the other style
-;;   keybindings, the letter `d` coincides with the HTML tag `<del>`.
+;;   using `C-c C-s s`.
 ;;
 ;; * **Task lists:** GFM task lists will be rendered as checkboxes
 ;;   (Emacs buttons) in both `markdown-mode' and `gfm-mode' when
 ;;   `markdown-make-gfm-checkboxes-buttons' is set to a non-nil value
 ;;   (and it is set to t by default).  These checkboxes can be
 ;;   toggled by clicking `mouse-1`, pressing `RET` over the button,
-;;   or by pressing `C-c C-x C-x` with the point anywhere in the task
-;;   list item.
+;;   or by pressing `C-c C-d` (`markdown-do`) with the point anywhere
+;;   in the task list item.
 ;;
 ;; * **Wiki links:** Generic wiki links are supported in
 ;;   `markdown-mode', but in `gfm-mode' specifically they will be
@@ -5482,41 +5487,59 @@ Assumes match data is available for `markdown-regex-italic'."
 
 ;;; Keymap ====================================================================
 
+(defun markdown--style-map-prompt ()
+  "Return a formatted prompt for Markdown markup insertion."
+  (concat
+   "Markdown: "
+   (propertize "bold" 'face 'markdown-bold-face) ", "
+   (propertize "italic" 'face 'markdown-italic-face) ", "
+   (propertize "code" 'face 'markdown-inline-code-face) ", "
+   (propertize "C = GFM code" 'face 'markdown-code-face) ", "
+   (propertize "pre" 'face 'markdown-pre-face) ", "
+   (propertize "footnote" 'face 'markdown-footnote-text-face) ", "
+   (propertize "q = blockquote" 'face 'markdown-blockquote-face) ", "
+   (propertize "h & 1-6 = heading" 'face 'markdown-header-face) ", "
+   (propertize "- = hr" 'face 'markdown-hr-face) ", "
+   "C-h = more"))
+
+(defvar markdown-mode-style-map
+  (let ((map (make-keymap (markdown--style-map-prompt))))
+    (define-key map (kbd "1") 'markdown-insert-header-atx-1)
+    (define-key map (kbd "2") 'markdown-insert-header-atx-2)
+    (define-key map (kbd "3") 'markdown-insert-header-atx-3)
+    (define-key map (kbd "4") 'markdown-insert-header-atx-4)
+    (define-key map (kbd "5") 'markdown-insert-header-atx-5)
+    (define-key map (kbd "6") 'markdown-insert-header-atx-6)
+    (define-key map (kbd "!") 'markdown-insert-header-setext-1)
+    (define-key map (kbd "@") 'markdown-insert-header-setext-2)
+    (define-key map (kbd "b") 'markdown-insert-bold)
+    (define-key map (kbd "c") 'markdown-insert-code)
+    (define-key map (kbd "C") 'markdown-insert-gfm-code-block)
+    (define-key map (kbd "f") 'markdown-insert-footnote)
+    (define-key map (kbd "h") 'markdown-insert-header-dwim)
+    (define-key map (kbd "H") 'markdown-insert-header-setext-dwim)
+    (define-key map (kbd "i") 'markdown-insert-italic)
+    (define-key map (kbd "k") 'markdown-insert-kbd)
+    (define-key map (kbd "l") 'markdown-insert-link)
+    (define-key map (kbd "p") 'markdown-insert-pre)
+    (define-key map (kbd "P") 'markdown-pre-region)
+    (define-key map (kbd "q") 'markdown-insert-blockquote)
+    (define-key map (kbd "s") 'markdown-insert-strike-through)
+    (define-key map (kbd "Q") 'markdown-blockquote-region)
+    (define-key map (kbd "w") 'markdown-insert-wiki-link)
+    (define-key map (kbd "-") 'markdown-insert-hr)
+    ;; Deprecated keys that may be removed in a future version
+    (define-key map (kbd "e") 'markdown-insert-italic)
+    map)
+  "Keymap for Markdown text styling commands.")
+
 (defvar markdown-mode-map
   (let ((map (make-keymap)))
-    ;; Element insertion
+    ;; Markup insertion & removal
+    (define-key map (kbd "C-c C-s") markdown-mode-style-map)
     (define-key map (kbd "C-c C-l") 'markdown-insert-link)
-    (define-key map (kbd "C-c C-a l") 'markdown-insert-link)
-    (define-key map (kbd "C-c C-a f") 'markdown-insert-footnote)
-    (define-key map (kbd "C-c C-a w") 'markdown-insert-wiki-link)
-    (define-key map (kbd "C-c C-i i") 'markdown-insert-image)
-    (define-key map (kbd "C-c C-i I") 'markdown-insert-reference-image)
-    (define-key map (kbd "C-c C-t h") 'markdown-insert-header-dwim)
-    (define-key map (kbd "C-c C-t H") 'markdown-insert-header-setext-dwim)
-    (define-key map (kbd "C-c C-t 1") 'markdown-insert-header-atx-1)
-    (define-key map (kbd "C-c C-t 2") 'markdown-insert-header-atx-2)
-    (define-key map (kbd "C-c C-t 3") 'markdown-insert-header-atx-3)
-    (define-key map (kbd "C-c C-t 4") 'markdown-insert-header-atx-4)
-    (define-key map (kbd "C-c C-t 5") 'markdown-insert-header-atx-5)
-    (define-key map (kbd "C-c C-t 6") 'markdown-insert-header-atx-6)
-    (define-key map (kbd "C-c C-t !") 'markdown-insert-header-setext-1)
-    (define-key map (kbd "C-c C-t @") 'markdown-insert-header-setext-2)
-    (define-key map (kbd "C-c C-s s") 'markdown-insert-bold)
-    (define-key map (kbd "C-c C-s e") 'markdown-insert-italic)
-    (define-key map (kbd "C-c C-s c") 'markdown-insert-code)
-    (define-key map (kbd "C-c C-s b") 'markdown-insert-blockquote)
-    (define-key map (kbd "C-c C-s k") 'markdown-insert-kbd)
-    (define-key map (kbd "C-c C-s C-b") 'markdown-blockquote-region)
-    (define-key map (kbd "C-c C-s p") 'markdown-insert-pre)
-    (define-key map (kbd "C-c C-s C-p") 'markdown-pre-region)
-    (define-key map (kbd "C-c C-s P") 'markdown-insert-gfm-code-block)
-    (define-key map (kbd "C-c -") 'markdown-insert-hr)
-    ;; Element insertion (deprecated)
-    (define-key map (kbd "C-c C-t t") 'markdown-insert-header-setext-1)
-    (define-key map (kbd "C-c C-t s") 'markdown-insert-header-setext-2)
-    ;; Element removal
     (define-key map (kbd "C-c C-k") 'markdown-kill-thing-at-point)
-    ;; Promotion, Demotion, Completion, and Cycling
+    ;; Promotion, demotion, and cycling
     (define-key map (kbd "C-c C--") 'markdown-promote)
     (define-key map (kbd "C-c C-=") 'markdown-demote)
     (define-key map (kbd "C-c C-]") 'markdown-complete)
@@ -5587,15 +5610,36 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-x C-i") 'markdown-toggle-inline-images)
     (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-url-hiding)
     (define-key map (kbd "C-c C-x C-m") 'markdown-toggle-markup-hiding)
-    (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
     ;; Alternative keys (in case of problems with the arrow keys)
     (define-key map (kbd "C-c C-x u") 'markdown-move-up)
     (define-key map (kbd "C-c C-x d") 'markdown-move-down)
     (define-key map (kbd "C-c C-x l") 'markdown-promote)
     (define-key map (kbd "C-c C-x r") 'markdown-demote)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item)
-    ;; Deprecated keys
+    ;; Deprecated keys that may be removed in a future version
+    (define-key map (kbd "C-c C-a L") 'markdown-insert-link) ;; C-c C-l
+    (define-key map (kbd "C-c C-a l") 'markdown-insert-link) ;; C-c C-l
+    (define-key map (kbd "C-c C-a r") 'markdown-insert-link) ;; C-c C-l
+    (define-key map (kbd "C-c C-a u") 'markdown-insert-uri) ;; C-c C-l
+    (define-key map (kbd "C-c C-a f") 'markdown-insert-footnote)
+    (define-key map (kbd "C-c C-a w") 'markdown-insert-wiki-link)
+    (define-key map (kbd "C-c C-t 1") 'markdown-insert-header-atx-1)
+    (define-key map (kbd "C-c C-t 2") 'markdown-insert-header-atx-2)
+    (define-key map (kbd "C-c C-t 3") 'markdown-insert-header-atx-3)
+    (define-key map (kbd "C-c C-t 4") 'markdown-insert-header-atx-4)
+    (define-key map (kbd "C-c C-t 5") 'markdown-insert-header-atx-5)
+    (define-key map (kbd "C-c C-t 6") 'markdown-insert-header-atx-6)
+    (define-key map (kbd "C-c C-t !") 'markdown-insert-header-setext-1)
+    (define-key map (kbd "C-c C-t @") 'markdown-insert-header-setext-2)
+    (define-key map (kbd "C-c C-t h") 'markdown-insert-header-dwim)
+    (define-key map (kbd "C-c C-t H") 'markdown-insert-header-setext-dwim)
+    (define-key map (kbd "C-c C-t s") 'markdown-insert-header-setext-2)
+    (define-key map (kbd "C-c C-t t") 'markdown-insert-header-setext-1)
+    (define-key map (kbd "C-c C-i i") 'markdown-insert-image)
+    (define-key map (kbd "C-c C-i I") 'markdown-insert-reference-image)
     (define-key map (kbd "C-c C-i C-t") 'markdown-toggle-inline-images)
+    (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox) ;; C-c C-d
+    (define-key map (kbd "C-c -") 'markdown-insert-hr)
     map)
   "Keymap for Markdown major mode.")
 
@@ -5647,23 +5691,24 @@ See also `markdown-mode-map'.")
      ["Widen" widen (buffer-narrowed-p)]
      "---"
      ["Toggle Markup Hiding" markdown-toggle-markup-hiding
+      :keys "C-c C-x C-m"
       :style radio
       :selected markdown-hide-markup])
     "---"
     ("Headings & Structure"
-     ["Automatic Heading" markdown-insert-header-dwim]
-     ["Automatic Heading (Setext)" markdown-insert-header-setext-dwim]
+     ["Automatic Heading" markdown-insert-header-dwim :keys "C-c C-s h"]
+     ["Automatic Heading (Setext)" markdown-insert-header-setext-dwim :keys "C-c C-s H"]
      ("Specific Heading (atx)"
-      ["First Level Setext" markdown-insert-header-setext-1]
-      ["Second Level Setext" markdown-insert-header-setext-2])
+      ["First Level atx" markdown-insert-header-atx-1 :keys "C-c C-s 1"]
+      ["Second Level atx" markdown-insert-header-atx-2 :keys "C-c C-s 2"]
+      ["Third Level atx" markdown-insert-header-atx-3 :keys "C-c C-s 3"]
+      ["Fourth Level atx" markdown-insert-header-atx-4 :keys "C-c C-s 4"]
+      ["Fifth Level atx" markdown-insert-header-atx-5 :keys "C-c C-s 5"]
+      ["Sixth Level atx" markdown-insert-header-atx-6 :keys "C-c C-s 6"])
      ("Specific Heading (Setext)"
-      ["First Level atx" markdown-insert-header-atx-1]
-      ["Second Level atx" markdown-insert-header-atx-2]
-      ["Third Level atx" markdown-insert-header-atx-3]
-      ["Fourth Level atx" markdown-insert-header-atx-4]
-      ["Fifth Level atx" markdown-insert-header-atx-5]
-      ["Sixth Level atx" markdown-insert-header-atx-6])
-     ["Horizontal Rule" markdown-insert-hr]
+      ["First Level Setext" markdown-insert-header-setext-1 :keys "C-c C-s !"]
+      ["Second Level Setext" markdown-insert-header-setext-2 :keys "C-c C-s @"])
+     ["Horizontal Rule" markdown-insert-hr :keys "C-c C-s -"]
      "---"
      ["Move Subtree Up" markdown-move-subtree-up :keys "M-S-<up>"]
      ["Move Subtree Down" markdown-move-subtree-down :keys "M-S-<down>"]
@@ -5686,19 +5731,20 @@ See also `markdown-mode-map'.")
      ["Indent List Item" markdown-demote :keys "M-<right>"]
      ["Outdent List Item" markdown-promote :keys "M-<left>"]
      ["Renumber List" markdown-cleanup-list-numbers]
-     ["Toggle Task List Item" markdown-toggle-gfm-checkbox])
+     ["Toggle Task List Item" markdown-toggle-gfm-checkbox :keys "C-c C-d"])
     ("Links & Images"
      ["Insert Link" markdown-insert-link]
      ["Insert Inline Image" markdown-insert-image]
      ["Insert Reference Image" markdown-insert-reference-image]
-     ["Insert Footnote" markdown-insert-footnote]
-     ["Insert Wiki Link" markdown-insert-wiki-link]
+     ["Insert Footnote" markdown-insert-footnote :keys "C-c C-s f"]
+     ["Insert Wiki Link" markdown-insert-wiki-link :keys "C-c C-s w"]
      "---"
      ["Check References" markdown-check-refs]
      ["Toggle URL Hiding" markdown-toggle-url-hiding
       :style radio
       :selected markdown-hide-urls]
      ["Toggle Inline Images" markdown-toggle-inline-images
+      :keys "C-c C-x C-i"
       :style radio
       :selected markdown-inline-image-overlays]
      ["Toggle Wiki Links" markdown-toggle-wiki-links
@@ -5738,8 +5784,8 @@ See also `markdown-mode-map'.")
      ["Kill ring save" markdown-kill-ring-save])
     ("Markup Completion and Cycling"
      ["Complete Markup" markdown-complete]
-     ["Promote Element" markdown-promote]
-     ["Demote Element" markdown-demote])
+     ["Promote Element" markdown-promote :keys "C-c C--"]
+     ["Demote Element" markdown-demote :keys "C-c C-="])
     "---"
     ["Kill Element" markdown-kill-thing-at-point]
     "---"

@@ -4,11 +4,27 @@
 
 *   **Breaking changes:**
 
+    -   Markup insertion and replacement keybindings under <kbd>C-c
+        C-s</kbd> (_s_ for style) have been revised to make them
+        easier to remember.  Now, when the prefix <kbd>C-c C-s</kbd>
+        is pressed, a short minibuffer help prompt is presented as a
+        reminder of a few of the most frequently used keys.  The major
+        changes are that bold is now inserted with <kbd>b</kbd>
+        (previously <kbd>s</kbd>) and italic is now <kbd>i</kbd>
+        (previously <kbd>e</kbd>).  As a result, blockquote is now
+        <kbd>q</kbd> (previously <kbd>b</kbd>) and strikethrough
+        markup is inserted with <kbd>s</kbd> (previously
+        <kbd>d</kbd>).  Press <kbd>C-c C-s C-h</kbd> for a complete
+        list of markup insertion keybindings.  Heading insertion
+        commands are also now under <kbd>C-c C-s</kbd>.
     -   Link insertion and editing has been consolidated into one
         command, `markdown-insert-link`, bound to <kbd>C-c C-l</kbd>.
         As such, the previous separate link insertion keybindings have
         been removed: <kbd>C-c C-a l</kbd>, <kbd>C-c C-a L</kbd>,
         <kbd>C-c C-a r</kbd>, and <kbd>C-c C-a u</kbd>.
+    -   Footnote and wiki link insertion have been moved to the
+        markup insertion prefix, as <kbd>C-c C-s f</kbd> and
+        <kbd>C-c C-s w</kbd>.
     -   Jumping between references and reference definitions via
         `markdown-jump`, previously bound to <kbd>C-c C-l</kbd>, has
         been moved to <kbd>C-c C-d</kbd> and rebranded as

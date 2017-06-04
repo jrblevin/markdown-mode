@@ -223,49 +223,55 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     (`markdown-toggle-inline-images`). This is a toggle command, so
     pressing this once again will remove inline images.
 
-  * Styles: <kbd>C-c C-s</kbd>
+  * Text Styles: <kbd>C-c C-s</kbd>
 
-    <kbd>C-c C-s e</kbd> inserts markup to make a region or word italic (<kbd>e</kbd>
-    for `<em>` or emphasis).  If there is an active region, make
-    the region italic.  If the point is at a non-italic word, make
-    the word italic.  If the point is at an italic word or phrase,
-    remove the italic markup.  Otherwise, simply insert italic
-    delimiters and place the cursor in between them.  Similarly,
-    use <kbd>C-c C-s s</kbd> for bold (`<strong>`), <kbd>C-c C-s c</kbd> for
-    inline code (`<code>`), and <kbd>C-c C-s k</kbd> for inserting `<kbd>`
-    tags.
+    <kbd>C-c C-s i</kbd> inserts markup to make a region or word italic. If
+    there is an active region, make the region italic.  If the point
+    is at a non-italic word, make the word italic.  If the point is
+    at an italic word or phrase, remove the italic markup.
+    Otherwise, simply insert italic delimiters and place the cursor
+    in between them.  Similarly, use <kbd>C-c C-s b</kbd> for bold, <kbd>C-c C-s c</kbd>
+    for inline code, and <kbd>C-c C-s k</kbd> for inserting `<kbd>` tags.
 
-    <kbd>C-c C-s b</kbd> inserts a blockquote using the active region, if any,
-    or starts a new blockquote.  <kbd>C-c C-s C-b</kbd> is a variation which
-    always operates on the region, regardless of whether it is
-    active or not.  The appropriate amount of indentation, if any,
-    is calculated automatically given the surrounding context, but
-    may be adjusted later using the region indentation commands.
+    <kbd>C-c C-s q</kbd> inserts a blockquote using the active region, if
+    any, or starts a new blockquote. <kbd>C-c C-s Q</kbd> is a variation
+    which always operates on the region, regardless of whether it
+    is active or not (i.e., when `transient-mark-mode` is off but
+    the mark is set).  The appropriate amount of indentation, if
+    any, is calculated automatically given the surrounding context,
+    but may be adjusted later using the region indentation
+    commands.
 
     <kbd>C-c C-s p</kbd> behaves similarly for inserting preformatted code
-    blocks, with <kbd>C-c C-s C-p</kbd> being the region-only counterpart.
+    blocks (with <kbd>C-c C-s P</kbd> being the region-only counterpart)
+    and <kbd>C-c C-s C</kbd> inserts a GFM style backquote fenced code block.
 
-  * Headings: <kbd>C-c C-t</kbd>
+  * Headings: <kbd>C-c C-s</kbd>
 
-    All heading insertion commands use the text in the active
-    region, if any, as the heading text.  Otherwise, if the current
-    line is not blank, they use the text on the current line.
-    Finally, the setext commands will prompt for heading text if
-    there is no active region and the current line is blank.
+    To insert or replace headings, there are two options.  You can
+    insert a specific level heading directly or you can have
+    `markdown-mode` determine the level for you based on the previous
+    heading.  As with the other markup commands, the heading
+    insertion commands use the text in the active region, if any,
+    as the heading text.  Otherwise, if the current line is not
+    blank, they use the text on the current line.  Finally, the
+    setext commands will prompt for heading text if there is no
+    active region and the current line is blank.
 
-    <kbd>C-c C-t h</kbd> inserts a heading with automatically chosen type and
-    level (both determined by the previous heading).  <kbd>C-c C-t H</kbd>
+    <kbd>C-c C-s h</kbd> inserts a heading with automatically chosen type and
+    level (both determined by the previous heading).  <kbd>C-c C-s H</kbd>
     behaves similarly, but uses setext (underlined) headings when
     possible, still calculating the level automatically.
     In cases where the automatically-determined level is not what
     you intended, the level can be quickly promoted or demoted
     (as described below).  Alternatively, a <kbd>C-u</kbd> prefix can be
-    given to insert a heading promoted by one level or a <kbd>C-u C-u</kbd>
-    prefix can be given to insert a heading demoted by one level.
+    given to insert a heading _promoted_ (lower number) by one
+    level or a <kbd>C-u C-u</kbd> prefix can be given to insert a heading
+    demoted (higher number) by one level.
 
-    To insert a heading of a specific level and type, use <kbd>C-c C-t 1</kbd>
-    through <kbd>C-c C-t 6</kbd> for atx (hash mark) headings and <kbd>C-c C-t !</kbd> or
-    <kbd>C-c C-t @</kbd> for setext headings of level one or two, respectively.
+    To insert a heading of a specific level and type, use <kbd>C-c C-s 1</kbd>
+    through <kbd>C-c C-s 6</kbd> for atx (hash mark) headings and <kbd>C-c C-s !</kbd> or
+    <kbd>C-c C-s @</kbd> for setext headings of level one or two, respectively.
     Note that <kbd>!</kbd> is <kbd>S-1</kbd> and <kbd>@</kbd> is <kbd>S-2</kbd>.
 
     If the point is at a heading, these commands will replace the
@@ -274,24 +280,24 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     press <kbd>C-c C-k</kbd> to kill the heading and press <kbd>C-y</kbd> to yank the
     heading text back into the buffer.
 
-  * Horizontal Rules: <kbd>C-c -</kbd>
+  * Horizontal Rules: <kbd>C-c C-s -</kbd>
 
-    <kbd>C-c -</kbd> inserts a horizontal rule.  By default, insert the
+    <kbd>C-c C-s -</kbd> inserts a horizontal rule.  By default, insert the
     first string in the list `markdown-hr-strings` (the most
     prominent rule).  With a <kbd>C-u</kbd> prefix, insert the last string.
     With a numeric prefix <kbd>N</kbd>, insert the string in position <kbd>N</kbd>
     (counting from 1).
 
-  * Footnotes: <kbd>C-c C-a f</kbd>
+  * Footnotes: <kbd>C-c C-s f</kbd>
 
-    <kbd>C-c C-a f</kbd> inserts a footnote marker at the point, inserts a
+    <kbd>C-c C-s f</kbd> inserts a footnote marker at the point, inserts a
     footnote definition below, and positions the point for
     inserting the footnote text.  Note that footnotes are an
     extension to Markdown and are not supported by all processors.
 
-  * Wiki Links: <kbd>C-c C-a f</kbd>
+  * Wiki Links: <kbd>C-c C-s w</kbd>
 
-    <kbd>C-c C-a w</kbd> inserts a wiki link of the form `[[WikiLink]]`.  If
+    <kbd>C-c C-s w</kbd> inserts a wiki link of the form `[[WikiLink]]`.  If
     there is an active region, use the region as the link text.  If the
     point is at a word, use the word as the link text.  If there is
     no active region and the point is not at word, simply insert
@@ -492,7 +498,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 As noted, many of the commands above behave differently depending
 on whether Transient Mark mode is enabled or not.  When it makes
 sense, if Transient Mark mode is on and the region is active, the
-command applies to the text in the region (e.g., <kbd>C-c C-s s</kbd> makes the
+command applies to the text in the region (e.g., <kbd>C-c C-s b</kbd> makes the
 region bold).  For users who prefer to work outside of Transient
 Mark mode, since Emacs 22 it can be enabled temporarily by pressing
 <kbd>C-SPC C-SPC</kbd>.  When this is not the case, many commands then
@@ -501,15 +507,15 @@ proceed to look work with the word or line at the point.
 When applicable, commands that specifically act on the region even
 outside of Transient Mark mode have the same keybinding as their
 standard counterpart, but the letter is uppercase.  For example,
-`markdown-insert-blockquote` is bound to <kbd>C-c C-s b</kbd> and only acts on
+`markdown-insert-blockquote` is bound to <kbd>C-c C-s q</kbd> and only acts on
 the region in Transient Mark mode while `markdown-blockquote-region`
-is bound to <kbd>C-c C-s B</kbd> and always applies to the region (when nonempty).
+is bound to <kbd>C-c C-s Q</kbd> and always applies to the region (when nonempty).
 
 Note that these region-specific functions are useful in many
 cases where it may not be obvious.  For example, yanking text from
 the kill ring sets the mark at the beginning of the yanked text
 and moves the point to the end.  Therefore, the (inactive) region
-contains the yanked text.  So, <kbd>C-y</kbd> followed by <kbd>C-c C-s C-b</kbd> will
+contains the yanked text.  So, <kbd>C-y</kbd> followed by <kbd>C-c C-s Q</kbd> will
 yank text and turn it into a blockquote.
 
 markdown-mode attempts to be flexible in how it handles
@@ -814,23 +820,22 @@ by `markdown-mode` and `gfm-mode` as described below.
 * **Fenced code blocks:** Code blocks quoted with backquotes, with
   optional programming language keywords, are highlighted in
   both `markdown-mode` and `gfm-mode`.  They can be inserted with
-  <kbd>C-c C-s P</kbd>.  If there is an active region, the text in the
+  <kbd>C-c C-s C</kbd>.  If there is an active region, the text in the
   region will be placed inside the code block.  You will be
   prompted for the name of the language, but may press enter to
   continue without naming a language.
 
 * **Strikethrough:** Strikethrough text is supported in both
   `markdown-mode` and `gfm-mode`.  It can be inserted (and toggled)
-  using <kbd>C-c C-s d</kbd>.  Following the mnemonics for the other style
-  keybindings, the letter <kbd>d</kbd> coincides with the HTML tag `<del>`.
+  using <kbd>C-c C-s s</kbd>.
 
 * **Task lists:** GFM task lists will be rendered as checkboxes
   (Emacs buttons) in both `markdown-mode` and `gfm-mode` when
   `markdown-make-gfm-checkboxes-buttons` is set to a non-nil value
   (and it is set to t by default).  These checkboxes can be
   toggled by clicking `mouse-1`, pressing <kbd>RET</kbd> over the button,
-  or by pressing <kbd>C-c C-x C-x</kbd> with the point anywhere in the task
-  list item.
+  or by pressing <kbd>C-c C-d</kbd> (`markdown-do`) with the point anywhere
+  in the task list item.
 
 * **Wiki links:** Generic wiki links are supported in
   `markdown-mode`, but in `gfm-mode` specifically they will be
