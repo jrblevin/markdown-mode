@@ -2374,23 +2374,25 @@ for (var i = 0; i < 10; i++) {
 
 (ert-deftest test-markdown-font-lock/inline-links ()
   "Test font lock for inline links."
-  (markdown-test-file "inline.text"
-   (markdown-test-range-has-face 925 925 markdown-markup-face)
-   (markdown-test-range-has-face 926 929 markdown-link-face)
-   (markdown-test-range-has-face 930 931 markdown-markup-face)
-   (markdown-test-range-has-face 932 949 markdown-url-face)
-   (markdown-test-range-has-face 951 957 markdown-link-title-face)
-   (markdown-test-range-has-face 958 958 markdown-markup-face)))
+  (let ((markdown-hidden-urls nil))
+    (markdown-test-file "inline.text"
+      (markdown-test-range-has-face 925 925 markdown-markup-face)
+      (markdown-test-range-has-face 926 929 markdown-link-face)
+      (markdown-test-range-has-face 930 931 markdown-markup-face)
+      (markdown-test-range-has-face 932 949 markdown-url-face)
+      (markdown-test-range-has-face 951 957 markdown-link-title-face)
+      (markdown-test-range-has-face 958 958 markdown-markup-face))))
 
 (ert-deftest test-markdown-font-lock/inline-links-with-parentheses ()
   "Test font lock for inline links with nested parentheses.
 See <https://github.com/jrblevin/markdown-mode/issues/170>."
-  (markdown-test-string "[foo](bar(baz)qux)"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 4 markdown-link-face)
-   (markdown-test-range-has-face 5 6 markdown-markup-face)
-   (markdown-test-range-has-face 7 17 markdown-url-face)
-   (markdown-test-range-has-face 18 18 markdown-markup-face)))
+  (let ((markdown-hidden-urls nil))
+    (markdown-test-string "[foo](bar(baz)qux)"
+      (markdown-test-range-has-face 1 1 markdown-markup-face)
+      (markdown-test-range-has-face 2 4 markdown-link-face)
+      (markdown-test-range-has-face 5 6 markdown-markup-face)
+      (markdown-test-range-has-face 7 17 markdown-url-face)
+      (markdown-test-range-has-face 18 18 markdown-markup-face))))
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
@@ -2646,6 +2648,17 @@ takes precedence)."
     (markdown-test-range-has-face 15 17 markdown-link-face) ; bar
     (markdown-test-range-has-face 20 20 markdown-reference-face) ; 2
     (markdown-test-range-has-face 22 49 nil))) ; [ ]and[ ]
+
+(ert-deftest test-markdown-font-lock/hidden-urls ()
+  "Test URL hiding and toggling."
+  (markdown-test-file "inline.text"
+    (markdown-test-range-has-face 925 925 markdown-markup-face)
+    (markdown-test-range-has-face 926 929 markdown-link-face)
+    (markdown-test-range-has-face 930 931 markdown-markup-face)
+    (markdown-test-range-has-face 932 949 markdown-markup-face)
+    (markdown-test-range-has-face 951 957 markdown-markup-face)
+    (markdown-test-range-has-face 958 958 markdown-markup-face)
+    (should (equal '((26 . 8734)) (get-text-property 932 'composition)))))
 
 ;;; Markdown Parsing Functions:
 
@@ -3994,7 +4007,7 @@ this is not header line
   (markdown-test-string
    "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."
    (fill-paragraph)
-   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa\naaa aaa aaa aaa."))))
+   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."))))
 
 ;;; Export tests:
 

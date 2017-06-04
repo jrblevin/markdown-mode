@@ -1076,6 +1076,13 @@ cause lag when typing on slower machines."
   :group 'markdown
   :type 'list)
 
+(defcustom markdown-url-compose-char (if (char-displayable-p ?∞) ?∞ ?#)
+  "Placeholder character for hidden URLs.
+Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
+  :type 'character
+  :safe 'characterp
+  :package-version '(markdown-mode . "2.3"))
+
 (defcustom markdown-enable-math nil
   "Syntax highlighting for inline LaTeX and itex expressions.
 Set this to a non-nil value to turn on math support by default.
@@ -1222,6 +1229,20 @@ This applies to insertions done with
 `markdown-electric-backquote'."
   :group 'markdown
   :type 'boolean)
+
+(defcustom markdown-hidden-urls t
+  "Hide URLs of inline links and reference tags of reference links.
+Such URLs will be replaced by an ellipsis (…), but it is still
+part of the buffer.  Deleting the final parenthesis, for example,
+allows easy editing of the URL.  You can also hover your mouse
+pointer over the link text to see the URL.
+
+You can interactively set the value of this variable by calling
+`markdown-toggle-hidden-urls' or from the menu Org>Hyperlinks menu."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.3"))
 
 
 ;;; Regular Expressions =======================================================
@@ -5121,6 +5142,9 @@ See also `markdown-mode-map'.")
      ["Wiki Link" markdown-insert-wiki-link]
      "---"
      ["Check References" markdown-check-refs]
+     ["Toggle Hidden URLs" markdown-toggle-hidden-urls
+      :style radio
+      :selected markdown-hidden-urls]
      ["Toggle Inline Images" markdown-toggle-inline-images
       :style radio
       :selected markdown-inline-image-overlays]
@@ -6812,11 +6836,15 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                      'help-echo (if title (concat title "\n" url) url)))
            ;; URL part
            (up (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-url-face
+                     'face (if markdown-hidden-urls
+                               'markdown-markup-face
+                             'markdown-url-face)
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
            ;; Title part
-           (tp (list 'face markdown-link-title-face
+           (tp (list 'face (if markdown-hidden-urls
+                               'markdown-markup-face
+                             'markdown-link-title-face)
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
@@ -6824,6 +6852,9 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
       (when link-start (add-text-properties link-start link-end lp))
       (when url-start (add-text-properties url-start url-end up))
       (when title-start (add-text-properties title-start title-end tp))
+      (when (and markdown-hidden-urls url-start)
+        (compose-region url-start (or title-end url-end)
+                        markdown-url-compose-char))
       t)))
 
 (defun markdown-fontify-reference-links (last)
@@ -6886,6 +6917,20 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                         'font-lock-multiline t)))
       (add-text-properties start end props)
       t)))
+
+(defun markdown-toggle-hidden-urls (&optional arg)
+  "Toggle the display or hiding of URLs.
+With a prefix argument ARG, enable URL hiding if ARG is positive,
+and disable it otherwise."
+  (interactive (list (or current-prefix-arg 'toggle)))
+  (setq markdown-hidden-urls
+        (if (eq arg 'toggle)
+            (not markdown-hidden-urls)
+          (> (prefix-numeric-value arg) 0)))
+  (if markdown-hidden-urls
+      (message "markdown-mode URL hiding enabled")
+    (message "markdown-mode URL hiding disabled"))
+  (markdown-reload-extensions))
 
 
 ;;; WikiLink Following/Markup =================================================
@@ -7465,6 +7510,7 @@ or \\[markdown-toggle-inline-images]."
   (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
+  (add-to-list 'font-lock-extra-managed-props 'composition)
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
   ;; Reload extensions
