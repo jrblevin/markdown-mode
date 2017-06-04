@@ -1223,6 +1223,17 @@ This applies to insertions done with
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-hide-urls t
+  "Hide URLs of inline links and reference tags of reference links.
+Such URLs will be replaced by an ellipsis (…), but it is still
+part of the buffer.  Deleting the final parenthesis, for example,
+allows easy editing of the URL.  You can also hover your mouse
+pointer over the link text to see the URL."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.3"))
+
 
 ;;; Regular Expressions =======================================================
 
@@ -6794,6 +6805,8 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
       (when link-start (add-text-properties link-start link-end lp))
       (when url-start (add-text-properties url-start url-end up))
       (when title-start (add-text-properties title-start title-end tp))
+      (when (and markdown-hide-urls url-start)
+        (compose-region url-start (or title-end url-end) ?…))
       t)))
 
 (defun markdown-fontify-reference-links (last)
@@ -7431,6 +7444,7 @@ or \\[markdown-toggle-inline-images]."
   (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
+  (add-to-list 'font-lock-extra-managed-props 'composition)
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
   ;; Reload extensions
