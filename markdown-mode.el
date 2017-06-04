@@ -3006,16 +3006,26 @@ Return nil otherwise."
                 (cl-some (lambda (prop) (get-char-property loc prop)) props)))
    finally return result))
 
-(defun markdown-match-inline-generic (regex last)
-  "Match inline REGEX from the point to LAST."
+(defun markdown-match-inline-generic (regex last &optional faceless)
+  "Match inline REGEX from the point to LAST.
+When FACELESS is non-nil, do not return matches where faces have been applied."
   (when (re-search-forward regex last t)
-    (let ((bounds (markdown-code-block-at-pos (match-beginning 1))))
-      (if (null bounds)
-          ;; Not in a code block: keep match data and return t when in bounds
-          (<= (match-end 0) last)
-        ;; In code block: move past it and recursively search again
-        (when (< (goto-char (nth 1 bounds)) last)
-          (markdown-match-inline-generic regex last))))))
+    (let ((bounds (markdown-code-block-at-pos (match-beginning 1)))
+          (face (and faceless (text-property-not-all
+                               (match-beginning 0) (match-end 0) 'face nil))))
+      (cond
+       ;; In code block: move past it and recursively search again
+       (bounds
+        (when (< (goto-char (cl-second bounds)) last)
+          (markdown-match-inline-generic regex last faceless)))
+       ;; When faces are found in the match range, skip over the match and
+       ;; recursively search again.
+       (face
+        (when (< (goto-char (match-end 0)) last)
+          (markdown-match-inline-generic regex last faceless)))
+       ;; Keep match data and return t when in bounds.
+       (t
+        (<= (match-end 0) last))))))
 
 (defun markdown-match-code (last)
   "Match inline code fragments from point to LAST."
