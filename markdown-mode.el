@@ -1403,7 +1403,7 @@ Group 5 matches the second component of the wiki link, when present.
 Group 6 matches the closing square brackets.")
 
 (defconst markdown-regex-uri
-  (concat (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+")
+  (concat "\\(" (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+\\)")
   "Regular expression for matching inline URIs.")
 
 (defconst markdown-regex-angle-uri
@@ -2410,7 +2410,7 @@ See `font-lock-syntactic-face-function' for details."
     (markdown-match-italic . ((1 markdown-markup-face prepend)
                               (2 markdown-italic-face append)
                               (3 markdown-markup-face prepend)))
-    (,markdown-regex-uri . markdown-link-face)
+    (markdown-fontify-plain-uris)
     (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend)))
   "Syntax highlighting for Markdown files.")
@@ -3299,6 +3299,11 @@ links with URLs."
 (defun markdown-match-angle-uris (last)
   "Match angle bracket URIs from point to LAST."
   (when (markdown-match-inline-generic markdown-regex-angle-uri last)
+    (goto-char (1+ (match-end 0)))))
+
+(defun markdown-match-plain-uris (last)
+  "Match plain URIs from point to LAST."
+  (when (markdown-match-inline-generic markdown-regex-uri last t)
     (goto-char (1+ (match-end 0)))))
 
 (defun markdown-get-match-boundaries (start-header end-header last &optional pos)
@@ -6839,6 +6844,18 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
       (dolist (g '(1 3))
         (add-text-properties (match-beginning g) (match-end g) mp))
       (add-text-properties url-start url-end up)
+      t)))
+
+(defun markdown-fontify-plain-uris (last)
+  "Add text properties to plain URLs from point to LAST."
+  (when (markdown-match-plain-uris last)
+    (let* ((start (match-beginning 0))
+           (end (match-end 0))
+           (props (list 'keymap markdown-mode-mouse-map
+                        'face markdown-link-face
+                        'mouse-face 'markdown-highlight-face
+                        'font-lock-multiline t)))
+      (add-text-properties start end props)
       t)))
 
 
