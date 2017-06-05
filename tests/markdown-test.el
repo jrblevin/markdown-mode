@@ -2064,7 +2064,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n*italic*\n"
-                        (markdown-test-range-has-face 1 5 markdown-header-delimiter-face)
+                        (markdown-test-range-has-face 1 5 'markdown-hr-face)
                         (markdown-test-range-has-face 8 8 markdown-markup-face)
                         (markdown-test-range-has-face 9 14 markdown-italic-face)
                         (markdown-test-range-has-face 15 15 markdown-markup-face)))
@@ -2179,7 +2179,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 (ert-deftest test-markdown-font-lock/bold-after-hr ()
   "Test bold after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n**bold**\n"
-   (markdown-test-range-has-face 1 5 markdown-header-delimiter-face)
+   (markdown-test-range-has-face 1 5 'markdown-hr-face)
    (markdown-test-range-has-face 8 9 markdown-markup-face)
    (markdown-test-range-has-face 10 13 markdown-bold-face)
    (markdown-test-range-has-face 14 15 markdown-markup-face)))

@@ -17,6 +17,8 @@
         whitespace surrounding hash marks in atx headings.
     -   Font lock for `~~strikethrough~~` is now supported in
         `markdown-mode` in addition to `gfm-mode`.
+    -   Introduced a new face for horizontal rules: `markdown-hr-face`.
+        Previously, `markdown-header-delimiter-face` was used.
 
 *   New features:
 
@@ -32,6 +34,9 @@
     -   When markup hiding is enabled, the character used for
         replacing blockquote markup can be changed by setting
         `markdown-blockquote-display-char`.
+    -   When markup hiding is enabled, the character used for
+        horizontal rule markup can be changed by setting
+        `markdown-hr-display-char`.
     -   Unicode bullets are used to replace ASCII list item markers
         for unordered lists when markup hiding is enabled.  The list
         of characters used, in order of list level, can be specified

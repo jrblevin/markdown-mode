@@ -722,6 +722,8 @@
 ;;     specified by setting the variable `markdown-list-item-bullets'.
 ;;     The placeholder character used to replace blockquote markup can
 ;;     be changed by setting `markdown-blockquote-display-char'.
+;;     Similarly, the character used for horizontal rules can be
+;;     customized by setting `markdown-hr-display-char'.
 ;;
 ;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
 ;;      code in code blocks using the native major mode.  This only
@@ -1136,6 +1138,15 @@ Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
   "Character for hiding blockquote markup."
   :type 'string
   :safe 'stringp
+  :package-version '(markdown-mode . "2.3"))
+
+(defcustom markdown-hr-display-char
+  (cond ((char-displayable-p ?─) ?─)
+        ((char-displayable-p ?━) ?━)
+        (t ?-))
+  "Character for hiding horizontal rule markup."
+  :type 'character
+  :safe 'characterp
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-enable-math nil
@@ -2387,6 +2398,11 @@ and disable it otherwise."
   "Face for mouse highlighting."
   :group 'markdown-faces)
 
+(defface markdown-hr-face
+  '((t (:inherit markdown-markup-face)))
+  "Face for horizontal rules."
+  :group 'markdown-faces)
+
 (defcustom markdown-header-scaling nil
   "Whether to use variable-height faces for headers.
 When non-nil, `markdown-header-face' will inherit from
@@ -2511,7 +2527,7 @@ Depending on your font, some reasonable choices are:
     (markdown-match-pandoc-metadata . ((1 markdown-markup-face)
                                        (2 markdown-markup-face)
                                        (3 markdown-metadata-value-face)))
-    (markdown-match-hr . markdown-header-delimiter-face)
+    (markdown-fontify-hrs)
     (markdown-match-code . ((1 markdown-markup-properties)
                             (2 markdown-inline-code-face)
                             (3 markdown-markup-properties)))
@@ -2571,6 +2587,21 @@ extension support.")
 (defconst markdown-regex-footnote-definition
   (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
   "Regular expression matching a footnote definition, capturing the label.")
+
+
+;;; Fontification Functions ===================================================
+
+(defun markdown-fontify-hrs (last)
+  "Add text properties to horizontal rules from point to LAST."
+  (when (markdown-match-hr last)
+    (add-text-properties
+     (match-beginning 0) (match-end 0)
+     `(face markdown-hr-face
+            font-lock-multiline t
+            ,@(when markdown-hide-markup
+                `(display ,(make-string
+                            (window-text-width) markdown-hr-display-char)))))
+     t))
 
 
 ;;; Compatibility =============================================================
