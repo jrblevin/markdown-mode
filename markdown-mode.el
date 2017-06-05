@@ -5043,13 +5043,16 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Link Movement
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
+    ;; Toggling functionality
+    (define-key map (kbd "C-c C-x C-i") 'markdown-toggle-inline-images)
+    (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-hidden-urls)
+    (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
     ;; Alternative keys (in case of problems with the arrow keys)
     (define-key map (kbd "C-c C-x u") 'markdown-move-up)
     (define-key map (kbd "C-c C-x d") 'markdown-move-down)
     (define-key map (kbd "C-c C-x l") 'markdown-promote)
     (define-key map (kbd "C-c C-x r") 'markdown-demote)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item)
-    (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
     map)
   "Keymap for Markdown major mode.")
 
