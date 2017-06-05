@@ -1651,9 +1651,8 @@ easier.")
 Which construct is actually contained in the match must be found separately."
   (mapconcat
    #'identity
-   ;; FIXME: Why `cl-mapcar' rather than `mapcar'?
-   (cl-mapcar (lambda (entry) (markdown-maybe-funcall-regexp (caar entry)))
-              markdown-fenced-block-pairs)
+   (mapcar (lambda (entry) (markdown-maybe-funcall-regexp (caar entry)))
+           markdown-fenced-block-pairs)
    "\\|"))
 
 (defun markdown-get-fenced-block-begin-properties ()
