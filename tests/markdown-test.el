@@ -2637,19 +2637,20 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/reference-definition ()
   "Reference definitions should not include ]."
-  (markdown-test-string "[1]: http://daringfireball.net/ \"title\""
-    (markdown-test-range-has-face 2 2 markdown-reference-face) ; 1
-    (markdown-test-range-has-face 6 31 markdown-url-face) ; URL
-    (markdown-test-range-has-face 34 38 markdown-link-title-face)) ; title
-  (markdown-test-string "[foo][1] and [bar][2]: not a reference definition"
-    (markdown-test-range-has-face 2 4 markdown-link-face) ; foo
-    (markdown-test-range-has-face 7 7 markdown-reference-face) ; 1
-    (markdown-test-range-has-face 9 13 nil) ; [ ]and[ ]
-    (markdown-test-range-has-face 15 17 markdown-link-face) ; bar
-    (markdown-test-range-has-face 20 20 markdown-reference-face) ; 2
-    (markdown-test-range-has-face 22 49 nil))) ; [ ]and[ ]
+  (let ((markdown-hidden-urls nil))
+    (markdown-test-string "[1]: http://daringfireball.net/ \"title\""
+      (markdown-test-range-has-face 2 2 markdown-reference-face) ; 1
+      (markdown-test-range-has-face 6 31 markdown-url-face) ; URL
+      (markdown-test-range-has-face 34 38 markdown-link-title-face)) ; title
+    (markdown-test-string "[foo][1] and [bar][2]: not a reference definition"
+      (markdown-test-range-has-face 2 4 markdown-link-face) ; foo
+      (markdown-test-range-has-face 7 7 markdown-reference-face) ; 1
+      (markdown-test-range-has-face 9 13 nil) ; [ ]and[ ]
+      (markdown-test-range-has-face 15 17 markdown-link-face) ; bar
+      (markdown-test-range-has-face 20 20 markdown-reference-face) ; 2
+      (markdown-test-range-has-face 22 49 nil)))) ; [ ]and[ ]
 
-(ert-deftest test-markdown-font-lock/hidden-urls ()
+(ert-deftest test-markdown-font-lock/hidden-urls-inline ()
   "Test URL hiding and toggling."
   (markdown-test-file "inline.text"
     (markdown-test-range-has-face 925 925 markdown-markup-face)
@@ -2659,6 +2660,22 @@ takes precedence)."
     (markdown-test-range-has-face 951 957 markdown-markup-face)
     (markdown-test-range-has-face 958 958 markdown-markup-face)
     (should (equal '((26 . 8734)) (get-text-property 932 'composition)))))
+
+(ert-deftest test-markdown-font-lock/hidden-urls-reference ()
+  "Test URL hiding and toggling."
+  (let ((markdown-hidden-urls t))
+    (markdown-test-string "[link][15]"
+      ;; Two-character reference labels shouldn't get composed.
+      (markdown-test-range-has-face 1 1 markdown-markup-face)
+      (markdown-test-range-has-face 2 5 markdown-link-face)
+      (markdown-test-range-has-face 6 10 markdown-markup-face)
+      (should-not (get-text-property 8 'composition)))
+    (markdown-test-string "[link][long-reference-label]"
+      ;; Longer reference labels should be composed
+      (markdown-test-range-has-face 1 1 markdown-markup-face)
+      (markdown-test-range-has-face 2 5 markdown-link-face)
+      (markdown-test-range-has-face 6 28 markdown-markup-face)
+      (should (equal '((20 . 8734)) (get-text-property 8 'composition))))))
 
 ;;; Markdown Parsing Functions:
 

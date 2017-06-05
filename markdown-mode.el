@@ -1076,7 +1076,11 @@ cause lag when typing on slower machines."
   :group 'markdown
   :type 'list)
 
-(defcustom markdown-url-compose-char (if (char-displayable-p ?∞) ?∞ ?#)
+(defcustom markdown-url-compose-char
+  (cond
+   ((char-displayable-p ?∞) ?∞)
+   ((char-displayable-p ?…) ?…)
+   (t ?#))
   "Placeholder character for hidden URLs.
 Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
   :type 'character
@@ -6879,13 +6883,17 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                                       (or (markdown-link-url)
                                           "Undefined reference"))))))
            ;; Reference part
-           (rp (list 'face 'markdown-reference-face
+           (rp (list 'face (if markdown-hidden-urls
+                               'markdown-markup-face
+                             'markdown-reference-face)
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)))
       (when link-start (add-text-properties link-start link-end lp))
-      (when ref-start (add-text-properties ref-start ref-end rp))
+      (when ref-start (add-text-properties ref-start ref-end rp)
+            (when (and markdown-hidden-urls (> (- ref-end ref-start) 3))
+              (compose-region ref-start ref-end markdown-url-compose-char)))
       t)))
 
 (defun markdown-fontify-angle-uris (last)
