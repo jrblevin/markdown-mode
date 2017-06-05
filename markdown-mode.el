@@ -7475,12 +7475,21 @@ or \\[markdown-toggle-inline-images]."
                   (overlay-put ov 'face 'default)
                   (push ov markdown-inline-image-overlays))))))))))
 
-(defun markdown-toggle-inline-images ()
-  "Toggle inline image overlays in the buffer."
-  (interactive)
+(defun markdown-toggle-inline-images (&optional arg)
+  "Toggle inline image overlays in the buffer.
+With a prefix argument ARG, enable inline images if ARG is
+positive, and disable it otherwise.  If called from Lisp, enable
+the mode if ARG is omitted or nil."
+  (interactive (list (or current-prefix-arg 'toggle)))
+  (setq markdown-inline-image-overlays
+        (if (eq arg 'toggle)
+            (not markdown-inline-image-overlays)
+          (> (prefix-numeric-value arg) 0)))
   (if markdown-inline-image-overlays
-      (markdown-remove-inline-images)
-    (markdown-display-inline-images)))
+      (progn (message "markdown-mode inline images enabled")
+             (markdown-display-inline-images))
+    (message "markdown-mode inline images disabled")
+    (markdown-remove-inline-images)))
 
 
 ;;; Mode Definition  ==========================================================
