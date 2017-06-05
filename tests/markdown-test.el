@@ -3132,6 +3132,23 @@ x: x
     ;; Point should be left at limit.
     (should (= (point) (point-max)))))
 
+(ert-deftest test-markdown-parsing/code-block-lang ()
+  "Test `markdown-code-block-lang'."
+  ;; Test with GFM code blocks.
+  (markdown-test-file "GFM.md"
+    ;; Test a call with the optional argument.
+    (should (string-equal
+             (markdown-code-block-lang
+              '(1455 . markdown-gfm-block-begin)) "js"))
+    ;; Test a call without the optional argument.
+    (goto-char 1504) ;; middle of a GFM code block
+    (should (string-equal (markdown-code-block-lang) "js")))
+  ;; Test with tilde-fenced cdoe blocks.
+  (markdown-test-file "outline-code.text"
+    (goto-char 107) ;; middle of a tilde fenced code block
+    (should (string-equal (markdown-code-block-lang
+                           '(83 . markdown-tilde-fence-begin)) ".bash"))))
+
 ;;; Reference Checking:
 
 (ert-deftest test-markdown-references/goto-line-button ()

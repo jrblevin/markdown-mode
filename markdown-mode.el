@@ -1700,6 +1700,17 @@ contains non-nil PROP."
                   (setq min-el el)))
            finally return min-el))
 
+(defun markdown-max-of-seq (map-fn seq)
+  "Apply MAP-FN to SEQ and return element of SEQ with maximum value of MAP-FN."
+  (cl-loop for el in seq
+           with max = -1.0e+INF          ; negative infinity
+           with max-el = nil
+           do (let ((res (funcall map-fn el)))
+                (when (and res (> res max))
+                  (setq max res)
+                  (setq max-el el)))
+           finally return max-el))
+
 (defun markdown-find-previous-block ()
   "Find previous block.
 Detect whether `markdown-syntax-propertize-fenced-block-constructs' was
@@ -4200,6 +4211,29 @@ automatically in order to have the correct markup."
     (markdown-ensure-blank-line-after)
     (forward-line -1)))
 
+(defun markdown-code-block-lang (&optional pos-prop)
+  "Return the language name for a GFM or tilde fenced code block.
+The beginning of the block may be described by POS-PROP,
+a cons of (pos . prop) giving the position and property
+at the beginning of the block."
+  (or pos-prop
+      (setq pos-prop
+            (markdown-max-of-seq
+             #'car
+             (cl-remove-if
+              #'null
+              (cl-mapcar
+               #'markdown-find-previous-prop
+               (markdown-get-fenced-block-begin-properties))))))
+  (when pos-prop
+    (goto-char (car pos-prop))
+    (set-match-data (get-text-property (point) (cdr pos-prop)))
+    ;; Note: Hard-coded group number assumes tilde
+    ;; and GFM fenced code regexp groups agree.
+    (when (and (match-beginning 3) (match-end 3))
+      (buffer-substring-no-properties
+       (match-beginning 3) (match-end 3)))))
+
 (defun markdown-gfm-parse-buffer-for-languages (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
     (save-excursion
@@ -4208,15 +4242,7 @@ automatically in order to have the correct markup."
        with prop = 'markdown-gfm-block-begin
        for pos-prop = (markdown-find-next-prop prop)
        while pos-prop
-       for lang = (progn
-                    (goto-char (car pos-prop))
-                    (save-match-data
-                      (set-match-data (get-text-property (point) prop))
-                      ;; Note: Hard-coded group number assumes tilde
-                      ;; and GFM fenced code regexp groups agree.
-                      (when (and (match-beginning 3) (match-end 3))
-                        (buffer-substring-no-properties
-                         (match-beginning 3) (match-end 3)))))
+       for lang = (markdown-code-block-lang pos-prop)
        do (progn (when lang (markdown-gfm-add-used-language lang))
                  (goto-char (next-single-property-change (point) prop)))))))
 
