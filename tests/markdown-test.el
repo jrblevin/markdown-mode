@@ -2307,15 +2307,19 @@ if (y)
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-1 ()
   "Test GFM-style fenced code blocks (1)."
-  (markdown-test-string "```ruby
+  (let ((markdown-fontify-code-blocks-natively t))
+    (markdown-test-string "```ruby
 require 'redcarpet'
 markdown = Redcarpet.new('Hello World!')
 puts markdown.to_html
 ```"
-   (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
-   (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
-   (markdown-test-range-has-face 9 90 markdown-pre-face) ; code
-   (markdown-test-range-has-face 92 94 markdown-markup-face))) ; ```
+      (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
+      (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
+      (markdown-test-range-has-face 9 90 'markdown-code-block-face) ; entire code block
+      (markdown-test-range-has-face 9 15 'font-lock-builtin-face) ; require
+      (markdown-test-range-has-face 17 27 'font-lock-string-face) ; 'redcarpet'
+      (markdown-test-range-has-face 70 72 'font-lock-builtin-face) ; puts
+      (markdown-test-range-has-face 92 94 markdown-markup-face)))) ; ```
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
   "Test GFM-style fenced code blocks (2)."

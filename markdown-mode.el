@@ -702,6 +702,13 @@
 ;;     `markdown-url-compose-char'.  Hidden URLs can be toggled using
 ;;     `C-c C-x C-l` (`markdown-toggle-hidden-urls').
 ;;
+;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
+;;      code in code blocks using the native major mode.  This only
+;;      works for fenced code blocks where the language is specified
+;;      where we can automatically determine the appropriate mode to
+;;      use.  The language to mode mapping may be customized by setting
+;;      the variable `markdown-code-lang-modes'.
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
@@ -2218,8 +2225,13 @@ START and END delimit region to propertize."
   "Face for blockquote sections."
   :group 'markdown-faces)
 
+(defface markdown-code-block-face
+  `((t (:inherit default)))
+  "Face for fenced code blocks."
+  :group 'markdown-faces)
+
 (defface markdown-pre-face
-  '((t (:inherit font-lock-constant-face)))
+  '((t (:inherit (markdown-code-block-face font-lock-constant-face))))
   "Face for preformatted text."
   :group 'markdown-faces)
 
@@ -2382,7 +2394,7 @@ See `font-lock-syntactic-face-function' for details."
                                             (4 markdown-language-info-face nil t)
                                             (5 markdown-markup-face nil t)))
     (markdown-match-gfm-close-code-blocks . ((1 markdown-markup-face)))
-    (markdown-match-gfm-code-blocks . ((0 markdown-pre-face)))
+    (markdown-fontify-gfm-code-blocks)
     (markdown-match-fenced-start-code-block . ((1 markdown-markup-face)
                                                (2 markdown-markup-face nil t)
                                                (3 markdown-language-keyword-face nil t)
@@ -2580,6 +2592,15 @@ Used for `flyspell-generic-check-word-predicate'."
                (if (listp faces)
                    (memq 'markdown-url-face faces)
                  (eq faces 'markdown-url-face)))))))
+
+(defun markdown-font-lock-ensure ()
+  "Provide `font-lock-ensure' in Emacs 24."
+  (if (fboundp 'font-lock-ensure)
+      (font-lock-ensure)
+    (with-no-warnings
+      ;; Suppress warning about non-interactive use of
+      ;; `font-lock-fontify-buffer' in Emacs 25.
+      (font-lock-fontify-buffer))))
 
 
 ;;; Markdown Parsing Functions ================================================
@@ -7500,6 +7521,105 @@ the mode if ARG is omitted or nil."
              (markdown-display-inline-images))
     (message "markdown-mode inline images disabled")
     (markdown-remove-inline-images)))
+
+
+;;; GFM Code Block Fontification ==============================================
+
+(defcustom markdown-fontify-code-blocks-natively nil
+  "When non-nil, fontify code in code blocks using the native major mode.
+This only works for fenced code blocks where the language is
+specified where we can automatically determine the appropriate
+mode to use.  The language to mode mapping may be customized by
+setting the variable `markdown-code-lang-modes'."
+  :group 'markdown
+  :type 'boolean)
+
+;; This is based on `org-code-lang-modes' from org-src.el
+(defcustom markdown-code-lang-modes
+  '(("ocaml" . tuareg-mode) ("elisp" . emacs-lisp-mode) ("ditaa" . artist-mode)
+    ("asymptote" . asy-mode) ("dot" . fundamental-mode) ("sqlite" . sql-mode)
+    ("calc" . fundamental-mode) ("C" . c-mode) ("cpp" . c++-mode)
+    ("C++" . c++-mode) ("screen" . shell-script-mode) ("shell" . sh-mode)
+    ("bash" . sh-mode))
+  "Alist mapping languages to their major mode.
+The key is the language name, the value is the major mode.  For
+many languages this is simple, but for language where this is not
+the case, this variable provides a way to simplify things on the
+user side.  For example, there is no ocaml-mode in Emacs, but the
+mode to use is `tuareg-mode'."
+  :group 'markdown
+  :type '(repeat
+          (cons
+           (string "Language name")
+           (symbol "Major mode"))))
+
+(defun markdown-get-lang-mode (lang)
+  "Return major mode that should be used for LANG.
+LANG is a string, and the returned major mode is a symbol."
+  (cl-find-if
+   'fboundp
+   (list (cdr (assoc lang markdown-code-lang-modes))
+         (cdr (assoc (downcase lang) markdown-code-lang-modes))
+         (intern (concat lang "-mode"))
+         (intern (concat (downcase lang) "-mode")))))
+
+(defun markdown-fontify-gfm-code-blocks (last)
+  "Add text properties to next GFM code block from point to LAST."
+  (when (markdown-match-gfm-code-blocks last)
+    (save-excursion
+      (save-match-data
+        (let* ((start (match-beginning 0))
+               (end (match-end 0))
+               (bol-prev (progn (goto-char start)
+                                (if (bolp) (point-at-bol 0) start)))
+               (eol-next (progn (goto-char end)
+                                (if (eolp) end (point-at-bol 2))))
+               lang)
+          (if (and markdown-fontify-code-blocks-natively
+                   (setq lang (markdown-code-block-lang)))
+              (markdown-fontify-gfm-code-block lang start end)
+            (add-face-text-property start end 'markdown-pre-face 'append))
+          ;; Set background for block as well as opening and closing lines.
+          (add-face-text-property
+           bol-prev eol-next 'markdown-code-block-face 'append))))
+    t))
+
+;; Based on `org-src-font-lock-fontify-block' from org-src.el.
+(defun markdown-fontify-gfm-code-block (lang start end)
+  "Fontify given code block.
+This function is called by Emacs for automatic fontification when
+`markdown-fontify-code-blocks-natively' is non-nil.  LANG is the
+language used in the block. START and END specify the block
+position."
+  (let ((lang-mode (markdown-get-lang-mode lang)))
+    (when (fboundp lang-mode)
+      (let ((string (buffer-substring-no-properties start end))
+            (modified (buffer-modified-p))
+            (markdown-buffer (current-buffer)) pos next)
+        (remove-text-properties start end '(face nil))
+        (with-current-buffer
+            (get-buffer-create
+             (concat " markdown-code-fontification:" (symbol-name lang-mode)))
+          ;; Make sure that modification hooks are not inhibited in
+          ;; the org-src-fontification buffer in case we're called
+          ;; from `jit-lock-function' (Bug#25132).
+          (let ((inhibit-modification-hooks nil))
+            (delete-region (point-min) (point-max))
+            (insert string " ")) ;; so there's a final property change
+          (unless (eq major-mode lang-mode) (funcall lang-mode))
+          (markdown-font-lock-ensure)
+          (setq pos (point-min))
+          (while (setq next (next-single-property-change pos 'face))
+            (let ((val (get-text-property pos 'face)))
+              (when val
+                (put-text-property
+                 (+ start (1- pos)) (1- (+ start next)) 'face
+                 val markdown-buffer)))
+            (setq pos next)))
+        (add-text-properties
+         start end
+         '(font-lock-fontified t fontified t font-lock-multiline t))
+        (set-buffer-modified-p modified)))))
 
 
 ;;; Mode Definition  ==========================================================

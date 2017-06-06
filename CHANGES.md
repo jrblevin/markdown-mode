@@ -13,6 +13,13 @@
 
 *   New features:
 
+    -   Native code block font-lock: Add a custom variable
+        `markdown-fontify-code-blocks-natively`, which determines
+        whether to fontify code in code blocks using the native major
+        mode.  This only works for fenced code blocks where the
+        language is specified where we can automatically determine the
+        appropriate mode to use.  The language to mode mapping may be
+        customized by setting the variable `markdown-code-lang-modes`.
     -   Add "page" movement, marking, and narrowing commands, where a
         "page" in Markdown is defined to be a top-level subtree:
         `markdown-forward-page` (<kbd>C-x ]</kbd>),
