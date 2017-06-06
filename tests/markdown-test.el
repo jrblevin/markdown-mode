@@ -70,7 +70,7 @@
          ,@body))))
 
 (defmacro markdown-test-string (string &rest body)
-  "Run body in a temporary buffer containing STRING in `markdown-mode'."
+  "Run BODY in a temporary buffer containing STRING in `markdown-mode'."
   (declare (indent 1))
   `(markdown-test-string-mode 'markdown-mode ,string ,@body))
 (def-edebug-spec markdown-test-string (form body))
@@ -82,7 +82,7 @@
 (def-edebug-spec markdown-test-file (form body))
 
 (defmacro markdown-test-string-gfm (string &rest body)
-  "Run body in a temporary buffer containing STRING in `gfm-mode'."
+  "Run BODY in a temporary buffer containing STRING in `gfm-mode'."
   (declare (indent 1))
   `(markdown-test-string-mode 'gfm-mode ,string ,@body))
 (def-edebug-spec markdown-test-string-gfm (form body))
@@ -94,7 +94,7 @@
 (def-edebug-spec markdown-test-file-gfm (form body))
 
 (defmacro markdown-test-temp-file (file &rest body)
-  "Open FILE from `markdown-test-dir' visiting temp file and execute body.
+  "Open FILE from `markdown-test-dir' visiting temp file and execute BODY.
 This file is not saved."
   (declare (indent 1))
   `(let ((fn (concat markdown-test-dir ,file))
@@ -169,7 +169,7 @@ This file is not saved."
         (goto-char (match-end 0)))))
 
 (defun markdown-test ()
-  "Run all defined tests for `markdown-mode'."
+  "Run all defined test cases for `markdown-mode'."
   (interactive)
   (ert "markdown"))
 
