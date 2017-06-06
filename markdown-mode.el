@@ -2531,7 +2531,10 @@ Used for `flyspell-generic-check-word-predicate'."
     (goto-char (1- (point)))
     (not (or (markdown-code-block-at-point-p)
              (markdown-inline-code-at-point-p)
-             (memq 'markdown-url-face (get-text-property (point) 'face))))))
+             (let ((faces (get-text-property (point) 'face)))
+               (if (listp faces)
+                   (memq 'markdown-url-face faces)
+                 (eq faces 'markdown-url-face)))))))
 
 
 ;;; Markdown Parsing Functions ================================================
