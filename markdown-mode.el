@@ -902,6 +902,7 @@
 (require 'cl-lib)
 (require 'url-parse)
 (require 'button)
+(require 'color)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -2373,6 +2374,20 @@ size of `markdown-header-face'."
                         (t (float (nth num markdown-header-scaling-values))))))
       (unless (get face-name 'saved-face) ; Don't update customized faces
         (set-face-attribute face-name nil :height scale)))))
+
+(defun markdown-update-code-block-face ()
+  "Generate `markdown-code-block-face' for code block backgrounds.
+When using a light-background theme, darken the background slightly for
+code blocks.  Similarly, when using a dark-background theme, lighten it
+slightly.  If the face has been customized already, leave it alone."
+  ;; Don't update customized faces
+  (unless (get 'markdown-code-block-face 'saved-face)
+    (set-face-attribute
+     'markdown-code-block-face nil
+     :background
+     (cl-case (cdr (assq 'background-mode (frame-parameters)))
+       ('light (color-darken-name (face-background 'default) 5))
+       ('dark (color-lighten-name (face-background 'default) 5))))))
 
 (defun markdown-syntactic-face (state)
   "Return font-lock face for characters with given STATE.
@@ -7661,6 +7676,7 @@ position."
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
   (add-to-list 'font-lock-extra-managed-props 'composition)
+  (markdown-update-code-block-face)
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
   ;; Reload extensions
