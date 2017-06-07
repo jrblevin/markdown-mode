@@ -1753,7 +1753,7 @@ of the block. If so, return a cons of (pos . property) where the beginning of
 the block was propertized."
   (let ((start-pt (point))
         (closest-open
-         (markdown-min-of-seq
+         (markdown-max-of-seq
           #'car
           (cl-remove-if
            #'null
