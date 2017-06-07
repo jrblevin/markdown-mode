@@ -1,4 +1,6 @@
-# Markdown Mode 2.3 (Under Development)
+# Markdown Mode 2.3
+
+*Under development*
 
 *   **Breaking changes:**
 
