@@ -6,6 +6,10 @@
 
     -   Rename internal `markdown-link-link` to `markdown-link-url`
         for clarity.
+    -   The old inline image toggling command <kbd>C-c C-i C-t</kbd>
+        should be considered deprecated by <kbd>C-c C-x C-i</kbd> and
+        may be removed in the near future.  Toggling keybindings are
+        currently being grouped under <kbd>C-c C-x</kbd>.
 
 *   New features:
 

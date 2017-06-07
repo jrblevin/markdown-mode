@@ -248,7 +248,7 @@
 ;;     image.
 ;;
 ;;     Local images associated with image links may be displayed
-;;     inline in the buffer by pressing `C-c C-i C-t`
+;;     inline in the buffer by pressing `C-c C-x C-i`
 ;;     (`markdown-toggle-inline-images'). This is a toggle command, so
 ;;     pressing this once again will remove inline images.
 ;;
@@ -1250,7 +1250,8 @@ allows easy editing of the URL.  You can also hover your mouse
 pointer over the link text to see the URL.
 
 You can interactively set the value of this variable by calling
-`markdown-toggle-hidden-urls' or from the menu Org>Hyperlinks menu."
+`markdown-toggle-hidden-urls' or from the menu Markdown > Links &
+Images menu."
   :group 'markdown
   :type 'boolean
   :safe 'booleanp
@@ -4960,7 +4961,6 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-aw" 'markdown-insert-wiki-link)
     (define-key map "\C-c\C-ii" 'markdown-insert-image)
     (define-key map "\C-c\C-iI" 'markdown-insert-reference-image)
-    (define-key map "\C-c\C-i\C-t" 'markdown-toggle-inline-images)
     (define-key map "\C-c\C-th" 'markdown-insert-header-dwim)
     (define-key map "\C-c\C-tH" 'markdown-insert-header-setext-dwim)
     (define-key map "\C-c\C-t1" 'markdown-insert-header-atx-1)
@@ -5061,6 +5061,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-x l") 'markdown-promote)
     (define-key map (kbd "C-c C-x r") 'markdown-demote)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item)
+    ;; Deprecated keys
+    (define-key map "\C-c\C-i\C-t" 'markdown-toggle-inline-images)
     map)
   "Keymap for Markdown major mode.")
 

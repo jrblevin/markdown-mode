@@ -230,7 +230,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     image.
 
     Local images associated with image links may be displayed
-    inline in the buffer by pressing <kbd>C-c C-i C-t</kbd>
+    inline in the buffer by pressing <kbd>C-c C-x C-i</kbd>
     (`markdown-toggle-inline-images`). This is a toggle command, so
     pressing this once again will remove inline images.
 
