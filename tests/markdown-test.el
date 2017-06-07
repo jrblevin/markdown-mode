@@ -1118,6 +1118,19 @@ Test point position upon removal and insertion."
                           (should (= (point) 35))
                           (should (looking-back "\\[link\\]: " nil)))))
 
+(ert-deftest test-markdown-insertion/reference-definition-block ()
+  "Test whitespace when inserting a reference definition among others"
+  (let ((markdown-reference-location 'header))
+    (markdown-test-string "text
+
+[1]: https://www.gnu.org/
+
+### header
+"
+      (markdown-insert-reference-definition "2")
+      (should (= (point) 38))
+      (should (looking-back "https://www.gnu.org/\n\\[2\\]: " nil)))))
+
 (ert-deftest test-markdown-insertion/inline-to-reference-link ()
   "Inline link to reference link conversion."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")"

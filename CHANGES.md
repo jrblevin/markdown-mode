@@ -35,6 +35,8 @@
     -   Adjust point so that it is left at beginning of setext
         headings in heading navigation commands.
     -   Prevent inline link matching in code blocks.
+    -   When inserting a new reference definition, don't add blank
+        line after existing reference definitions.
 
 *   Bug fixes:
 

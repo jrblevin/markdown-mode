@@ -3693,7 +3693,9 @@ be used to populate the title attribute when converted to XHTML."
       (immediately (markdown-end-of-text-block))
       (subtree     (markdown-end-of-subtree))
       (header      (markdown-end-of-defun)))
-    (unless (markdown-cur-line-blank-p) (insert "\n"))
+    (unless (or (markdown-cur-line-blank-p)
+                (thing-at-point-looking-at markdown-regex-reference-definition))
+      (insert "\n"))
     (insert "\n[" label "]: ")
     (if url
         (insert url)
