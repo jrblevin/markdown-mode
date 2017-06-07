@@ -676,6 +676,14 @@ provides an interface to all of the possible customizations:
     non-nil (default), then buttons are enabled.  This works in
     `markdown-mode` as well as `gfm-mode`.
 
+  * `markdown-hidden-urls` - Determines whether URL and reference
+    labels are hidden for inline and reference links.  By default,
+    inline links will appear in the buffer as `[link](∞)` instead
+    of `[link](http://perhaps.a/very/long/url/)`.  To change the
+    placeholder (composition) character used, set the variable
+    `markdown-url-compose-char`.  Hidden URLs can be toggled using
+    <kbd>C-c C-x C-l</kbd> (`markdown-toggle-hidden-urls`).
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode
