@@ -26,6 +26,8 @@
         `markdown-reference-location` and
         `markdown-footnote-location`.
     -   Ask flyspell to ignore URLs and words in code fragments.
+    -   Make inline links, reference links, angle bracket URLs, and
+        plain URLs clickable.
 
 *   Improvements:
 
