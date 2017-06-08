@@ -39,7 +39,8 @@
     -   Add `subtree` as a possible value for
         `markdown-reference-location` and
         `markdown-footnote-location`.
-    -   Ask flyspell to ignore URLs and words in code fragments.
+    -   Ask flyspell to ignore words in URLs, code fragments,
+        comments, and reference labels.
     -   Make inline links, reference links, angle bracket URLs, and
         plain URLs clickable.
     -   URL and reference label hiding for inline and reference links.

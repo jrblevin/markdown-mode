@@ -2605,10 +2605,15 @@ Used for `flyspell-generic-check-word-predicate'."
     (goto-char (1- (point)))
     (not (or (markdown-code-block-at-point-p)
              (markdown-inline-code-at-point-p)
+             (nth 4 (syntax-ppss)) ;; in comment
              (let ((faces (get-text-property (point) 'face)))
                (if (listp faces)
-                   (memq 'markdown-url-face faces)
-                 (eq faces 'markdown-url-face)))))))
+                   (or (memq 'markdown-reference-face faces)
+                       (memq 'markdown-markup-face faces)
+                       (memq 'markdown-url-face faces))
+                 (memq faces '(markdown-reference-face
+                               markdown-markup-face
+                               markdown-url-face))))))))
 
 (defun markdown-font-lock-ensure ()
   "Provide `font-lock-ensure' in Emacs 24."
