@@ -20,6 +20,7 @@
         language is specified where we can automatically determine the
         appropriate mode to use.  The language to mode mapping may be
         customized by setting the variable `markdown-code-lang-modes`.
+        ([GH-123][], [GH-185][])
     -   Add command <kbd>C-c C-x C-f</kbd> for toggling native font lock
         for code blocks (`markdown-toggle-fontify-code-blocks-natively`).
     -   Add "page" movement, marking, and narrowing commands, where a
@@ -69,6 +70,8 @@
 
 *   Bug fixes:
 
+  [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
+  [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
 
 # Markdown Mode 2.2
