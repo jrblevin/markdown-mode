@@ -3597,6 +3597,15 @@ date = 2015-08-13 11:35:25 EST
    (markdown-beginning-of-text-block)
    (should (= (point) (point-min)))))
 
+(ert-deftest test-markdown-movement/mark-text-block ()
+  "Test `markdown-mark-text-block'."
+  (markdown-test-file "outline.text"
+    ;; Start in middle of nested list with no separating whitespace.
+    (goto-char 193)
+    (markdown-mark-text-block)
+    (should (= (point) 143))
+    (should (= (mark) 269))))
+
 (ert-deftest test-markdown-movement/block ()
   "Test Markdown block movement."
   (markdown-test-file "outline.text"

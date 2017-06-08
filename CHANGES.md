@@ -33,9 +33,11 @@
         `markdown-mark-subtree` (<kbd>C-c C-M-h</kbd>) and
         `markdown-narrow-to-subtree` (<kbd>C-x n s</kbd>).
         ([GH-191][])
-    -   Add plain text block movement commands:
-        <kbd>C-M-{</kbd> (`markdown-beginning-of-text-block`) and
-        <kbd>C-M-}</kbd> (`markdown-end-of-text-block`).  ([GH-191][])
+    -   Add plain text block movement commands: <kbd>C-M-{</kbd>
+        (`markdown-beginning-of-text-block`) and <kbd>C-M-}</kbd>
+        (`markdown-end-of-text-block`).  To mark a plain text block,
+        use <kbd>C-c M-h</kbd> (`markdown-mark-text-block`).
+        ([GH-191][])
     -   Add `subtree` as a possible value for
         `markdown-reference-location` and
         `markdown-footnote-location`.

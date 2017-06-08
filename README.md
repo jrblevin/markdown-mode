@@ -463,7 +463,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     to the end of the current or following defun, and <kbd>C-M-h</kbd> will
     put the region around the entire defun.
 
-  * Movement by Plain Text Blocks: <kbd>C-M-{</kbd> and <kbd>C-M-}</kbd>
+  * Movement by Plain Text Blocks: <kbd>C-M-{</kbd>, <kbd>C-M-}</kbd>, and <kbd>C-c M-h</kbd>
 
     While the block and defun movement commands respect Markdown
     syntax, these commands simply move over whitespace-separated
@@ -471,7 +471,8 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     these commands to move over entire lists, whitespace separated
     segments of code, etc.  To move backward use <kbd>C-M-{</kbd>
     (`markdown-beginning-of-text-block`) and to move forward use
-    <kbd>C-M-}</kbd> (`markdown-end-of-text-block`).
+    <kbd>C-M-}</kbd> (`markdown-end-of-text-block`).  To mark a plain text
+    block, use <kbd>C-c M-h</kbd> (`markdown-mark-text-block`).
 
 As noted, many of the commands above behave differently depending
 on whether Transient Mark mode is enabled or not.  When it makes

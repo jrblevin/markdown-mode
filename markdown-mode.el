@@ -481,7 +481,7 @@
 ;;     to the end of the current or following defun, and `C-M-h` will
 ;;     put the region around the entire defun.
 ;;
-;;   * Movement by Plain Text Blocks: `C-M-{` and `C-M-}`
+;;   * Movement by Plain Text Blocks: `C-M-{`, `C-M-}`, and `C-c M-h`
 ;;
 ;;     While the block and defun movement commands respect Markdown
 ;;     syntax, these commands simply move over whitespace-separated
@@ -489,7 +489,8 @@
 ;;     these commands to move over entire lists, whitespace separated
 ;;     segments of code, etc.  To move backward use `C-M-{`
 ;;     (`markdown-beginning-of-text-block`) and to move forward use
-;;     `C-M-}` (`markdown-end-of-text-block`).
+;;     `C-M-}` (`markdown-end-of-text-block`).  To mark a plain text
+;;     block, use `C-c M-h` (`markdown-mark-text-block`).
 ;;
 ;; As noted, many of the commands above behave differently depending
 ;; on whether Transient Mark mode is enabled or not.  When it makes
@@ -5086,6 +5087,7 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Text Blocks (contextually unaware)
     (define-key map (kbd "C-M-{") 'markdown-beginning-of-text-block)
     (define-key map (kbd "C-M-}") 'markdown-end-of-text-block)
+    (define-key map (kbd "C-c M-h") 'markdown-mark-text-block)
     ;; Pages (top-level sections)
     (define-key map [remap backward-page] 'markdown-backward-page)
     (define-key map [remap forward-page] 'markdown-forward-page)
@@ -5183,6 +5185,7 @@ See also `markdown-mode-map'.")
      ["Exdent Region" markdown-exdent-region]
      "--"
      ["Mark Block" markdown-mark-block]
+     ["Mark Plain Text Block" markdown-mark-text-block]
      ["Mark Section" mark-defun]
      ["Mark Subtree" markdown-mark-subtree])
     ("Lists"
@@ -6338,6 +6341,25 @@ The current block is the one that contains point or follows point."
   (let ((beginning-of-defun-function 'markdown-backward-block)
         (end-of-defun-function 'markdown-forward-block))
     (narrow-to-defun)))
+
+(defun markdown-mark-text-block ()
+  "Put mark at end of this plain text block, point at beginning.
+The block marked is the one that contains point or follows point.
+
+Interactively, if this command is repeated or (in Transient Mark
+mode) if the mark is active, it marks the next block after the
+ones already marked."
+  (interactive)
+  (if (or (and (eq last-command this-command) (mark t))
+          (and transient-mark-mode mark-active))
+      (set-mark
+       (save-excursion
+         (goto-char (mark))
+         (markdown-end-of-text-block)
+         (point)))
+    (let ((beginning-of-defun-function 'markdown-beginning-of-text-block)
+          (end-of-defun-function 'markdown-end-of-text-block))
+      (mark-defun))))
 
 (defun markdown-mark-page ()
   "Put mark at end of this top level section, point at beginning.
