@@ -441,6 +441,14 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     at the point.  Finally, <kbd>C-c C-u</kbd> will move up to a lower-level
     (higher precedence) visible heading.
 
+  * Movement by Subtree: <kbd>C-c {</kbd>, <kbd>C-c }</kbd>, and <kbd>C-c C-M-h</kbd>
+
+    Move to the beginning of subtree or backward up the tree with
+    <kbd>C-c {</kbd> (`markdown-beginning-of-subtree`).  Move forward to the
+    end of the subtree or to the next end of subtree with
+    <kbd>C-c }</kbd> (`markdown-end-of-subtree`).  To mark the current subtree,
+    use <kbd>C-c C-M-h</kbd> (`markdown-mark-subtree`).
+
   * Movement by Markdown Blocks: <kbd>M-{</kbd> and <kbd>M-}</kbd>
 
     These keys are usually bound to `forward-paragraph` and

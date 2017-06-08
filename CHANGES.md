@@ -38,6 +38,11 @@
         (`markdown-end-of-text-block`).  To mark a plain text block,
         use <kbd>C-c M-h</kbd> (`markdown-mark-text-block`).
         ([GH-191][])
+    -   Subtree movement and Marking: Move to the beginning of subtree
+        or backward up the tree with `C-c {`
+        (`markdown-beginning-of-subtree`).  Move forward to the end of
+        the subtree or to the next end of subtree with `C-c }`
+        (`markdown-end-of-subtree`).  ([GH-191][])
     -   Add `subtree` as a possible value for
         `markdown-reference-location` and
         `markdown-footnote-location`.

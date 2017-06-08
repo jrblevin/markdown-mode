@@ -459,6 +459,14 @@
 ;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
+;;   * Movement by Subtree: `C-c {`, `C-c }`, and `C-c C-M-h`
+;;
+;;     Move to the beginning of subtree or backward up the tree with
+;;     `C-c {` (`markdown-beginning-of-subtree`).  Move forward to the
+;;     end of the subtree or to the next end of subtree with
+;;     `C-c }` (`markdown-end-of-subtree`).  To mark the current subtree,
+;;     use `C-c C-M-h` (`markdown-mark-subtree`).
+;;
 ;;   * Movement by Markdown Blocks: `M-{` and `M-}`
 ;;
 ;;     These keys are usually bound to `forward-paragraph' and
@@ -5054,6 +5062,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-f") 'markdown-forward-same-level)
     (define-key map (kbd "C-c C-b") 'markdown-backward-same-level)
     (define-key map (kbd "C-c C-u") 'markdown-up-heading)
+    (define-key map (kbd "C-c {") 'markdown-beginning-of-subtree)
+    (define-key map (kbd "C-c }") 'markdown-end-of-subtree)
     ;; Buffer-wide commands
     (define-key map (kbd "C-c C-c m") 'markdown-other-window)
     (define-key map (kbd "C-c C-c p") 'markdown-preview)
@@ -5147,8 +5157,13 @@ See also `markdown-mode-map'.")
      ["Backward Same Level" markdown-backward-same-level]
      ["Up to Parent Heading" markdown-up-heading]
      "---"
+     ["Beginning of Subtree" markdown-beginning-of-subtree]
+     ["End of Subtree" markdown-end-of-subtree]
+     "---"
      ["Forward Block" markdown-forward-block]
-     ["Backward Block" markdown-backward-block])
+     ["Backward Block" markdown-backward-block]
+     ["Forward Plain Text Block" markdown-beginning-of-text-block]
+     ["Backward Plain Text Block" markdown-end-of-text-block])
     ("Show & Hide"
      ["Cycle Heading Visibility" markdown-cycle (markdown-on-heading-p)]
      ["Cycle Heading Visibility (Global)" markdown-shifttab]
@@ -6113,18 +6128,55 @@ Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
   "Return non-nil if point is on a heading line."
   (get-text-property (point) 'markdown-heading))
 
-(defun markdown-end-of-subtree (&optional invisible-OK)
-  "Move to the end of the current subtree.
+(defun markdown-beginning-of-subtree (&optional invisible-ok)
+  "Move to beginning of section, up the subtree, or to previous sibling.
 Only visible heading lines are considered, unless INVISIBLE-OK is
-non-nil.
-Derived from `org-end-of-subtree'."
-  (markdown-back-to-heading invisible-OK)
+non-nil."
+  (interactive)
+  ;; Move to section heading if not there already.
+  (if (not (looking-at markdown-regex-header))
+      (condition-case nil
+          (markdown-back-to-heading-over-code-block invisible-ok)
+        (error (goto-char (point-min))))
+    ;; Otherwise, try to move up the heading hierarchy.
+    (condition-case nil
+        (markdown-up-heading 1)
+      (error (condition-case nil
+                 (markdown-backward-same-level 1)
+               (error (goto-char (point-min)))))))
+  (point))
+
+;; This function is derived from `org-end-of-subtree'.
+(defun markdown-end-of-subtree (&optional invisible-ok to-heading)
+  "Move to the end of the current subtree.
+Only visible header lines are considered, unless INVISIBLE-OK is
+non-nil. When TO-HEADING is non-nil or when called interactively,
+move to the point at which the next header begins.  This is useful
+when calling the function repeatedly, to move across subtrees."
+  (interactive)
+  (when (called-interactively-p 'interactive) (setq to-heading t))
+  ;; Attempt to move back to the section heading first.
+  (condition-case nil
+      (markdown-back-to-heading-over-code-block invisible-ok)
+    ;; If the point is before first heading, move to first heading.
+    (error (markdown-next-heading)))
   (let ((first t)
+        (start (point))
         (level (markdown-outline-level)))
     (while (and (not (eobp))
                 (or first (> (markdown-outline-level) level)))
       (setq first nil)
       (markdown-next-heading))
+    ;; If the point is at the end of the subtree already, move
+    ;; up and forward at the higher level first.  On failure,
+    ;; move to the end of the buffer.
+    (when (= start (point))
+      (condition-case nil
+          (progn (markdown-up-heading 1)
+                 (markdown-forward-same-level 1)
+                 (markdown-end-of-subtree invisible-ok to-heading))
+        (error (goto-char (point-max))))))
+  (unless to-heading
     (if (memq (preceding-char) '(?\n ?\^M))
         (progn
           ;; Go to end of line before heading
