@@ -7569,7 +7569,7 @@ and disable otherwise."
     (message "markdown-mode native code block fontification disabled"))
   (markdown-reload-extensions))
 
-;; This is based on `org-code-lang-modes' from org-src.el
+;; This is based on `org-src-lang-modes' from org-src.el
 (defcustom markdown-code-lang-modes
   '(("ocaml" . tuareg-mode) ("elisp" . emacs-lisp-mode) ("ditaa" . artist-mode)
     ("asymptote" . asy-mode) ("dot" . fundamental-mode) ("sqlite" . sql-mode)
