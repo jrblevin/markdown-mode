@@ -7593,10 +7593,10 @@ LANG is a string, and the returned major mode is a symbol."
           (if (and markdown-fontify-code-blocks-natively
                    (setq lang (markdown-code-block-lang)))
               (markdown-fontify-gfm-code-block lang start end)
-            (add-face-text-property start end 'markdown-pre-face 'append))
+            (add-text-properties start end '(face markdown-pre-face)))
           ;; Set background for block as well as opening and closing lines.
-          (add-face-text-property
-           bol-prev eol-next 'markdown-code-face 'append))))
+          (font-lock-append-text-property
+           bol-prev eol-next 'face 'markdown-code-face))))
     t))
 
 ;; Based on `org-src-font-lock-fontify-block' from org-src.el.
