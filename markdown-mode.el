@@ -2211,11 +2211,6 @@ START and END delimit region to propertize."
   "Base face for headers hash delimiter."
   :group 'markdown-faces)
 
-(defface markdown-inline-code-face
-  '((t (:inherit font-lock-constant-face)))
-  "Face for inline code."
-  :group 'markdown-faces)
-
 (defface markdown-list-face
   '((t (:inherit markdown-markup-face)))
   "Face for list item markers."
@@ -2226,13 +2221,18 @@ START and END delimit region to propertize."
   "Face for blockquote sections."
   :group 'markdown-faces)
 
-(defface markdown-code-block-face
-  `((t (:inherit default)))
-  "Face for fenced code blocks."
+(defface markdown-code-face
+  `((t (:inherit fixed-pitch)))
+  "Face for inline code, pre blocks, and fenced code blocks."
+  :group 'markdown-faces)
+
+(defface markdown-inline-code-face
+  '((t (:inherit markdown-code-face font-lock-constant-face)))
+  "Face for inline code."
   :group 'markdown-faces)
 
 (defface markdown-pre-face
-  '((t (:inherit (markdown-code-block-face font-lock-constant-face))))
+  '((t (:inherit (markdown-code-face font-lock-constant-face))))
   "Face for preformatted text."
   :group 'markdown-faces)
 
@@ -2375,15 +2375,15 @@ size of `markdown-header-face'."
       (unless (get face-name 'saved-face) ; Don't update customized faces
         (set-face-attribute face-name nil :height scale)))))
 
-(defun markdown-update-code-block-face ()
-  "Generate `markdown-code-block-face' for code block backgrounds.
+(defun markdown-update-code-face ()
+  "Generate `markdown-code-face' for code block backgrounds.
 When using a light-background theme, darken the background slightly for
 code blocks.  Similarly, when using a dark-background theme, lighten it
 slightly.  If the face has been customized already, leave it alone."
   ;; Don't update customized faces
-  (unless (get 'markdown-code-block-face 'saved-face)
+  (unless (get 'markdown-code-face 'saved-face)
     (set-face-attribute
-     'markdown-code-block-face nil
+     'markdown-code-face nil
      :background
      (cl-case (cdr (assq 'background-mode (frame-parameters)))
        ('light (color-darken-name (face-background 'default) 5))
@@ -7596,7 +7596,7 @@ LANG is a string, and the returned major mode is a symbol."
             (add-face-text-property start end 'markdown-pre-face 'append))
           ;; Set background for block as well as opening and closing lines.
           (add-face-text-property
-           bol-prev eol-next 'markdown-code-block-face 'append))))
+           bol-prev eol-next 'markdown-code-face 'append))))
     t))
 
 ;; Based on `org-src-font-lock-fontify-block' from org-src.el.
@@ -7676,7 +7676,7 @@ position."
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
   (add-to-list 'font-lock-extra-managed-props 'composition)
-  (markdown-update-code-block-face)
+  (markdown-update-code-face)
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
   ;; Reload extensions
