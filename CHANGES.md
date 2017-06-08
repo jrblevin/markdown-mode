@@ -20,6 +20,8 @@
         language is specified where we can automatically determine the
         appropriate mode to use.  The language to mode mapping may be
         customized by setting the variable `markdown-code-lang-modes`.
+    -   Add command <kbd>C-c C-x C-f</kbd> for toggling native font lock
+        for code blocks (`markdown-toggle-fontify-code-blocks-natively`).
     -   Add "page" movement, marking, and narrowing commands, where a
         "page" in Markdown is defined to be a top-level subtree:
         `markdown-forward-page` (<kbd>C-x ]</kbd>),

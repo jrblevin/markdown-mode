@@ -707,7 +707,9 @@
 ;;      works for fenced code blocks where the language is specified
 ;;      where we can automatically determine the appropriate mode to
 ;;      use.  The language to mode mapping may be customized by setting
-;;      the variable `markdown-code-lang-modes'.
+;;      the variable `markdown-code-lang-modes'.  This can be toggled
+;;      interactively by pressing `C-c C-x C-f`
+;;      (`markdown-toggle-fontify-code-blocks-natively`).
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
@@ -5088,6 +5090,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Toggling functionality
+    (define-key map (kbd "C-c C-x C-f") 'markdown-toggle-fontify-code-blocks-natively)
     (define-key map (kbd "C-c C-x C-i") 'markdown-toggle-inline-images)
     (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-hidden-urls)
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
@@ -5218,7 +5221,10 @@ See also `markdown-mode-map'.")
      ["Blockquote Region" markdown-blockquote-region]
      ["Preformatted Region" markdown-pre-region]
      "---"
-     ["Enable LaTeX math" markdown-toggle-math
+     ["Fontify Code Blocks Natively" markdown-toggle-fontify-code-blocks-natively
+      :style radio
+      :selected markdown-fontify-code-blocks-natively]
+     ["LaTeX Math Support" markdown-toggle-math
       :style radio
       :selected markdown-enable-math])
     "---"
@@ -7548,6 +7554,20 @@ mode to use.  The language to mode mapping may be customized by
 setting the variable `markdown-code-lang-modes'."
   :group 'markdown
   :type 'boolean)
+
+(defun markdown-toggle-fontify-code-blocks-natively (&optional arg)
+  "Toggle the native fontification of code blocks.
+With a prefix argument ARG, enable if ARG is positive,
+and disable otherwise."
+  (interactive (list (or current-prefix-arg 'toggle)))
+  (setq markdown-fontify-code-blocks-natively
+        (if (eq arg 'toggle)
+            (not markdown-fontify-code-blocks-natively)
+          (> (prefix-numeric-value arg) 0)))
+  (if markdown-fontify-code-blocks-natively
+      (message "markdown-mode native code block fontification enabled")
+    (message "markdown-mode native code block fontification disabled"))
+  (markdown-reload-extensions))
 
 ;; This is based on `org-code-lang-modes' from org-src.el
 (defcustom markdown-code-lang-modes

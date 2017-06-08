@@ -689,7 +689,9 @@ provides an interface to all of the possible customizations:
      works for fenced code blocks where the language is specified
      where we can automatically determine the appropriate mode to
      use.  The language to mode mapping may be customized by setting
-     the variable `markdown-code-lang-modes`.
+     the variable `markdown-code-lang-modes`.  This can be toggled
+     interactively by pressing <kbd>C-c C-x C-f</kbd>
+     (`markdown-toggle-fontify-code-blocks-natively`).
 
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
