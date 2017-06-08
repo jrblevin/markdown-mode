@@ -2316,9 +2316,12 @@ puts markdown.to_html
       (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
       (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
       (markdown-test-range-has-face 9 90 'markdown-code-face) ; entire code block
-      (markdown-test-range-has-face 9 15 'font-lock-builtin-face) ; require
+      (unless (version< emacs-version "24.4")
+        (markdown-test-range-has-face 9 15 'font-lock-builtin-face)) ; require
       (markdown-test-range-has-face 17 27 'font-lock-string-face) ; 'redcarpet'
-      (markdown-test-range-has-face 70 72 'font-lock-builtin-face) ; puts
+      (markdown-test-range-has-face 40 48 'font-lock-type-face) ; Redcarpet
+      (unless (version< emacs-version "24.4")
+        (markdown-test-range-has-face 70 72 'font-lock-builtin-face)) ; puts
       (markdown-test-range-has-face 92 94 markdown-markup-face)))) ; ```
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
