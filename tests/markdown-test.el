@@ -3585,10 +3585,10 @@ x: x
      ;; Test that the code block is invisible
      (markdown-test-range-has-property 83 157 'invisible 'outline)
      ;; Check subsequent headings
-     (outline-next-visible-heading 1)
+     (markdown-next-visible-heading 1)
      (should (eq (point) 69))
      (should (looking-at "^## Level two"))
-     (outline-next-visible-heading 1)
+     (markdown-next-visible-heading 1)
      (should (eq (point) 159))
      (should (looking-at "^# Level one again")))))
 

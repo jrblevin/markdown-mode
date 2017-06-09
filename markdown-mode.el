@@ -452,11 +452,11 @@
 ;;
 ;;   * Outline Navigation: `C-c C-n`, `C-c C-p`, `C-c C-f`, `C-c C-b`, and `C-c C-u`
 ;;
-;;     Navigation between headings is possible using `outline-mode'.
-;;     Use `C-c C-n` and `C-c C-p` to move between the next and previous
-;;     visible headings.  Similarly, `C-c C-f` and `C-c C-b` move to the
-;;     next and previous visible headings at the same level as the one
-;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
+;;     Navigation between headings is possible using `C-c C-n` and
+;;     `C-c C-p` to move between the next and previous visible
+;;     headings.  Similarly, `C-c C-f` and `C-c C-b` move to the next
+;;     and previous visible headings at the same level as the one at
+;;     the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
 ;;   * Movement by Markdown Blocks: `M-{` and `M-}`
@@ -524,15 +524,13 @@
 ;; pre block, and so on.  Exdention is handled similarly when backspace
 ;; is pressed at the beginning of the non-whitespace portion of a line.
 ;;
-;; markdown-mode supports outline-minor-mode as well as org-mode-style
-;; visibility cycling for atx- or hash-style headings.  There are two
-;; types of visibility cycling: Pressing `S-TAB` cycles globally between
-;; the table of contents view (headings only), outline view (top-level
-;; headings only), and the full document view.  Pressing `TAB` while the
-;; point is at a heading will cycle through levels of visibility for the
-;; subtree: completely folded, visible children, and fully visible.
-;; Note that mixing hash and underline style headings will give undesired
-;; results.
+;; markdown-mode supports org-mode-style visibility cycling for atx-
+;; or hash-style headings.  There are two types of visibility cycling:
+;; Pressing `S-TAB` cycles globally between the table of contents view
+;; (headings only), outline view (top-level headings only), and the
+;; full document view.  Pressing `TAB` while the point is at a heading
+;; will cycle through levels of visibility for the subtree: completely
+;; folded, visible children, and fully visible.
 
 ;;; Customization:
 
@@ -914,7 +912,6 @@
 ;;; Code:
 
 (require 'easymenu)
-(require 'outline)
 (require 'thingatpt)
 (require 'cl-lib)
 (require 'url-parse)
@@ -2589,33 +2586,6 @@ in XEmacs 21."
    ;; XEmacs
    ((fboundp 'region-active-p)
     (defalias 'markdown-use-region-p 'region-active-p))))
-
-;; Use new names for outline-mode functions in Emacs 25 and later.
-(eval-and-compile
-  (defalias 'markdown-hide-sublevels
-    (if (fboundp 'outline-hide-sublevels)
-        'outline-hide-sublevels
-      'hide-sublevels))
-  (defalias 'markdown-show-all
-    (if (fboundp 'outline-show-all)
-        'outline-show-all
-      'show-all))
-  (defalias 'markdown-hide-body
-    (if (fboundp 'outline-hide-body)
-        'outline-hide-body
-      'hide-body))
-  (defalias 'markdown-show-children
-    (if (fboundp 'outline-show-children)
-        'outline-show-children
-      'show-children))
-  (defalias 'markdown-show-subtree
-    (if (fboundp 'outline-show-subtree)
-        'outline-show-subtree
-      'show-subtree))
-  (defalias 'markdown-hide-subtree
-    (if (fboundp 'outline-hide-subtree)
-        'outline-hide-subtree
-      'hide-subtree)))
 
 ;; Provide directory-name-p to Emacs 24
 (defsubst markdown-directory-name-p (name)
@@ -6077,43 +6047,55 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
 
 ;;; Outline ===================================================================
 
-(defun markdown-move-heading-common (move-fn &optional arg)
-  "Wrapper for `outline-mode' functions to skip false positives.
-MOVE-FN is a function and ARG is its argument. For example,
-headings inside preformatted code blocks may match
-`outline-regexp' but should not be considered as headings."
-  (let ((prev -1) (start (point)))
-    (if arg (funcall move-fn arg) (funcall move-fn))
-    (while (and (/= prev (point)) (markdown-code-block-at-point-p))
-      (setq prev (point))
-      (if arg (funcall move-fn arg) (funcall move-fn)))
-    ;; Adjust point for setext headings
-    (save-match-data
-      (when (thing-at-point-looking-at markdown-regex-header-setext)
-        (goto-char (match-beginning 0))))
-    (if (= (point) start) nil (point))))
+(defun markdown-next-heading (arg &optional visible-only)
+  "Move to the next heading of any level.
+With ARG, repeats or can move backward if negative.  When
+VISIBLE-ONLY is non-nil, move past invisible headings."
+  (interactive "p")
+  (if (< arg 0)
+      (beginning-of-line)
+    (end-of-line))
+  (let (found)
+    ;; Move backward with negative argument.
+    (while (and (not (bobp)) (< arg 0))
+      (setq found nil)
+      (while (and (not found)
+                  (not (bobp))
+                  (re-search-backward markdown-regex-header nil 'move))
+        (when (and (not (markdown-code-block-at-pos (match-beginning 0)))
+                   (not (and visible-only (invisible-p (match-beginning 0)))))
+          (setq found (match-beginning 0))))
+      (setq arg (1+ arg)))
+    ;; Move forward with positive argument.
+    (while (and (not (eobp)) (> arg 0))
+      (setq found nil)
+      (while (and (not found)
+                  (not (eobp))
+                  (re-search-forward markdown-regex-header nil 'move))
+        (when (and (not (markdown-code-block-at-pos (match-beginning 0)))
+                   (not (and visible-only (invisible-p (match-beginning 0)))))
+          (setq found (match-beginning 0))))
+      (setq arg (1- arg)))
+    (if found (beginning-of-line))))
+
+(defun markdown-previous-heading (arg &optional visible-only)
+  "Move to the previous heading of any level.
+With ARG, repeats or can move backward if negative.  When
+VISIBLE-ONLY is non-nil, move past invisible headings."
+  (interactive "p")
+  (markdown-next-heading (- arg) visible-only))
 
 (defun markdown-next-visible-heading (arg)
-  "Move to the next visible heading line of any level.
-With argument, repeats or can move backward if negative. ARG is
-passed to `outline-next-visible-heading'."
+  "Move to the next visible heading of any level.
+With ARG, repeats or can move backward if negative."
   (interactive "p")
-  (markdown-move-heading-common 'outline-next-visible-heading arg))
+  (markdown-next-heading arg t))
 
 (defun markdown-previous-visible-heading (arg)
-  "Move to the previous visible heading line of any level.
-With argument, repeats or can move backward if negative. ARG is
-passed to `outline-previous-visible-heading'."
+  "Move to the previous visible heading of any level.
+With ARG, repeats or can move backward if negative."
   (interactive "p")
-  (markdown-move-heading-common 'outline-previous-visible-heading arg))
-
-(defun markdown-next-heading ()
-  "Move to the next heading line of any level."
-  (markdown-move-heading-common 'outline-next-heading))
-
-(defun markdown-previous-heading ()
-  "Move to the previous heading line of any level."
-  (markdown-move-heading-common 'outline-previous-heading))
+  (markdown-next-heading (- arg) t))
 
 (defun markdown-back-to-heading-over-code-block (&optional invisible-ok no-error)
   "Move back to the beginning of the previous heading.
@@ -6130,7 +6112,7 @@ Leaves match data intact for `markdown-regex-header'."
         (save-excursion
           (while (and (not found)
                       (re-search-backward markdown-regex-header nil t))
-            (when (and (or invisible-ok (not (outline-invisible-p)))
+            (when (and (or invisible-ok (not (invisible-p (point))))
                        (not (markdown-code-block-at-point-p)))
               (setq found (point))))
           (if (not found)
@@ -6138,12 +6120,47 @@ Leaves match data intact for `markdown-regex-header'."
             (setq found (point))))
         (when found (goto-char found)))))
 
+;; Based on `outline-get-next-sibling' from outline.el.
+(defun markdown-get-next-sibling ()
+  "Move to next heading of the same level, and return point.
+If there is no such heading, return nil."
+  (let ((level (markdown-outline-level)))
+    (markdown-next-visible-heading 1)
+    (while (and (not (eobp)) (> (markdown-outline-level) level))
+      (markdown-next-visible-heading 1))
+    (if (or (eobp) (< (markdown-outline-level) level))
+	nil
+      (point))))
+
+;; Based on `outline-get-last-sibling' from outline.el.
+(defun markdown-get-previous-sibling ()
+  "Move to previous heading of the same level, and return point.
+If there is no such heading, return nil."
+  (let ((opoint (point))
+	(level (markdown-outline-level)))
+    (markdown-previous-visible-heading 1)
+    (when (and (/= (point) opoint) (markdown-on-heading-p))
+      (while (and (> (markdown-outline-level) level)
+		  (not (bobp)))
+	(markdown-previous-visible-heading 1))
+      (if (< (markdown-outline-level) level)
+	  nil
+        (point)))))
+
+;; Based on `outline-forward-same-level' from outline.el.
 (defun markdown-forward-same-level (arg)
   "Move forward to the ARG'th heading at same level as this one.
 Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-back-to-heading-over-code-block)
-  (markdown-move-heading-common 'outline-forward-same-level arg))
+  (while (> arg 0)
+    (let ((point-to-move-to (save-excursion (markdown-get-next-sibling))))
+      (if point-to-move-to
+	  (progn (goto-char point-to-move-to)
+                 (setq arg (1- arg)))
+	(progn
+	  (setq arg 0)
+	  (error "No following same-level heading"))))))
 
 (defun markdown-backward-same-level (arg)
   "Move backward to the ARG'th heading at same level as this one.
@@ -6151,46 +6168,55 @@ Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-back-to-heading-over-code-block)
   (while (> arg 0)
-    ;; outline-get-last-sibling needs match-data set for outline-regexp.
-    (let ((point-to-move-to (save-excursion
-                              (outline-get-last-sibling))))
+    (let ((point-to-move-to (save-excursion (markdown-get-previous-sibling))))
       (if point-to-move-to
-          (progn
-            (goto-char point-to-move-to)
-            (setq arg (1- arg)))
+          (progn (goto-char point-to-move-to)
+                 (setq arg (1- arg)))
         (error "No previous same-level heading")))))
 
-(defun markdown-up-heading (arg)
+(defun markdown-up-heading (arg &optional invisible-ok)
   "Move to the visible heading line of which the present line is a subheading.
-With argument, move up ARG levels."
+With argument, move up ARG levels.  If INVISIBLE-OK is non-nil,
+also consider invisible lines."
   (interactive "p")
   (and (called-interactively-p 'any)
        (not (eq last-command 'markdown-up-heading)) (push-mark))
-  (markdown-move-heading-common 'outline-up-heading arg))
+  (markdown-back-to-heading-over-code-block invisible-ok)
+  (let ((start-level (markdown-outline-level)))
+    (when (<= start-level 1)
+      (error "Already at top level of the outline"))
+    (while (and (> start-level 1) (> arg 0) (not (bobp)))
+      (let ((level start-level))
+	(while (not (or (< level start-level) (bobp)))
+	  (if invisible-ok
+	      (markdown-previous-heading 1)
+	    (markdown-previous-visible-heading 1))
+	  (setq level (markdown-outline-level)))
+	(setq start-level level))
+      (setq arg (- arg 1))))
+  (looking-at markdown-regex-header))
 
-(defun markdown-back-to-heading (&optional invisible-ok)
-  "Move to previous heading line, or beg of this line if it's a heading.
-Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
-  (markdown-move-heading-common 'outline-back-to-heading invisible-ok))
-
-(defalias 'markdown-end-of-heading 'outline-end-of-heading)
+(defun markdown-end-of-heading ()
+  "Move to one char before the next end of a heading line."
+  (if (re-search-forward "\n" nil 'move)
+      (forward-char -1)))
 
 (defun markdown-on-heading-p ()
   "Return non-nil if point is on a heading line."
   (get-text-property (point) 'markdown-heading))
 
+;; Derived from `org-end-of-subtree'.
 (defun markdown-end-of-subtree (&optional invisible-OK)
   "Move to the end of the current subtree.
 Only visible heading lines are considered, unless INVISIBLE-OK is
-non-nil.
-Derived from `org-end-of-subtree'."
-  (markdown-back-to-heading invisible-OK)
+non-nil."
+  (markdown-back-to-heading-over-code-block invisible-OK)
   (let ((first t)
         (level (markdown-outline-level)))
     (while (and (not (eobp))
                 (or first (> (markdown-outline-level) level)))
       (setq first nil)
-      (markdown-next-heading))
+      (markdown-next-heading 1))
     (if (memq (preceding-char) '(?\n ?\^M))
         (progn
           ;; Go to end of line before heading
@@ -6217,38 +6243,59 @@ setext header, but should not be folded."
           (let ((end (progn (goto-char (cl-second body))
                             (markdown-text-property-at-point
                              'markdown-yaml-metadata-end))))
-            (outline-flag-region (point-min) (1+ (cl-second end)) nil)))))
+            (markdown-outline-flag-region
+             (point-min) (1+ (cl-second end)) nil)))))
     ;; Hide any false positives in code blocks
-    (unless (outline-on-heading-p)
-      (outline-next-visible-heading 1))
+    (unless (markdown-on-heading-p)
+      (markdown-next-visible-heading 1))
     (while (< (point) (point-max))
       (when (markdown-code-block-at-point-p)
-        (outline-flag-region (1- (point-at-bol)) (point-at-eol) t))
-      (outline-next-visible-heading 1))))
+        (markdown-outline-flag-region
+         (1- (point-at-bol)) (point-at-eol) t))
+      (markdown-next-visible-heading 1))))
 
 (defvar markdown-cycle-global-status 1)
 (defvar markdown-cycle-subtree-status nil)
 
 (defun markdown-next-preface ()
+  "Move point just before the next heading line."
   (let (finish)
-    (while (and (not finish) (re-search-forward (concat "\n\\(?:" outline-regexp "\\)")
-                                                nil 'move))
+    (while (and (not finish)
+                (re-search-forward markdown-regex-header nil 'move))
       (unless (markdown-code-block-at-point-p)
         (goto-char (match-beginning 0))
         (setq finish t))))
-  (when (and (bolp) (or outline-blank-line (eobp)) (not (bobp)))
+  (when (and (bolp) (eobp) (not (bobp)))
     (forward-char -1)))
 
+(defun markdown-isearch-open-invisible (_overlay)
+  "Used for `isearch-open-invisible' overlay property."
+  (markdown-show-entry))
+
+;; Based on `outline-flag-region' from outline.el.
+(defun markdown-outline-flag-region (from to flag)
+  "Hide or show lines from FROM to TO, according to FLAG.
+If FLAG is nil then text is shown, while if FLAG is t the text is hidden."
+  (remove-overlays from to 'invisible 'markdown-outline)
+  (when flag
+    ;; We use `front-advance' here because the invisible text begins at the
+    ;; very end of the heading, before the newline, so text inserted at FROM
+    ;; belongs to the heading rather than to the entry.
+    (let ((o (make-overlay from to nil 'front-advance)))
+      (overlay-put o 'evaporate t)
+      (overlay-put o 'invisible 'markdown-outline)
+      (overlay-put o 'isearch-open-invisible 'markdown-isearch-open-invisible))))
+
 (defun markdown-show-entry ()
+  "Show the contents of this section and the heading."
   (save-excursion
-    (outline-back-to-heading t)
-    (outline-flag-region (1- (point))
-                         (progn
-                           (markdown-next-preface)
-                           (if (= 1 (- (point-max) (point)))
-                               (point-max)
-                             (point)))
-                         nil)))
+    (markdown-back-to-heading-over-code-block t)
+    (let ((from (1- (point)))
+          (to (progn (markdown-next-preface)
+                     (if (= 1 (- (point-max) (point)))
+                         (point-max)
+                       (point)))))
+      (markdown-outline-flag-region from to nil))))
 
 (defun markdown-cycle (&optional arg)
   "Visibility cycling for Markdown mode.
@@ -6266,6 +6313,7 @@ Derived from `org-cycle'."
       (markdown-hide-sublevels 1)
       (message "CONTENTS")
       (setq markdown-cycle-global-status 3)
+      ;; FIXME: Remove this dependency
       (markdown-outline-fix-visibility))
 
      ((and (eq last-command this-command)
@@ -6280,15 +6328,16 @@ Derived from `org-cycle'."
       (markdown-hide-body)
       (message "OVERVIEW")
       (setq markdown-cycle-global-status 2)
+      ;; FIXME: Remove this dependency
       (markdown-outline-fix-visibility))))
 
    ((save-excursion (beginning-of-line 1) (markdown-on-heading-p))
     ;; At a heading: rotate between three different views
-    (markdown-back-to-heading)
+    (markdown-back-to-heading-over-code-block)
     (let ((goal-column 0) eoh eol eos)
       ;; Determine boundaries
       (save-excursion
-        (markdown-back-to-heading)
+        (markdown-back-to-heading-over-code-block)
         (save-excursion
           (beginning-of-line 2)
           (while (and (not (eobp)) ;; this is like `next-line'
@@ -6332,6 +6381,50 @@ Calls `markdown-cycle' with argument t."
   (interactive)
   (markdown-cycle t))
 
+;; NEEDS_WORK/FIXME: Continue here
+(defun markdown-hide-sublevels (levels)
+  "Hide everything but the top LEVELS levels of headers, in whole buffer.
+This also unhides the top heading-less body, if any.
+
+Interactively, the prefix argument supplies the value of LEVELS.
+When invoked without a prefix argument, LEVELS defaults to the level
+of the current heading, or to 1 if the current line is not a heading."
+  (interactive (list
+		(cond
+		 (current-prefix-arg (prefix-numeric-value current-prefix-arg))
+		 ((save-excursion (beginning-of-line)
+				  (looking-at markdown-regex-header))
+		  (markdownoutline-level))
+		 (t 1))))
+  (if (< levels 1)
+      (error "Must keep at least one level of headers"))
+  (save-excursion
+    (let* (outline-view-change-hook
+           (beg (progn
+                  (goto-char (point-min))
+                  ;; Skip the prelude, if any.
+                  (unless (outline-on-heading-p t) (outline-next-heading))
+                  (point)))
+           (end (progn
+                  (goto-char (point-max))
+                  ;; Keep empty last line, if available.
+                  (if (bolp) (1- (point)) (point)))))
+      (if (< end beg)
+	  (setq beg (prog1 end (setq end beg))))
+      ;; First hide everything.
+      (markdown-flag-region beg end t)
+      ;; Then unhide the top level headers.
+      (outline-map-region
+       (lambda ()
+	 (if (<= (funcall outline-level) levels)
+	     (outline-show-heading)))
+       beg end)
+      ;; Finally unhide any trailing newline.
+      (goto-char (point-max))
+      (if (and (bolp) (not (bobp)) (outline-invisible-p (1- (point))))
+          (outline-flag-region (1- (point)) (point) nil))))
+  (run-hooks 'outline-view-change-hook))
+
 (defun markdown-outline-level ()
   "Return the depth to which a statement is nested in the outline."
   (cond
@@ -6357,7 +6450,7 @@ demote."
             (remove 't))
         (markdown-cycle-atx promote-or-demote remove)
         (catch 'end-of-subtree
-          (while (markdown-next-heading)
+          (while (markdown-next-heading 1)
             ;; Exit if this not a higher level heading; promote otherwise.
             (if (and (looking-at markdown-regex-header-atx)
                      (<= (length (match-string-no-properties 1)) level))
@@ -7856,13 +7949,9 @@ position."
        'markdown-adaptive-fill-function)
   (set (make-local-variable 'fill-forward-paragraph-function)
        'markdown-fill-forward-paragraph-function)
-  ;; Outline mode
-  (make-local-variable 'outline-regexp)
-  (setq outline-regexp markdown-regex-header)
-  (make-local-variable 'outline-level)
-  (setq outline-level 'markdown-outline-level)
-  ;; Cause use of ellipses for invisible text.
-  (add-to-invisibility-spec '(outline . t))
+
+  ;; Outline visibility cycling
+  (add-to-invisibility-spec '(markdown-outline . t))
 
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
