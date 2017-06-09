@@ -687,6 +687,18 @@ provides an interface to all of the possible customizations:
     interactively using <kbd>C-c C-x C-l</kbd> (`markdown-toggle-url-hiding`)
     or from the Markdown | Links & Images menu.
 
+  * `markdown-hide-markup` - Determines whether all possible markup
+    is hidden or otherwise beautified (default: `nil`).   The actual
+    buffer text remains unchanged, but the display will be altered.
+    Brackets and URLs for links will be hidden, asterisks and
+    underscores for italic and bold text will be hidden, text
+    bullets for unordered lists will be replaced by Unicode
+    bullets, and so on.  Since this includes URLs and reference
+    labels, when non-nil this setting supercedes `markdown-hide-urls`.
+    Markup hiding can be toggled using <kbd>C-c C-x C-m</kbd>
+    (`markdown-toggle-markup-hiding`) or from the Markdown | Show &
+    Hide menu.
+
   * `markdown-fontify-code-blocks-natively` - Whether to fontify
      code in code blocks using the native major mode.  This only
      works for fenced code blocks where the language is specified

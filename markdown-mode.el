@@ -705,6 +705,18 @@
 ;;     interactively using `C-c C-x C-l` (`markdown-toggle-url-hiding')
 ;;     or from the Markdown | Links & Images menu.
 ;;
+;;   * `markdown-hide-markup' - Determines whether all possible markup
+;;     is hidden or otherwise beautified (default: `nil').   The actual
+;;     buffer text remains unchanged, but the display will be altered.
+;;     Brackets and URLs for links will be hidden, asterisks and
+;;     underscores for italic and bold text will be hidden, text
+;;     bullets for unordered lists will be replaced by Unicode
+;;     bullets, and so on.  Since this includes URLs and reference
+;;     labels, when non-nil this setting supercedes `markdown-hide-urls'.
+;;     Markup hiding can be toggled using `C-c C-x C-m`
+;;     (`markdown-toggle-markup-hiding') or from the Markdown | Show &
+;;     Hide menu.
+;;
 ;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
 ;;      code in code blocks using the native major mode.  This only
 ;;      works for fenced code blocks where the language is specified
@@ -2079,6 +2091,39 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-blockquotes start end)
       (markdown-syntax-propertize-headings start end)
       (markdown-syntax-propertize-comments start end))))
+
+
+;;; Markup Hiding
+
+(defcustom markdown-hide-markup nil
+  "Determines whether markup in the buffer will be hidden.
+When set to nil, all markup is displayed in the buffer as it
+appears in the file.  An exception is when `markdown-hide-urls'
+is non-nil.
+When set to a non-nil value, all possible markup will be hidden.
+You can interactively toggle the value of this variable with
+`markdown-toggle-markup-hiding', \\[markdown-toggle-markup-hiding],
+or from the Markdown > Show & Hide menu."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.3"))
+
+(defun markdown-toggle-markup-hiding (&optional arg)
+  "Toggle the display or hiding of markup.
+With a prefix argument ARG, enable markup hiding if ARG is positive,
+and disable it otherwise."
+  (interactive (list (or current-prefix-arg 'toggle)))
+  (setq markdown-hide-markup
+        (if (eq arg 'toggle)
+            (not markdown-hide-markup)
+          (> (prefix-numeric-value arg) 0)))
+  (if markdown-hide-markup
+      (progn (add-to-invisibility-spec 'markdown-markup)
+             (message "markdown-mode markup hiding enabled"))
+    (progn (remove-from-invisibility-spec 'markdown-markup)
+           (message "markdown-mode markup hiding disabled")))
+  (markdown-reload-extensions))
 
 
 ;;; Font Lock =================================================================
@@ -5102,6 +5147,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-x C-f") 'markdown-toggle-fontify-code-blocks-natively)
     (define-key map (kbd "C-c C-x C-i") 'markdown-toggle-inline-images)
     (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-url-hiding)
+    (define-key map (kbd "C-c C-x C-m") 'markdown-toggle-markup-hiding)
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
     ;; Alternative keys (in case of problems with the arrow keys)
     (define-key map (kbd "C-c C-x u") 'markdown-move-up)
@@ -5159,7 +5205,11 @@ See also `markdown-mode-map'.")
      ["Narrow to Block" markdown-narrow-to-block]
      ["Narrow to Section" narrow-to-defun]
      ["Narrow to Subtree" markdown-narrow-to-subtree]
-     ["Widen" widen (buffer-narrowed-p)])
+     ["Widen" widen (buffer-narrowed-p)]
+     "---"
+     ["Toggle Markup Hiding" markdown-toggle-markup-hiding
+      :style radio
+      :selected markdown-hide-markup])
     "---"
     ("Headings & Structure"
      ["Automatic Heading" markdown-insert-header-dwim]
@@ -7720,6 +7770,12 @@ position."
   (set (make-local-variable 'font-lock-multiline) t)
   (add-to-list 'font-lock-extra-managed-props 'composition)
   (markdown-update-code-face)
+  ;; Markup hiding
+  (make-local-variable 'markdown-hide-markup)
+  (add-to-list 'font-lock-extra-managed-props 'invisible)
+  (if markdown-hide-markup
+      (add-to-invisibility-spec 'markdown-markup)
+    (remove-from-invisibility-spec 'markdown-markup))
   ;; Extensions
   (make-local-variable 'markdown-enable-math)
   ;; Reload extensions
