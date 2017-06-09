@@ -2605,6 +2605,15 @@ date: 2015-08-13 11:35:25 EST
    (markdown-test-range-has-face 1 10 markdown-blockquote-face)
    (markdown-test-range-has-face 4 9 markdown-italic-face)))
 
+(ert-deftest test-markdown-font-lock/blockquote-code ()
+  "Test font lock for inline code inside of a blockquote."
+  (markdown-test-string
+   "> `code`"
+   (markdown-test-range-has-face 1 8 'markdown-blockquote-face)
+   (markdown-test-range-has-face 3 3 'markdown-markup-face)
+   (markdown-test-range-has-face 4 7 'markdown-inline-code-face)
+   (markdown-test-range-has-face 8 8 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/blockquote-link ()
   "Test font lock for links inside of a blockquote.
 This test will fail until font lock for inline links inside
