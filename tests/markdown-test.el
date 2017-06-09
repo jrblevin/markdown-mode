@@ -2595,14 +2595,14 @@ date: 2015-08-13 11:35:25 EST
   "Test font lock for bold inside of a blockquote."
   (markdown-test-string
    "> **bold**"
-   (markdown-test-range-has-face 2 10 markdown-blockquote-face)
+   (markdown-test-range-has-face 1 10 markdown-blockquote-face)
    (markdown-test-range-has-face 5 8 markdown-bold-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-italic ()
   "Test font lock for italic inside of a blockquote."
   (markdown-test-string
    "> *italic*"
-   (markdown-test-range-has-face 2 10 markdown-blockquote-face)
+   (markdown-test-range-has-face 1 10 markdown-blockquote-face)
    (markdown-test-range-has-face 4 9 markdown-italic-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-link ()
@@ -2610,12 +2610,15 @@ date: 2015-08-13 11:35:25 EST
 This test will fail until font lock for inline links inside
 blockquotes is implemented (at present, the blockquote face
 takes precedence)."
-  :expected-result :failed
   (markdown-test-string
    "> [link](url)"
-   (markdown-test-range-has-face 1 13 markdown-blockquote-face)
-   (markdown-test-range-has-face 3 8 markdown-link-face)
-   (markdown-test-range-has-face 9 13 markdown-url-face)))
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 13 markdown-blockquote-face)
+   (markdown-test-range-has-face 3 3 markdown-markup-face)
+   (markdown-test-range-has-face 4 7 markdown-link-face)
+   (markdown-test-range-has-face 8 9 markdown-markup-face)
+   (markdown-test-range-has-face 10 12 markdown-url-face)
+   (markdown-test-range-has-face 13 13 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-comment ()
   "Test font lock for comments inside of a blockquote."

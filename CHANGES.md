@@ -10,6 +10,9 @@
         should be considered deprecated by <kbd>C-c C-x C-i</kbd> and
         may be removed in the near future.  Toggling keybindings are
         currently being grouped under <kbd>C-c C-x</kbd>.
+    -   `markdown-blockquote-face` is now applied to the entire
+        blockquote, including the leading `>`, so it can be used to
+        apply a background if desired.
 
 *   New features:
 

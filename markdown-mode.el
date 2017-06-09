@@ -2423,8 +2423,6 @@ See `font-lock-syntactic-face-function' for details."
     (markdown-match-fenced-end-code-block . ((0 markdown-markup-face)))
     (markdown-match-fenced-code-blocks . ((0 markdown-pre-face)))
     (markdown-match-pre-blocks . ((0 markdown-pre-face)))
-    (markdown-match-blockquotes . ((1 markdown-markup-face)
-                                   (2 markdown-blockquote-face)))
     (markdown-match-heading-1-setext . ((1 markdown-header-face-1)
                                         (2 markdown-header-rule-face)))
     (markdown-match-heading-2-setext . ((1 markdown-header-face-2)
@@ -2489,7 +2487,9 @@ See `font-lock-syntactic-face-function' for details."
                               (3 markdown-markup-face prepend)))
     (markdown-fontify-plain-uris)
     (,markdown-regex-email . markdown-link-face)
-    (,markdown-regex-line-break . (1 markdown-line-break-face prepend)))
+    (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
+    (markdown-match-blockquotes . ((0 markdown-blockquote-face append)
+                                   (1 markdown-markup-face prepend))))
   "Syntax highlighting for Markdown files.")
 
 (defvar markdown-mode-font-lock-keywords nil
