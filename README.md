@@ -677,13 +677,13 @@ provides an interface to all of the possible customizations:
     non-nil (default), then buttons are enabled.  This works in
     `markdown-mode` as well as `gfm-mode`.
 
-  * `markdown-hidden-urls` - Determines whether URL and reference
+  * `markdown-hide-urls` - Determines whether URL and reference
     labels are hidden for inline and reference links.  By default,
     inline links will appear in the buffer as `[link](∞)` instead
     of `[link](http://perhaps.a/very/long/url/)`.  To change the
     placeholder (composition) character used, set the variable
-    `markdown-url-compose-char`.  Hidden URLs can be toggled using
-    <kbd>C-c C-x C-l</kbd> (`markdown-toggle-hidden-urls`).
+    `markdown-url-compose-char`.  URL hiding can be toggled
+    interactively using <kbd>C-c C-x C-l</kbd> (`markdown-toggle-url-hiding`).
 
   * `markdown-fontify-code-blocks-natively` - Whether to fontify
      code in code blocks using the native major mode.  This only

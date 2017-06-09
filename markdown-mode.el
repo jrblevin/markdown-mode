@@ -700,8 +700,8 @@
 ;;     inline links will appear in the buffer as `[link](∞)` instead
 ;;     of `[link](http://perhaps.a/very/long/url/)`.  To change the
 ;;     placeholder (composition) character used, set the variable
-;;     `markdown-url-compose-char'.  URL hiding can be toggled using
-;;     `C-c C-x C-l` (`markdown-toggle-url-hiding').
+;;     `markdown-url-compose-char'.  URL hiding can be toggled
+;;     interactively using `C-c C-x C-l` (`markdown-toggle-url-hiding').
 ;;
 ;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
 ;;      code in code blocks using the native major mode.  This only
@@ -5206,7 +5206,7 @@ See also `markdown-mode-map'.")
      ["Wiki Link" markdown-insert-wiki-link]
      "---"
      ["Check References" markdown-check-refs]
-     ["Toggle Hidden URLs" markdown-toggle-url-hiding
+     ["Toggle URL Hiding" markdown-toggle-url-hiding
       :style radio
       :selected markdown-hide-urls]
      ["Toggle Inline Images" markdown-toggle-inline-images
