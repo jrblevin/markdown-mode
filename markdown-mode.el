@@ -7780,6 +7780,8 @@ position."
   (set (make-local-variable 'font-lock-multiline) t)
   (add-to-list 'font-lock-extra-managed-props 'composition)
   (markdown-update-code-face)
+  ;; URL hiding
+  (make-local-variable 'markdown-hide-urls)
   ;; Markup hiding
   (make-local-variable 'markdown-hide-markup)
   (add-to-list 'font-lock-extra-managed-props 'invisible)
