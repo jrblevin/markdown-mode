@@ -2095,6 +2095,10 @@ START and END delimit region to propertize."
 
 ;;; Markup Hiding
 
+(defconst markdown-markup-properties
+  '(face markdown-markup-face invisible markdown-markup)
+  "List of properties and values to apply to markup.")
+
 (defcustom markdown-hide-markup nil
   "Determines whether markup in the buffer will be hidden.
 When set to nil, all markup is displayed in the buffer as it
@@ -2497,12 +2501,12 @@ See `font-lock-syntactic-face-function' for details."
                                        (2 markdown-markup-face)
                                        (3 markdown-metadata-value-face)))
     (markdown-match-hr . markdown-header-delimiter-face)
-    (markdown-match-code . ((1 markdown-markup-face)
+    (markdown-match-code . ((1 markdown-markup-properties)
                             (2 markdown-inline-code-face)
-                            (3 markdown-markup-face)))
-    (,markdown-regex-kbd . ((1 markdown-markup-face)
+                            (3 markdown-markup-properties)))
+    (,markdown-regex-kbd . ((1 markdown-markup-properties)
                             (2 markdown-inline-code-face)
-                            (3 markdown-markup-face)))
+                            (3 markdown-markup-properties)))
     (markdown-fontify-angle-uris)
     (,markdown-regex-list . (2 markdown-list-face))
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
@@ -2524,12 +2528,12 @@ See `font-lock-syntactic-face-function' for details."
     (markdown-match-math-double . ((1 markdown-markup-face prepend)
                                    (2 markdown-math-face append)
                                    (3 markdown-markup-face prepend)))
-    (markdown-match-bold . ((1 markdown-markup-face prepend)
+    (markdown-match-bold . ((1 markdown-markup-properties prepend)
                             (2 markdown-bold-face append)
-                            (3 markdown-markup-face prepend)))
-    (markdown-match-italic . ((1 markdown-markup-face prepend)
+                            (3 markdown-markup-properties prepend)))
+    (markdown-match-italic . ((1 markdown-markup-properties prepend)
                               (2 markdown-italic-face append)
-                              (3 markdown-markup-face prepend)))
+                              (3 markdown-markup-properties prepend)))
     (markdown-fontify-plain-uris)
     (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend))

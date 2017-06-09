@@ -1871,6 +1871,58 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
     (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
     (should (= (point) 28))))
 
+;;; Markup hiding tests:
+
+(ert-deftest test-markdown-markup-hiding/italics-1 ()
+  "Test hiding markup for italics."
+  (markdown-test-file "inline.text"
+    (goto-char 9)
+    (should (looking-at "\*italic\*"))
+    (markdown-test-range-has-property (point) (point) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point)))
+    (should-not (invisible-p (+ 1 (point))))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p (point)))
+    (should-not (invisible-p (+ 1 (point))))))
+
+(ert-deftest test-markdown-markup-hiding/bold-1 ()
+  "Test hiding markup for bold."
+  (markdown-test-file "inline.text"
+    (goto-char 27)
+    (should (looking-at "\*\*bold\*\*"))
+    (markdown-test-range-has-property (point) (1+ (point)) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point)))
+    (should-not (invisible-p (+ 1 (point))))
+    (should-not (invisible-p (+ 2 (point))))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p (point)))
+    (should (invisible-p (+ 1 (point))))
+    (should-not (invisible-p (+ 2 (point))))))
+
+(ert-deftest test-markdown-markup-hiding/code-1 ()
+  "Test hiding markup for inline code."
+  (markdown-test-file "inline.text"
+    (goto-char 45)
+    (should (looking-at "`code`"))
+    (markdown-test-range-has-property (point) (point) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point)))
+    (should-not (invisible-p (1+ (point))))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p (point)))
+    (should-not (invisible-p (1+ (point))))))
+
+(ert-deftest test-markdown-markup-hiding/kbd-1 ()
+  "Test hiding markup for <kbd> tags."
+  (markdown-test-string "<kbd>C-c C-x C-m</kbd>"
+    (markdown-test-range-has-property (point) (+ 4 (point)) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point))) ;; part of <kbd>
+    (should-not (invisible-p (+ 4 (point)))) ;; part of <kbd>
+    (should-not (invisible-p (+ 5 (point)))) ;; inside <kbd>
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p (point))) ;; part of <kbd>
+    (should (invisible-p (+ 4 (point)))) ;; part of <kbd>
+    (should-not (invisible-p (+ 5 (point)))))) ;; inside <kbd>
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
