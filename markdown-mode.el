@@ -6922,15 +6922,11 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                      'help-echo (if title (concat title "\n" url) url)))
            ;; URL part
            (up (list 'keymap markdown-mode-mouse-map
-                     'face (if markdown-hidden-urls
-                               'markdown-markup-face
-                             'markdown-url-face)
+                     'face 'markdown-url-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
            ;; Title part
-           (tp (list 'face (if markdown-hidden-urls
-                               'markdown-markup-face
-                             'markdown-link-title-face)
+           (tp (list 'face 'markdown-link-title-face
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
@@ -6965,9 +6961,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                                       (or (markdown-link-url)
                                           "Undefined reference"))))))
            ;; Reference part
-           (rp (list 'face (if markdown-hidden-urls
-                               'markdown-markup-face
-                             'markdown-reference-face)
+           (rp (list 'face 'markdown-reference-face
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)

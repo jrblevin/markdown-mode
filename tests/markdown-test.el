@@ -2663,8 +2663,8 @@ takes precedence)."
     (markdown-test-range-has-face 925 925 markdown-markup-face)
     (markdown-test-range-has-face 926 929 markdown-link-face)
     (markdown-test-range-has-face 930 931 markdown-markup-face)
-    (markdown-test-range-has-face 932 949 markdown-markup-face)
-    (markdown-test-range-has-face 951 957 markdown-markup-face)
+    (markdown-test-range-has-face 932 949 markdown-url-face)
+    (markdown-test-range-has-face 951 957 markdown-link-title-face)
     (markdown-test-range-has-face 958 958 markdown-markup-face)
     (should (equal '((26 . 8734)) (get-text-property 932 'composition)))))
 
@@ -2675,13 +2675,17 @@ takes precedence)."
       ;; Two-character reference labels shouldn't get composed.
       (markdown-test-range-has-face 1 1 markdown-markup-face)
       (markdown-test-range-has-face 2 5 markdown-link-face)
-      (markdown-test-range-has-face 6 10 markdown-markup-face)
+      (markdown-test-range-has-face 6 7 markdown-markup-face)
+      (markdown-test-range-has-face 8 9 markdown-reference-face)
+      (markdown-test-range-has-face 10 10 markdown-markup-face)
       (should-not (get-text-property 8 'composition)))
     (markdown-test-string "[link][long-reference-label]"
       ;; Longer reference labels should be composed
       (markdown-test-range-has-face 1 1 markdown-markup-face)
       (markdown-test-range-has-face 2 5 markdown-link-face)
-      (markdown-test-range-has-face 6 28 markdown-markup-face)
+      (markdown-test-range-has-face 6 7 markdown-markup-face)
+      (markdown-test-range-has-face 8 27 markdown-reference-face)
+      (markdown-test-range-has-face 28 28 markdown-markup-face)
       (should (equal '((20 . 8734)) (get-text-property 8 'composition))))))
 
 ;;; Markdown Parsing Functions:
