@@ -13,6 +13,8 @@
     -   `markdown-blockquote-face` is now applied to the entire
         blockquote, including the leading `>`, so it can be used to
         apply a background if desired.
+    -   In `markdown-regex-header`, groups 4 and 6 now include
+        whitespace surrounding hash marks in atx headings.
 
 *   New features:
 

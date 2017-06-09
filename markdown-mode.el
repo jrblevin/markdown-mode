@@ -1334,14 +1334,14 @@ Group 2 matches only the label, without the surrounding markup.
 Group 3 matches the closing square bracket.")
 
 (defconst markdown-regex-header
-  "^\\(?:\\([^\r\n\t -].*\\)\n\\(?:\\(=+\\)\\|\\(-+\\)\\)\\|\\(#+\\)[ \t]+\\(.*?\\)[ \t]*\\(#*\\)\\)$"
+  "^\\(?:\\([^\r\n\t -].*\\)\n\\(?:\\(=+\\)\\|\\(-+\\)\\)\\|\\(#+[ \t]+\\)\\(.*?\\)\\([ \t]*#*\\)\\)$"
   "Regexp identifying Markdown headings.
 Group 1 matches the text of a setext heading.
 Group 2 matches the underline of a level-1 setext heading.
 Group 3 matches the underline of a level-2 setext heading.
-Group 4 matches the opening hash marks of an atx heading.
+Group 4 matches the opening hash marks of an atx heading and whitespace.
 Group 5 matches the text, without surrounding whitespace, of an atx heading.
-Group 6 matches the closing hash marks of an atx heading.")
+Group 6 matches the closing whitespace and hash marks of an atx heading.")
 
 (defconst markdown-regex-header-setext
   "^\\([^\r\n\t -].*\\)\n\\(=+\\|-+\\)$"
@@ -2024,7 +2024,8 @@ start which was previously propertized."
        (match-beginning 0) (match-end 0)
        (cond ((match-string-no-properties 2) 'markdown-heading-1-setext)
              ((match-string-no-properties 3) 'markdown-heading-2-setext)
-             (t (let ((atx-level (length (match-string-no-properties 4))))
+             (t (let ((atx-level (length (markdown-trim-whitespace
+                                          (match-string-no-properties 4)))))
                   (intern (format "markdown-heading-%d-atx" atx-level)))))
        (match-data t)))))
 
@@ -5340,7 +5341,8 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
             (setq heading (match-string-no-properties 1))
             (setq pos (match-beginning 1)
                   level 2))
-           ((setq hashes (match-string-no-properties 4))
+           ((setq hashes (markdown-trim-whitespace
+                          (match-string-no-properties 4)))
             (setq heading (match-string-no-properties 5)
                   pos (match-beginning 4)
                   level (length hashes))))
@@ -6328,7 +6330,8 @@ Calls `markdown-cycle' with argument t."
    ((markdown-code-block-at-point-p) 7) ;; Only 6 header levels are defined.
    ((match-end 2) 1)
    ((match-end 3) 2)
-   ((match-end 4) (- (match-end 4) (match-beginning 4)))))
+   ((match-end 4)
+    (length (markdown-trim-whitespace (match-string-no-properties 4))))))
 
 (defun markdown-promote-subtree (&optional arg)
   "Promote the current subtree of ATX headings.
