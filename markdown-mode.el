@@ -6969,6 +6969,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            (title (match-string-no-properties 7))
            ;; Markup part
            (mp (list 'face 'markdown-markup-face
+                     'invisible 'markdown-markup
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
@@ -6979,17 +6980,19 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            ;; URL part
            (up (list 'keymap markdown-mode-mouse-map
                      'face 'markdown-url-face
+                     'invisible 'markdown-markup
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
            ;; Title part
            (tp (list 'face 'markdown-link-title-face
+                     'invisible 'markdown-markup
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)))
       (when link-start (add-text-properties link-start link-end lp))
       (when url-start (add-text-properties url-start url-end up))
-      (when title-start (add-text-properties title-start title-end tp))
+      (when title-start (add-text-properties url-end title-end tp))
       (when (and markdown-hide-urls url-start)
         (compose-region url-start (or title-end url-end)
                         markdown-url-compose-char))
@@ -7004,6 +7007,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            (ref-end (match-end 6))
            ;; Markup part
            (mp (list 'face 'markdown-markup-face
+                     'invisible 'markdown-markup
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
@@ -7018,6 +7022,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                                           "Undefined reference"))))))
            ;; Reference part
            (rp (list 'face 'markdown-reference-face
+                     'invisible 'markdown-markup
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
@@ -7035,6 +7040,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            (url-end (match-end 2))
            ;; Markup part
            (mp (list 'face 'markdown-markup-face
+                     'invisible 'markdown-markup
                      'font-lock-multiline t))
            ;; URI part
            (up (list 'keymap markdown-mode-mouse-map

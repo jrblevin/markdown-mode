@@ -16,6 +16,24 @@
 
 *   New features:
 
+    -   Markup hiding: Add a custom variable `markdown-hide-markup`,
+        which determines whether to hide or otherwise beautify
+        Markdown markup.  For example, for inline links the brackets,
+        URL, and title will be hidden and only the (clickable) link
+        text will remain.  The URL can be seen by hovering with the
+        mouse pointer and edited by deleting one of the invisible
+        brackets or parentheses.  This can be toggled interactively
+        using <kbd>C-c C-x C-m</kbd> (`markdown-toggle-markup-hiding`).
+        This setting superceds URL hiding (below).
+    -   URL and reference label hiding: URLs for inline links and
+        labels for reference links are now hidden by default.  This is
+        configurable via `markdown-hide-urls`.  URLs will appear as
+        `[link](∞)` instead of
+        `[link](http://perhaps.a/very/long/url/)`.  To change the
+        placeholder character used, set `markdown-url-compose-char`.
+        This feature can be toggled using <kbd>C-c C-x C-l</kbd>
+        (`markdown-toggle-url-hiding`).  If full markup hiding (above)
+        is enabled, then URL hiding has no additional effect.
     -   Native code block font-lock: Add a custom variable
         `markdown-fontify-code-blocks-natively`, which determines
         whether to fontify code in code blocks using the native major
@@ -48,13 +66,6 @@
         comments, and reference labels.
     -   Make inline links, reference links, angle bracket URLs, and
         plain URLs clickable.
-    -   URL and reference label hiding for inline and reference links.
-        This is configurable via `markdown-hide-urls`.  By default,
-        URLs will appear as `[link](∞)` instead of
-        `[link](http://perhaps.a/very/long/url/)`.
-        To change the placeholder character used, set
-        `markdown-url-compose-char`.  This feature can be toggled using
-        <kbd>C-c C-x C-l</kbd> (`markdown-toggle-url-hiding`).
     -   Add an additional keybinding for toggling inline image
         display, <kbd>C-c C-x C-i</kbd>.
 

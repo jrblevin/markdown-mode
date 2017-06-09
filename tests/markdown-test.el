@@ -1923,6 +1923,45 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
     (should (invisible-p (+ 4 (point)))) ;; part of <kbd>
     (should-not (invisible-p (+ 5 (point)))))) ;; inside <kbd>
 
+(ert-deftest test-markdown-markup-hiding/inline-links ()
+  "Test hiding markup for inline links."
+  (markdown-test-file "inline.text"
+    (goto-char 925)
+    (should (looking-at "\\[text\\](http://www.w3.org/ \"title\")"))
+    (markdown-test-range-has-property 925 925 'invisible 'markdown-markup) ; [
+    (markdown-test-range-has-property 930 958 'invisible 'markdown-markup) ; ](...)
+    (should-not (invisible-p 925))
+    (should-not (invisible-p 958))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p 925))
+    (should-not (invisible-p 926))
+    (should (invisible-p 958))))
+
+(ert-deftest test-markdown-markup-hiding/reference-links ()
+  "Test hiding markup for reference links."
+  (markdown-test-string "[text][ref]"
+    (markdown-test-range-has-property 1 1 'invisible 'markdown-markup) ; [
+    (markdown-test-range-has-property 6 11 'invisible 'markdown-markup) ; ][ref]
+    (should-not (invisible-p 1))
+    (should-not (invisible-p 6))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p 1))
+    (should-not (invisible-p 2))
+    (should (invisible-p 6))))
+
+(ert-deftest test-markdown-markup-hiding/angle-urls ()
+  "Test hiding markup for angle urls."
+  (markdown-test-string "<http://jblevins.org/projects/markdown-mode/>"
+    (markdown-test-range-has-property 1 1 'invisible 'markdown-markup) ; <
+    (markdown-test-range-has-property 45 45 'invisible 'markdown-markup) ; >
+    (should-not (invisible-p 1))
+    (should-not (invisible-p 2))
+    (should-not (invisible-p 45))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p 1))
+    (should-not (invisible-p 2))
+    (should (invisible-p 45))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
