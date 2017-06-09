@@ -46,12 +46,12 @@
     -   Make inline links, reference links, angle bracket URLs, and
         plain URLs clickable.
     -   URL and reference label hiding for inline and reference links.
-        This is configurable via `markdown-hidden-urls`.  By default,
+        This is configurable via `markdown-hide-urls`.  By default,
         URLs will appear as `[link](∞)` instead of
         `[link](http://perhaps.a/very/long/url/)`.
         To change the placeholder character used, set
         `markdown-url-compose-char`.  This feature can be toggled using
-        <kbd>C-c C-x C-l</kbd> (`markdown-toggle-hidden-urls`).
+        <kbd>C-c C-x C-l</kbd> (`markdown-toggle-url-hiding`).
     -   Add an additional keybinding for toggling inline image
         display, <kbd>C-c C-x C-i</kbd>.
 

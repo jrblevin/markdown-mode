@@ -695,13 +695,13 @@
 ;;     non-nil (default), then buttons are enabled.  This works in
 ;;     `markdown-mode' as well as `gfm-mode'.
 ;;
-;;   * `markdown-hidden-urls' - Determines whether URL and reference
+;;   * `markdown-hide-urls' - Determines whether URL and reference
 ;;     labels are hidden for inline and reference links.  By default,
 ;;     inline links will appear in the buffer as `[link](∞)` instead
 ;;     of `[link](http://perhaps.a/very/long/url/)`.  To change the
 ;;     placeholder (composition) character used, set the variable
-;;     `markdown-url-compose-char'.  Hidden URLs can be toggled using
-;;     `C-c C-x C-l` (`markdown-toggle-hidden-urls').
+;;     `markdown-url-compose-char'.  URL hiding can be toggled using
+;;     `C-c C-x C-l` (`markdown-toggle-url-hiding').
 ;;
 ;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
 ;;      code in code blocks using the native major mode.  This only
@@ -1253,7 +1253,7 @@ This applies to insertions done with
   :group 'markdown
   :type 'boolean)
 
-(defcustom markdown-hidden-urls t
+(defcustom markdown-hide-urls t
   "Hide URLs of inline links and reference tags of reference links.
 Such URLs will be replaced by an ellipsis (…), but it is still
 part of the buffer.  Deleting the final parenthesis, for example,
@@ -1261,7 +1261,7 @@ allows easy editing of the URL.  You can also hover your mouse
 pointer over the link text to see the URL.
 
 You can interactively set the value of this variable by calling
-`markdown-toggle-hidden-urls' or from the menu Markdown > Links &
+`markdown-toggle-url-hiding' or from the menu Markdown > Links &
 Images menu."
   :group 'markdown
   :type 'boolean
@@ -5099,7 +5099,7 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Toggling functionality
     (define-key map (kbd "C-c C-x C-f") 'markdown-toggle-fontify-code-blocks-natively)
     (define-key map (kbd "C-c C-x C-i") 'markdown-toggle-inline-images)
-    (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-hidden-urls)
+    (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-url-hiding)
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox)
     ;; Alternative keys (in case of problems with the arrow keys)
     (define-key map (kbd "C-c C-x u") 'markdown-move-up)
@@ -5206,9 +5206,9 @@ See also `markdown-mode-map'.")
      ["Wiki Link" markdown-insert-wiki-link]
      "---"
      ["Check References" markdown-check-refs]
-     ["Toggle Hidden URLs" markdown-toggle-hidden-urls
+     ["Toggle Hidden URLs" markdown-toggle-url-hiding
       :style radio
-      :selected markdown-hidden-urls]
+      :selected markdown-hide-urls]
      ["Toggle Inline Images" markdown-toggle-inline-images
       :style radio
       :selected markdown-inline-image-overlays]
@@ -6934,7 +6934,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
       (when link-start (add-text-properties link-start link-end lp))
       (when url-start (add-text-properties url-start url-end up))
       (when title-start (add-text-properties title-start title-end tp))
-      (when (and markdown-hidden-urls url-start)
+      (when (and markdown-hide-urls url-start)
         (compose-region url-start (or title-end url-end)
                         markdown-url-compose-char))
       t)))
@@ -6968,7 +6968,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
           (add-text-properties (match-beginning g) (match-end g) mp)))
       (when link-start (add-text-properties link-start link-end lp))
       (when ref-start (add-text-properties ref-start ref-end rp)
-            (when (and markdown-hidden-urls (> (- ref-end ref-start) 3))
+            (when (and markdown-hide-urls (> (- ref-end ref-start) 3))
               (compose-region ref-start ref-end markdown-url-compose-char)))
       t)))
 
@@ -7002,16 +7002,16 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
       (add-text-properties start end props)
       t)))
 
-(defun markdown-toggle-hidden-urls (&optional arg)
+(defun markdown-toggle-url-hiding (&optional arg)
   "Toggle the display or hiding of URLs.
 With a prefix argument ARG, enable URL hiding if ARG is positive,
 and disable it otherwise."
   (interactive (list (or current-prefix-arg 'toggle)))
-  (setq markdown-hidden-urls
+  (setq markdown-hide-urls
         (if (eq arg 'toggle)
-            (not markdown-hidden-urls)
+            (not markdown-hide-urls)
           (> (prefix-numeric-value arg) 0)))
-  (if markdown-hidden-urls
+  (if markdown-hide-urls
       (message "markdown-mode URL hiding enabled")
     (message "markdown-mode URL hiding disabled"))
   (markdown-reload-extensions))

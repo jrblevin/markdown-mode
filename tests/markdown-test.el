@@ -2381,7 +2381,7 @@ for (var i = 0; i < 10; i++) {
 
 (ert-deftest test-markdown-font-lock/inline-links ()
   "Test font lock for inline links."
-  (let ((markdown-hidden-urls nil))
+  (let ((markdown-hide-urls nil))
     (markdown-test-file "inline.text"
       (markdown-test-range-has-face 925 925 markdown-markup-face)
       (markdown-test-range-has-face 926 929 markdown-link-face)
@@ -2393,7 +2393,7 @@ for (var i = 0; i < 10; i++) {
 (ert-deftest test-markdown-font-lock/inline-links-with-parentheses ()
   "Test font lock for inline links with nested parentheses.
 See <https://github.com/jrblevin/markdown-mode/issues/170>."
-  (let ((markdown-hidden-urls nil))
+  (let ((markdown-hide-urls nil))
     (markdown-test-string "[foo](bar(baz)qux)"
       (markdown-test-range-has-face 1 1 markdown-markup-face)
       (markdown-test-range-has-face 2 4 markdown-link-face)
@@ -2644,7 +2644,7 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/reference-definition ()
   "Reference definitions should not include ]."
-  (let ((markdown-hidden-urls nil))
+  (let ((markdown-hide-urls nil))
     (markdown-test-string "[1]: http://daringfireball.net/ \"title\""
       (markdown-test-range-has-face 2 2 markdown-reference-face) ; 1
       (markdown-test-range-has-face 6 31 markdown-url-face) ; URL
@@ -2670,7 +2670,7 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/hidden-urls-reference ()
   "Test URL hiding and toggling."
-  (let ((markdown-hidden-urls t))
+  (let ((markdown-hide-urls t))
     (markdown-test-string "[link][15]"
       ;; Two-character reference labels shouldn't get composed.
       (markdown-test-range-has-face 1 1 markdown-markup-face)
