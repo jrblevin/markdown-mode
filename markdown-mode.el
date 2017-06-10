@@ -7413,7 +7413,8 @@ return the number of paragraphs left to move."
             (font-lock-syntactic-face-function . markdown-syntactic-face)))
     ;; Refontify buffer
     (when (and font-lock-mode (fboundp 'font-lock-refresh-defaults))
-      (font-lock-refresh-defaults))
+      (font-lock-refresh-defaults)
+      (font-lock-ensure))
 
     ;; Add or remove hooks related to extensions
     (markdown-setup-wiki-link-hooks)))
