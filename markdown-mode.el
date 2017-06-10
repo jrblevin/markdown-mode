@@ -2236,17 +2236,17 @@ and disable it otherwise."
   :group 'faces)
 
 (defface markdown-italic-face
-  '((t (:inherit font-lock-variable-name-face :slant italic :weight normal)))
+  '((t (:inherit italic)))
   "Face for italic text."
   :group 'markdown-faces)
 
 (defface markdown-bold-face
-  '((t (:inherit font-lock-variable-name-face :weight bold :slant normal)))
+  '((t (:inherit bold)))
   "Face for bold text."
   :group 'markdown-faces)
 
 (defface markdown-strike-through-face
-  '((t (:inherit font-lock-variable-name-face :strike-through t)))
+  '((t (:strike-through t)))
   "Face for strike-through text."
   :group 'markdown-faces)
 
@@ -2301,7 +2301,7 @@ and disable it otherwise."
   :group 'markdown-faces)
 
 (defface markdown-link-face
-  '((t (:inherit font-lock-keyword-face)))
+  '((t (:inherit link)))
   "Face for links."
   :group 'markdown-faces)
 
