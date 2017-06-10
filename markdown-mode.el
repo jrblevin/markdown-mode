@@ -7688,10 +7688,11 @@ LANG is a string, and the returned major mode is a symbol."
       (save-match-data
         (let* ((start (match-beginning 0))
                (end (match-end 0))
+               ;; Find positions outside opening and closing backquotes.
                (bol-prev (progn (goto-char start)
-                                (if (bolp) (point-at-bol 0) start)))
+                                (if (bolp) (point-at-bol 0) (point-at-bol))))
                (eol-next (progn (goto-char end)
-                                (if (eolp) end (point-at-bol 2))))
+                                (if (eolp) (point-at-eol 2) (point-at-eol))))
                lang)
           (if (and markdown-fontify-code-blocks-natively
                    (setq lang (markdown-code-block-lang)))
