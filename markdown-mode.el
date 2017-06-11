@@ -1452,8 +1452,11 @@ Groups 2 and 4 matches the opening and closing delimiters.
 Group 3 matches the text inside the delimiters.")
 
 (defconst markdown-regex-blockquote
-  "^[ \t]*\\(>\\)\\(.*\\)$"
+  "^[ \t]*\\([A-Z]*>\\)\\(.*\\)$"
   "Regular expression for matching blockquote lines.
+Also accounts for a potential capital letter preceding the angle
+bracket, for use with Leanpub blocks (asides, warnings, info
+blocks, etc.).
 Group 1 matches the leading angle bracket.
 Group 2 matches the text.")
 

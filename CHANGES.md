@@ -73,6 +73,8 @@
         plain URLs clickable.
     -   Add an additional keybinding for toggling inline image
         display, <kbd>C-c C-x C-i</kbd>.
+    -   Support Leanpub blocks (asides, info blocks, warnings, etc.).
+        These are simple extensions of the usual blockquote syntax.
 
 *   Improvements:
 
