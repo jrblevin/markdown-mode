@@ -699,6 +699,9 @@ provides an interface to all of the possible customizations:
     (`markdown-toggle-markup-hiding`) or from the Markdown | Show &
     Hide menu.
 
+    The placeholder character used to replace blockquote markup can
+    be changed by setting `markdown-blockquote-display-char`.
+
   * `markdown-fontify-code-blocks-natively` - Whether to fontify
      code in code blocks using the native major mode.  This only
      works for fenced code blocks where the language is specified

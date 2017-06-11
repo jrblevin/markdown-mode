@@ -717,6 +717,9 @@
 ;;     (`markdown-toggle-markup-hiding') or from the Markdown | Show &
 ;;     Hide menu.
 ;;
+;;     The placeholder character used to replace blockquote markup can
+;;     be changed by setting `markdown-blockquote-display-char'.
+;;
 ;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
 ;;      code in code blocks using the native major mode.  This only
 ;;      works for fenced code blocks where the language is specified
@@ -1118,6 +1121,18 @@ cause lag when typing on slower machines."
 Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
   :type 'character
   :safe 'characterp
+  :package-version '(markdown-mode . "2.3"))
+
+(defcustom markdown-blockquote-display-char
+  (cond
+   ((char-displayable-p ?▌) "▌")
+   ((char-displayable-p ?┃) "┃")
+   ((char-displayable-p ?│) "│")
+   ((char-displayable-p ?|) "|")
+   (t ">"))
+  "Character for hiding blockquote markup."
+  :type 'string
+  :safe 'stringp
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-enable-math nil
@@ -2516,8 +2531,7 @@ See `font-lock-syntactic-face-function' for details."
     (markdown-fontify-plain-uris)
     (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
-    (markdown-match-blockquotes . ((0 markdown-blockquote-face append)
-                                   (1 markdown-markup-face prepend))))
+    (markdown-fontify-blockquotes))
   "Syntax highlighting for Markdown files.")
 
 (defvar markdown-mode-font-lock-keywords nil
@@ -3505,6 +3519,21 @@ is \"\n\n\""
         (when (match-end 6)
           (add-text-properties
            (match-beginning 6) (match-end 6) markup-props))))
+    t))
+
+(defun markdown-fontify-blockquotes (last)
+  "Apply font-lock properties to blockquotes from point to LAST."
+  (when (markdown-match-blockquotes last)
+    (add-text-properties
+     (match-beginning 1) (match-end 1)
+     (if markdown-hide-markup
+         `(face markdown-blockquote-face
+                display ,markdown-blockquote-display-char)
+       `(face markdown-markup-face
+              ,@(when markdown-hide-markup
+                  `(display ,markdown-blockquote-display-char)))))
+    (font-lock-append-text-property
+     (match-beginning 0) (match-end 0) 'face 'markdown-blockquote-face)
     t))
 
 

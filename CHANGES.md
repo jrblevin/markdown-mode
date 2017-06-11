@@ -27,6 +27,9 @@
         brackets or parentheses.  This can be toggled interactively
         using <kbd>C-c C-x C-m</kbd> (`markdown-toggle-markup-hiding`).
         This setting superceds URL hiding (below).
+    -   When markup hiding is enabled, the character used for
+        replacing blockquote markup can be changed by setting
+        `markdown-blockquote-display-char`.
     -   URL and reference label hiding: URLs for inline links and
         labels for reference links are now hidden by default.  This is
         configurable via `markdown-hide-urls`.  URLs will appear as
