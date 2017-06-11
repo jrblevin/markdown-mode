@@ -2473,28 +2473,7 @@ See `font-lock-syntactic-face-function' for details."
     (markdown-match-fenced-end-code-block . ((0 markdown-markup-face)))
     (markdown-match-fenced-code-blocks . ((0 markdown-pre-face)))
     (markdown-match-pre-blocks . ((0 markdown-pre-face)))
-    (markdown-match-heading-1-setext . ((1 markdown-header-face-1)
-                                        (2 markdown-header-rule-face)))
-    (markdown-match-heading-2-setext . ((1 markdown-header-face-2)
-                                        (3 markdown-header-rule-face)))
-    (markdown-match-heading-6-atx . ((4 markdown-header-delimiter-face)
-                                     (5 markdown-header-face-6)
-                                     (6 markdown-header-delimiter-face)))
-    (markdown-match-heading-5-atx . ((4 markdown-header-delimiter-face)
-                                     (5 markdown-header-face-5)
-                                     (6 markdown-header-delimiter-face)))
-    (markdown-match-heading-4-atx . ((4 markdown-header-delimiter-face)
-                                     (5 markdown-header-face-4)
-                                     (6 markdown-header-delimiter-face)))
-    (markdown-match-heading-3-atx . ((4 markdown-header-delimiter-face)
-                                     (5 markdown-header-face-3)
-                                     (6 markdown-header-delimiter-face)))
-    (markdown-match-heading-2-atx . ((4 markdown-header-delimiter-face)
-                                     (5 markdown-header-face-2)
-                                     (6 markdown-header-delimiter-face)))
-    (markdown-match-heading-1-atx . ((4 markdown-header-delimiter-face)
-                                     (5 markdown-header-face-1)
-                                     (6 markdown-header-delimiter-face)))
+    (markdown-fontify-headings)
     (markdown-match-declarative-metadata . ((1 markdown-metadata-key-face)
                                               (2 markdown-markup-face)
                                               (3 markdown-metadata-value-face)))
@@ -3299,38 +3278,6 @@ Use data stored in 'markdown-blockquote text property during syntax
 analysis."
   (markdown-match-propertized-text 'markdown-blockquote last))
 
-(defun markdown-match-heading-1-setext (last)
-  "Match level 1 setext headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-1-setext last))
-
-(defun markdown-match-heading-2-setext (last)
-  "Match level 2 setext headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-2-setext last))
-
-(defun markdown-match-heading-1-atx (last)
-  "Match level 1 ATX headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-1-atx last))
-
-(defun markdown-match-heading-2-atx (last)
-  "Match level 2 ATX headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-2-atx last))
-
-(defun markdown-match-heading-3-atx (last)
-  "Match level 3 ATX headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-3-atx last))
-
-(defun markdown-match-heading-4-atx (last)
-  "Match level 4 ATX headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-4-atx last))
-
-(defun markdown-match-heading-5-atx (last)
-  "Match level 5 ATX headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-5-atx last))
-
-(defun markdown-match-heading-6-atx (last)
-  "Match level 6 ATX headings from point to LAST."
-  (markdown-match-propertized-text 'markdown-heading-6-atx last))
-
 (defun markdown-match-hr (last)
   "Match horizontal rules comments from the point to LAST."
   (while (and (re-search-forward markdown-regex-hr last t)
@@ -3527,6 +3474,39 @@ is \"\n\n\""
 
 (defun markdown-match-yaml-metadata-key (last)
   (markdown-match-propertized-text 'markdown-metadata-key last))
+
+
+;;; Markdown Font Fontification Functions =====================================
+
+(defun markdown-fontify-headings (last)
+  "Add text properties to headings from point to LAST."
+  (when (markdown-match-propertized-text 'markdown-heading last)
+    (let* ((level (markdown-outline-level))
+           (heading-face
+            (intern (format "markdown-header-face-%d" level)))
+           (heading-props `(face ,heading-face))
+           (markup-props `(face markdown-header-delimiter-face
+                                ,@(when markdown-hide-markup `(display ""))))
+           (rule-props `(face markdown-header-rule-face
+                              ,@(when markdown-hide-markup `(display "")))))
+      (if (match-end 1)
+          ;; Setext heading
+          (progn (add-text-properties
+                  (match-beginning 1) (match-end 1) heading-props)
+                 (if (= level 1)
+                     (add-text-properties
+                      (match-beginning 2) (match-end 2) rule-props)
+                   (add-text-properties
+                    (match-beginning 3) (match-end 3) rule-props)))
+        ;; atx heading
+        (add-text-properties
+         (match-beginning 4) (match-end 4) markup-props)
+        (add-text-properties
+         (match-beginning 5) (match-end 5) heading-props)
+        (when (match-end 6)
+          (add-text-properties
+           (match-beginning 6) (match-end 6) markup-props))))
+    t))
 
 
 ;;; Syntax Table ==============================================================
@@ -7789,6 +7769,7 @@ position."
   ;; Markup hiding
   (make-local-variable 'markdown-hide-markup)
   (add-to-list 'font-lock-extra-managed-props 'invisible)
+  (add-to-list 'font-lock-extra-managed-props 'display)
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
