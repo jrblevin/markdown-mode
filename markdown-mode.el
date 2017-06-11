@@ -587,7 +587,7 @@
 ;;   * `markdown-header-scaling-values' - list of scaling values,
 ;;     relative to baseline, for headers of levels one through six,
 ;;     used when `markdown-header-scaling' is non-nil
-;;     (default: `(1.8 1.4 1.2 1.0 1.0 1.0)`).
+;;     (default: `(2.0 1.7 1.4 1.1 1.0 1.0)`).
 ;;
 ;;   * `markdown-list-indent-width' - depth of indentation for lists
 ;;     when inserting, promoting, and demoting list items (default: 4).
@@ -2381,7 +2381,7 @@ headers of levels one through six respectively."
   :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-header-scaling-values
-  '(1.8 1.4 1.2 1.0 1.0 1.0)
+  '(2.0 1.7 1.4 1.1 1.0 1.0)
   "List of scaling values for headers of level one through six.
 Used when `markdown-header-scaling' is non-nil."
   :type 'list
@@ -2410,7 +2410,6 @@ Used when `markdown-header-scaling' is non-nil."
        `(defface ,face-name
           '((t (:inherit markdown-header-face :height ,scale)))
           (format "Face for level %s headers.
-
 You probably don't want to customize this face directly. Instead
 you can customize the base face `markdown-header-face' or the
 variable-height variable `markdown-header-scaling'." ,num1)

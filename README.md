@@ -569,7 +569,7 @@ provides an interface to all of the possible customizations:
   * `markdown-header-scaling-values` - list of scaling values,
     relative to baseline, for headers of levels one through six,
     used when `markdown-header-scaling` is non-nil
-    (default: `(1.8 1.4 1.2 1.0 1.0 1.0)`).
+    (default: `(2.0 1.7 1.4 1.1 1.0 1.0)`).
 
   * `markdown-list-indent-width` - depth of indentation for lists
     when inserting, promoting, and demoting list items (default: 4).

@@ -86,6 +86,8 @@
         line after existing reference definitions.
     -   `markdown-toggle-inline-images` now displays the status in the
         minibuffer.
+    -   Increased default heading scaling range slightly, to make
+        level differences more pronounced when markup is hidden.
 
 *   Bug fixes:
 
