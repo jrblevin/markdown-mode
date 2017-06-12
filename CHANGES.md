@@ -59,6 +59,11 @@
         appropriate mode to use.  The language to mode mapping may be
         customized by setting the variable `markdown-code-lang-modes`.
         ([GH-123][], [GH-185][])
+    -   When the `[edit-indirect](https://github.com/Fanael/edit-indirect/)`
+        package is installed, <kbd>C-c '</kbd> (`markdown-edit-code-block`)
+        can be used to edit a code block in an indirect buffer in the native
+        major mode.  Press <kbd>C-c C-c</kbd> to commit changes and return
+        or <kbd>C-c C-k</kbd> to cancel.
     -   Add command <kbd>C-c C-x C-f</kbd> for toggling native font lock
         for code blocks (`markdown-toggle-fontify-code-blocks-natively`).
     -   Add "page" movement, marking, and narrowing commands, where a

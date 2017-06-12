@@ -492,6 +492,14 @@
 ;;     `C-M-}` (`markdown-end-of-text-block`).  To mark a plain text
 ;;     block, use `C-c M-h` (`markdown-mark-text-block`).
 ;;
+;;   * Miscellaneous Commands:
+;;
+;;     When the `[edit-indirect](https://github.com/Fanael/edit-indirect/)`
+;;     package is installed, <kbd>C-c '</kbd> (`markdown-edit-code-block`)
+;;     can be used to edit a code block in an indirect buffer in the
+;;     native major mode.  Press <kbd>C-c C-c</kbd> to commit changes
+;;     and return or <kbd>C-c C-k</kbd> to cancel.
+;;
 ;; As noted, many of the commands above behave differently depending
 ;; on whether Transient Mark mode is enabled or not.  When it makes
 ;; sense, if Transient Mark mode is on and the region is active, the
@@ -933,6 +941,7 @@
 (defvar jit-lock-start)
 (defvar jit-lock-end)
 (defvar flyspell-generic-check-word-predicate)
+(defvar edit-indirect-guess-mode-function)
 
 (declare-function eww-open-file "eww")
 (declare-function url-path-and-query "url-parse")
@@ -5248,6 +5257,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-c c") 'markdown-check-refs)
     (define-key map (kbd "C-c C-c n") 'markdown-cleanup-list-numbers)
     (define-key map (kbd "C-c C-c ]") 'markdown-complete-buffer)
+    (define-key map (kbd "C-c '") 'markdown-edit-code-block)
     ;; List editing
     (define-key map (kbd "M-<up>") 'markdown-move-up)
     (define-key map (kbd "M-<down>") 'markdown-move-down)
@@ -5413,6 +5423,7 @@ See also `markdown-mode-map'.")
      ["Blockquote" markdown-insert-blockquote]
      ["Preformatted" markdown-insert-pre]
      ["GFM Code Block" markdown-insert-gfm-code-block]
+     ["Edit Code Block" markdown-edit-code-block (markdown-code-block-at-point-p)]
      "---"
      ["Blockquote Region" markdown-blockquote-region]
      ["Preformatted Region" markdown-pre-region]
@@ -7882,6 +7893,27 @@ position."
          start end
          '(font-lock-fontified t fontified t font-lock-multiline t))
         (set-buffer-modified-p modified)))))
+
+(defun markdown-edit-code-block ()
+  "Edit Markdown code block in an indirect buffer."
+  (interactive)
+  (save-excursion
+    (if (fboundp 'edit-indirect-region)
+        (let* ((bounds (markdown-get-enclosing-fenced-block-construct))
+               (begin (and bounds (goto-char (nth 0 bounds)) (point-at-bol 2)))
+               (end (and bounds (goto-char (nth 1 bounds)) (point-at-bol 1))))
+          (if (and begin end)
+              (let* ((lang (markdown-code-block-lang))
+                     (mode (and lang (markdown-get-lang-mode lang)))
+                     (edit-indirect-guess-mode-function
+                      (lambda (_parent-buffer _beg _end)
+                        (funcall mode))))
+                (edit-indirect-region begin end 'display-buffer))
+            (error "Not inside a GFM or tilde fenced code block")))
+      (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
+        (progn (package-refresh-contents)
+               (package-install 'edit-indirect)
+               (markdown-edit-code-block))))))
 
 
 ;;; Mode Definition  ==========================================================

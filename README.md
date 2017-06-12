@@ -474,6 +474,14 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     <kbd>C-M-}</kbd> (`markdown-end-of-text-block`).  To mark a plain text
     block, use <kbd>C-c M-h</kbd> (`markdown-mark-text-block`).
 
+  * Miscellaneous Commands:
+
+    When the `[edit-indirect](https://github.com/Fanael/edit-indirect/)`
+    package is installed, <kbd>C-c '</kbd> (`markdown-edit-code-block`)
+    can be used to edit a code block in an indirect buffer in the
+    native major mode.  Press <kbd>C-c C-c</kbd> to commit changes
+    and return or <kbd>C-c C-k</kbd> to cancel.
+
 As noted, many of the commands above behave differently depending
 on whether Transient Mark mode is enabled or not.  When it makes
 sense, if Transient Mark mode is on and the region is active, the
