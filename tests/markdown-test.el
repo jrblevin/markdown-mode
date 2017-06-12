@@ -3331,7 +3331,15 @@ x: x
   (markdown-test-file "outline-code.text"
     (goto-char 107) ;; middle of a tilde fenced code block
     (should (string-equal (markdown-code-block-lang
-                           '(83 . markdown-tilde-fence-begin)) ".bash"))))
+                           '(83 . markdown-tilde-fence-begin)) "bash"))))
+
+(ert-deftest test-markdown-parsing/code-block-lang-period ()
+  "Test `markdown-code-block-lang' when language name begins with a period."
+  (markdown-test-string "~~~ { .ruby }
+puts 'hello, world'
+~~~
+"
+    (should (string-equal (markdown-code-block-lang) "ruby"))))
 
 ;;; Reference Checking:
 

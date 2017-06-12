@@ -4478,9 +4478,13 @@ at the beginning of the block."
     (set-match-data (get-text-property (point) (cdr pos-prop)))
     ;; Note: Hard-coded group number assumes tilde
     ;; and GFM fenced code regexp groups agree.
-    (when (and (match-beginning 3) (match-end 3))
-      (buffer-substring-no-properties
-       (match-beginning 3) (match-end 3)))))
+    (let ((begin (match-beginning 3))
+          (end (match-end 3)))
+      (when (and begin end)
+        ;; Fix language strings beginning with periods, like ".ruby".
+        (when (eq (char-after begin) ?.)
+          (setq begin (1+ begin)))
+        (buffer-substring-no-properties begin end)))))
 
 (defun markdown-gfm-parse-buffer-for-languages (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
