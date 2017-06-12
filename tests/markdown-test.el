@@ -2013,29 +2013,43 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    "* something about function foo_bar
 * something else about foo_bar"
    (markdown-test-range-has-face 31 34 nil)
-   (markdown-test-range-has-face 38 62 nil))
+   (markdown-test-range-has-face 38 62 nil)))
+
+(ert-deftest test-markdown-font-lock/italics-8 ()
+  "Test multiline italics across list items."
   (markdown-test-string
    "* something about function
   foo_bar
 * something else about
   foo_bar"
    (markdown-test-range-has-face 30 36 nil)
-   (markdown-test-range-has-face 63 69 nil))
+   (markdown-test-range-has-face 63 69 nil)))
+
+(ert-deftest test-markdown-font-lock/italics-9 ()
+  "Test multiline italics across list items."
   (markdown-test-string
    "foo_bar
 * foo_bar"
    (markdown-test-range-has-face 4 7 nil)
    (markdown-test-range-has-face 11 14 nil)))
 
-(ert-deftest test-markdown-font-lock/italics-7 ()
+(ert-deftest test-markdown-font-lock/italics-10 ()
   "Underscores in URLs should not trigger italics."
   :expected-result :failed
   (markdown-test-string
    "<http://jblevins.org/research/centroid/cd_z_path.m>"
-   (markdown-test-range-face-equals 2 50 markdown-link-face))
+   (markdown-test-range-face-equals 2 50 markdown-link-face)))
+
+(ert-deftest test-markdown-font-lock/italics-11 ()
+  "Underscores in URLs should not trigger italics."
+  :expected-result :failed
   (markdown-test-string
    "[1]: http://jblevins.org/research/centroid/cd_z_path.m"
-   (markdown-test-range-face-equals 6 54 markdown-url-face))
+   (markdown-test-range-face-equals 6 54 markdown-url-face)))
+
+(ert-deftest test-markdown-font-lock/italics-12 ()
+  "Underscores in URLs should not trigger italics."
+  :expected-result :failed
   (markdown-test-string
    "[cd\\_z\\_path.m](http://jblevins.org/research/centroid/cd_z_path.m)"
    (markdown-test-range-face-equals 17 65 markdown-url-face)))
