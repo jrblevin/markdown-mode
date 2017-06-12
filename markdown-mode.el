@@ -733,7 +733,7 @@
 ;;      use.  The language to mode mapping may be customized by setting
 ;;      the variable `markdown-code-lang-modes'.  This can be toggled
 ;;      interactively by pressing `C-c C-x C-f`
-;;      (`markdown-toggle-fontify-code-blocks-natively`).
+;;      (`markdown-toggle-fontify-code-blocks-natively').
 ;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
