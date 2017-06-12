@@ -3623,7 +3623,7 @@ is \"\n\n\""
             font-lock-multiline t
             ,@(when markdown-hide-markup
                 `(display ,(make-string
-                            (window-text-width) markdown-hr-display-char)))))
+                            (window-body-width) markdown-hr-display-char)))))
      t))
 
 
