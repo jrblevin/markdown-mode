@@ -819,10 +819,10 @@
 ;;   prompted for the name of the language, but may press enter to
 ;;   continue without naming a language.
 ;;
-;; * **Strikethrough:** Strikethrough text is only supported in
-;;   `gfm-mode' and can be inserted (and toggled) using `C-c C-s d`.
-;;   Following the mnemonics for the other style keybindings, the
-;;   letter `d` coincides with the HTML tag `<del>`.
+;; * **Strikethrough:** Strikethrough text is supported in both
+;;   `markdown-mode' and `gfm-mode'.  It can be inserted (and toggled)
+;;   using `C-c C-s d`.  Following the mnemonics for the other style
+;;   keybindings, the letter `d` coincides with the HTML tag `<del>`.
 ;;
 ;; * **Task lists:** GFM task lists will be rendered as checkboxes
 ;;   (Emacs buttons) in both `markdown-mode' and `gfm-mode' when
@@ -2545,6 +2545,9 @@ Depending on your font, some reasonable choices are:
     (markdown-match-italic . ((1 markdown-markup-properties prepend)
                               (2 markdown-italic-face append)
                               (3 markdown-markup-properties prepend)))
+    (,markdown-regex-strike-through . ((3 markdown-markup-properties)
+                                       (4 markdown-strike-through-face)
+                                       (5 markdown-markup-properties)))
     (markdown-fontify-plain-uris)
     (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
@@ -7967,14 +7970,8 @@ position."
   "Hook run when entering GFM mode.")
 
 (defvar gfm-font-lock-keywords
-  (append
-   ;; GFM features to match first
-   (list
-    (cons markdown-regex-strike-through '((3 markdown-markup-face)
-                                          (4 markdown-strike-through-face)
-                                          (5 markdown-markup-face))))
-   ;; Basic Markdown features (excluding possibly overridden ones)
-   markdown-mode-font-lock-keywords-basic)
+  ;; Basic Markdown features (excluding possibly overridden ones)
+  markdown-mode-font-lock-keywords-basic
   "Default highlighting expressions for GitHub Flavored Markdown mode.")
 
 ;;;###autoload

@@ -15,6 +15,8 @@
         apply a background if desired.
     -   In `markdown-regex-header`, groups 4 and 6 now include
         whitespace surrounding hash marks in atx headings.
+    -   Font lock for `~~strikethrough~~` is now supported in
+        `markdown-mode` in addition to `gfm-mode`.
 
 *   New features:
 

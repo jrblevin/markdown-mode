@@ -801,10 +801,10 @@ by `markdown-mode` and `gfm-mode` as described below.
   prompted for the name of the language, but may press enter to
   continue without naming a language.
 
-* **Strikethrough:** Strikethrough text is only supported in
-  `gfm-mode` and can be inserted (and toggled) using <kbd>C-c C-s d</kbd>.
-  Following the mnemonics for the other style keybindings, the
-  letter <kbd>d</kbd> coincides with the HTML tag `<del>`.
+* **Strikethrough:** Strikethrough text is supported in both
+  `markdown-mode` and `gfm-mode`.  It can be inserted (and toggled)
+  using <kbd>C-c C-s d</kbd>.  Following the mnemonics for the other style
+  keybindings, the letter <kbd>d</kbd> coincides with the HTML tag `<del>`.
 
 * **Task lists:** GFM task lists will be rendered as checkboxes
   (Emacs buttons) in both `markdown-mode` and `gfm-mode` when
