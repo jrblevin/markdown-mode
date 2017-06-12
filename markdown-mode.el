@@ -7793,7 +7793,7 @@ LANG is a string, and the returned major mode is a symbol."
                (bol-prev (progn (goto-char start)
                                 (if (bolp) (point-at-bol 0) (point-at-bol))))
                (eol-next (progn (goto-char end)
-                                (if (eolp) (point-at-eol 2) (point-at-eol))))
+                                (if (bolp) (point-at-bol 2) (point-at-bol 3))))
                lang)
           (if (and markdown-fontify-code-blocks-natively
                    (setq lang (markdown-code-block-lang)))
