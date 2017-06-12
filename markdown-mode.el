@@ -2454,12 +2454,14 @@ code blocks.  Similarly, when using a dark-background theme, lighten it
 slightly.  If the face has been customized already, leave it alone."
   ;; Don't update customized faces
   (unless (get 'markdown-code-face 'saved-face)
-    (set-face-attribute
-     'markdown-code-face nil
-     :background
-     (cl-case (cdr (assq 'background-mode (frame-parameters)))
-       ('light (color-darken-name (face-background 'default) 5))
-       ('dark (color-lighten-name (face-background 'default) 5))))))
+    (let ((bg (face-background 'default)))
+      (when (and bg (not (equal bg "unspecified-bg")))
+        (set-face-attribute
+         'markdown-code-face nil
+         :background
+         (cl-case (cdr (assq 'background-mode (frame-parameters)))
+           ('light (color-darken-name bg 5))
+           ('dark (color-lighten-name bg 5))))))))
 
 (defun markdown-syntactic-face (state)
   "Return font-lock face for characters with given STATE.
