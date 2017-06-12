@@ -2531,7 +2531,7 @@ Depending on your font, some reasonable choices are:
                                                (4 markdown-language-info-face nil t)
                                                (5 markdown-markup-face nil t)))
     (markdown-match-fenced-end-code-block . ((0 markdown-markup-face)))
-    (markdown-match-fenced-code-blocks . ((0 markdown-pre-face)))
+    (markdown-fontify-fenced-code-blocks)
     (markdown-match-pre-blocks . ((0 markdown-pre-face)))
     (markdown-fontify-headings)
     (markdown-match-declarative-metadata . ((1 markdown-metadata-key-face)
@@ -7782,9 +7782,10 @@ LANG is a string, and the returned major mode is a symbol."
          (intern (concat lang "-mode"))
          (intern (concat (downcase lang) "-mode")))))
 
-(defun markdown-fontify-gfm-code-blocks (last)
-  "Add text properties to next GFM code block from point to LAST."
-  (when (markdown-match-gfm-code-blocks last)
+(defun markdown-fontify-code-blocks-generic (matcher last)
+  "Add text properties to next code block from point to LAST.
+Use matching function MATCHER."
+  (when (funcall matcher last)
     (save-excursion
       (save-match-data
         (let* ((start (match-beginning 0))
@@ -7797,16 +7798,24 @@ LANG is a string, and the returned major mode is a symbol."
                lang)
           (if (and markdown-fontify-code-blocks-natively
                    (setq lang (markdown-code-block-lang)))
-              (markdown-fontify-gfm-code-block lang start end)
+              (markdown-fontify-code-block-natively lang start end)
             (add-text-properties start end '(face markdown-pre-face)))
           ;; Set background for block as well as opening and closing lines.
           (font-lock-append-text-property
            bol-prev eol-next 'face 'markdown-code-face))))
     t))
 
+(defun markdown-fontify-gfm-code-blocks (last)
+  "Add text properties to next GFM code block from point to LAST."
+  (markdown-fontify-code-blocks-generic 'markdown-match-gfm-code-blocks last))
+
+(defun markdown-fontify-fenced-code-blocks (last)
+  "Add text properties to next tilde fenced code block from point to LAST."
+  (markdown-fontify-code-blocks-generic 'markdown-match-fenced-code-blocks last))
+
 ;; Based on `org-src-font-lock-fontify-block' from org-src.el.
-(defun markdown-fontify-gfm-code-block (lang start end)
-  "Fontify given code block.
+(defun markdown-fontify-code-block-natively (lang start end)
+  "Fontify given GFM or fenced code block.
 This function is called by Emacs for automatic fontification when
 `markdown-fontify-code-blocks-natively' is non-nil.  LANG is the
 language used in the block. START and END specify the block
