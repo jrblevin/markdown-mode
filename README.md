@@ -694,7 +694,7 @@ provides an interface to all of the possible customizations:
     underscores for italic and bold text will be hidden, text
     bullets for unordered lists will be replaced by Unicode
     bullets, and so on.  Since this includes URLs and reference
-    labels, when non-nil this setting supercedes `markdown-hide-urls`.
+    labels, when non-nil this setting supersedes `markdown-hide-urls`.
     Markup hiding can be toggled using <kbd>C-c C-x C-m</kbd>
     (`markdown-toggle-markup-hiding`) or from the Markdown | Show &
     Hide menu.

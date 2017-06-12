@@ -712,7 +712,7 @@
 ;;     underscores for italic and bold text will be hidden, text
 ;;     bullets for unordered lists will be replaced by Unicode
 ;;     bullets, and so on.  Since this includes URLs and reference
-;;     labels, when non-nil this setting supercedes `markdown-hide-urls'.
+;;     labels, when non-nil this setting supersedes `markdown-hide-urls'.
 ;;     Markup hiding can be toggled using `C-c C-x C-m`
 ;;     (`markdown-toggle-markup-hiding') or from the Markdown | Show &
 ;;     Hide menu.
