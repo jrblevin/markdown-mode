@@ -2507,7 +2507,7 @@ See `font-lock-syntactic-face-function' for details."
                             (2 markdown-inline-code-face)
                             (3 markdown-markup-properties)))
     (markdown-fontify-angle-uris)
-    (,markdown-regex-list . (2 markdown-list-face))
+    (markdown-fontify-list-items)
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
                                  (3 markdown-markup-face)))        ; ]
@@ -3243,6 +3243,24 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
             t)
         (goto-char (1+ (match-end 0)))))))
 
+(defun markdown-match-list-items (last)
+  "Match list items from point to LAST."
+  (when (markdown-match-inline-generic markdown-regex-list last)
+    (let ((begin (match-beginning 2))
+          (end (match-end 2)))
+        (if (or (markdown-range-property-any
+                 begin end 'face (list markdown-header-delimiter-face
+                                       markdown-inline-code-face
+                                       markdown-bold-face
+                                       markdown-math-face))
+                (markdown-in-comment-p))
+            (progn (goto-char (min (1+ (match-end 0)) last))
+                   (markdown-match-list-items last))
+          (set-match-data (list (match-beginning 0) (match-end 0)
+                                (match-beginning 1) (match-end 1)
+                                (match-beginning 2) (match-end 2)))
+          (goto-char (1+ (match-end 0)))))))
+
 (defun markdown-match-math-single (last)
   "Match single quoted $..$ math from point to LAST."
   (markdown-match-math-generic markdown-regex-math-inline-single last))
@@ -3544,6 +3562,17 @@ is \"\n\n\""
                   `(display ,markdown-blockquote-display-char)))))
     (font-lock-append-text-property
      (match-beginning 0) (match-end 0) 'face 'markdown-blockquote-face)
+    t))
+
+(defun markdown-fontify-list-items (last)
+  "Apply font-lock properties to list markers from point to LAST."
+  (when (markdown-match-list-items last)
+    (let* ((indent (length (match-string-no-properties 1)))
+           (level (/ indent 4)) ;; level = 0, 1, 2, ...
+           (bullet (nth (mod level (length markdown-list-item-bullets))
+                        markdown-list-item-bullets)))
+    (add-text-properties
+     (match-beginning 2) (match-end 2) '(face markdown-list-face)))
     t))
 
 
