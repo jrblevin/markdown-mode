@@ -30,11 +30,12 @@
         mouse pointer and edited by deleting one of the invisible
         brackets or parentheses.  This can be toggled interactively
         using <kbd>C-c C-x C-m</kbd> (`markdown-toggle-markup-hiding`).
-        This setting supersedes URL hiding (below).
+        This setting supersedes URL hiding (below).  ([GH-130][])
     -   Unicode bullets are used to replace ASCII list item markers
         for unordered lists when markup hiding is enabled.  The list
         of characters used, in order of list level, can be specified
         by setting the variable `markdown-list-item-bullets`.
+        ([GH-130][])
     -   When markup hiding is enabled, the characters used for
         replacing certain markup can be changed by customizing the
         corresponding variables:
@@ -108,6 +109,7 @@
 *   Bug fixes:
 
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
+  [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
 
