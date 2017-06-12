@@ -2589,21 +2589,6 @@ extension support.")
   "Regular expression matching a footnote definition, capturing the label.")
 
 
-;;; Fontification Functions ===================================================
-
-(defun markdown-fontify-hrs (last)
-  "Add text properties to horizontal rules from point to LAST."
-  (when (markdown-match-hr last)
-    (add-text-properties
-     (match-beginning 0) (match-end 0)
-     `(face markdown-hr-face
-            font-lock-multiline t
-            ,@(when markdown-hide-markup
-                `(display ,(make-string
-                            (window-text-width) markdown-hr-display-char)))))
-     t))
-
-
 ;;; Compatibility =============================================================
 
 (defun markdown-replace-regexp-in-string (regexp rep string)
@@ -3624,6 +3609,18 @@ is \"\n\n\""
         (add-text-properties
          (match-beginning 2) (match-end 2) `(display ,bullet))))
     t))
+
+(defun markdown-fontify-hrs (last)
+  "Add text properties to horizontal rules from point to LAST."
+  (when (markdown-match-hr last)
+    (add-text-properties
+     (match-beginning 0) (match-end 0)
+     `(face markdown-hr-face
+            font-lock-multiline t
+            ,@(when markdown-hide-markup
+                `(display ,(make-string
+                            (window-text-width) markdown-hr-display-char)))))
+     t))
 
 
 ;;; Syntax Table ==============================================================
