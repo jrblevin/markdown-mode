@@ -702,10 +702,11 @@ provides an interface to all of the possible customizations:
     Unicode bullets are used to replace ASCII list item markers.
     The list of characters used, in order of list level, can be
     specified by setting the variable `markdown-list-item-bullets`.
-    The placeholder character used to replace blockquote markup can
-    be changed by setting `markdown-blockquote-display-char`.
-    Similarly, the character used for horizontal rules can be
-    customized by setting `markdown-hr-display-char`.
+    The placeholder characters used to replace other markup can
+    be changed by customizing the corresponding variables:
+    `markdown-blockquote-display-char`,
+    `markdown-hr-display-char`, and
+    `markdown-definition-display-char`.
 
   * `markdown-fontify-code-blocks-natively` - Whether to fontify
      code in code blocks using the native major mode.  This only

@@ -720,10 +720,11 @@
 ;;     Unicode bullets are used to replace ASCII list item markers.
 ;;     The list of characters used, in order of list level, can be
 ;;     specified by setting the variable `markdown-list-item-bullets'.
-;;     The placeholder character used to replace blockquote markup can
-;;     be changed by setting `markdown-blockquote-display-char'.
-;;     Similarly, the character used for horizontal rules can be
-;;     customized by setting `markdown-hr-display-char'.
+;;     The placeholder characters used to replace other markup can
+;;     be changed by customizing the corresponding variables:
+;;     `markdown-blockquote-display-char',
+;;     `markdown-hr-display-char', and
+;;     `markdown-definition-display-char'.
 ;;
 ;;   * `markdown-fontify-code-blocks-natively' - Whether to fontify
 ;;      code in code blocks using the native major mode.  This only
@@ -1145,6 +1146,18 @@ Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
         ((char-displayable-p ?━) ?━)
         (t ?-))
   "Character for hiding horizontal rule markup."
+  :type 'character
+  :safe 'characterp
+  :package-version '(markdown-mode . "2.3"))
+
+(defcustom markdown-definition-display-char
+  (cond ((char-displayable-p ?⁘) ?⁘)
+        ((char-displayable-p ?⁙) ?⁙)
+        ((char-displayable-p ?≡) ?≡)
+        ((char-displayable-p ?⌑) ?⌑)
+        ((char-displayable-p ?◊) ?◊)
+        (t nil))
+  "Character for replacing definition list markup."
   :type 'character
   :safe 'characterp
   :package-version '(markdown-mode . "2.3"))
@@ -3608,10 +3621,17 @@ is \"\n\n\""
                         markdown-list-item-bullets)))
       (add-text-properties
        (match-beginning 2) (match-end 2) '(face markdown-list-face))
-      (when (and markdown-hide-markup
-                 (string-match-p "[\\*\\+-]" (match-string 2)))
-        (add-text-properties
-         (match-beginning 2) (match-end 2) `(display ,bullet))))
+      (when markdown-hide-markup
+        (cond
+         ;; Unordered lists
+         ((string-match-p "[\\*\\+-]" (match-string 2))
+          (add-text-properties
+           (match-beginning 2) (match-end 2) `(display ,bullet)))
+         ;; Definition lists
+         ((string-equal ":" (match-string 2))
+          (add-text-properties
+           (match-beginning 2) (match-end 2)
+           `(display ,(char-to-string markdown-definition-display-char)))))))
     t))
 
 (defun markdown-fontify-hrs (last)

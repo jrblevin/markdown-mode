@@ -30,17 +30,17 @@
         mouse pointer and edited by deleting one of the invisible
         brackets or parentheses.  This can be toggled interactively
         using <kbd>C-c C-x C-m</kbd> (`markdown-toggle-markup-hiding`).
-        This setting superceds URL hiding (below).
-    -   When markup hiding is enabled, the character used for
-        replacing blockquote markup can be changed by setting
-        `markdown-blockquote-display-char`.
-    -   When markup hiding is enabled, the character used for
-        horizontal rule markup can be changed by setting
-        `markdown-hr-display-char`.
+        This setting supersedes URL hiding (below).
     -   Unicode bullets are used to replace ASCII list item markers
         for unordered lists when markup hiding is enabled.  The list
         of characters used, in order of list level, can be specified
         by setting the variable `markdown-list-item-bullets`.
+    -   When markup hiding is enabled, the characters used for
+        replacing certain markup can be changed by customizing the
+        corresponding variables:
+        `markdown-blockquote-display-char`,
+        `markdown-hr-display-char`, and
+        `markdown-definition-display-char`.
     -   URL and reference label hiding: URLs for inline links and
         labels for reference links are now hidden by default.  This is
         configurable via `markdown-hide-urls`.  URLs will appear as
