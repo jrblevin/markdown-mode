@@ -3617,12 +3617,12 @@ is \"\n\n\""
            (level (/ indent 4)) ;; level = 0, 1, 2, ...
            (bullet (nth (mod level (length markdown-list-item-bullets))
                         markdown-list-item-bullets)))
-    (add-text-properties
-     (match-beginning 2) (match-end 2) '(face markdown-list-face))
-    (when (and markdown-hide-markup
-               (string-match-p "[\\*\\+-]" (match-string 2)))
       (add-text-properties
-       (match-beginning 2) (match-end 2) `(display ,bullet))))
+       (match-beginning 2) (match-end 2) '(face markdown-list-face))
+      (when (and markdown-hide-markup
+                 (string-match-p "[\\*\\+-]" (match-string 2)))
+        (add-text-properties
+         (match-beginning 2) (match-end 2) `(display ,bullet))))
     t))
 
 
