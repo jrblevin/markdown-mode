@@ -1179,6 +1179,7 @@ Math support can be enabled, disabled, or toggled later using
   :group 'markdown
   :type 'boolean
   :safe 'booleanp)
+(make-variable-buffer-local 'markdown-enable-math)
 
 (defcustom markdown-css-paths nil
   "URL of CSS file to link to in the output XHTML."
@@ -1324,7 +1325,7 @@ Such URLs will be replaced by an ellipsis (…), but it is still
 part of the buffer.  Deleting the final parenthesis, for example,
 allows easy editing of the URL.  You can also hover your mouse
 pointer over the link text to see the URL.
-
+Set this to a non-nil value to turn this feature on by default.
 You can interactively set the value of this variable by calling
 `markdown-toggle-url-hiding' or from the menu Markdown > Links &
 Images menu."
@@ -1332,6 +1333,7 @@ Images menu."
   :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.3"))
+(make-variable-buffer-local 'markdown-hide-urls)
 
 
 ;;; Regular Expressions =======================================================
@@ -2186,7 +2188,7 @@ START and END delimit region to propertize."
 When set to nil, all markup is displayed in the buffer as it
 appears in the file.  An exception is when `markdown-hide-urls'
 is non-nil.
-When set to a non-nil value, all possible markup will be hidden.
+Set this to a non-nil value to turn this feature on by default.
 You can interactively toggle the value of this variable with
 `markdown-toggle-markup-hiding', \\[markdown-toggle-markup-hiding],
 or from the Markdown > Show & Hide menu."
@@ -2194,6 +2196,7 @@ or from the Markdown > Show & Hide menu."
   :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.3"))
+(make-variable-buffer-local 'markdown-hide-markup)
 
 (defun markdown-toggle-markup-hiding (&optional arg)
   "Toggle the display or hiding of markup.
@@ -7955,18 +7958,12 @@ position."
   (set (make-local-variable 'font-lock-defaults) nil)
   (set (make-local-variable 'font-lock-multiline) t)
   (add-to-list 'font-lock-extra-managed-props 'composition)
-  (markdown-update-code-face)
-  ;; URL hiding
-  (make-local-variable 'markdown-hide-urls)
-  ;; Markup hiding
-  (make-local-variable 'markdown-hide-markup)
   (add-to-list 'font-lock-extra-managed-props 'invisible)
   (add-to-list 'font-lock-extra-managed-props 'display)
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
-  ;; Extensions
-  (make-local-variable 'markdown-enable-math)
+  (markdown-update-code-face)
   ;; Reload extensions
   (markdown-reload-extensions)
   ;; Add a buffer-local hook to reload after file-local variables are read
