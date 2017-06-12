@@ -2049,7 +2049,7 @@ start which was previously propertized."
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
-  (let* ((state (syntax-ppss)) (in-comment (nth 4 state)))
+  (let* ((in-comment (markdown-in-comment-p)))
     (goto-char start)
     (cond
      ;; Comment start
@@ -2655,7 +2655,7 @@ Used for `flyspell-generic-check-word-predicate'."
     (goto-char (1- (point)))
     (not (or (markdown-code-block-at-point-p)
              (markdown-inline-code-at-point-p)
-             (nth 4 (syntax-ppss)) ;; in comment
+             (markdown-in-comment-p)
              (let ((faces (get-text-property (point) 'face)))
                (if (listp faces)
                    (or (memq 'markdown-reference-face faces)
@@ -3116,6 +3116,11 @@ Set match data for `markdown-regex-header'."
     (when match-data
       (set-match-data match-data)
       t)))
+
+(defsubst markdown-in-comment-p (&optional pos)
+  "Return non-nil if POS is in a comment.
+If POS is not given, use point instead."
+  (nth 4 (syntax-ppss pos)))
 
 
 ;;; Markdown Font Lock Matching Functions =====================================
