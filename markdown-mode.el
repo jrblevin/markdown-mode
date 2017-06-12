@@ -2030,6 +2030,17 @@ start which was previously propertized."
                          'markdown-blockquote
                          (match-data t)))))
 
+(defun markdown-syntax-propertize-hrs (start end)
+  "Match horizontal rules from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (re-search-forward markdown-regex-hr end t)
+      (unless (or (markdown-on-heading-p)
+                  (markdown-code-block-at-point-p))
+        (put-text-property (match-beginning 0) (match-end 0)
+                           'markdown-hr
+                           (match-data t))))))
+
 (defun markdown-syntax-propertize-yaml-metadata (start end)
   (save-excursion
     (goto-char start)
@@ -2098,6 +2109,7 @@ start which was previously propertized."
         'markdown-gfm-code nil
         'markdown-pre nil
         'markdown-blockquote nil
+        'markdown-hr nil
         'markdown-heading nil
         'markdown-heading-1-setext nil
         'markdown-heading-2-setext nil
@@ -2110,7 +2122,7 @@ start which was previously propertized."
         'markdown-metadata-key nil
         'markdown-metadata-value nil
         'markdown-metadata-markup nil)
-  "Property list of all known markdown syntactic properties.")
+  "Property list of all Markdown syntactic properties.")
 
 (defun markdown-syntax-propertize (start end)
   "Function used as `syntax-propertize-function'.
@@ -2123,6 +2135,7 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-pre-blocks start end)
       (markdown-syntax-propertize-blockquotes start end)
       (markdown-syntax-propertize-headings start end)
+      (markdown-syntax-propertize-hrs start end)
       (markdown-syntax-propertize-comments start end))))
 
 
@@ -3280,10 +3293,10 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
     (let ((begin (match-beginning 2))
           (end (match-end 2)))
         (if (or (markdown-range-property-any
-                 begin end 'face (list markdown-header-delimiter-face
-                                       markdown-inline-code-face
+                 begin end 'face (list markdown-inline-code-face
                                        markdown-bold-face
                                        markdown-math-face))
+                (markdown-range-properties-exist begin end '(markdown-hr))
                 (markdown-in-comment-p))
             (progn (goto-char (min (1+ (match-end 0)) last))
                    (markdown-match-list-items last))
@@ -3352,16 +3365,7 @@ analysis."
 
 (defun markdown-match-hr (last)
   "Match horizontal rules comments from the point to LAST."
-  (while (and (re-search-forward markdown-regex-hr last t)
-              (or (markdown-on-heading-p)
-                  (markdown-code-block-at-point-p))
-              (< (match-end 0) last))
-    (forward-line))
-  (beginning-of-line)
-  (cond ((looking-at-p markdown-regex-hr)
-         (forward-line)
-         t)
-        (t nil)))
+  (markdown-match-propertized-text 'markdown-hr last))
 
 (defun markdown-match-comments (last)
   "Match HTML comments from the point to LAST."
