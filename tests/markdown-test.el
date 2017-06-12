@@ -2470,6 +2470,25 @@ for (var i = 0; i < 10; i++) {
    (markdown-test-range-has-face 45 115 markdown-pre-face) ; [code]
    (markdown-test-range-has-face 117 119 markdown-markup-face))) ; ```
 
+(ert-deftest test-markdown-font-lock/tilde-fenced-1 ()
+  "Test native fontification of tilde fenced code blocks."
+  (let ((markdown-fontify-code-blocks-natively t))
+    (markdown-test-string "~~~ruby
+require 'redcarpet'
+markdown = Redcarpet.new('Hello World!')
+puts markdown.to_html
+~~~"
+      (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
+      (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
+      (markdown-test-range-has-face 9 90 'markdown-code-face) ; entire code block
+      (unless (version< emacs-version "24.4")
+        (markdown-test-range-has-face 9 15 'font-lock-builtin-face)) ; require
+      (markdown-test-range-has-face 17 27 'font-lock-string-face) ; 'redcarpet'
+      (markdown-test-range-has-face 40 48 'font-lock-type-face) ; Redcarpet
+      (unless (version< emacs-version "24.4")
+        (markdown-test-range-has-face 70 72 'font-lock-builtin-face)) ; puts
+      (markdown-test-range-has-face 92 94 markdown-markup-face)))) ; ```
+
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
   (markdown-test-string "##abc##"
