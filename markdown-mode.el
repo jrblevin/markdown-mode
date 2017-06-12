@@ -717,6 +717,9 @@
 ;;     (`markdown-toggle-markup-hiding') or from the Markdown | Show &
 ;;     Hide menu.
 ;;
+;;     Unicode bullets are used to replace ASCII list item markers.
+;;     The list of characters used, in order of list level, can be
+;;     specified by setting the variable `markdown-list-item-bullets'.
 ;;     The placeholder character used to replace blockquote markup can
 ;;     be changed by setting `markdown-blockquote-display-char'.
 ;;
@@ -2471,6 +2474,15 @@ See `font-lock-syntactic-face-function' for details."
      (in-comment 'markdown-comment-face)
      (t nil))))
 
+(defcustom markdown-list-item-bullets
+  '("●" "◎" "○" "◆" "◇" "►" "•")
+  "List of bullets to use for unordered lists.
+It can contain any number of symbols, which will be repeated.
+Depending on your font, some reasonable choices are:
+♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ❀ ◆ ◖ ▶ ► • ★ ▸."
+  :group 'markdown
+  :type '(repeat (string :tag "Bullet character")))
+
 (defvar markdown-mode-font-lock-keywords-basic
   `((markdown-match-yaml-metadata-begin . ((1 markdown-markup-face)))
     (markdown-match-yaml-metadata-end . ((1 markdown-markup-face)))
@@ -3572,7 +3584,11 @@ is \"\n\n\""
            (bullet (nth (mod level (length markdown-list-item-bullets))
                         markdown-list-item-bullets)))
     (add-text-properties
-     (match-beginning 2) (match-end 2) '(face markdown-list-face)))
+     (match-beginning 2) (match-end 2) '(face markdown-list-face))
+    (when (and markdown-hide-markup
+               (string-match-p "[\\*\\+-]" (match-string 2)))
+      (add-text-properties
+       (match-beginning 2) (match-end 2) `(display ,bullet))))
     t))
 
 

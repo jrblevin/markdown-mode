@@ -1962,6 +1962,15 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
     (should-not (invisible-p 2))
     (should (invisible-p 45))))
 
+(ert-deftest test-markdown-markup-hiding/list-items ()
+  "Test hiding markup for list items."
+  (let ((markdown-hide-markup t))
+    (markdown-test-file "nested-list.text"
+      (markdown-test-range-has-property 4 4 'display (nth 0 markdown-list-item-bullets))
+      (markdown-test-range-has-property 194 194 'display (nth 0 markdown-list-item-bullets))
+      (markdown-test-range-has-property 224 224 'display (nth 1 markdown-list-item-bullets))
+      (markdown-test-range-has-property 525 525 'display (nth 2 markdown-list-item-bullets)))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()

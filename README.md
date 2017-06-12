@@ -699,6 +699,9 @@ provides an interface to all of the possible customizations:
     (`markdown-toggle-markup-hiding`) or from the Markdown | Show &
     Hide menu.
 
+    Unicode bullets are used to replace ASCII list item markers.
+    The list of characters used, in order of list level, can be
+    specified by setting the variable `markdown-list-item-bullets`.
     The placeholder character used to replace blockquote markup can
     be changed by setting `markdown-blockquote-display-char`.
 

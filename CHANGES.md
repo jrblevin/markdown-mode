@@ -30,6 +30,10 @@
     -   When markup hiding is enabled, the character used for
         replacing blockquote markup can be changed by setting
         `markdown-blockquote-display-char`.
+    -   Unicode bullets are used to replace ASCII list item markers
+        for unordered lists when markup hiding is enabled.  The list
+        of characters used, in order of list level, can be specified
+        by setting the variable `markdown-list-item-bullets`.
     -   URL and reference label hiding: URLs for inline links and
         labels for reference links are now hidden by default.  This is
         configurable via `markdown-hide-urls`.  URLs will appear as
