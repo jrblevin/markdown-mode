@@ -1420,19 +1420,20 @@ Groups 1 and 3 match the opening and closing tags.
 Group 2 matches the key sequence.")
 
 (defconst markdown-regex-gfm-code-block-open
- "^[[:blank:]]*\\(```\\)[[:blank:]]*\\({\\)?[[:blank:]]*\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?[[:blank:]]*\\(}\\)?[[:blank:]]*$"
- "Regular expression matching opening of GFM code blocks.
-Group 1 matches the opening three backquotes.
-Group 2 matches the opening brace (optional).
+  "^[[:blank:]]*\\(```\\)\\([[:blank:]]*{?[[:blank:]]*\\)\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?\\([[:blank:]]*}?[[:blank:]]*\\)$"
+  "Regular expression matching opening of GFM code blocks.
+Group 1 matches the opening three backquotes and any following whitespace.
+Group 2 matches the opening brace (optional) and surrounding whitespace.
 Group 3 matches the language identifier (optional).
 Group 4 matches the info string (optional).
-Group 5 matches the closing brace (optional).
+Group 5 matches the closing brace (optional), whitespace, and newline.
 Groups need to agree with `markdown-regex-tilde-fence-begin'.")
 
 (defconst markdown-regex-gfm-code-block-close
- "^[[:blank:]]*\\(```\\)\\s *?$"
+ "^[[:blank:]]*\\(```\\)\\(\\s *?\\)$"
  "Regular expression matching closing of GFM code blocks.
-Group 1 matches the closing three backquotes.")
+Group 1 matches the closing three backquotes.
+Group 2 matches any whitespace and the final newline.")
 
 (defconst markdown-regex-pre
   "^\\(    \\|\t\\).*$"
@@ -1566,13 +1567,13 @@ missing."
 
 (defconst markdown-regex-tilde-fence-begin
   (markdown-make-tilde-fence-regex
-   3 "[[:blank:]]*\\({\\)?[[:blank:]]*\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?[[:blank:]]*\\(}\\)?[[:blank:]]*$")
+   3 "\\([[:blank:]]*{?\\)[[:blank:]]*\\([^[:space:]]+?\\)?\\(?:[[:blank:]]+\\(.+?\\)\\)?\\([[:blank:]]*}?[[:blank:]]*\\)$")
   "Regular expression for matching tilde-fenced code blocks.
 Group 1 matches the opening tildes.
-Group 2 matches the opening brace (optional).
+Group 2 matches (optional) opening brace and surrounding whitespace.
 Group 3 matches the language identifier (optional).
 Group 4 matches the info string (optional).
-Group 5 matches the closing brace (optional).
+Group 5 matches the closing brace (optional) and any surrounding whitespace.
 Groups need to agree with `markdown-regex-gfm-code-block-open'.")
 
 (defconst markdown-regex-declarative-metadata
@@ -2158,6 +2159,14 @@ START and END delimit region to propertize."
   '(face markdown-markup-face invisible markdown-markup)
   "List of properties and values to apply to markup.")
 
+(defconst markdown-language-keyword-properties
+  '(face markdown-language-keyword-face invisible markdown-markup)
+  "List of properties and values to apply to code block language names.")
+
+(defconst markdown-language-info-properties
+  '(face markdown-language-info-face invisible markdown-markup)
+  "List of properties and values to apply to code block language info strings.")
+
 (defcustom markdown-hide-markup nil
   "Determines whether markup in the buffer will be hidden.
 When set to nil, all markup is displayed in the buffer as it
@@ -2531,19 +2540,19 @@ Depending on your font, some reasonable choices are:
     (markdown-match-yaml-metadata-key . ((1 markdown-metadata-key-face)
                                          (2 markdown-markup-face)
                                          (3 markdown-metadata-value-face)))
-    (markdown-match-gfm-open-code-blocks . ((1 markdown-markup-face)
-                                            (2 markdown-markup-face nil t)
-                                            (3 markdown-language-keyword-face nil t)
-                                            (4 markdown-language-info-face nil t)
-                                            (5 markdown-markup-face nil t)))
-    (markdown-match-gfm-close-code-blocks . ((1 markdown-markup-face)))
+    (markdown-match-gfm-open-code-blocks . ((1 markdown-markup-properties)
+                                            (2 markdown-markup-properties nil t)
+                                            (3 markdown-language-keyword-properties nil t)
+                                            (4 markdown-language-info-properties nil t)
+                                            (5 markdown-markup-properties nil t)))
+    (markdown-match-gfm-close-code-blocks . ((0 markdown-markup-properties)))
     (markdown-fontify-gfm-code-blocks)
-    (markdown-match-fenced-start-code-block . ((1 markdown-markup-face)
-                                               (2 markdown-markup-face nil t)
-                                               (3 markdown-language-keyword-face nil t)
-                                               (4 markdown-language-info-face nil t)
-                                               (5 markdown-markup-face nil t)))
-    (markdown-match-fenced-end-code-block . ((0 markdown-markup-face)))
+    (markdown-match-fenced-start-code-block . ((1 markdown-markup-properties)
+                                               (2 markdown-markup-properties nil t)
+                                               (3 markdown-language-keyword-properties nil t)
+                                               (4 markdown-language-info-properties nil t)
+                                               (5 markdown-markup-properties nil t)))
+    (markdown-match-fenced-end-code-block . ((0 markdown-markup-properties)))
     (markdown-fontify-fenced-code-blocks)
     (markdown-match-pre-blocks . ((0 markdown-pre-face)))
     (markdown-fontify-headings)

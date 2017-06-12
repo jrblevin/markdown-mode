@@ -1971,6 +1971,28 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
       (markdown-test-range-has-property 224 224 'display (nth 1 markdown-list-item-bullets))
       (markdown-test-range-has-property 525 525 'display (nth 2 markdown-list-item-bullets)))))
 
+(ert-deftest test-markdown-markup-hiding/gfm-code-blocks ()
+  "Test hiding markup for GFM code blocks."
+  (let ((markdown-hide-markup t))
+    (markdown-test-file "GFM.md"
+      (markdown-test-range-has-property 1548 1552 'invisible 'markdown-markup)
+      (should (invisible-p 1548))
+      (should (invisible-p 1552))
+      (markdown-test-range-has-property 1607 1609 'invisible 'markdown-markup)
+      (should (invisible-p 1607))
+      (should (invisible-p 1609)))))
+
+(ert-deftest test-markdown-markup-hiding/fenced-code-blocks ()
+  "Test hiding markup for tilde fenced code blocks."
+  (let ((markdown-hide-markup t))
+    (markdown-test-file "outline-code.text"
+      (markdown-test-range-has-property 83 93 'invisible 'markdown-markup)
+      (should (invisible-p 83))
+      (should (invisible-p 93))
+      (markdown-test-range-has-property 154 156 'invisible 'markdown-markup)
+      (should (invisible-p 154))
+      (should (invisible-p 156)))))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
