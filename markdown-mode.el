@@ -3199,8 +3199,10 @@ data.  See `markdown-code-block-at-point-p' for code blocks."
 
 (defun markdown-code-block-at-pos (pos)
   "Return match data list if there is a code block at POS.
+Uses text properties at the beginning of the line position.
 This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  Return nil otherwise."
+  (setq pos (save-excursion (goto-char pos) (point-at-bol)))
   (or (get-text-property pos 'markdown-pre)
       (markdown-get-enclosing-fenced-block-construct pos)
       ;; polymode removes text properties set by markdown-mode, so
