@@ -3237,7 +3237,7 @@ Return nil otherwise."
   (let (props)
     (catch 'found
       (dolist (loc (number-sequence begin end))
-        (when (setq props (get-char-property loc prop))
+        (when (setq props (get-text-property loc prop))
           (cond ((listp props)
                  ;; props is a list, check for membership
                  (dolist (val prop-values)
@@ -3253,7 +3253,7 @@ Return nil otherwise."
    with result = nil
    while (not
           (setq result
-                (cl-some (lambda (prop) (get-char-property loc prop)) props)))
+                (cl-some (lambda (prop) (get-text-property loc prop)) props)))
    finally return result))
 
 (defun markdown-match-inline-generic (regex last &optional faceless)
