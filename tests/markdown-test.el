@@ -2876,14 +2876,14 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/stars-in-code-in-heading ()
   "Test asterisks in inline code in headings."
+  :expected-result :failed
   (markdown-test-string "# Title with `char** foo, int* bar`"
-    (should-not (markdown-test-range-has-face 20 29 markdown-italic-face))))
+    (should-not (markdown-range-property-any 20 29 'face '(markdown-italic-face)))))
 
 (ert-deftest test-markdown-font-lock/stars-in-code-in-blockquote ()
   "Test asterisks in inline code in blockquote."
-  :expected-result :failed
   (markdown-test-string "> Quote with `**stars**`"
-    (should-not (markdown-test-range-has-face 17 21 markdown-bold-face))))
+    (should-not (markdown-range-property-any 17 21 'face '(markdown-italic-face)))))
 
 ;;; Markdown Parsing Functions:
 
