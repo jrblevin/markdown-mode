@@ -3153,8 +3153,8 @@ intact additional processing."
           (cl-pushnew target refs :test #'equal)))
       (reverse refs))))
 
-(defun markdown-inline-code-at-point ()
-  "Return non-nil if the point is at an inline code fragment.
+(defun markdown-inline-code-at-pos (pos)
+  "Return non-nil if there is an inline code fragment at POS.
 Return nil otherwise.  Set match data according to
 `markdown-match-code' upon success.
 This function searches the block for a code fragment that
@@ -3167,6 +3167,7 @@ Group 1 matches the opening backquotes.
 Group 2 matches the code fragment itself, without backquotes.
 Group 3 matches the closing backquotes."
   (save-excursion
+    (goto-char pos)
     (let ((old-point (point))
           (end-of-block (progn (markdown-end-of-text-block) (point)))
           found)
@@ -3178,12 +3179,17 @@ Group 3 matches the closing backquotes."
            (<= (match-beginning 0) old-point) ; match contains old-point
            (>= (match-end 0) old-point)))))
 
+(defun markdown-inline-code-at-point ()
+  "Return non-nil if the point is at an inline code fragment.
+See `markdown-inline-code-at-pos' for details."
+  (markdown-inline-code-at-pos (point)))
+
 (defun markdown-inline-code-at-point-p ()
   "Return non-nil if there is inline code at the point.
 This is a predicate function counterpart to
 `markdown-inline-code-at-point' which does not modify the match
 data.  See `markdown-code-block-at-point-p' for code blocks."
-  (save-match-data (markdown-inline-code-at-point)))
+  (save-match-data (markdown-inline-code-at-pos (point))))
 
 (make-obsolete 'markdown-code-at-point-p 'markdown-inline-code-at-point-p "v2.2")
 
