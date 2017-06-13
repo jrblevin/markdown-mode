@@ -1531,7 +1531,7 @@ Group 6 matches the closing square brackets.")
   "Regular expression for matching inline URIs in angle brackets.")
 
 (defconst markdown-regex-email
-  "<\\(\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+\\)>"
+  "<\\(\\(?:\\sw\\|\\s_\\|\\s.\\)+@\\(?:\\sw\\|\\s_\\|\\s.\\)+\\)>"
   "Regular expression for matching inline email addresses.")
 
 (defsubst markdown-make-regex-link-generic ()
