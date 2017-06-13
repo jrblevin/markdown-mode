@@ -3998,6 +3998,36 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
       (should (equal (file-name-nondirectory (buffer-file-name)) "path"))
       (kill-buffer))))
 
+(ert-deftest test-markdown-link/inline-link-at-pos ()
+  "Test `markdown-link-at-pos' return values with an inline link."
+  (markdown-test-string "[text](url \"title\")"
+    (should (equal (markdown-link-at-pos (point)) '(1 20 "text" "url" nil "title")))))
+
+(ert-deftest test-markdown-link/inline-image-at-pos ()
+  "Test `markdown-link-at-pos' return values with an inline image."
+  (markdown-test-string "![text](url \"title\")"
+    (should (equal (markdown-link-at-pos (point)) '(nil nil nil nil nil nil)))))
+
+(ert-deftest test-markdown-link/reference-link-at-pos ()
+  "Test `markdown-link-at-pos' return values with a reference link."
+  (markdown-test-string "[text][ref]"
+    (should (equal (markdown-link-at-pos (point)) '(1 12 "text" nil "ref" nil)))))
+
+(ert-deftest test-markdown-link/reference-image-at-pos ()
+  "Test `markdown-link-at-pos' return values with a reference image."
+  (markdown-test-string "![text][ref]"
+    (should (equal (markdown-link-at-pos (point)) '(nil nil nil nil nil nil)))))
+
+(ert-deftest test-markdown-link/angle-uri-at-pos ()
+  "Test `markdown-link-at-pos' return values with an angle bracket inline link."
+  (markdown-test-string "<http://jblevins.org/projects/markdown-mode/>"
+    (should (equal (markdown-link-at-pos (point)) '(1 46 nil "http://jblevins.org/projects/markdown-mode/" nil nil)))))
+
+(ert-deftest test-markdown-link/plain-uri-at-pos ()
+  "Test `markdown-link-at-pos' return values with a plain URI."
+  (markdown-test-string "http://jblevins.org/projects/markdown-mode/"
+    (should (equal (markdown-link-at-pos (point)) '(1 44 nil "http://jblevins.org/projects/markdown-mode/" nil nil)))))
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/file-local-variables ()
