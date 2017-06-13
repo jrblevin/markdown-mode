@@ -2887,7 +2887,8 @@ takes precedence)."
 (ert-deftest test-markdown-font-lock/stars-in-code-in-blockquote ()
   "Test asterisks in inline code in blockquote."
   (markdown-test-string "> Quote with `**stars**`"
-    (should-not (markdown-range-property-any 17 21 'face '(markdown-italic-face)))
+    (should-not (markdown-range-property-any
+                 17 21 'face '(markdown-italic-face markdown-bold-face)))
     (markdown-test-range-has-face 15 23 'markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/two-bold-words-after-list ()
