@@ -3179,6 +3179,11 @@ Group 3 matches the closing backquotes."
            (<= (match-beginning 0) old-point) ; match contains old-point
            (>= (match-end 0) old-point)))))
 
+(defun markdown-inline-code-at-pos-p (pos)
+  "Return non-nil if there is an inline code fragment at POS.
+Like `markdown-inline-code-at-pos`, but preserves match data."
+  (save-match-data (markdown-inline-code-at-pos pos)))
+
 (defun markdown-inline-code-at-point ()
   "Return non-nil if the point is at an inline code fragment.
 See `markdown-inline-code-at-pos' for details."
@@ -3282,50 +3287,53 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                           (match-beginning 2) (match-end 2)
                           (match-beginning 3) (match-end 3)
                           (match-beginning 4) (match-end 4)))
-    (goto-char (1+ (match-end 0)))))
+    t))
 
 (defun markdown-match-bold (last)
   "Match inline bold from the point to LAST."
   (when (markdown-match-inline-generic markdown-regex-bold last)
-    (let ((begin (match-beginning 2)) (end (match-end 2)))
-      (cond
-       ((markdown-range-property-any
-         begin end 'face (list markdown-inline-code-face
-                               markdown-math-face))
-        (goto-char (1+ (match-end 0)))
-        (markdown-match-bold last))
-       (t
+    (let ((begin (match-beginning 2))
+          (end (match-end 2)))
+      (if (or (markdown-inline-code-at-pos-p begin)
+              (markdown-inline-code-at-pos-p end)
+              (markdown-range-property-any
+               begin begin 'face '(markdown-url-face))
+              (markdown-range-property-any
+               begin end 'face '(markdown-inline-code-face
+                                 markdown-math-face)))
+          (progn (goto-char (min (1+ begin) last))
+                 (when (< (point) last)
+                   (markdown-match-italic last)))
         (set-match-data (list (match-beginning 2) (match-end 2)
-                          (match-beginning 3) (match-end 3)
-                          (match-beginning 4) (match-end 4)
-                          (match-beginning 5) (match-end 5)))
-        (goto-char (1+ (match-end 0))))))))
+                              (match-beginning 3) (match-end 3)
+                              (match-beginning 4) (match-end 4)
+                              (match-beginning 5) (match-end 5)))
+        t))))
 
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
   (let ((regex (if (eq major-mode 'gfm-mode)
                    markdown-regex-gfm-italic markdown-regex-italic)))
     (when (markdown-match-inline-generic regex last)
-      (let ((begin (match-beginning 1)) (end (match-end 1)))
-        (cond
-         ((markdown-range-property-any
-           begin begin 'face (list markdown-url-face))
-          ;; Italics shouldn't begin inside a URL due to an underscore
-          (goto-char (min (1+ (match-end 0)) last))
-          (markdown-match-italic last))
-         ((markdown-range-property-any
-           begin end 'face (list markdown-inline-code-face
-                                 markdown-bold-face
-                                 markdown-list-face
-                                 markdown-math-face))
-          (goto-char (1+ (match-end 0)))
-          (markdown-match-italic last))
-         (t
+      (let ((begin (match-beginning 1))
+            (end (match-end 1)))
+        (if (or (markdown-inline-code-at-pos-p begin)
+                (markdown-inline-code-at-pos-p end)
+                (markdown-range-property-any
+                 begin begin 'face '(markdown-url-face))
+                (markdown-range-property-any
+                 begin end 'face '(markdown-inline-code-face
+                                   markdown-bold-face
+                                   markdown-list-face
+                                   markdown-math-face)))
+            (progn (goto-char (min (1+ begin) last))
+                   (when (< (point) last)
+                     (markdown-match-italic last)))
           (set-match-data (list (match-beginning 1) (match-end 1)
                                 (match-beginning 2) (match-end 2)
                                 (match-beginning 3) (match-end 3)
                                 (match-beginning 4) (match-end 4)))
-          (goto-char (1+ (match-end 0)))))))))
+          t)))))
 
 (defun markdown-match-math-generic (regex last)
   "Match REGEX from point to LAST.

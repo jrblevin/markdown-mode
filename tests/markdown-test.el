@@ -2870,13 +2870,11 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/snake-case-code-in-heading ()
   "Test underscores in inline code in headings."
-  :expected-result :failed
   (markdown-test-string "# Title with `snake_case_code`"
     (should-not (markdown-range-property-any 21 24 'face '(markdown-italic-face)))))
 
 (ert-deftest test-markdown-font-lock/stars-in-code-in-heading ()
   "Test asterisks in inline code in headings."
-  :expected-result :failed
   (markdown-test-string "# Title with `char** foo, int* bar`"
     (should-not (markdown-range-property-any 20 29 'face '(markdown-italic-face)))))
 
@@ -2887,7 +2885,6 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/two-bold-words-after-list ()
   "Test two bold words after a list marker."
-  :expected-result :failed
   (markdown-test-string "- **foo** **bar**"
     (should-not (markdown-range-property-any
                  (point-min) (point-max) 'face '(markdown-italic-face)))))
@@ -3330,7 +3327,9 @@ x: x
 ---
 `x`
 "
-    (should (= (markdown-match-code (point-max)) (point-max)))))
+    (should (markdown-match-code (point-max)))
+    (should (= (point) (point-max)))
+    (should (equal (match-data t) '(14 17 14 15 15 16 16 17)))))
 
 (ert-deftest test-markdown-parsing/list-item-at-point ()
   "Test `markdown-list-item-at-point-p'."
