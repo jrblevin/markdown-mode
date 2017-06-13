@@ -2238,12 +2238,16 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
   "Bold markers in inline code should not trigger bold."
   (markdown-test-string
    "`def __init__(self):`"
-   (markdown-test-range-has-face 8 11 markdown-inline-code-face))
+   (markdown-test-range-has-face 8 11 'markdown-inline-code-face)
+   (should-not (markdown-range-property-any
+                (point-min) (point-max) 'face '(markdown-bold-face))))
   (markdown-test-string
    "`**foo` bar `baz**`"
-   (markdown-test-range-face-equals 2 6 markdown-inline-code-face)
+   (markdown-test-range-has-face 2 6 'markdown-inline-code-face)
    (markdown-test-range-face-equals 9 11 nil)
-   (markdown-test-range-face-equals 14 18 markdown-inline-code-face)))
+   (markdown-test-range-has-face 14 18 'markdown-inline-code-face)
+   (should-not (markdown-range-property-any
+                (point-min) (point-max) 'face '(markdown-bold-face)))))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
@@ -2871,17 +2875,20 @@ takes precedence)."
 (ert-deftest test-markdown-font-lock/snake-case-code-in-heading ()
   "Test underscores in inline code in headings."
   (markdown-test-string "# Title with `snake_case_code`"
-    (should-not (markdown-range-property-any 21 24 'face '(markdown-italic-face)))))
+    (should-not (markdown-range-property-any 21 24 'face '(markdown-italic-face)))
+    (markdown-test-range-has-face 15 29 'markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/stars-in-code-in-heading ()
   "Test asterisks in inline code in headings."
   (markdown-test-string "# Title with `char** foo, int* bar`"
-    (should-not (markdown-range-property-any 20 29 'face '(markdown-italic-face)))))
+    (should-not (markdown-range-property-any 20 29 'face '(markdown-italic-face)))
+    (markdown-test-range-has-face 15 34 'markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/stars-in-code-in-blockquote ()
   "Test asterisks in inline code in blockquote."
   (markdown-test-string "> Quote with `**stars**`"
-    (should-not (markdown-range-property-any 17 21 'face '(markdown-italic-face)))))
+    (should-not (markdown-range-property-any 17 21 'face '(markdown-italic-face)))
+    (markdown-test-range-has-face 15 23 'markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/two-bold-words-after-list ()
   "Test two bold words after a list marker."
