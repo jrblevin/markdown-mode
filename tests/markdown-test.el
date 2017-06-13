@@ -2905,7 +2905,6 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/heading-with-italics-and-bold ()
   "Test that HRs are distinguished from setext H2 markup."
-  :expected-result :failed
   (markdown-test-file "outline.text"
     (goto-char 485)
     (should (markdown-on-heading-p))

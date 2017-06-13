@@ -6363,7 +6363,7 @@ Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
 
 (defun markdown-on-heading-p ()
   "Return non-nil if point is on a heading line."
-  (get-text-property (point) 'markdown-heading))
+  (get-text-property (point-at-bol) 'markdown-heading))
 
 (defun markdown-end-of-subtree (&optional invisible-OK)
   "Move to the end of the current subtree.
