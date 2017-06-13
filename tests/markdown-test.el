@@ -2903,6 +2903,16 @@ takes precedence)."
     (markdown-test-range-has-face 30 33 'markdown-bold-face)
     (should-not (markdown-range-property-any 30 33 'face '(markdown-italic-face)))))
 
+(ert-deftest test-markdown-font-lock/heading-with-italics-and-bold ()
+  "Test that HRs are distinguished from setext H2 markup."
+  :expected-result :failed
+  (markdown-test-file "outline.text"
+    (goto-char 485)
+    (should (markdown-on-heading-p))
+    (beginning-of-line)
+    (should (markdown-on-heading-p))
+    (should-not (markdown-range-property-any 453 484 'face '(markdown-hr-face)))))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
