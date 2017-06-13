@@ -3250,6 +3250,15 @@ only partially propertized."
   (markdown-test-file "wiki-links.text"
    (should (equal (markdown-get-defined-references) nil))))
 
+(ert-deftest test-markdown-parsing/get-used-uris ()
+  "Test `markdown-get-used-uris'."
+  (markdown-test-file "syntax.text"
+    (let ((uris (markdown-get-used-uris)))
+      (should (equal (nth 0 uris) "#overview"))
+      (should (equal (nth 20 uris) "http://www.aaronsw.com/2002/atx/"))
+      (should-not (member "http://example.com/" uris))
+      (should-not (member "address@example.com" uris)))))
+
 (defun markdown-test-test-region (beg end)
   (goto-char (1- beg))
   (should-not (markdown-inline-code-at-point-p))

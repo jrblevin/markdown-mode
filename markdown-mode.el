@@ -3152,6 +3152,27 @@ intact additional processing."
           (cl-pushnew target refs :test #'equal)))
       (reverse refs))))
 
+(defun markdown-get-used-uris ()
+  "Return a list of all used URIs in the buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (let (uris)
+      (while (re-search-forward
+              (concat "\\(?:" markdown-regex-link-inline
+                      "\\|" markdown-regex-angle-uri
+                      "\\|" markdown-regex-uri
+                      "\\|" markdown-regex-email
+                      "\\)")
+              nil t)
+        (unless (or (markdown-inline-code-at-point-p)
+                    (markdown-code-block-at-point-p))
+          (cl-pushnew (or (match-string-no-properties 6)
+                          (match-string-no-properties 10)
+                          (match-string-no-properties 12)
+                          (match-string-no-properties 13))
+                      uris :test #'equal)))
+      (reverse uris))))
+
 (defun markdown-inline-code-at-pos (pos)
   "Return non-nil if there is an inline code fragment at POS.
 Return nil otherwise.  Set match data according to
