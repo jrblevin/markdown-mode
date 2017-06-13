@@ -2868,6 +2868,23 @@ takes precedence)."
       (markdown-test-range-has-face 28 28 markdown-markup-face)
       (should (equal '((20 . 8734)) (get-text-property 8 'composition))))))
 
+(ert-deftest test-markdown-font-lock/snake-case-code-in-heading ()
+  "Test underscores in inline code in headings."
+  :expected-result :failed
+  (markdown-test-string "# Title with `snake_case_code`"
+    (should-not (markdown-range-property-any 21 24 'face '(markdown-italic-face)))))
+
+(ert-deftest test-markdown-font-lock/stars-in-code-in-heading ()
+  "Test asterisks in inline code in headings."
+  (markdown-test-string "# Title with `char** foo, int* bar`"
+    (should-not (markdown-test-range-has-face 20 29 markdown-italic-face))))
+
+(ert-deftest test-markdown-font-lock/stars-in-code-in-blockquote ()
+  "Test asterisks in inline code in blockquote."
+  :expected-result :failed
+  (markdown-test-string "> Quote with `**stars**`"
+    (should-not (markdown-test-range-has-face 17 21 markdown-bold-face))))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
