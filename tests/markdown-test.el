@@ -3789,6 +3789,12 @@ date = 2015-08-13 11:35:25 EST
    (beginning-of-defun -1)
    (should (looking-at "### Third level number two ###"))))
 
+(ert-deftest test-markdown-movement/beginning-of-defun-at-point-max ()
+  "Test beginning of defun navigation at point-max."
+  (markdown-test-file "outline.text"
+    (goto-char (point-max))
+    (beginning-of-defun)))
+
 (ert-deftest test-markdown-movement/text-block ()
   "Test plain text block movement."
   (markdown-test-file "outline.text"
