@@ -941,7 +941,6 @@
 (defvar jit-lock-start)
 (defvar jit-lock-end)
 (defvar flyspell-generic-check-word-predicate)
-(defvar edit-indirect-guess-mode-function)
 
 (declare-function eww-open-file "eww")
 (declare-function url-path-and-query "url-parse")
@@ -7946,6 +7945,9 @@ position."
          start end
          '(font-lock-fontified t fontified t font-lock-multiline t))
         (set-buffer-modified-p modified)))))
+
+(require 'edit-indirect nil t)
+(defvar edit-indirect-guess-mode-function)
 
 (defun markdown-edit-code-block ()
   "Edit Markdown code block in an indirect buffer."
