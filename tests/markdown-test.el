@@ -2885,6 +2885,13 @@ takes precedence)."
   (markdown-test-string "> Quote with `**stars**`"
     (should-not (markdown-range-property-any 17 21 'face '(markdown-italic-face)))))
 
+(ert-deftest test-markdown-font-lock/two-bold-words-after-list ()
+  "Test two bold words after a list marker."
+  :expected-result :failed
+  (markdown-test-string "- **foo** **bar**"
+    (should-not (markdown-range-property-any
+                 (point-min) (point-max) 'face '(markdown-italic-face)))))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
