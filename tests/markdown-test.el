@@ -2896,6 +2896,13 @@ takes precedence)."
     (should-not (markdown-range-property-any
                  (point-min) (point-max) 'face '(markdown-italic-face)))))
 
+(ert-deftest test-markdown-font-lock/heading-with-italics-and-bold ()
+  "Test two bold words after a list marker."
+  (markdown-test-string "# Title with *italics* and **bold**"
+    (markdown-test-range-has-face 15 21 'markdown-italic-face)
+    (markdown-test-range-has-face 30 33 'markdown-bold-face)
+    (should-not (markdown-range-property-any 30 33 'face '(markdown-italic-face)))))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
