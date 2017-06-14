@@ -2064,10 +2064,10 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-font-lock/italics-10 ()
   "Underscores in URLs should not trigger italics."
-  :expected-result :failed
   (markdown-test-string
    "<http://jblevins.org/research/centroid/cd_z_path.m>"
-   (markdown-test-range-face-equals 2 50 markdown-link-face)))
+   (markdown-test-range-face-equals 2 50 'markdown-plain-url-face)
+   (should-not (markdown-range-property-any 43 43 'face '(markdown-italic-face)))))
 
 (ert-deftest test-markdown-font-lock/italics-11 ()
   "Underscores in URLs should not trigger italics."
@@ -2261,6 +2261,12 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 1 21 'markdown-comment-face)
    (should-not
     (markdown-range-property-any 1 21 'face '(markdown-bold-face)))))
+
+(ert-deftest test-markdown-font-lock/no-bold-in-url ()
+  "Test not matching bold in plain URL links."
+  (markdown-test-string
+   "<https://example.com/__not-bold__>"
+   (should-not (markdown-range-property-any 23 30 'face '(markdown-bold-face)))))
 
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."

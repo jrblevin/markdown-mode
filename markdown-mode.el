@@ -3343,7 +3343,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
               (markdown-inline-code-at-pos-p end)
               (markdown-in-comment-p)
               (markdown-range-property-any
-               begin begin 'face '(markdown-url-face))
+               begin begin 'face '(markdown-url-face
+                                   markdown-plain-url-face))
               (markdown-range-property-any
                begin end 'face '(markdown-inline-code-face
                                  markdown-math-face)))
@@ -3367,7 +3368,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                 (markdown-inline-code-at-pos-p end)
                 (markdown-in-comment-p)
                 (markdown-range-property-any
-                 begin begin 'face '(markdown-url-face))
+                 begin begin 'face '(markdown-url-face
+                                     markdown-plain-url-face))
                 (markdown-range-property-any
                  begin end 'face '(markdown-inline-code-face
                                    markdown-bold-face
