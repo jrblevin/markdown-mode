@@ -2546,8 +2546,8 @@ slightly.  If the face has been customized already, leave it alone."
          'markdown-code-face nil
          :background
          (cl-case (cdr (assq 'background-mode (frame-parameters)))
-           ('light (color-darken-name bg 5))
-           ('dark (color-lighten-name bg 5))))))))
+           ('light (color-darken-name bg 3))
+           ('dark (color-lighten-name bg 3))))))))
 
 (defun markdown-syntactic-face (state)
   "Return font-lock face for characters with given STATE.
