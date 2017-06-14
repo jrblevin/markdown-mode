@@ -7059,16 +7059,20 @@ displaying the rendered output."
       (when (file-exists-p outfile-name)
         (delete-file outfile-name)))))
 
+(defun markdown-get-other-window ()
+  "Find another window to display preview or output content."
+  (cond
+   ((memq markdown-split-window-direction '(vertical below))
+    (or (window-in-direction 'below) (split-window-vertically)))
+   ((memq markdown-split-window-direction '(horizontal right))
+    (or (window-in-direction 'right) (split-window-horizontally)))
+   (t (split-window-sensibly))))
+
 (defun markdown-display-buffer-other-window (buf)
+  "Display preview or output buffer BUF in another window."
   (let ((cur-buf (current-buffer))
-        split-width-threshold split-height-threshold)
-    (cond ((memq markdown-split-window-direction '(vertical below))
-           (setq split-width-threshold nil)
-           (setq split-height-threshold 0))
-          ((memq markdown-split-window-direction '(horizontal right))
-           (setq split-width-threshold 0)
-           (setq split-height-threshold nil)))
-    (switch-to-buffer-other-window buf)
+        (window (markdown-get-other-window)))
+    (set-window-buffer window buf)
     (set-buffer cur-buf)))
 
 (defun markdown-live-preview-if-markdown ()

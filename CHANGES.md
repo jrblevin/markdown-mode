@@ -113,6 +113,8 @@
         minibuffer.
     -   Increased default heading scaling range slightly, to make
         level differences more pronounced when markup is hidden.
+    -   Reuse existing windows, when possible, rather than splitting
+        again in preferred direction. ([GH-129][])
 
 *   Bug fixes:
 
