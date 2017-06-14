@@ -116,11 +116,19 @@
 
 *   Bug fixes:
 
+    -   Fix spurious bold/italic faces in inline code. ([GH-172][])
+    -   Fix defun movement at end of buffer. ([GH-197][])
+    -   Fix bug with adjacent bold font-locking in a list
+        item. ([GH-176][])
+
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130
   [gh-134]: https://github.com/jrblevin/markdown-mode/issues/134
+  [gh-172]: https://github.com/jrblevin/markdown-mode/issues/172
+  [gh-176]: https://github.com/jrblevin/markdown-mode/issues/176
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
+  [gh-197]: https://github.com/jrblevin/markdown-mode/issues/197
 
 # Markdown Mode 2.2
 
