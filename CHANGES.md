@@ -125,7 +125,7 @@
     -   Fix defun movement at end of buffer. ([GH-197][])
     -   Fix bug with adjacent bold font-locking in a list
         item. ([GH-176][])
-    -   Prohibit italics and bold in comments.
+    -   Prevent matching italics, bold, and inline code in comments.
 
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130

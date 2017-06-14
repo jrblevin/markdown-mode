@@ -3303,11 +3303,25 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
   (unless (bobp)
     (backward-char 1))
   (when (markdown-match-inline-generic markdown-regex-code last)
-    (set-match-data (list (match-beginning 1) (match-end 1)
-                          (match-beginning 2) (match-end 2)
-                          (match-beginning 3) (match-end 3)
-                          (match-beginning 4) (match-end 4)))
-    t))
+    (let ((begin (match-beginning 1))
+          (end (match-end 1))
+          (open-begin (match-beginning 2))
+          (open-end (match-end 2))
+          (code-begin (match-beginning 3))
+          (code-end (match-end 3))
+          (close-begin (match-beginning 4))
+          (close-end (match-end 4)))
+      (if (or (markdown-in-comment-p begin)
+              (markdown-in-comment-p end)
+              (markdown-code-block-at-pos begin))
+          (progn (goto-char (min (1+ begin) last))
+                 (when (< (point) last)
+                   (markdown-match-code last)))
+        (set-match-data (list begin end
+                              open-begin open-end
+                              code-begin code-end
+                              close-begin close-end))
+        t))))
 
 (defun markdown-match-bold (last)
   "Match inline bold from the point to LAST."

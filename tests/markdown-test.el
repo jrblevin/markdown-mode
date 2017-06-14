@@ -2371,6 +2371,13 @@ Test currently fails because this case isn't handled properly."
    (markdown-test-range-has-face 19 19 markdown-markup-face)
    (markdown-test-range-has-face 20 20 nil)))
 
+(ert-deftest test-markdown-font-lock/code-in-comment ()
+  "Test that inline code is not matched inside a comment."
+  (markdown-test-string
+   "<!-- `not code` -->"
+   (markdown-test-range-has-face 1 19 'markdown-comment-face)
+   (should-not (markdown-range-property-any 1 19 'face '(markdown-inline-code-face)))))
+
 (ert-deftest test-markdown-font-lock/kbd ()
   "Test font lock for <kbd> tags."
   (markdown-test-string "<kbd>C-c <</kbd>"
@@ -3374,8 +3381,9 @@ x: x
 `x`
 "
     (should (markdown-match-code (point-max)))
-    (should (= (point) (point-max)))
-    (should (equal (match-data t) '(14 17 14 15 15 16 16 17)))))
+    (should (= (point) 17))
+    (should (equal (match-data t) '(14 17 14 15 15 16 16 17)))
+    (should-not (markdown-match-code (point-max)))))
 
 (ert-deftest test-markdown-parsing/list-item-at-point ()
   "Test `markdown-list-item-at-point-p'."
