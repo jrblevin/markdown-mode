@@ -2420,7 +2420,16 @@ and disable it otherwise."
 
 (defface markdown-url-face
   '((t (:inherit font-lock-string-face)))
-  "Face for URLs."
+  "Face for URLs that are part of markup.
+For example, this applies to URLs in inline links:
+[link text](http://example.com/)."
+  :group 'markdown-faces)
+
+(defface markdown-plain-url-face
+  '((t (:inherit markdown-link-face)))
+  "Face for URLs that are also links.
+For example, this applies to plain angle bracket URLs:
+<http://example.com/>."
   :group 'markdown-faces)
 
 (defface markdown-link-title-face
@@ -2600,6 +2609,7 @@ Depending on your font, some reasonable choices are:
                             (2 markdown-inline-code-face)
                             (3 markdown-markup-properties)))
     (markdown-fontify-angle-uris)
+    (,markdown-regex-email . 'markdown-plain-url-face)
     (markdown-fontify-list-items)
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
@@ -2612,6 +2622,7 @@ Depending on your font, some reasonable choices are:
                                              (4 markdown-markup-face)    ; :
                                              (5 markdown-url-face)       ; url
                                              (6 markdown-link-title-face))) ; "title" (optional)
+    (markdown-fontify-plain-uris)
     ;; Math mode $..$
     (markdown-match-math-single . ((1 markdown-markup-face prepend)
                                    (2 markdown-math-face append)
@@ -2629,8 +2640,6 @@ Depending on your font, some reasonable choices are:
     (,markdown-regex-strike-through . ((3 markdown-markup-properties)
                                        (4 markdown-strike-through-face)
                                        (5 markdown-markup-properties)))
-    (markdown-fontify-plain-uris)
-    (,markdown-regex-email . markdown-link-face)
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
     (markdown-fontify-sub-superscripts)
     (markdown-fontify-blockquotes))
@@ -2757,9 +2766,11 @@ Used for `flyspell-generic-check-word-predicate'."
                (if (listp faces)
                    (or (memq 'markdown-reference-face faces)
                        (memq 'markdown-markup-face faces)
+                       (memq 'markdown-plain-url-face faces)
                        (memq 'markdown-url-face faces))
                  (memq faces '(markdown-reference-face
                                markdown-markup-face
+                               markdown-plain-url-face
                                markdown-url-face))))))))
 
 (defun markdown-font-lock-ensure ()
@@ -7361,7 +7372,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
                      'font-lock-multiline t))
            ;; URI part
            (up (list 'keymap markdown-mode-mouse-map
-                     'face markdown-link-face
+                     'face 'markdown-plain-url-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t)))
       (dolist (g '(1 3))
@@ -7375,7 +7386,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
     (let* ((start (match-beginning 0))
            (end (match-end 0))
            (props (list 'keymap markdown-mode-mouse-map
-                        'face markdown-link-face
+                        'face 'markdown-plain-url-face
                         'mouse-face 'markdown-highlight-face
                         'font-lock-multiline t)))
       (add-text-properties start end props)
