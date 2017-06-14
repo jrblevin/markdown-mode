@@ -19,6 +19,8 @@
         `markdown-mode` in addition to `gfm-mode`.
     -   Introduced a new face for horizontal rules: `markdown-hr-face`.
         Previously, `markdown-header-delimiter-face` was used.
+    -   Markdown Mode is now distributed under the GNU GPL version 3
+        or later.
 
 *   New features:
 
