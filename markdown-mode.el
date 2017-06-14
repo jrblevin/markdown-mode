@@ -7066,7 +7066,7 @@ displaying the rendered output."
     (or (window-in-direction 'below) (split-window-vertically)))
    ((memq markdown-split-window-direction '(horizontal right))
     (or (window-in-direction 'right) (split-window-horizontally)))
-   (t (split-window-sensibly))))
+   (t (split-window-sensibly (get-buffer-window)))))
 
 (defun markdown-display-buffer-other-window (buf)
   "Display preview or output buffer BUF in another window."
