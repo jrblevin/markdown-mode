@@ -2140,8 +2140,8 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
    (markdown-test-range-has-face 1 10 nil)
    (markdown-test-range-has-face 12 16 markdown-inline-code-face)))
 
-(ert-deftest test-markdown-font-lock/italics-and-code ()
-  "Test seeming italics mixed with code."
+(ert-deftest test-markdown-font-lock/italics-in-reference-definitions ()
+  "Test not matching italics in reference definitions across lines."
   (markdown-test-string
    "[lg]: twilight_sm.png\n[sm]: twilight_lg.png"
    (markdown-test-range-has-face 7 21 markdown-url-face)
