@@ -117,6 +117,7 @@
         level differences more pronounced when markup is hidden.
     -   Reuse existing windows, when possible, rather than splitting
         again in preferred direction. ([GH-129][])
+    -   Update known languages in `markdown-gfm-recognized-languages`.
 
 *   Bug fixes:
 
