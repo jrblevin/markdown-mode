@@ -142,6 +142,7 @@
         item. ([GH-176][])
     -   Prevent matching italics, bold, and inline code in comments.
     -   Prevent matching italics and bold in URLs.
+    -   Prevent matching links in inline code or comment spans.
 
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130

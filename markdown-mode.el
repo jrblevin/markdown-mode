@@ -3547,8 +3547,12 @@ links with URLs."
                 ;; Clear match data to test for a match after functions returns.
                 (set-match-data nil)
                 (re-search-forward "\\(!\\)?\\(\\[\\)" last 'limit))
-              ;; Keep searching if this is in a code block or is include syntax.
+              ;; Keep searching if this is in a code block, inline
+              ;; code, or a comment, or if it is include syntax.
               (or (markdown-code-block-at-point-p)
+                  (markdown-inline-code-at-pos-p (match-beginning 0))
+                  (markdown-inline-code-at-pos-p (match-end 0))
+                  (markdown-in-comment-p)
                   (and (char-equal (char-after (point-at-bol)) ?<)
                        (char-equal (char-after (1+ (point-at-bol))) ?<)))
               (< (point) last)))

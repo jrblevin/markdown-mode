@@ -2594,6 +2594,14 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
   (markdown-test-string "`<h1> <!-- HTML comment inside inline code -->`"
    (markdown-test-range-has-face (1+ (point-min)) (- (point-max) 2) markdown-inline-code-face)))
 
+(ert-deftest test-markdown-font-lock/inline-code-link ()
+  "Test links inside of inline code."
+  (markdown-test-string "`[text](url)`"
+   (markdown-test-range-has-face (1+ (point-min)) (- (point-max) 2) 'markdown-inline-code-face)
+   (should-not (markdown-range-property-any
+                (1+ (point-min)) (- (point-max) 2) 'face
+                '(markdown-markup-face markdown-link-face markdown-url-face)))))
+
 (ert-deftest test-markdown-font-lock/comment-hanging-indent ()
   "Test comments with hanging indentation."
   (markdown-test-string "<!-- This comment has\n    hanging indentation -->"
@@ -2623,6 +2631,14 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
   (markdown-test-string "<!-- > test -->"
    (markdown-test-range-face-equals (point-min) (1- (point-max))
                                     markdown-comment-face)))
+
+(ert-deftest test-markdown-font-lock/comment-link ()
+  "Test links inside of comments."
+  (markdown-test-string "<!-- [text](url) -->"
+   (markdown-test-range-has-face (+ (point-min) 5) (- (point-max) 4) 'markdown-comment-face)
+   (should-not (markdown-range-property-any
+                (+ (point-min) 5) (- (point-max) 4) 'face
+                '(markdown-markup-face markdown-link-face markdown-url-face)))))
 
 (ert-deftest test-markdown-font-lock/footnote-markers-links ()
   "Test an edge case involving footnote markers and inline reference links."
