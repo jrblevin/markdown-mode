@@ -125,6 +125,7 @@
     -   Avoid error when live-previewing a buffer that's not visiting
         a file.  Thanks to Tianxiang Xiong for a patch.
         ([GH-200][], [GH-201][])
+    -   Adaptive filling for Leanpub blocks.
 
 *   Bug fixes:
 

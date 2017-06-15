@@ -1493,13 +1493,14 @@ Groups 2 and 4 matches the opening and closing delimiters.
 Group 3 matches the text inside the delimiters.")
 
 (defconst markdown-regex-blockquote
-  "^[ \t]*\\([A-Z]*>\\)\\(.*\\)$"
+  "^[ \t]*\\([A-Z]?>\\)\\([ \t]*\\)\\(.*\\)$"
   "Regular expression for matching blockquote lines.
 Also accounts for a potential capital letter preceding the angle
 bracket, for use with Leanpub blocks (asides, warnings, info
 blocks, etc.).
 Group 1 matches the leading angle bracket.
-Group 2 matches the text.")
+Group 2 matches the separating whitespace.
+Group 3 matches the text.")
 
 (defconst markdown-regex-line-break
   "[^ \n\t][ \t]*\\(  \\)$"
@@ -7684,11 +7685,12 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     (markdown-replace-regexp-in-string
      "[0-9\\.*+-]" " " (match-string-no-properties 0)))
    ;; Blockquote
-   ((looking-at "^[ \t]*>[ \t]*")
-    (match-string-no-properties 0))
+   ((looking-at markdown-regex-blockquote)
+    (buffer-substring-no-properties (match-beginning 0) (match-end 2)))
    ;; List items
    ((looking-at markdown-regex-list)
     (match-string-no-properties 0))
+   ;; Footnote definition
    ((looking-at-p markdown-regex-footnote-definition)
     "    ") ; four spaces
    ;; No match
@@ -8222,7 +8224,7 @@ position."
                 "[ \t]*\\[\\^\\S-*\\]:[ \t]*$") ; just the start of a footnote def
               "\\|"))
   (set (make-local-variable 'adaptive-fill-first-line-regexp)
-       "\\`[ \t]*>[ \t]*?\\'")
+       "\\`[ \t]*[A-Z]?>[ \t]*?\\'")
   (set (make-local-variable 'adaptive-fill-regexp) "\\s-*")
   (set (make-local-variable 'adaptive-fill-function)
        'markdown-adaptive-fill-function)
