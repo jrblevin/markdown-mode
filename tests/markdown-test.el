@@ -2959,6 +2959,34 @@ takes precedence)."
     ;; {pagebreak}
     (markdown-test-range-has-face 427 437 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/leanpub-include ()
+  "Test Leanpub include syntax."
+  (markdown-test-file "Leanpub.md"
+    ;; no title
+    (markdown-test-range-has-face 561 563 'markdown-markup-face)
+    (markdown-test-range-has-face 564 577 'markdown-url-face)
+    (markdown-test-range-has-face 578 578 'markdown-markup-face)
+    ;; title
+    (markdown-test-range-has-face 581 583 'markdown-markup-face)
+    (markdown-test-range-has-face 584 611 'markdown-link-title-face)
+    (markdown-test-range-has-face 612 613 'markdown-markup-face)
+    (markdown-test-range-has-face 614 628 'markdown-url-face)
+    (markdown-test-range-has-face 629 629 'markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/curly-brace-include ()
+  "Test curly brace include syntax."
+  (markdown-test-string "<<{file}"
+    (markdown-test-range-has-face 1 3 'markdown-markup-face)
+    (markdown-test-range-has-face 4 7 'markdown-url-face)
+    (markdown-test-range-has-face 8 8 'markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/square-bracket-include ()
+  "Test square bracket include syntax."
+  (markdown-test-string "<<[file]"
+    (markdown-test-range-has-face 1 3 'markdown-markup-face)
+    (markdown-test-range-has-face 4 7 'markdown-url-face)
+    (markdown-test-range-has-face 8 8 'markdown-markup-face)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()

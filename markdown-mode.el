@@ -1649,6 +1649,23 @@ Group 2 matches the opening markup--a tilde or carat.
 Group 3 matches the text inside the delimiters.
 Group 4 matches the closing markup--a tilde or carat.")
 
+(defconst markdown-regex-include
+  "^\\(<<\\)\\(?:\\(\\[\\)\\(.*\\)\\(\\]\\)\\)?\\(?:\\((\\)\\(.*\\)\\()\\)\\)?\\(?:\\({\\)\\(.*\\)\\(}\\)\\)?$"
+  "Regular expression matching common forms of include syntax.
+Marked 2, Leanpub, and other processors support some of these forms:
+
+<<[sections/section1.md]
+<<(folder/filename)
+<<[Code title](folder/filename)
+<<{folder/raw_file.html}
+
+Group 1 matches the opening two angle brackets.
+Groups 2-4 match the opening square bracket, the text inside,
+and the closing square bracket, respectively.
+Groups 5-7 match the opening parenthesis, the text inside, and
+the closing parenthesis.
+Groups 8-10 match the opening brace, the text inside, and the brace.")
+
 
 ;;; Syntax ====================================================================
 
@@ -2214,6 +2231,10 @@ START and END delimit region to propertize."
   '(face markdown-language-info-face invisible markdown-markup)
   "List of properties and values to apply to code block language info strings.")
 
+(defconst markdown-include-title-properties
+  '(face markdown-link-title-face invisible markdown-markup)
+  "List of properties and values to apply to included code titles.")
+
 (defcustom markdown-hide-markup nil
   "Determines whether markup in the buffer will be hidden.
 When set to nil, all markup is displayed in the buffer as it
@@ -2632,6 +2653,13 @@ Depending on your font, some reasonable choices are:
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-face)        ; label
                                  (3 markdown-markup-face)))        ; ]
+    (markdown-match-includes . ((1 markdown-markup-properties)
+                                (2 markdown-markup-properties nil t)
+                                (3 markdown-include-title-properties nil t)
+                                (4 markdown-markup-properties nil t)
+                                (5 markdown-markup-properties)
+                                (6 'markdown-url-face)
+                                (7 markdown-markup-properties)))
     (markdown-fontify-inline-links)
     (markdown-fontify-reference-links)
     (,markdown-regex-reference-definition . ((1 markdown-markup-face) ; [
@@ -3519,7 +3547,10 @@ links with URLs."
                 ;; Clear match data to test for a match after functions returns.
                 (set-match-data nil)
                 (re-search-forward "\\(!\\)?\\(\\[\\)" last 'limit))
-              (markdown-code-block-at-point-p)
+              ;; Keep searching if this is in a code block or is include syntax.
+              (or (markdown-code-block-at-point-p)
+                  (and (char-equal (char-after (point-at-bol)) ?<)
+                       (char-equal (char-after (1+ (point-at-bol))) ?<)))
               (< (point) last)))
   ;; Match opening exclamation point (optional) and left bracket.
   (when (match-beginning 2)
@@ -3700,6 +3731,64 @@ is \"\n\n\""
                 (markdown-inline-code-at-pos-p (match-end 0))
                 (markdown-in-comment-p))
       t)))
+
+(defun markdown-match-includes (last)
+  "Match include statements from point to LAST.
+Sets match data for the following seven groups:
+Group 1: opening two angle brackets
+Group 2: opening title delimiter (optional)
+Group 3: title text (optional)
+Group 4: closing title delimiter (optional)
+Group 5: opening filename delimiter
+Group 6: filename
+Group 7: closing filename delimiter"
+  (when (markdown-match-inline-generic markdown-regex-include last)
+    (let ((valid (not (or (markdown-in-comment-p (match-beginning 0))
+                          (markdown-in-comment-p (match-end 0))
+                          (markdown-code-block-at-pos (match-beginning 0))))))
+      (cond
+       ;; Parentheses and maybe square brackets, but no curly braces:
+       ;; match optional title in square brackets and file in parentheses.
+       ((and valid (match-beginning 5)
+             (not (match-beginning 8)))
+        (set-match-data (list (match-beginning 1) (match-end 7)
+                              (match-beginning 1) (match-end 1)
+                              (match-beginning 2) (match-end 2)
+                              (match-beginning 3) (match-end 3)
+                              (match-beginning 4) (match-end 4)
+                              (match-beginning 5) (match-end 5)
+                              (match-beginning 6) (match-end 6)
+                              (match-beginning 7) (match-end 7))))
+       ;; Only square brackets present: match file in square brackets.
+       ((and valid (match-beginning 2)
+             (not (match-beginning 5))
+             (not (match-beginning 7)))
+        (set-match-data (list (match-beginning 1) (match-end 4)
+                              (match-beginning 1) (match-end 1)
+                              nil nil
+                              nil nil
+                              nil nil
+                              (match-beginning 2) (match-end 2)
+                              (match-beginning 3) (match-end 3)
+                              (match-beginning 4) (match-end 4))))
+       ;; Only curly braces present: match file in curly braces.
+       ((and valid (match-beginning 8)
+             (not (match-beginning 2))
+             (not (match-beginning 5)))
+        (set-match-data (list (match-beginning 1) (match-end 10)
+                              (match-beginning 1) (match-end 1)
+                              nil nil
+                              nil nil
+                              nil nil
+                              (match-beginning 8) (match-end 8)
+                              (match-beginning 9) (match-end 9)
+                              (match-beginning 10) (match-end 10))))
+       (t
+        ;; Not a valid match, move to next line and search again.
+        (forward-line)
+        (when (< (point) last)
+          (setq valid (markdown-match-includes last)))))
+      valid)))
 
 
 ;;; Markdown Font Fontification Functions =====================================

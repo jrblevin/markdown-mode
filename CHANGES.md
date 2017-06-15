@@ -104,6 +104,8 @@
         Markdown Extra, Leanpub, etc.
     -   Add basic font-lock support for Leanpub section identifers and
         page breaks.
+    -   Add basic font-lock support for common file inclusion syntax:
+        `<<(file)`, `<<[title](file)`, `<<[file]`, and ``<<{file}`.
 
 *   Improvements:
 
