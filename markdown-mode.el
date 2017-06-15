@@ -1988,16 +1988,21 @@ of the block construct enclosing POS, if it exists. Used in
             #'markdown-text-property-at-point
             (markdown-get-fenced-block-end-properties)))))))))
 
-(defun markdown-propertize-end-match (reg end correct-entry enclosed-text-start)
+(defun markdown-propertize-end-match (reg end fence-spec middle-begin)
   "Get match for REG up to END, if exists, and propertize appropriately.
-CORRECT-ENTRY is an entry in `markdown-fenced-block-pairs' and
-ENCLOSED-TEXT-START is the start of the \"middle\" section of the block."
+FENCE-SPEC is an entry in `markdown-fenced-block-pairs' and
+MIDDLE-BEGIN is the start of the \"middle\" section of the block."
   (when (re-search-forward reg end t)
-    (put-text-property (match-beginning 0) (match-end 0)
-                       (cl-cadadr correct-entry) (match-data t))
-    (put-text-property
-     enclosed-text-start (match-beginning 0) (cl-third correct-entry)
-     (list enclosed-text-start (match-beginning 0)))))
+    (let ((close-begin (match-beginning 0)) ; Start of closing line.
+          (close-end (match-end 0))         ; End of closing line.
+          (close-data (match-data t)))      ; Match data for closing line.
+      ;; Propertize middle section of fenced block.
+      (put-text-property middle-begin close-begin
+                         (cl-third fence-spec)
+                         (list middle-begin close-begin))
+      ;; Propertize closing line of fenced block.
+      (put-text-property close-begin close-end
+                         (cl-cadadr fence-spec) close-data))))
 
 (defun markdown-syntax-propertize-fenced-block-constructs (start end)
   "Propertize according to `markdown-fenced-block-pairs' from START to END.
