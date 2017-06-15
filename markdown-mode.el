@@ -2243,6 +2243,10 @@ START and END delimit region to propertize."
   '(face markdown-link-title-face invisible markdown-markup)
   "List of properties and values to apply to included code titles.")
 
+(defconst markdown-inline-footnote-properties
+  '(face nil display ((raise 0.2) (height 0.8)))
+  "Properties to apply to footnote markers and inline footnotes.")
+
 (defcustom markdown-hide-markup nil
   "Determines whether markup in the buffer will be hidden.
 When set to nil, all markup is displayed in the buffer as it
@@ -2666,13 +2670,15 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-angle-uris)
     (,markdown-regex-email . 'markdown-plain-url-face)
     (markdown-fontify-list-items)
-    (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
+    (,markdown-regex-footnote . ((0 markdown-inline-footnote-properties)
+                                 (1 markdown-markup-properties)    ; [^
                                  (2 markdown-footnote-marker-face) ; label
-                                 (3 markdown-markup-face)))        ; ]
-    (,markdown-regex-pandoc-inline-footnote . ((1 markdown-markup-properties)  ; ^
-                                               (2 'markdown-markup-face)        ; [
+                                 (3 markdown-markup-properties)))  ; ]
+    (,markdown-regex-pandoc-inline-footnote . ((0 markdown-inline-footnote-properties)
+                                               (1 markdown-markup-properties)   ; ^
+                                               (2 markdown-markup-properties)   ; [
                                                (3 'markdown-footnote-text-face) ; text
-                                               (4 'markdown-markup-face)))      ; ]
+                                               (4 markdown-markup-properties))) ; ]
     (markdown-match-includes . ((1 markdown-markup-properties)
                                 (2 markdown-markup-properties nil t)
                                 (3 markdown-include-title-properties nil t)

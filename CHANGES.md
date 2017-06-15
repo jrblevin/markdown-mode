@@ -108,6 +108,8 @@
     -   Add basic font-lock support for common file inclusion syntax:
         `<<(file)`, `<<[title](file)`, `<<[file]`, and ``<<{file}`.
     -   Add font lock support for Pandoc inline footnotes. ([GH-81][])
+    -   Raise footnote markers and inline footnote text, and
+        optionally hide markup.
 
 *   Improvements:
 
