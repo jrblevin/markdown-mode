@@ -2949,6 +2949,16 @@ takes precedence)."
     ;; Inline attributes before a fenced code block
     (markdown-test-range-has-face 632 696 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/leanpub-sections ()
+  "Test Leanpub section markers."
+  (markdown-test-file "Leanpub.md"
+    ;; {frontmatter}
+    (markdown-test-range-has-face 12 24 'markdown-markup-face)
+    ;; {mainmatter}
+    (markdown-test-range-has-face 69 80 'markdown-markup-face)
+    ;; {pagebreak}
+    (markdown-test-range-has-face 427 437 'markdown-markup-face)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
