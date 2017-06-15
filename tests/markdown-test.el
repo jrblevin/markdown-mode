@@ -4494,6 +4494,21 @@ paragraph 2")))))
    (fill-paragraph)
    (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."))))
 
+(ert-deftest test-markdown-filling/pandoc-line-blocks ()
+  "Filling should leave Pandoc line blocks undisturbed.
+This includes preserving whitespace after the pipe."
+  (let ((text "| The limerick packs laughs anatomical
+| In space that is quite economical.
+|    But the good ones I've seen
+|    So seldom are clean
+| And the clean ones so seldom are comical
+
+| 200 Main St.
+| Berkeley, CA 94718"))
+    (markdown-test-string text
+      (fill-region (point-min) (point-max))
+      (should (string-equal (buffer-string) text)))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()

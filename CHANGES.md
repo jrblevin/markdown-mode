@@ -110,6 +110,7 @@
     -   Add font lock support for Pandoc inline footnotes. ([GH-81][])
     -   Raise footnote markers and inline footnote text, and
         optionally hide markup.
+    -   Filling with now respects Pandoc line blocks.  ([GH-144][])
 
 *   Improvements:
 
@@ -152,6 +153,7 @@
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130
   [gh-134]: https://github.com/jrblevin/markdown-mode/issues/134
+  [gh-144]: https://github.com/jrblevin/markdown-mode/issues/144
   [gh-172]: https://github.com/jrblevin/markdown-mode/issues/172
   [gh-176]: https://github.com/jrblevin/markdown-mode/issues/176
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185

@@ -3333,6 +3333,11 @@ Set match data for `markdown-regex-header'."
       (set-match-data match-data)
       t)))
 
+(defun markdown-pipe-at-bol-p ()
+  "Return non-nil if the line begins with a pipe symbol.
+This may be useful for tables and Pandoc's line_blocks extension."
+  (char-equal (char-after (point-at-bol)) ?|))
+
 
 ;;; Markdown Font Lock Matching Functions =====================================
 
@@ -7891,6 +7896,10 @@ return the number of paragraphs left to move."
        ;; Move point past whitespace following list marker.
        ((looking-at markdown-regex-list)
         (goto-char (match-end 0)))
+       ;; Move point past whitespace following pipe at beginning of line
+       ;; to handle Pandoc line blocks.
+       ((looking-at "^|\\s-*")
+        (goto-char (match-end 0)))
        ;; Return point if the paragraph passed was a code block.
        ((markdown-code-block-at-pos (point-at-bol 2))
         (goto-char start)))))
@@ -8356,6 +8365,7 @@ position."
                     "[ \t]*\\(?:[0-9]+\\|#\\)\\.[ \t]+" ; ordered list item
                     "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
                     "[ \t]*:[ \t]+" ; definition
+                    "^|" ; table or Pandoc line block
                     )
                   "\\|"))
   (set
@@ -8394,6 +8404,8 @@ position."
             'markdown-inside-link-p nil t)
   (add-hook 'fill-nobreak-predicate
             'markdown-line-is-reference-definition-p nil t)
+  (add-hook 'fill-nobreak-predicate
+            'markdown-pipe-at-bol-p nil t)
 
   ;; Indentation
   (setq indent-line-function markdown-indent-function)
