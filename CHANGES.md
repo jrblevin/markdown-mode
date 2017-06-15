@@ -21,6 +21,8 @@
         Previously, `markdown-header-delimiter-face` was used.
     -   Markdown Mode is now distributed under the GNU GPL version 3
         or later.
+    -   Rename `markdown-fill-forward-paragraph-function` to
+        `markdown-fill-forward-paragraph`.
 
 *   New features:
 
@@ -118,6 +120,8 @@
     -   Reuse existing windows, when possible, rather than splitting
         again in preferred direction. ([GH-129][])
     -   Update known languages in `markdown-gfm-recognized-languages`.
+    -   Filling with `fill-region` now leaves code blocks unmodified.
+        ([GH-192][])
 
 *   Bug fixes:
 
@@ -135,6 +139,7 @@
   [gh-176]: https://github.com/jrblevin/markdown-mode/issues/176
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
+  [gh-192]: https://github.com/jrblevin/markdown-mode/issues/192
   [gh-197]: https://github.com/jrblevin/markdown-mode/issues/197
 
 # Markdown Mode 2.2

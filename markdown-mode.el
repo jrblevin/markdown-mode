@@ -7709,24 +7709,39 @@ handles filling itself, it always returns t so that
     (fill-paragraph justify))
   t)
 
-(defun markdown-fill-forward-paragraph-function (&optional arg)
+(make-obsolete 'markdown-fill-forward-paragraph-function
+               'markdown-fill-forward-paragraph "v2.3")
+
+(defun markdown-fill-forward-paragraph (&optional arg)
   "Function used by `fill-paragraph' to move over ARG paragraphs.
 This is a `fill-forward-paragraph-function' for `markdown-mode'.
 It is called with a single argument specifying the number of
 paragraphs to move.  Just like `forward-paragraph', it should
 return the number of paragraphs left to move."
-  (let* ((arg (or arg 1))
-         (paragraphs-remaining (forward-paragraph arg))
-         (start (point)))
-    (when (< arg 0)
+  (or arg (setq arg 1))
+  (if (> arg 0)
+      ;; With positive ARG, move across ARG non-code-block paragraphs,
+      ;; one at a time.  When passing a code block, don't decrement ARG.
+      (while (and (not (eobp))
+                  (> arg 0)
+                  (= (forward-paragraph 1) 0)
+                  (or (markdown-code-block-at-pos (point-at-bol 0))
+                      (setq arg (1- arg)))))
+    ;; Move backward by one paragraph with negative ARG (always -1).
+    (let ((start (point)))
+      (setq arg (forward-paragraph arg))
       (while (and (not (eobp))
                   (progn (move-to-left-margin) (not (eobp)))
                   (looking-at-p paragraph-separate))
         (forward-line 1))
-      (if (looking-at markdown-regex-list)
-          (forward-char (length (match-string 0)))
-        (goto-char start)))
-    paragraphs-remaining))
+      (cond
+       ;; Move point past whitespace following list marker.
+       ((looking-at markdown-regex-list)
+        (goto-char (match-end 0)))
+       ;; Return point if the paragraph passed was a code block.
+       ((markdown-code-block-at-pos (point-at-bol 2))
+        (goto-char start)))))
+  arg)
 
 
 ;;; Extension Framework =======================================================
@@ -8210,7 +8225,7 @@ position."
   (set (make-local-variable 'adaptive-fill-function)
        'markdown-adaptive-fill-function)
   (set (make-local-variable 'fill-forward-paragraph-function)
-       'markdown-fill-forward-paragraph-function)
+       #'markdown-fill-forward-paragraph)
   ;; Outline mode
   (make-local-variable 'outline-regexp)
   (setq outline-regexp markdown-regex-header)

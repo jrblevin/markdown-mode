@@ -4346,6 +4346,60 @@ this is not header line
         (fill-paragraph)
         (should (string-equal (buffer-string) text))))))
 
+(ert-deftest test-markdown-filling/fill-region-skip-code-blocks ()
+  "Test `fill-region' on code blocks."
+  (let ((text "testing\n\n```\nhello\nworld\n```\n\n123"))
+    (markdown-test-string text
+      ;; Fill entire buffer; buffer should not change.
+      (fill-region (point-min) (point-max))
+      (should (string-equal (buffer-string) text)))))
+
+(ert-deftest test-markdown-filling/fill-region-skip-code-blocks-2 ()
+  "Test `fill-region' on a buffer with a code block with long paragraphs."
+  (markdown-test-string "long unwrapped paragraph 1
+
+```
+code
+block
+
+foo
+bar
+```
+
+long unwrapped paragraph 2"
+    ;; Test markdown-fill-forward-paragraph movement.
+    (should (= (markdown-fill-forward-paragraph 1) 0))
+    (should (= (point) 28)) ;; Point just after par. 1.
+    (should (= (markdown-fill-forward-paragraph 1) 0))
+    (should (= (point) 84)) ;; Point at end of par. 2.
+    ;; Test filling the entire buffer with `fill-region'.
+    (let ((fill-column 12))
+      (fill-region (point-min) (point-max))
+      (should (string-equal (buffer-string)
+                            "long
+unwrapped
+paragraph 1
+
+```
+code
+block
+
+foo
+bar
+```
+
+long
+unwrapped
+paragraph 2")))))
+
+(ert-deftest test-markdown-filling/fill-region-skip-code-blocks-3 ()
+  "Test `fill-region' on a lone code block with no surrounding text."
+  (let ((text "```\ncode\nblock\n```\n"))
+    (markdown-test-string text
+      ;; Fill entire buffer; buffer should not change.
+      (fill-region (point-min) (point-max))
+      (should (string-equal (buffer-string) text)))))
+
 (ert-deftest test-markdown-filling/long-paragraph-with-link ()
   "Test `fill-paragraph' on a long paragraph with a long link."
   (markdown-test-string
