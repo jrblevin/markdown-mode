@@ -23,6 +23,7 @@
         or later.
     -   Rename `markdown-fill-forward-paragraph-function` to
         `markdown-fill-forward-paragraph`.
+    -   Rename `markdown-footnote-face` to `markdown-footnote-marker-face`.
 
 *   New features:
 

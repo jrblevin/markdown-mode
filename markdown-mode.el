@@ -2334,8 +2334,8 @@ and disable it otherwise."
 (defvar markdown-reference-face 'markdown-reference-face
   "Face name to use for reference.")
 
-(defvar markdown-footnote-face 'markdown-footnote-face
-  "Face name to use for footnote identifiers.")
+(defvar markdown-footnote-marker-face 'markdown-footnote-marker-face
+  "Face name to use for footnote markers.")
 
 (defvar markdown-url-face 'markdown-url-face
   "Face name to use for URLs.")
@@ -2452,7 +2452,10 @@ and disable it otherwise."
   "Face for link references."
   :group 'markdown-faces)
 
-(defface markdown-footnote-face
+(define-obsolete-face-alias 'markdown-footnote-face
+  'markdown-footnote-marker-face "v2.3")
+
+(defface markdown-footnote-marker-face
   '((t (:inherit markdown-markup-face)))
   "Face for footnote markers."
   :group 'markdown-faces)
@@ -2651,7 +2654,7 @@ Depending on your font, some reasonable choices are:
     (,markdown-regex-email . 'markdown-plain-url-face)
     (markdown-fontify-list-items)
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
-                                 (2 markdown-footnote-face)        ; label
+                                 (2 markdown-footnote-marker-face) ; label
                                  (3 markdown-markup-face)))        ; ]
     (markdown-match-includes . ((1 markdown-markup-properties)
                                 (2 markdown-markup-properties nil t)

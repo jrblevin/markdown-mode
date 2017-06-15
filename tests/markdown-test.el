@@ -2645,7 +2645,7 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
   (markdown-test-string "Harvard[^1] [tuition][]"
    (markdown-test-range-has-face 1 7 nil)
    (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 10 10 markdown-footnote-face)
+   (markdown-test-range-has-face 10 10 markdown-footnote-marker-face)
    (markdown-test-range-has-face 11 11 markdown-markup-face)
    (markdown-test-range-has-face 12 12 nil)
    (markdown-test-range-has-face 13 13 markdown-markup-face)
