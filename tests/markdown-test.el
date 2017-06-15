@@ -2939,6 +2939,16 @@ takes precedence)."
     (should (markdown-on-heading-p))
     (should-not (markdown-range-property-any 453 484 'face '(markdown-hr-face)))))
 
+(ert-deftest test-markdown-font-lock/inline-attributes ()
+  "Test inline attributes before a fenced code block."
+  (markdown-test-file "Leanpub.md"
+    ;; Inline attributes for a heading
+    (markdown-test-range-has-face 38 42 'markdown-markup-face)
+    ;; Inline attributes inside an aside block
+    (markdown-test-range-has-face 123 141 'markdown-markup-face)
+    ;; Inline attributes before a fenced code block
+    (markdown-test-range-has-face 632 696 'markdown-markup-face)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()

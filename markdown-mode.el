@@ -1626,6 +1626,11 @@ or
       markdown-regex-yaml-pandoc-metadata-end-border
     markdown-regex-yaml-metadata-border))
 
+(defconst markdown-regex-inline-attributes
+  "[ \t]*\\({:?\\)[ \t]*\\(\\(#[[:alpha:]_.:-]+\\|\\.[[:alpha:]_.:-]+\\|\\w+=['\"]?[^\n'\"]*['\"]?\\),?[ \t]*\\)+\\(}\\)[ \t]*$"
+  "Regular expression for matching inline identifiers or attribute lists.
+Compatible with Pandoc, Python Markdown, PHP Markdown Extra, and Leanpub.")
+
 (defconst markdown-regex-sub-superscript
   "\\(?:^\\|[^\\~^]\\)\\(\\([~^]\\)\\([[:alnum:]]+\\)\\(\\2\\)\\)"
   "The regular expression matching a sub- or superscript.
@@ -2648,6 +2653,7 @@ Depending on your font, some reasonable choices are:
                                        (5 markdown-markup-properties)))
     (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
     (markdown-fontify-sub-superscripts)
+    (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-fontify-blockquotes))
   "Syntax highlighting for Markdown files.")
 
@@ -3670,6 +3676,14 @@ is \"\n\n\""
 
 (defun markdown-match-yaml-metadata-key (last)
   (markdown-match-propertized-text 'markdown-metadata-key last))
+
+(defun markdown-match-inline-attributes (last)
+  "Match inline attributes from point to LAST."
+  (when (markdown-match-inline-generic markdown-regex-inline-attributes last)
+    (unless (or (markdown-inline-code-at-pos-p (match-beginning 0))
+                (markdown-inline-code-at-pos-p (match-end 0))
+                (markdown-in-comment-p))
+      t)))
 
 
 ;;; Markdown Font Fontification Functions =====================================

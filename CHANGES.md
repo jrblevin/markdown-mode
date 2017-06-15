@@ -99,6 +99,9 @@
     -   Font lock, with markup hiding, for subscripts (e.g., `H~2~0`)
         and superscripts (e.g., `334^10^`).  Thanks to Syohei Yoshida
         for a patch on which this is based.  ([GH-134][])
+    -   Add basic font-lock support for inline attribute lists or
+        inline identifiers used by Pandoc, Python Markdown, PHP
+        Markdown Extra, Leanpub, etc.
 
 *   Improvements:
 
