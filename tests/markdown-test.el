@@ -3003,6 +3003,23 @@ takes precedence)."
     (markdown-test-range-has-face 4 7 'markdown-url-face)
     (markdown-test-range-has-face 8 8 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/pandoc-inline-footnote ()
+  "Test font lock for Pandoc inline footnotes."
+  (markdown-test-string "Here is an inline note.^[Inline notes are easier to write, since
+you don't have to pick an identifier and move down to type the
+note.]  And then you can close it and continue writing."
+    (markdown-test-range-has-face 1 23 nil)
+    (markdown-test-range-has-face 24 25 'markdown-markup-face)
+    (markdown-test-range-has-face 26 133 'markdown-footnote-text-face)
+    (markdown-test-range-has-face 134 134 'markdown-markup-face)))
+
+(ert-deftest test-markdown-font-lock/pandoc-inline-footnote-across-block ()
+  "Test font lock for Pandoc inline footnotes."
+  (markdown-test-string "Inline notes should not^[match
+
+across blocks]"
+    (markdown-test-range-has-face (point-min) (point-max) nil)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()

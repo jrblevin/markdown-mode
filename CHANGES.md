@@ -107,6 +107,7 @@
         page breaks.
     -   Add basic font-lock support for common file inclusion syntax:
         `<<(file)`, `<<[title](file)`, `<<[file]`, and ``<<{file}`.
+    -   Add font lock support for Pandoc inline footnotes. ([GH-81][])
 
 *   Improvements:
 
@@ -145,6 +146,7 @@
     -   Prevent matching italics and bold in URLs.
     -   Prevent matching links in inline code or comment spans.
 
+  [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130
   [gh-134]: https://github.com/jrblevin/markdown-mode/issues/134

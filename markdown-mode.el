@@ -1666,6 +1666,14 @@ Groups 5-7 match the opening parenthesis, the text inside, and
 the closing parenthesis.
 Groups 8-10 match the opening brace, the text inside, and the brace.")
 
+(defconst markdown-regex-pandoc-inline-footnote
+  "\\(\\^\\)\\(\\[\\)\\(\\(?:.\\|\n[^\n]\\)*?\\)\\(\\]\\)"
+  "Regular expression for Pandoc inline footnote^[footnote text].
+Group 1 matches the opening caret.
+Group 2 matches the opening square bracket.
+Group 3 matches the footnote text, without the surrounding markup.
+Group 4 matches the closing square bracket.")
+
 
 ;;; Syntax ====================================================================
 
@@ -2460,6 +2468,11 @@ and disable it otherwise."
   "Face for footnote markers."
   :group 'markdown-faces)
 
+(defface markdown-footnote-text-face
+  '((t (:inherit font-lock-comment-face)))
+  "Face for footnote text."
+  :group 'markdown-faces)
+
 (defface markdown-url-face
   '((t (:inherit font-lock-string-face)))
   "Face for URLs that are part of markup.
@@ -2656,6 +2669,10 @@ Depending on your font, some reasonable choices are:
     (,markdown-regex-footnote . ((1 markdown-markup-face)          ; [^
                                  (2 markdown-footnote-marker-face) ; label
                                  (3 markdown-markup-face)))        ; ]
+    (,markdown-regex-pandoc-inline-footnote . ((1 markdown-markup-properties)  ; ^
+                                               (2 'markdown-markup-face)        ; [
+                                               (3 'markdown-footnote-text-face) ; text
+                                               (4 'markdown-markup-face)))      ; ]
     (markdown-match-includes . ((1 markdown-markup-properties)
                                 (2 markdown-markup-properties nil t)
                                 (3 markdown-include-title-properties nil t)
