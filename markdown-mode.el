@@ -7093,33 +7093,35 @@ Browse the resulting file within Emacs using
 `markdown-live-preview-window-function' Return the buffer
 displaying the rendered output."
   (interactive)
-  (let* ((markdown-live-preview-currently-exporting t)
-         (cur-buf (current-buffer))
-         (export-file (markdown-export (markdown-live-preview-get-filename)))
-         ;; get positions in all windows currently displaying output buffer
-         (window-data
-          (markdown-live-preview-window-serialize
-           markdown-live-preview-buffer)))
-    (save-window-excursion
-      (let ((output-buffer
-             (funcall markdown-live-preview-window-function export-file)))
-        (with-current-buffer output-buffer
-          (setq markdown-live-preview-source-buffer cur-buf)
-          (add-hook 'kill-buffer-hook
-                    #'markdown-live-preview-remove-on-kill t t))
+  (let ((filename (markdown-live-preview-get-filename)))
+    (when filename
+      (let* ((markdown-live-preview-currently-exporting t)
+             (cur-buf (current-buffer))
+             (export-file (markdown-export filename))
+             ;; get positions in all windows currently displaying output buffer
+             (window-data
+              (markdown-live-preview-window-serialize
+               markdown-live-preview-buffer)))
+        (save-window-excursion
+          (let ((output-buffer
+                 (funcall markdown-live-preview-window-function export-file)))
+            (with-current-buffer output-buffer
+              (setq markdown-live-preview-source-buffer cur-buf)
+              (add-hook 'kill-buffer-hook
+                        #'markdown-live-preview-remove-on-kill t t))
+            (with-current-buffer cur-buf
+              (setq markdown-live-preview-buffer output-buffer))))
         (with-current-buffer cur-buf
-          (setq markdown-live-preview-buffer output-buffer))))
-    (with-current-buffer cur-buf
-      ;; reset all windows displaying output buffer to where they were,
-      ;; now with the new output
-      (mapc #'markdown-live-preview-window-deserialize window-data)
-      ;; delete html editing buffer
-      (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
-      (when (and export-file (file-exists-p export-file)
-                 (eq markdown-live-preview-delete-export
-                     'delete-on-export))
-        (delete-file export-file))
-      markdown-live-preview-buffer)))
+          ;; reset all windows displaying output buffer to where they were,
+          ;; now with the new output
+          (mapc #'markdown-live-preview-window-deserialize window-data)
+          ;; delete html editing buffer
+          (let ((buf (get-file-buffer export-file))) (when buf (kill-buffer buf)))
+          (when (and export-file (file-exists-p export-file)
+                     (eq markdown-live-preview-delete-export
+                         'delete-on-export))
+            (delete-file export-file))
+          markdown-live-preview-buffer)))))
 
 (defun markdown-live-preview-remove ()
   (when (buffer-live-p markdown-live-preview-buffer)
@@ -7128,7 +7130,7 @@ displaying the rendered output."
   ;; if set to 'delete-on-export, the output has already been deleted
   (when (eq markdown-live-preview-delete-export 'delete-on-destroy)
     (let ((outfile-name (markdown-live-preview-get-filename)))
-      (when (file-exists-p outfile-name)
+      (when (and outfile-name (file-exists-p outfile-name))
         (delete-file outfile-name)))))
 
 (defun markdown-get-other-window ()
@@ -8301,7 +8303,10 @@ position."
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
   (if markdown-live-preview-mode
-      (markdown-display-buffer-other-window (markdown-live-preview-export))
+      (if (markdown-live-preview-get-filename)
+          (markdown-display-buffer-other-window (markdown-live-preview-export))
+        (markdown-live-preview-mode -1)
+        (error "Buffer %s does not visit a file" (current-buffer)))
     (markdown-live-preview-remove)))
 
 

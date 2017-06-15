@@ -4755,6 +4755,23 @@ paragraph 2")))))
     (message "no eww, no libxml2, or no %s found: skipping %s" markdown-command test)
     nil))
 
+(ert-deftest test-markdown-ext/live-preview-no-file ()
+  "Live-preview a `markdown-mode' buffer without a file."
+  (with-temp-buffer
+    (markdown-mode)
+
+    ;; Activating `markdown-live-preview-mode' signals error
+    (should-error (markdown-live-preview-mode))
+
+    ;; After trying to activate live preview mode, mode is not activated
+    (should-not markdown-live-preview-mode)
+
+    ;; `markdown-live-preview-export' does nothing
+    (should-not (markdown-live-preview-export))
+
+    ;; `markdown-live-preview-remove' does nothing
+    (should-not (markdown-live-preview-remove))))
+
 (ert-deftest test-markdown-ext/live-preview-exports ()
   (markdown-test-temp-file "inline.text"
     (unless (and (fboundp 'libxml-parse-html-region) (require 'eww nil t))
