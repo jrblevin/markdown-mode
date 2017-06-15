@@ -122,6 +122,9 @@
     -   Update known languages in `markdown-gfm-recognized-languages`.
     -   Filling with `fill-region` now leaves code blocks unmodified.
         ([GH-192][])
+    -   Avoid error when live-previewing a buffer that's not visiting
+        a file.  Thanks to Tianxiang Xiong for a patch.
+        ([GH-200][], [GH-201][])
 
 *   Bug fixes:
 
@@ -141,6 +144,8 @@
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
   [gh-192]: https://github.com/jrblevin/markdown-mode/issues/192
   [gh-197]: https://github.com/jrblevin/markdown-mode/issues/197
+  [gh-200]: https://github.com/jrblevin/markdown-mode/issues/200
+  [gh-201]: https://github.com/jrblevin/markdown-mode/issues/201
 
 # Markdown Mode 2.2
 
