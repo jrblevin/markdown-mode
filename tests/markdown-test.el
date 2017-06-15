@@ -2590,7 +2590,7 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
    (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/inline-code-comment ()
-  "Test comments inside of a pre block."
+  "Test comments inside of inline code."
   (markdown-test-string "`<h1> <!-- HTML comment inside inline code -->`"
    (markdown-test-range-has-face (1+ (point-min)) (- (point-max) 2) markdown-inline-code-face)))
 
