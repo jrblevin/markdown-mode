@@ -4301,7 +4301,7 @@ location determined by `markdown-reference-location'."
     (when bounds (delete-region (car bounds) (cdr bounds)))
     (markdown-insert-reference-link text label url title)))
 
-(defun markdown-insert-uri ()
+(defun markdown-insert-uri (&optional uri)
   "Insert markup for an inline URI.
 If there is an active region, use it as the URI.  If the point is
 at a URI, wrap it with angle brackets.  If the point is at an
@@ -4314,10 +4314,12 @@ angle brackets place the point between them."
                      (region-beginning) (region-end)
                      markdown-regex-angle-uri 0 2)))
         (markdown-wrap-or-insert "<" ">" nil (car bounds) (cdr bounds)))
-    ;; Markup removal, URI at point, or empty markup insertion
+    ;; Markup removal, URI at point, new URI, or empty markup insertion
     (if (thing-at-point-looking-at markdown-regex-angle-uri)
         (markdown-unwrap-thing-at-point nil 0 2)
-      (markdown-wrap-or-insert "<" ">" 'url nil nil))))
+      (if uri
+          (insert "<" uri ">")
+        (markdown-wrap-or-insert "<" ">" 'url nil nil)))))
 
 (defun markdown-insert-wiki-link ()
   "Insert a wiki link of the form [[WikiLink]].
