@@ -24,6 +24,9 @@
     -   Rename `markdown-fill-forward-paragraph-function` to
         `markdown-fill-forward-paragraph`.
     -   Rename `markdown-footnote-face` to `markdown-footnote-marker-face`.
+    -   Functions `markdown-insert-inline-link-dwim` and
+        `markdown-insert-reference-link-dwim` have been combined and
+        replaced with `markdown-insert-link`.
 
 *   New features:
 
@@ -111,6 +114,8 @@
     -   Raise footnote markers and inline footnote text, and
         optionally hide markup.
     -   Filling with now respects Pandoc line blocks.  ([GH-144][])
+    -   Add interactive link editing and insertion command
+        `markdown-insert-link`.  ([GH-199][])
 
 *   Improvements:
 
@@ -160,6 +165,7 @@
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191
   [gh-192]: https://github.com/jrblevin/markdown-mode/issues/192
   [gh-197]: https://github.com/jrblevin/markdown-mode/issues/197
+  [gh-199]: https://github.com/jrblevin/markdown-mode/issues/199
   [gh-200]: https://github.com/jrblevin/markdown-mode/issues/200
   [gh-201]: https://github.com/jrblevin/markdown-mode/issues/201
 

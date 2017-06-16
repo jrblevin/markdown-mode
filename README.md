@@ -176,45 +176,43 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Hyperlinks: <kbd>C-c C-a</kbd>
 
-    In this group, <kbd>C-c C-a l</kbd> inserts an inline link of the form
-    `[text](url)`.  The link text is determined as follows.  First,
-    if there is an active region (i.e., when transient mark mode is
-    on and the mark is active), use it as the link text.  Second,
-    if the point is at a word, use that word as the link text.  In
-    these two cases, the original text will be replaced with the
-    link and point will be left at the position for inserting a
-    URL.  Otherwise, insert empty link markup and place the point
-    for inserting the link text.
+    In this group, <kbd>C-c C-a l</kbd> inserts links, either inline,
+    reference, or plain URLs.  The URL or `[reference]` label, link
+    text, and optional title are entered through a series of
+    interactive prompts.  The type of link is determined by which
+    values are provided:
 
-    <kbd>C-c C-a L</kbd> inserts a reference link of the form `[text][label]`
-    and, optionally, a corresponding reference label definition.
-    The link text is determined in the same way as with an inline
-    link (using the region, when active, or the word at the point),
-    but instead of inserting empty markup as a last resort, the
-    link text will be read from the minibuffer.  The reference
-    label will be read from the minibuffer in both cases, with
-    completion from the set of currently defined references.  To
-    create an implicit reference link, press <kbd>RET</kbd> to accept the
-    default, an empty label.  If the entered referenced label is
-    not defined, additionally prompt for the URL and (optional)
-    title.  If a URL is provided, a reference definition will be
-    inserted in accordance with `markdown-reference-location`.
-    If a title is given, it will be added to the end of the
-    reference definition and will be used to populate the title
-    attribute when converted to XHTML.
+    *   If both a URL and link text are given, insert an inline link:
+        `[text](url)`.
+    *   If both a `[reference]` label and link text are given, insert
+        a reference link: `[text][reference]`.
+    *   If only link text is given, insert an implicit reference link:
+        `[text][]`.
+    *   If only a URL is given, insert a plain URL link:
+        `<url>`.
 
-    <kbd>C-c C-a u</kbd> inserts a bare url, delimited by angle brackets.  When
-    there is an active region, the text in the region is used as the
-    URL.  If the point is at a URL, that url is used.  Otherwise,
-    insert angle brackets and position the point in between them
-    for inserting the URL.
+    If there is an active region, use the text as the default URL,
+    if it seems to be a URL, or link text value otherwise.  The region
+    will be deleted and replaced by the link.
+
+    Note that this function can be used to convert a link from one
+    type to another (inline, reference, or plain URL) by
+    selectively adding or removing properties via the interactive
+    prompts.
+
+    If a reference label is given that is not yet defined, you
+    will be prompted for the URL and optional title and the
+    reference will be inserted according to the value of
+    `markdown-reference-location`.  If a title is given, it will be
+    added to the end of the reference definition and will be used
+    to populate the title attribute when converted to HTML.
 
     <kbd>C-c C-a f</kbd> inserts a footnote marker at the point, inserts a
     footnote definition below, and positions the point for
     inserting the footnote text.  Note that footnotes are an
     extension to Markdown and are not supported by all processors.
 
-    <kbd>C-c C-a w</kbd> behaves much like the inline link insertion command
+    <kbd>C-c C-a w</kbd> behaves much like the link insertion command
     and inserts a wiki link of the form `[[WikiLink]]`.  If there
     is an active region, use the region as the link text.  If the
     point is at a word, use the word as the link text.  If there is

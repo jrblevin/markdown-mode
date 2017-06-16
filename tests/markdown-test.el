@@ -1130,78 +1130,47 @@ Test point position upon removal and insertion."
       (should (looking-back "https://www.gnu.org/\n\\[2\\]: " nil)))))
 
 (ert-deftest test-markdown-insertion/inline-to-reference-link ()
-  "Inline link to reference link conversion."
+  "Inline link to reference link conversion with tab completion."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")"
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n")))
-  (markdown-test-string "[text](http://jblevins.org/)"
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 1 RET"))
-                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/\n"))))
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET M-DEL M-DEL M-DEL [1] RET RET h TAB RET RET"))
+                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: http://jblevins.org/ \"title\"\n"))))
 
 (ert-deftest test-markdown-insertion/inline-to-reference-link-2 ()
-  "Inline link to reference link conversion with existing reference links.
-Regression test: adding a new reference link with
-`markdown-insert-reference-link-dwim' should not throw an 'args
-out of range' error when the existing reference label is a single
-character."
+  "Inline link to reference link conversion with existing reference links."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")\n\n[1]: https://www.gnu.org"
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-reference-link-dwim RET 2 RET"))))
-
-(ert-deftest test-markdown-insertion/inline-link-empty ()
-  "Test `markdown-insert-inline-link-dwim' for empty markup insertion.
-Point should be left inside square brackets."
-  (markdown-test-string "abc "
-    (end-of-line)
-    (call-interactively 'markdown-insert-inline-link-dwim)
-    (should (string-equal (buffer-string) "abc []()"))
-    (should (= (point) 6))))
-
-(ert-deftest test-markdown-insertion/inline-link-word-at-point ()
-  "Test `markdown-insert-inline-link-dwim' with word at point.
-Point should be left inside parentheses."
-  (markdown-test-string "abc def ghi"
-    (forward-word 2)
-    (call-interactively 'markdown-insert-inline-link-dwim)
-    (should (string-equal (buffer-string) "abc [def]() ghi"))
-    (should (= (point) 11))))
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET M-DEL M-DEL M-DEL [1] RET RET"))
+                        (should (string-equal (buffer-string) "[text][1]\n\n[1]: https://www.gnu.org"))))
 
 (ert-deftest test-markdown-insertion/inline-link-angle-url-at-point ()
-  "Test `markdown-insert-inline-link-dwim' with angle URL at point.
-Point should be left inside square brackets."
+  "Test `markdown-insert-link' with angle URL at point."
   (markdown-test-string "<https://www.gnu.org/>"
-    (forward-line)
-    (call-interactively 'markdown-insert-inline-link-dwim)
-    (should (string-equal (buffer-string) "[](https://www.gnu.org/)"))
-    (should (= (point) 2))))
+    (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET RET GNU RET RET"))
+    (should (string-equal (buffer-string) "[GNU](https://www.gnu.org/)"))))
 
 (ert-deftest test-markdown-insertion/inline-link-plain-url-at-point ()
-  "Test `markdown-insert-inline-link-dwim' with plain URL at point.
-Point should be left inside square brackets."
+  "Test `markdown-insert-link' with plain URL at point."
   (markdown-test-string "https://www.gnu.org/"
-    (forward-line)
-    (call-interactively 'markdown-insert-inline-link-dwim)
-    (should (string-equal (buffer-string) "[](https://www.gnu.org/)"))
-    (should (= (point) 2))))
+    (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET RET GNU RET RET"))
+    (should (string-equal (buffer-string) "[GNU](https://www.gnu.org/)"))))
 
 (ert-deftest test-markdown-insertion/inline-link-reference-link-at-point ()
-  "Test `markdown-insert-inline-link-dwim' with reference link at point."
+  "Test `markdown-insert-link' with reference link at point."
   (markdown-test-string ""
     (markdown-insert-reference-link "link" "label" "http://jblevins.org/")
-    (call-interactively 'markdown-insert-inline-link-dwim)
-    (should (string-equal (buffer-substring 1 29) "[link](http://jblevins.org/)"))
-    (should (= (point) 29))))
+    (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET DEL DEL DEL DEL DEL DEL DEL http://example.com/ RET RET RET"))
+    (should (string-equal (buffer-substring 1 28) "[link](http://example.com/)"))
+    (should (= (point) 28))))
 
 (ert-deftest test-markdown-insertion/inline-link-active-region ()
-  "Test `markdown-insert-inline-link-dwim' with active region.
-Point should be left inside parentheses."
+  "Test `markdown-insert-link' with active region."
   (markdown-test-string "abc def ghi"
     (let ((tmm-orig transient-mark-mode))
       (transient-mark-mode 1)
       (push-mark (point) t t)
       (forward-word 2)
-      (call-interactively 'markdown-insert-inline-link-dwim)
-      (should (string-equal (buffer-string) "[abc def]() ghi"))
-      (should (= (point) 11))
+      (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET http://example.com/ RET RET RET"))
+      (should (string-equal (buffer-string) "[abc def](http://example.com/) ghi"))
+      (should (= (point) 31))
       (transient-mark-mode tmm-orig))))
 
 ;;; Footnote tests:
