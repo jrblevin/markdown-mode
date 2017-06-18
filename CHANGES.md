@@ -4,6 +4,14 @@
 
 *   **Breaking changes:**
 
+    -   Link insertion and editing has been consolidated into one
+        command, `markdown-insert-link`, bound to <kbd>C-c C-k</kbd>.
+        As such, the previous separate link insertion keybindings have
+        been removed: <kbd>C-c C-a l</kbd>, <kbd>C-c C-a L</kbd>,
+        <kbd>C-c C-a r</kbd>, and <kbd>C-c C-a u</kbd>.
+    -   Jumping between references and reference definitions via
+        `markdown-jump`, previously bound to <kbd>C-c C-k</kbd>, has
+        been moved to <kbd>C-c C-d</kbd>.
     -   Rename internal `markdown-link-link` to `markdown-link-url`
         for clarity.
     -   The old inline image toggling command <kbd>C-c C-i C-t</kbd>

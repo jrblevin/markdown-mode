@@ -176,10 +176,8 @@
 ;;; Usage:
 
 ;; Keybindings are grouped by prefixes based on their function.  For
-;; example, the commands for inserting links are grouped under `C-c
-;; C-a`, where the `C-a` is a mnemonic for the HTML `<a>` tag.  In
-;; other cases, the connection to HTML is not direct.  For example,
-;; commands dealing with headings begin with `C-c C-t` (mnemonic:
+;; example, the commands for styling text are grouped under `C-c C-s`
+;; and commands dealing with headings begin with `C-c C-t` (mnemonic:
 ;; titling).  The primary commands in each group will are described
 ;; below.  You can obtain a list of all keybindings by pressing `C-c
 ;; C-h`.  Movement and shifting commands tend to be associated with
@@ -190,13 +188,14 @@
 ;; commands are described below.  You can obtain a list of all
 ;; keybindings by pressing `C-c C-h`.
 ;;
-;;   * Hyperlinks: `C-c C-a`
+;;   * Hyperlinks: `C-c C-l`
 ;;
-;;     In this group, `C-c C-a l` inserts links, either inline,
-;;     reference, or plain URLs.  The URL or `[reference]` label, link
-;;     text, and optional title are entered through a series of
-;;     interactive prompts.  The type of link is determined by which
-;;     values are provided:
+;;     `C-c C-l` (`markdown-insert-link`) is a general command for
+;;     inserting standard Markdown links of any form: either inline
+;;     links, reference links, or plain URLs in angle brackets.  The
+;;     URL or `[reference]` label, link text, and optional title are
+;;     entered through a series of interactive prompts.  The type of
+;;     link is determined by which values are provided:
 ;;
 ;;     *   If both a URL and link text are given, insert an inline link:
 ;;         `[text](url)`.
@@ -207,9 +206,10 @@
 ;;     *   If only a URL is given, insert a plain URL link:
 ;;         `<url>`.
 ;;
-;;     If there is an active region, use the text as the default URL,
-;;     if it seems to be a URL, or link text value otherwise.  The region
-;;     will be deleted and replaced by the link.
+;;     If there is an active region, this command uses the region as
+;;     either the default URL (if it seems to be a URL) or link text
+;;     value otherwise.  The region will be deleted and replaced by the
+;;     link.
 ;;
 ;;     Note that this function can be used to convert a link from one
 ;;     type to another (inline, reference, or plain URL) by
@@ -222,19 +222,6 @@
 ;;     `markdown-reference-location'.  If a title is given, it will be
 ;;     added to the end of the reference definition and will be used
 ;;     to populate the title attribute when converted to HTML.
-;;
-;;     `C-c C-a f` inserts a footnote marker at the point, inserts a
-;;     footnote definition below, and positions the point for
-;;     inserting the footnote text.  Note that footnotes are an
-;;     extension to Markdown and are not supported by all processors.
-;;
-;;     `C-c C-a w` behaves much like the link insertion command
-;;     and inserts a wiki link of the form `[[WikiLink]]`.  If there
-;;     is an active region, use the region as the link text.  If the
-;;     point is at a word, use the word as the link text.  If there is
-;;     no active region and the point is not at word, simply insert
-;;     link markup.  Note that wiki links are an extension to Markdown
-;;     and are not supported by all processors.
 ;;
 ;;   * Images: `C-c C-i`
 ;;
@@ -307,6 +294,22 @@
 ;;     With a numeric prefix `N`, insert the string in position `N`
 ;;     (counting from 1).
 ;;
+;;   * Footnotes: `C-c C-a f`
+;;
+;;     `C-c C-a f` inserts a footnote marker at the point, inserts a
+;;     footnote definition below, and positions the point for
+;;     inserting the footnote text.  Note that footnotes are an
+;;     extension to Markdown and are not supported by all processors.
+;;
+;;   * Wiki Links: `C-c C-a f`
+;;
+;;     `C-c C-a w` inserts a wiki link of the form `[[WikiLink]]`.  If
+;;     there is an active region, use the region as the link text.  If the
+;;     point is at a word, use the word as the link text.  If there is
+;;     no active region and the point is not at word, simply insert
+;;     link markup.  Note that wiki links are an extension to Markdown
+;;     and are not supported by all processors.
+;;
 ;;   * Markdown and Maintenance Commands: `C-c C-c`
 ;;
 ;;     *Compile:* `C-c C-c m` will run Markdown on the current buffer
@@ -360,9 +363,9 @@
 ;;     or in the other window with the `C-u` prefix).  Use `M-p` and
 ;;     `M-n` to quickly jump to the previous or next link of any type.
 ;;
-;;   * Jumping: `C-c C-l`
+;;   * Jumping: `C-c C-d`
 ;;
-;;     Use `C-c C-l` to jump from the object at point to its counterpart
+;;     Use `C-c C-d` to jump from the object at point to its counterpart
 ;;     elsewhere in the text, when possible.  Jumps between reference
 ;;     links and definitions; between footnote markers and footnote
 ;;     text.  If more than one link uses the same reference name, a
@@ -5463,6 +5466,7 @@ Assumes match data is available for `markdown-regex-italic'."
 (defvar markdown-mode-map
   (let ((map (make-keymap)))
     ;; Element insertion
+    (define-key map (kbd "C-c C-l") 'markdown-insert-link)
     (define-key map "\C-c\C-al" 'markdown-insert-link)
     (define-key map "\C-c\C-af" 'markdown-insert-footnote)
     (define-key map "\C-c\C-aw" 'markdown-insert-wiki-link)
@@ -5489,11 +5493,8 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map "\C-c\C-sP" 'markdown-insert-gfm-code-block)
     (define-key map "\C-c-" 'markdown-insert-hr)
     ;; Element insertion (deprecated)
-    (define-key map "\C-c\C-ar" 'markdown-insert-reference-link-dwim)
     (define-key map "\C-c\C-tt" 'markdown-insert-header-setext-1)
     (define-key map "\C-c\C-ts" 'markdown-insert-header-setext-2)
-    (define-key map "\C-c\C-aL" 'markdown-insert-link)
-    (define-key map "\C-c\C-au" 'markdown-insert-link)
     ;; Element removal
     (define-key map (kbd "C-c C-k") 'markdown-kill-thing-at-point)
     ;; Promotion, Demotion, Completion, and Cycling
@@ -5502,7 +5503,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-]") 'markdown-complete)
     ;; Following and Jumping
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
-    (define-key map (kbd "C-c C-l") 'markdown-jump)
+    (define-key map (kbd "C-c C-d") 'markdown-jump)
     ;; Indentation
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "DEL") 'markdown-exdent-or-delete)

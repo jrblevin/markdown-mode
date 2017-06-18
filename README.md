@@ -160,10 +160,8 @@ GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2 can install
 ## Usage
 
 Keybindings are grouped by prefixes based on their function.  For
-example, the commands for inserting links are grouped under `C-c
-C-a`, where the <kbd>C-a</kbd> is a mnemonic for the HTML `<a>` tag.  In
-other cases, the connection to HTML is not direct.  For example,
-commands dealing with headings begin with <kbd>C-c C-t</kbd> (mnemonic:
+example, the commands for styling text are grouped under <kbd>C-c C-s</kbd>
+and commands dealing with headings begin with <kbd>C-c C-t</kbd> (mnemonic:
 titling).  The primary commands in each group will are described
 below.  You can obtain a list of all keybindings by pressing `C-c
 C-h`.  Movement and shifting commands tend to be associated with
@@ -174,13 +172,14 @@ are grouped under the <kbd>C-c C-c</kbd> prefix.  The most commonly used
 commands are described below.  You can obtain a list of all
 keybindings by pressing <kbd>C-c C-h</kbd>.
 
-  * Hyperlinks: <kbd>C-c C-a</kbd>
+  * Hyperlinks: <kbd>C-c C-l</kbd>
 
-    In this group, <kbd>C-c C-a l</kbd> inserts links, either inline,
-    reference, or plain URLs.  The URL or `[reference]` label, link
-    text, and optional title are entered through a series of
-    interactive prompts.  The type of link is determined by which
-    values are provided:
+    <kbd>C-c C-l</kbd> (`markdown-insert-link`) is a general command for
+    inserting standard Markdown links of any form: either inline
+    links, reference links, or plain URLs in angle brackets.  The
+    URL or `[reference]` label, link text, and optional title are
+    entered through a series of interactive prompts.  The type of
+    link is determined by which values are provided:
 
     *   If both a URL and link text are given, insert an inline link:
         `[text](url)`.
@@ -191,9 +190,10 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     *   If only a URL is given, insert a plain URL link:
         `<url>`.
 
-    If there is an active region, use the text as the default URL,
-    if it seems to be a URL, or link text value otherwise.  The region
-    will be deleted and replaced by the link.
+    If there is an active region, this command uses the region as
+    either the default URL (if it seems to be a URL) or link text
+    value otherwise.  The region will be deleted and replaced by the
+    link.
 
     Note that this function can be used to convert a link from one
     type to another (inline, reference, or plain URL) by
@@ -206,19 +206,6 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     `markdown-reference-location`.  If a title is given, it will be
     added to the end of the reference definition and will be used
     to populate the title attribute when converted to HTML.
-
-    <kbd>C-c C-a f</kbd> inserts a footnote marker at the point, inserts a
-    footnote definition below, and positions the point for
-    inserting the footnote text.  Note that footnotes are an
-    extension to Markdown and are not supported by all processors.
-
-    <kbd>C-c C-a w</kbd> behaves much like the link insertion command
-    and inserts a wiki link of the form `[[WikiLink]]`.  If there
-    is an active region, use the region as the link text.  If the
-    point is at a word, use the word as the link text.  If there is
-    no active region and the point is not at word, simply insert
-    link markup.  Note that wiki links are an extension to Markdown
-    and are not supported by all processors.
 
   * Images: <kbd>C-c C-i</kbd>
 
@@ -291,6 +278,22 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     With a numeric prefix <kbd>N</kbd>, insert the string in position <kbd>N</kbd>
     (counting from 1).
 
+  * Footnotes: <kbd>C-c C-a f</kbd>
+
+    <kbd>C-c C-a f</kbd> inserts a footnote marker at the point, inserts a
+    footnote definition below, and positions the point for
+    inserting the footnote text.  Note that footnotes are an
+    extension to Markdown and are not supported by all processors.
+
+  * Wiki Links: <kbd>C-c C-a f</kbd>
+
+    <kbd>C-c C-a w</kbd> inserts a wiki link of the form `[[WikiLink]]`.  If
+    there is an active region, use the region as the link text.  If the
+    point is at a word, use the word as the link text.  If there is
+    no active region and the point is not at word, simply insert
+    link markup.  Note that wiki links are an extension to Markdown
+    and are not supported by all processors.
+
   * Markdown and Maintenance Commands: <kbd>C-c C-c</kbd>
 
     *Compile:* <kbd>C-c C-c m</kbd> will run Markdown on the current buffer
@@ -344,9 +347,9 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     or in the other window with the <kbd>C-u</kbd> prefix).  Use <kbd>M-p</kbd> and
     <kbd>M-n</kbd> to quickly jump to the previous or next link of any type.
 
-  * Jumping: <kbd>C-c C-l</kbd>
+  * Jumping: <kbd>C-c C-d</kbd>
 
-    Use <kbd>C-c C-l</kbd> to jump from the object at point to its counterpart
+    Use <kbd>C-c C-d</kbd> to jump from the object at point to its counterpart
     elsewhere in the text, when possible.  Jumps between reference
     links and definitions; between footnote markers and footnote
     text.  If more than one link uses the same reference name, a
