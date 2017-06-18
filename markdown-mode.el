@@ -1254,7 +1254,7 @@ completion."
   :type 'boolean)
 
 (defcustom markdown-use-pandoc-style-yaml-metadata nil
-  "When non-nil, allow yaml metadata anywhere in the document."
+  "When non-nil, allow YAML metadata anywhere in the document."
   :group 'markdown
   :type 'boolean)
 
@@ -1606,20 +1606,20 @@ or
 
 (defconst markdown-regex-yaml-metadata-border
   "\\(-\\{3\\}\\)$"
-  "Regular expression for matching yaml metadata.")
+  "Regular expression for matching YAML metadata.")
 
 (defconst markdown-regex-yaml-pandoc-metadata-end-border
   "^\\(\\.\\{3\\}\\|\\-\\{3\\}\\)$"
-  "Regular expression for matching yaml metadata end borders.")
+  "Regular expression for matching YAML metadata end borders.")
 
 (defsubst markdown-get-yaml-metadata-start-border ()
-  "Return yaml metadata start border depending upon whether Pandoc is used."
+  "Return YAML metadata start border depending upon whether Pandoc is used."
   (concat
    (if markdown-use-pandoc-style-yaml-metadata "^" "\\`")
    markdown-regex-yaml-metadata-border))
 
 (defsubst markdown-get-yaml-metadata-end-border (_)
-  "Return yaml metadata end border depending upon whether Pandoc is used."
+  "Return YAML metadata end border depending upon whether Pandoc is used."
   (if markdown-use-pandoc-style-yaml-metadata
       markdown-regex-yaml-pandoc-metadata-end-border
     markdown-regex-yaml-metadata-border))
