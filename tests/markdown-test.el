@@ -3614,6 +3614,18 @@ puts 'hello, world'
     (should (equal (markdown-cur-list-item-bounds)
                    '(1 18 2 4 "- " "[ ] ")))))
 
+(ert-deftest test-markdown-lists/gfm-task-list-item-at-point-1 ()
+  "Test `markdown-gfm-task-list-item-at-point' with regular list items."
+  (markdown-test-file "nested-list.text"
+    (dolist (pos '(1 26 36 267 514 540))
+      (goto-char pos)
+      (should-not (markdown-gfm-task-list-item-at-point)))))
+
+(ert-deftest test-markdown-lists/gfm-task-list-item-at-point-2 ()
+  "Test `markdown-gfm-task-list-item-at-point' with a task list item."
+  (markdown-test-string "  - [ ] task"
+    (should (markdown-gfm-task-list-item-at-point))))
+
 (ert-deftest test-markdown-insertion/insert-gfm-task-list-item ()
   "Test `markdown-insert-list-item' in a GFM task list."
   (markdown-test-string "  - [ ] task"

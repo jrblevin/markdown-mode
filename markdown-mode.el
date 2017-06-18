@@ -8030,6 +8030,16 @@ if ARG is omitted or nil."
   'mouse-face 'markdown-highlight-face
   'action #'markdown-toggle-gfm-checkbox-button)
 
+(defun markdown-gfm-task-list-item-at-point (&optional bounds)
+  "Return non-nil if there is a GFM task list item at the point.
+Optionally, the list item BOUNDS may be given if available, as
+returned by `markdown-cur-list-item-bounds'.  When a task list item
+is found, the return value is the same value returned by
+`markdown-cur-list-item-bounds'."
+  (unless bounds
+    (setq bounds (markdown-cur-list-item-bounds)))
+  (> (length (nth 5 bounds)) 0))
+
 (defun markdown-toggle-gfm-checkbox ()
   "Toggle GFM checkbox at point.
 Returns the resulting status as a string, either \"[x]\" or \"[ ]\".
