@@ -5,7 +5,7 @@
 *   **Breaking changes:**
 
     -   Link insertion and editing has been consolidated into one
-        command, `markdown-insert-link`, bound to <kbd>C-c C-k</kbd>.
+        command, `markdown-insert-link`, bound to <kbd>C-c C-l</kbd>.
         As such, the previous separate link insertion keybindings have
         been removed: <kbd>C-c C-a l</kbd>, <kbd>C-c C-a L</kbd>,
         <kbd>C-c C-a r</kbd>, and <kbd>C-c C-a u</kbd>.
