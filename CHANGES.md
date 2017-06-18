@@ -61,7 +61,7 @@
         `markdown-hr-display-char`, and
         `markdown-definition-display-char`.
     -   URL and reference label hiding: URLs for inline links and
-        labels for reference links are now hidden by default.  This is
+        labels for reference links can now be hidden if desired.  This is
         configurable via `markdown-hide-urls`.  URLs will appear as
         `[link](∞)` instead of
         `[link](http://perhaps.a/very/long/url/)`.  To change the

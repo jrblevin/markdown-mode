@@ -2854,14 +2854,15 @@ takes precedence)."
 
 (ert-deftest test-markdown-font-lock/hidden-urls-inline ()
   "Test URL hiding and toggling."
-  (markdown-test-file "inline.text"
-    (markdown-test-range-has-face 925 925 markdown-markup-face)
-    (markdown-test-range-has-face 926 929 markdown-link-face)
-    (markdown-test-range-has-face 930 931 markdown-markup-face)
-    (markdown-test-range-has-face 932 949 markdown-url-face)
-    (markdown-test-range-has-face 951 957 markdown-link-title-face)
-    (markdown-test-range-has-face 958 958 markdown-markup-face)
-    (should (equal '((26 . 8734)) (get-text-property 932 'composition)))))
+  (let ((markdown-hide-urls t))
+    (markdown-test-file "inline.text"
+      (markdown-test-range-has-face 925 925 markdown-markup-face)
+      (markdown-test-range-has-face 926 929 markdown-link-face)
+      (markdown-test-range-has-face 930 931 markdown-markup-face)
+      (markdown-test-range-has-face 932 949 markdown-url-face)
+      (markdown-test-range-has-face 951 957 markdown-link-title-face)
+      (markdown-test-range-has-face 958 958 markdown-markup-face)
+      (should (equal '((26 . 8734)) (get-text-property 932 'composition))))))
 
 (ert-deftest test-markdown-font-lock/hidden-urls-reference ()
   "Test URL hiding and toggling."
@@ -4486,7 +4487,7 @@ paragraph 2")))))
   (markdown-test-string
    "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."
    (fill-paragraph)
-   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."))))
+   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa\naaa aaa aaa aaa."))))
 
 (ert-deftest test-markdown-filling/pandoc-line-blocks ()
   "Filling should leave Pandoc line blocks undisturbed.
