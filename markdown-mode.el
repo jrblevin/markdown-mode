@@ -2839,10 +2839,12 @@ Used for `flyspell-generic-check-word-predicate'."
                    (or (memq 'markdown-reference-face faces)
                        (memq 'markdown-markup-face faces)
                        (memq 'markdown-plain-url-face faces)
+                       (memq 'markdown-inline-code-face faces)
                        (memq 'markdown-url-face faces))
                  (memq faces '(markdown-reference-face
                                markdown-markup-face
                                markdown-plain-url-face
+                               markdown-inline-code-face
                                markdown-url-face))))))))
 
 (defun markdown-font-lock-ensure ()
