@@ -3161,6 +3161,9 @@ The named components are:
     marker, and whitespace following list marker (an integer).
   - marker: String containing the list marker and following whitespace
             (e.g., \"- \" or \"* \").
+  - checkbox: String containing the GFM checkbox portion, if any,
+    including any trailing whitespace before the text
+    begins (e.g., \"[x] \").
 
 As an example, for the following unordered list item
 
@@ -3168,29 +3171,27 @@ As an example, for the following unordered list item
 
 the returned list would be
 
-    (1 14 3 5 \"- \")
+    (1 14 3 5 \"- \" nil)
 
 If the point is not inside a list item, return nil.
 Leave match data intact for `markdown-regex-list'."
-  (let (cur prev-begin prev-end indent nonlist-indent marker)
-    ;; Store current location
-    (setq cur (point))
-    ;; Verify that cur is between beginning and end of item
-    (save-excursion
+  (save-excursion
+    (let ((cur (point)))
       (end-of-line)
       (when (re-search-backward markdown-regex-list nil t)
-        (setq prev-begin (match-beginning 0))
-        (setq indent (length (match-string-no-properties 1)))
-        (setq nonlist-indent (length (match-string 0)))
-        (setq marker (concat (match-string-no-properties 2)
-                             (match-string-no-properties 3)))
-        (save-match-data
-          (markdown-cur-list-item-end nonlist-indent)
-          (setq prev-end (point)))
-        (when (and (>= cur prev-begin)
-                   (<= cur prev-end)
-                   nonlist-indent)
-          (list prev-begin prev-end indent nonlist-indent marker))))))
+        (let* ((begin (match-beginning 0))
+               (indent (length (match-string-no-properties 1)))
+               (nonlist-indent (length (match-string 0)))
+               (marker (concat (match-string-no-properties 2)
+                               (match-string-no-properties 3)))
+               (checkbox (progn (goto-char (match-end 0))
+                                (when (looking-at "\\[[xX ]\\]\\s-*")
+                                  (match-string-no-properties 0))))
+               (end (save-match-data
+                      (markdown-cur-list-item-end nonlist-indent)
+                      (point))))
+          (when (and (>= cur begin) (<= cur end) nonlist-indent)
+            (list begin end indent nonlist-indent marker checkbox)))))))
 
 (defun markdown-list-item-at-point-p ()
   "Return t if there is a list item at the point and nil otherwise."
@@ -6089,12 +6090,11 @@ increase the indentation by one level."
         ;; Compute indentation and marker for new list item
         (setq cur-indent (nth 2 bounds))
         (setq marker (nth 4 bounds))
-        ;; Is this a GFM checkbox?
-        (when (save-excursion
-                (goto-char (cl-first bounds))
-                (forward-char (cl-fourth bounds))
-                (looking-at "\\(\\[\\)[xX ]\\(\\]\\s-*\\)"))
-          (setq marker (concat marker (match-string 1) " " (match-string 2))))
+        ;; If current item is a GFM checkbox, insert new unchecked checkbox.
+        (when (nth 5 bounds)
+          (setq marker
+                (concat marker
+                        (replace-regexp-in-string "[Xx]" " " (nth 5 bounds)))))
         (cond
          ;; Dedent: decrement indentation, find previous marker.
          ((= arg 4)

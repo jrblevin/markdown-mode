@@ -3593,11 +3593,11 @@ puts 'hello, world'
     (markdown-next-list-item 4)
     (should (eq (point) 3700))
     (should (equal (markdown-cur-list-item-bounds)
-                   (list 3700 3901 0 4 "-   ")))
+                   (list 3700 3901 0 4 "-   " nil)))
     (markdown-next-list-item 4)
     (should (eq (point) 3903))
     (should (equal (markdown-cur-list-item-bounds)
-                   (list 3903 3937 0 4 "*   ")))))
+                   (list 3903 3937 0 4 "*   " nil)))))
 
 (ert-deftest test-markdown-lists/bounds-2 ()
   "Function `markdown-cur-list-item-bounds' should return nil outside of list items."
@@ -3607,6 +3607,19 @@ puts 'hello, world'
     (should (null (markdown-cur-list-item-bounds)))
     (forward-line)
     (should (markdown-cur-list-item-bounds))))
+
+(ert-deftest test-markdown-lists/bounds-gfm-task-list-item ()
+  "Test `markdown-cur-list-item-bounds' with a GFM task list item."
+  (markdown-test-string "  - [ ] task name"
+    (should (equal (markdown-cur-list-item-bounds)
+                   '(1 18 2 4 "- " "[ ] ")))))
+
+(ert-deftest test-markdown-insertion/insert-gfm-task-list-item ()
+  "Test `markdown-insert-list-item' in a GFM task list."
+  (markdown-test-string "  - [ ] task"
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "  - [ ] task\n  - [ ] "))))
 
 (ert-deftest test-markdown-lists/promotion-and-demotion ()
   "Test function `markdown-promote-list-item'."
