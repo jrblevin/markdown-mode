@@ -900,7 +900,7 @@ first version was released on May 24, 2007.
   * 2013-01-25: [Version 1.9][]
   * 2013-03-24: [Version 2.0][]
   * 2016-01-09: [Version 2.1][]
-  * 2016-05-26: [Version 2.2][]
+  * 2017-05-26: [Version 2.2][]
 
 [Version 1.1]: http://jblevins.org/projects/markdown-mode/rev-1-1
 [Version 1.2]: http://jblevins.org/projects/markdown-mode/rev-1-2
