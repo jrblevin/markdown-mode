@@ -155,7 +155,11 @@ maintainer if not).
 
 `markdown-mode` depends on `cl-lib`, which has been bundled with
 GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2 can install
-`cl-lib` with `package.el`.
+`cl-lib` with `package.el`.  Additionally, to enable editing of code
+blocks in indirect buffers using <kbd>C-c </kbd>`, you will need to install
+the [`edit-indirect`][ei] package.
+
+  [ei]: https://github.com/Fanael/edit-indirect/
 
 ## Usage
 
@@ -477,11 +481,10 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Miscellaneous Commands:
 
-    When the `[edit-indirect](https://github.com/Fanael/edit-indirect/)`
-    package is installed, <kbd>C-c '</kbd> (`markdown-edit-code-block`)
-    can be used to edit a code block in an indirect buffer in the
-    native major mode.  Press <kbd>C-c C-c</kbd> to commit changes
-    and return or <kbd>C-c C-k</kbd> to cancel.
+    When the [`edit-indirect`][ei] package is installed, <kbd>C-c </kbd>`
+    (`markdown-edit-code-block`) can be used to edit a code block
+    in an indirect buffer in the native major mode. Press <kbd>C-c C-c</kbd>
+    to commit changes and return or <kbd>C-c C-k</kbd> to cancel.
 
 As noted, many of the commands above behave differently depending
 on whether Transient Mark mode is enabled or not.  When it makes
