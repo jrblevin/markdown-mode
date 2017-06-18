@@ -351,15 +351,18 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     or in the other window with the <kbd>C-u</kbd> prefix).  Use <kbd>M-p</kbd> and
     <kbd>M-n</kbd> to quickly jump to the previous or next link of any type.
 
-  * Jumping: <kbd>C-c C-d</kbd>
+  * Doing Things: <kbd>C-c C-d</kbd>
 
-    Use <kbd>C-c C-d</kbd> to jump from the object at point to its counterpart
-    elsewhere in the text, when possible.  Jumps between reference
-    links and definitions; between footnote markers and footnote
-    text.  If more than one link uses the same reference name, a
-    new buffer will be created containing clickable buttons for jumping
-    to each link.  You may press <kbd>TAB</kbd> or <kbd>S-TAB</kbd> to jump between
-    buttons in this window.
+    Use <kbd>C-c C-d</kbd> to do something sensible with the object at the point:
+
+      - Jumps between reference links and reference definitions.
+        If more than one link uses the same reference label, a
+        window will be shown containing clickable buttons for
+        jumping to each link.  Pressing <kbd>TAB</kbd> or <kbd>S-TAB</kbd> cycles
+        between buttons in this window.
+      - Jumps between footnote markers and footnote text.
+      - Toggles the completion status of GFM task list items
+        (checkboxes).
 
   * Promotion and Demotion: <kbd>C-c C--</kbd> and <kbd>C-c C-=</kbd>
 

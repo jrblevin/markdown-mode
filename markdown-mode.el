@@ -367,15 +367,18 @@
 ;;     or in the other window with the `C-u` prefix).  Use `M-p` and
 ;;     `M-n` to quickly jump to the previous or next link of any type.
 ;;
-;;   * Jumping: `C-c C-d`
+;;   * Doing Things: `C-c C-d`
 ;;
-;;     Use `C-c C-d` to jump from the object at point to its counterpart
-;;     elsewhere in the text, when possible.  Jumps between reference
-;;     links and definitions; between footnote markers and footnote
-;;     text.  If more than one link uses the same reference name, a
-;;     new buffer will be created containing clickable buttons for jumping
-;;     to each link.  You may press `TAB` or `S-TAB` to jump between
-;;     buttons in this window.
+;;     Use `C-c C-d` to do something sensible with the object at the point:
+;;
+;;       - Jumps between reference links and reference definitions.
+;;         If more than one link uses the same reference label, a
+;;         window will be shown containing clickable buttons for
+;;         jumping to each link.  Pressing `TAB` or `S-TAB` cycles
+;;         between buttons in this window.
+;;       - Jumps between footnote markers and footnote text.
+;;       - Toggles the completion status of GFM task list items
+;;         (checkboxes).
 ;;
 ;;   * Promotion and Demotion: `C-c C--` and `C-c C-=`
 ;;
@@ -4212,7 +4215,7 @@ be used to populate the title attribute when converted to XHTML."
     (when url
       (message
        (substitute-command-keys
-        "Defined reference [%s], press \\[markdown-jump] to jump there")
+        "Reference [%s] was defined, press \\[markdown-do] to jump there")
        label))))
 
 (make-obsolete 'markdown-insert-inline-link-dwim 'markdown-insert-link "v2.3")
@@ -5505,9 +5508,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C--") 'markdown-promote)
     (define-key map (kbd "C-c C-=") 'markdown-demote)
     (define-key map (kbd "C-c C-]") 'markdown-complete)
-    ;; Following and Jumping
+    ;; Following and doing things
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
-    (define-key map (kbd "C-c C-d") 'markdown-jump)
+    (define-key map (kbd "C-c C-d") 'markdown-do)
     ;; Indentation
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "DEL") 'markdown-exdent-or-delete)
@@ -5608,7 +5611,7 @@ See also `markdown-mode-map'.")
   '("Markdown"
     "---"
     ("Movement"
-     ["Jump" markdown-jump]
+     ["Jump" markdown-do]
      ["Follow Link" markdown-follow-thing-at-point]
      ["Next Link" markdown-next-link]
      ["Previous Link" markdown-previous-link]
@@ -7760,7 +7763,7 @@ Designed to be used with the `after-change-functions' hook."
   (markdown-check-change-for-wiki-link (point-min) (point-max)))
 
 
-;;; Following and Jumping =====================================================
+;;; Following & Doing =========================================================
 
 (defun markdown-follow-thing-at-point (arg)
   "Follow thing at point if possible, such as a reference link or wiki link.
@@ -7777,21 +7780,32 @@ See `markdown-follow-link-at-point' and
         (t
          (error "Nothing to follow at point"))))
 
-(defun markdown-jump ()
-  "Jump to another location based on context at point.
+(make-obsolete 'markdown-jump 'markdown-do "v2.3")
+
+(defun markdown-do ()
+  "Do something sensible based on context at point.
 Jumps between reference links and definitions; between footnote
 markers and footnote text."
   (interactive)
-  (cond ((markdown-footnote-text-positions)
-         (markdown-footnote-return))
-        ((markdown-footnote-marker-positions)
-         (markdown-footnote-goto-text))
-        ((thing-at-point-looking-at markdown-regex-link-reference)
-         (markdown-reference-goto-definition))
-        ((thing-at-point-looking-at markdown-regex-reference-definition)
-         (markdown-reference-goto-link (match-string-no-properties 2)))
-        (t
-         (error "Nothing to jump to from context at point"))))
+  (cond
+   ;; Footnote definition
+   ((markdown-footnote-text-positions)
+    (markdown-footnote-return))
+   ;; Footnote marker
+   ((markdown-footnote-marker-positions)
+    (markdown-footnote-goto-text))
+   ;; Reference link
+   ((thing-at-point-looking-at markdown-regex-link-reference)
+    (markdown-reference-goto-definition))
+   ;; Reference definition
+   ((thing-at-point-looking-at markdown-regex-reference-definition)
+    (markdown-reference-goto-link (match-string-no-properties 2)))
+   ;; GFM task list item
+   ((markdown-gfm-task-list-item-at-point)
+    (markdown-toggle-gfm-checkbox))
+   ;; Otherwise
+   (t
+    (error "Nothing to do in context at point"))))
 
 
 ;;; Miscellaneous =============================================================

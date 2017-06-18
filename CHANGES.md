@@ -11,7 +11,9 @@
         <kbd>C-c C-a r</kbd>, and <kbd>C-c C-a u</kbd>.
     -   Jumping between references and reference definitions via
         `markdown-jump`, previously bound to <kbd>C-c C-k</kbd>, has
-        been moved to <kbd>C-c C-d</kbd>.
+        been moved to <kbd>C-c C-d</kbd> and rebranded as
+        `markdown-do`, which attempts to do something sensible with
+        the object at the point.
     -   Rename internal `markdown-link-link` to `markdown-link-url`
         for clarity.
     -   The old inline image toggling command <kbd>C-c C-i C-t</kbd>
@@ -124,6 +126,10 @@
     -   Filling with now respects Pandoc line blocks.  ([GH-144][])
     -   Add interactive link editing and insertion command
         `markdown-insert-link`.  ([GH-199][])
+    -   Added <kbd>C-c C-d</kbd>, `markdown-do`, which is a
+        replacement for <kbd>C-c C-l</kbd>, `markdown-jump`.  In
+        addition to jumping between reference/footnote labels and
+        definitions, it also toggles GFM checkboxes.
 
 *   Improvements:
 

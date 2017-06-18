@@ -1374,7 +1374,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
     (select-window (previous-window))))
 
 (ert-deftest test-markdown-footnote-reference/jump ()
-  "Test `markdown-jump' for footnotes and reference links."
+  "Test `markdown-do' for footnotes and reference links."
   (markdown-test-string
       "body[^1], [link 1][ref],
 [link 2][ref]
@@ -1383,16 +1383,16 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 [ref]: https://duckduckgo.com/"
    (goto-char 5) ; start of [^1]
-   (markdown-jump) ; markdown-footnote-goto-text
+   (markdown-do) ; markdown-footnote-goto-text
    (should (looking-at "footnote"))
-   (markdown-jump) ; markdown-footnote-return
+   (markdown-do) ; markdown-footnote-return
    (should (= (point) 9)) ; just after [^1]
    (markdown-next-link) ; beginning of [link 1][]
-   (markdown-jump)
+   (markdown-do)
    (should (looking-at "https://duckduckgo.com/"))
    (should (equal (markdown-reference-find-links "ref")
                   (list (list "link 2" 26 2) (list "link 1" 11 1))))
-   (markdown-jump) ; opens a reference link buffer
+   (markdown-do) ; opens a reference link buffer
    (should (string= (buffer-string) "Links using reference ref:\n\nlink 1 (line 1)\nlink 2 (line 2)\n"))
    (should (looking-at "link 1")) ; in reference link popop buffer
    (execute-kbd-macro (read-kbd-macro "RET")) ; jump to "link 1"
