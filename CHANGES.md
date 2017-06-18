@@ -10,7 +10,7 @@
         been removed: <kbd>C-c C-a l</kbd>, <kbd>C-c C-a L</kbd>,
         <kbd>C-c C-a r</kbd>, and <kbd>C-c C-a u</kbd>.
     -   Jumping between references and reference definitions via
-        `markdown-jump`, previously bound to <kbd>C-c C-k</kbd>, has
+        `markdown-jump`, previously bound to <kbd>C-c C-l</kbd>, has
         been moved to <kbd>C-c C-d</kbd> and rebranded as
         `markdown-do`, which attempts to do something sensible with
         the object at the point.
