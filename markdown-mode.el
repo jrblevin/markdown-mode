@@ -8435,8 +8435,11 @@ position."
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
   ;; ElDoc support
-  (add-function :before-until (local 'eldoc-documentation-function)
-                #'markdown-eldoc-function)
+  (if (eval-when-compile (fboundp 'add-function))
+      (add-function :before-until (local 'eldoc-documentation-function)
+                    #'markdown-eldoc-function)
+    (set (make-local-variable 'eldoc-documentation-function)
+         #'markdown-eldoc-function))
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
