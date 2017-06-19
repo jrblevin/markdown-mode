@@ -4271,7 +4271,7 @@ selectively adding or removing information via the prompts."
                                   (markdown-get-defined-references))))
            (used-uris (markdown-get-used-uris))
            (uri-or-ref (completing-read
-                        "URI or [reference]: "
+                        "URL or [reference]: "
                         (append defined-refs used-uris)
                         nil nil (or uri ref)))
            (ref (cond ((string-match "\\`\\[\\(.*\\)\\]\\'" uri-or-ref)
@@ -4281,7 +4281,7 @@ selectively adding or removing information via the prompts."
            (uri (unless ref uri-or-ref))
            (text-prompt (if ref
                             "Link text: "
-                          "Link text (blank for plain URI): "))
+                          "Link text (blank for plain URL): "))
            (text (read-string text-prompt text))
            (text (if (= (length text) 0) nil text))
            (plainp (and uri (not text)))
@@ -4289,7 +4289,7 @@ selectively adding or removing information via the prompts."
            (ref (if implicitp text ref))
            (definedp (and ref (markdown-reference-definition ref)))
            (ref-url (unless (or uri definedp)
-                      (completing-read "Reference URI: " used-uris)))
+                      (completing-read "Reference URL: " used-uris)))
            (title (unless (or plainp definedp)
                     (read-string "Title or alt text (optional): " title)))
            (title (if (= (length title) 0) nil title)))
@@ -8302,6 +8302,31 @@ position."
                (markdown-edit-code-block))))))
 
 
+;;; ElDoc Support
+
+(defun markdown-eldoc-function ()
+  "Return a helpful string when appropriate based on context.
+* Report URL when point is at a hidden URL."
+  (cond
+   ;; Hidden URL or reference for inline link
+   ((and (or (thing-at-point-looking-at markdown-regex-link-inline)
+             (thing-at-point-looking-at markdown-regex-link-reference))
+         (or markdown-hide-urls markdown-hide-markup))
+    (let* ((edit-keys (substitute-command-keys "\\[markdown-insert-link]"))
+           (edit-str (propertize edit-keys 'face 'font-lock-constant-face))
+           (reference-p (string-equal (match-string 5) "["))
+           (object (if reference-p "reference" "URL")))
+      (format "Hidden %s (%s to edit): %s" object edit-str
+              (if reference-p
+                  (concat
+                   (propertize "[" 'face 'markdown-markup-face)
+                   (propertize (match-string-no-properties 6)
+                               'face 'markdown-reference-face)
+                   (propertize "]" 'face 'markdown-markup-face))
+                (propertize (match-string-no-properties 6)
+                            'face 'markdown-url-face)))))))
+
+
 ;;; Mode Definition  ==========================================================
 
 (defun markdown-show-version ()
@@ -8409,7 +8434,9 @@ position."
   (setq outline-level 'markdown-outline-level)
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
-
+  ;; ElDoc support
+  (add-function :before-until (local 'eldoc-documentation-function)
+                #'markdown-eldoc-function)
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
