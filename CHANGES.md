@@ -77,7 +77,7 @@
         appropriate mode to use.  The language to mode mapping may be
         customized by setting the variable `markdown-code-lang-modes`.
         ([GH-123][], [GH-185][])
-    -   When the `[edit-indirect](https://github.com/Fanael/edit-indirect/)`
+    -   When the [`edit-indirect`](https://github.com/Fanael/edit-indirect/)
         package is installed, <kbd>C-c '</kbd> (`markdown-edit-code-block`)
         can be used to edit a code block in an indirect buffer in the native
         major mode.  Press <kbd>C-c C-c</kbd> to commit changes and return
@@ -119,7 +119,7 @@
     -   Add basic font-lock support for Leanpub section identifers and
         page breaks.
     -   Add basic font-lock support for common file inclusion syntax:
-        `<<(file)`, `<<[title](file)`, `<<[file]`, and ``<<{file}`.
+        `<<(file)`, `<<[title](file)`, `<<[file]`, and `<<{file}`.
     -   Add font lock support for Pandoc inline footnotes. ([GH-81][])
     -   Raise footnote markers and inline footnote text, and
         optionally hide markup.
