@@ -4220,8 +4220,10 @@ be used to populate the title attribute when converted to XHTML."
         "Reference [%s] was defined, press \\[markdown-do] to jump there")
        label))))
 
-(make-obsolete 'markdown-insert-inline-link-dwim 'markdown-insert-link "v2.3")
-(make-obsolete 'markdown-insert-reference-link-dwim 'markdown-insert-link "v2.3")
+(define-obsolete-function-alias
+  'markdown-insert-inline-link-dwim 'markdown-insert-link "v2.3")
+(define-obsolete-function-alias
+  'markdown-insert-reference-link-dwim 'markdown-insert-link "v2.3")
 
 (defun markdown-insert-link ()
   "Insert new or update an existing link, with interactive prompts.
