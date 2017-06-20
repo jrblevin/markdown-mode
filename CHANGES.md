@@ -37,6 +37,9 @@
     -   Functions `markdown-insert-inline-link-dwim` and
         `markdown-insert-reference-link-dwim` have been combined and
         replaced with `markdown-insert-link`.
+    -   Functions `markdown-exdent-region` and `markdown-exdent-or-delete`
+        are now named `markdown-outdent-region` and
+        `markdown-outdent-or-delete`, respectively.
 
 *   New features:
 

@@ -421,7 +421,7 @@
 ;;     increase the indentation by one level.
 ;;
 ;;     Existing list items can be moved up or down with `M-UP` or
-;;     `M-DOWN` and indented or exdented with `M-RIGHT` or `M-LEFT`.
+;;     `M-DOWN` and indented or outdented with `M-RIGHT` or `M-LEFT`.
 ;;
 ;;   * Editing Subtrees: `M-S-UP`, `M-S-DOWN`, `M-S-LEFT`, and `M-S-RIGHT`
 ;;
@@ -439,9 +439,9 @@
 ;;
 ;;   * Shifting the Region: `C-c <` and `C-c >`
 ;;
-;;     Text in the region can be indented or exdented as a group using
+;;     Text in the region can be indented or outdented as a group using
 ;;     `C-c >` to indent to the next indentation point (calculated in
-;;     the current context), and `C-c <` to exdent to the previous
+;;     the current context), and `C-c <` to outdent to the previous
 ;;     indentation point.  These keybindings are the same as those for
 ;;     similar commands in `python-mode'.
 ;;
@@ -534,7 +534,7 @@
 ;; you might have in mind when you press `RET` at the end of a line or
 ;; `TAB`.  For example, you may want to start a new list item,
 ;; continue a list item with hanging indentation, indent for a nested
-;; pre block, and so on.  Exdention is handled similarly when backspace
+;; pre block, and so on.  Outdenting is handled similarly when backspace
 ;; is pressed at the beginning of the non-whitespace portion of a line.
 ;;
 ;; markdown-mode supports outline-minor-mode as well as org-mode-style
@@ -5089,7 +5089,10 @@ Positions are calculated by `markdown-calc-indents'."
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
-(defun markdown-exdent-find-next-position (cur-pos positions)
+(define-obsolete-function-alias 'markdown-exdent-find-next-position
+  'markdown-outdent-find-next-position "v2.3")
+
+(defun markdown-outdent-find-next-position (cur-pos positions)
   "Return the maximal element that precedes CUR-POS from POSITIONS.
 Positions are calculated by `markdown-calc-indents'."
   (let ((result 0))
@@ -5190,10 +5193,13 @@ list simply adds a blank line)."
         (newline)
         (markdown-indent-line)))))
 
-(defun markdown-exdent-or-delete (arg)
+(define-obsolete-function-alias 'markdown-exdent-or-delete
+  'markdown-outdent-or-delete "v2.3")
+
+(defun markdown-outdent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
 When BACKSPACE is pressed, if there is only whitespace
-before the current point, then exdent the line one level.
+before the current point, then outdent the line one level.
 Otherwise, do normal delete by repeating
 `backward-delete-char-untabify' ARG times."
   (interactive "*p")
@@ -5205,7 +5211,7 @@ Otherwise, do normal delete by repeating
                                 (current-column)))
           (positions (markdown-calc-indents)))
       (if (and (> cur-pos 0) (= cur-pos start-of-indention))
-          (indent-line-to (markdown-exdent-find-next-position cur-pos positions))
+          (indent-line-to (markdown-outdent-find-next-position cur-pos positions))
         (backward-delete-char-untabify arg)))))
 
 (defun markdown-find-leftmost-column (beg end)
@@ -5223,18 +5229,21 @@ Otherwise, do normal delete by repeating
 
 (defun markdown-indent-region (beg end arg)
   "Indent the region from BEG to END using some heuristics.
-When ARG is non-nil, exdent the region instead.
+When ARG is non-nil, outdent the region instead.
 See `markdown-indent-line' and `markdown-indent-line'."
   (interactive "*r\nP")
   (let* ((positions (sort (delete-dups (markdown-calc-indents)) '<))
          (leftmostcol (markdown-find-leftmost-column beg end))
          (next-pos (if arg
-                       (markdown-exdent-find-next-position leftmostcol positions)
+                       (markdown-outdent-find-next-position leftmostcol positions)
                      (markdown-indent-find-next-position leftmostcol positions))))
     (indent-rigidly beg end (- next-pos leftmostcol))
     (setq deactivate-mark nil)))
 
-(defun markdown-exdent-region (beg end)
+(define-obsolete-function-alias 'markdown-exdent-region
+  'markdown-outdent-region "v2.3")
+
+(defun markdown-outdent-region (beg end)
   "Call `markdown-indent-region' on region from BEG to END with prefix."
   (interactive "*r")
   (markdown-indent-region beg end t))
@@ -5517,9 +5526,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-d") 'markdown-do)
     ;; Indentation
     (define-key map (kbd "<return>") 'markdown-enter-key)
-    (define-key map (kbd "<backspace>") 'markdown-exdent-or-delete)
+    (define-key map (kbd "<backspace>") 'markdown-outdent-or-delete)
     (define-key map (kbd "C-c >") 'markdown-indent-region)
-    (define-key map (kbd "C-c <") 'markdown-exdent-region)
+    (define-key map (kbd "C-c <") 'markdown-outdent-region)
     ;; Visibility cycling
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
@@ -5665,7 +5674,7 @@ See also `markdown-mode-map'.")
      ["Demote Header" markdown-demote :keys "M-<right>"])
     ("Region & Mark"
      ["Indent Region" markdown-indent-region]
-     ["Exdent Region" markdown-exdent-region]
+     ["Outdent Region" markdown-outdent-region]
      "--"
      ["Mark Block" markdown-mark-block]
      ["Mark Plain Text Block" markdown-mark-text-block]
@@ -5675,8 +5684,8 @@ See also `markdown-mode-map'.")
      ["Insert List Item" markdown-insert-list-item]
      ["Move List Item Up" markdown-move-up :keys "M-<up>"]
      ["Move List Item Down" markdown-move-down :keys "M-<down>"]
-     ["Exdent List Item" markdown-promote :keys "M-<left>"]
      ["Indent List Item" markdown-demote :keys "M-<right>"]
+     ["Outdent List Item" markdown-promote :keys "M-<left>"]
      ["Renumber List" markdown-cleanup-list-numbers]
      ["Toggle Task List Item" markdown-toggle-gfm-checkbox])
     ("Links & Images"

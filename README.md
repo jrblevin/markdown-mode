@@ -405,7 +405,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     increase the indentation by one level.
 
     Existing list items can be moved up or down with <kbd>M-UP</kbd> or
-    <kbd>M-DOWN</kbd> and indented or exdented with <kbd>M-RIGHT</kbd> or <kbd>M-LEFT</kbd>.
+    <kbd>M-DOWN</kbd> and indented or outdented with <kbd>M-RIGHT</kbd> or <kbd>M-LEFT</kbd>.
 
   * Editing Subtrees: <kbd>M-S-UP</kbd>, <kbd>M-S-DOWN</kbd>, <kbd>M-S-LEFT</kbd>, and <kbd>M-S-RIGHT</kbd>
 
@@ -423,9 +423,9 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Shifting the Region: <kbd>C-c <</kbd> and <kbd>C-c ></kbd>
 
-    Text in the region can be indented or exdented as a group using
+    Text in the region can be indented or outdented as a group using
     <kbd>C-c ></kbd> to indent to the next indentation point (calculated in
-    the current context), and <kbd>C-c <</kbd> to exdent to the previous
+    the current context), and <kbd>C-c <</kbd> to outdent to the previous
     indentation point.  These keybindings are the same as those for
     similar commands in `python-mode`.
 
@@ -518,7 +518,7 @@ through several possible indentation levels corresponding to things
 you might have in mind when you press <kbd>RET</kbd> at the end of a line or
 <kbd>TAB</kbd>.  For example, you may want to start a new list item,
 continue a list item with hanging indentation, indent for a nested
-pre block, and so on.  Exdention is handled similarly when backspace
+pre block, and so on.  Outdenting is handled similarly when backspace
 is pressed at the beginning of the non-whitespace portion of a line.
 
 markdown-mode supports outline-minor-mode as well as org-mode-style
