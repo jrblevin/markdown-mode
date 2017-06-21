@@ -140,6 +140,8 @@
         plain URLs clickable.
     -   Add an additional keybinding for toggling inline image
         display, <kbd>C-c C-x C-i</kbd>.
+    -   Add a keybinding for toggling LaTeX math (_e_quation) support:
+        <kbd>C-c C-x C-e</kbd>.
     -   Support Leanpub blocks (asides, info blocks, warnings, etc.).
         These are simple extensions of the usual blockquote syntax.
     -   Font lock, with markup hiding, for subscripts (e.g., `H~2~0`)

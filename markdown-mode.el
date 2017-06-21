@@ -639,10 +639,11 @@
 ;;   * `markdown-uri-types' - a list of protocol schemes (e.g., "http")
 ;;     for URIs that `markdown-mode' should highlight.
 ;;
-;;   * `markdown-enable-math' - syntax highlighting for LaTeX
-;;     fragments (default: `nil').  Set this to `t' to turn on math
-;;     support by default.  Math support can be enabled, disabled, or
-;;     toggled later using the function `markdown-toggle-math'."
+;;   * `markdown-enable-math' - font lock for inline and display LaTeX
+;;     math expressions (default: `nil').  Set this to `t' to turn on
+;;     math support by default.  Math support can be toggled
+;;     interactively later using `C-c C-x C-e`
+;;     (`markdown-toggle-math').
 ;;
 ;;   * `markdown-css-paths' - CSS files to link to in XHTML output
 ;;     (default: `nil`).
@@ -5608,6 +5609,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "M-n") 'markdown-next-link)
     (define-key map (kbd "M-p") 'markdown-previous-link)
     ;; Toggling functionality
+    (define-key map (kbd "C-c C-x C-e") 'markdown-toggle-math)
     (define-key map (kbd "C-c C-x C-f") 'markdown-toggle-fontify-code-blocks-natively)
     (define-key map (kbd "C-c C-x C-i") 'markdown-toggle-inline-images)
     (define-key map (kbd "C-c C-x C-l") 'markdown-toggle-url-hiding)

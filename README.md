@@ -616,10 +616,11 @@ provides an interface to all of the possible customizations:
   * `markdown-uri-types` - a list of protocol schemes (e.g., "http")
     for URIs that `markdown-mode` should highlight.
 
-  * `markdown-enable-math` - syntax highlighting for LaTeX
-    fragments (default: `nil`).  Set this to `t` to turn on math
-    support by default.  Math support can be enabled, disabled, or
-    toggled later using the function `markdown-toggle-math`."
+  * `markdown-enable-math` - font lock for inline and display LaTeX
+    math expressions (default: `nil`).  Set this to `t` to turn on
+    math support by default.  Math support can be toggled
+    interactively later using <kbd>C-c C-x C-e</kbd>
+    (`markdown-toggle-math`).
 
   * `markdown-css-paths` - CSS files to link to in XHTML output
     (default: `nil`).
