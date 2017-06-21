@@ -119,7 +119,7 @@
     -   Add basic font-lock support for inline attribute lists or
         inline identifiers used by Pandoc, Python Markdown, PHP
         Markdown Extra, Leanpub, etc.
-    -   Add basic font-lock support for Leanpub section identifers and
+    -   Add basic font-lock support for Leanpub section identifiers and
         page breaks.
     -   Add basic font-lock support for common file inclusion syntax:
         `<<(file)`, `<<[title](file)`, `<<[file]`, and `<<{file}`.
