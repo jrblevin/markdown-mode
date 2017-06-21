@@ -172,6 +172,8 @@
     -   Prevent matching links in inline code or comment spans.
     -   Avoid infinite loop when promoting or demoting last section in
         a buffer.
+    -   Fix font lock for subsequent inline links after a malformed
+        inline link.  ([GH-209][])
 
   [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
@@ -187,6 +189,7 @@
   [gh-199]: https://github.com/jrblevin/markdown-mode/issues/199
   [gh-200]: https://github.com/jrblevin/markdown-mode/issues/200
   [gh-201]: https://github.com/jrblevin/markdown-mode/issues/201
+  [gh-209]: https://github.com/jrblevin/markdown-mode/issues/209
 
 # Markdown Mode 2.2
 

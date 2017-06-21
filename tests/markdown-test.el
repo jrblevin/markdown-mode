@@ -3496,6 +3496,26 @@ x: x
     ;; Point should be left at limit.
     (should (= (point) (point-max)))))
 
+(ert-deftest test-markdown-parsing/broken-inline-link ()
+  "Test `markdown-match-generic-links' with an invalid link."
+  (markdown-test-string "[site1](http://site1.com
+[site2](http://site2.com)
+[site3](http://site3.com)"
+    (goto-char (point-min))
+    (let ((limit (point-at-eol)))
+      ;; The first link is broken and shouldn't match.
+      (should-not (markdown-match-generic-links limit nil))
+      ;; Subsequent search shouldn't match, so point should move to limit.
+      (should (= (point) limit)))
+    ;; The second link should still match, starting from (point-min).
+    (let ((limit (point-at-eol 2)))
+      (should (markdown-match-generic-links limit nil))
+      (should (= (point) (match-end 0))))
+    ;; The third link should match when starting past the second one.
+    (goto-char (match-end 0))
+    (should (markdown-match-generic-links (point-max) nil))
+    (should (= (point) (match-end 0)))))
+
 (ert-deftest test-markdown-parsing/code-block-lang ()
   "Test `markdown-code-block-lang'."
   ;; Test with GFM code blocks.

@@ -3654,11 +3654,10 @@ links with URLs."
               (setq cont-point nil)
               (goto-char second-end))
           ;; If no closing parenthesis in range, update continuation point
-          (setq cont-point (min end-of-block last))))
+          (setq cont-point (min end-of-block second-begin))))
       (cond
        ;; On failure, continue searching at cont-point
        ((and cont-point (< cont-point last))
-        ;;(message "Failure, starting over at cont-point = %d" cont-point)
         (goto-char cont-point)
         (markdown-match-generic-links last ref))
        ;; No more text, return nil
