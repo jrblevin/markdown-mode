@@ -170,6 +170,8 @@
     -   Prevent matching italics, bold, and inline code in comments.
     -   Prevent matching italics and bold in URLs.
     -   Prevent matching links in inline code or comment spans.
+    -   Avoid infinite loop when promoting or demoting last section in
+        a buffer.
 
   [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123

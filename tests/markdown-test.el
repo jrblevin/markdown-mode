@@ -1616,6 +1616,15 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
                         (markdown-promote-subtree)
                         (should (string-equal (buffer-string) "h1\n\nh2\n\n# h3 #\n\n# h2 #\n\n# h1 #\n"))))
 
+(ert-deftest test-markdown-subtree/promote-single-section ()
+  "Test `markdown-promote-subtree' on a single or last section.
+Should not cause an infinite loop."
+  (markdown-test-string "foo\n\n## h2 ##\n\nbar\n"
+    ;; The h2 should get promoted to h1 away.
+    (markdown-test-goto-heading "h2")
+    (markdown-promote-subtree)
+    (should (string-equal (buffer-string) "foo\n\n# h2 #\n\nbar\n"))))
+
 (ert-deftest test-markdown-subtree/demote ()
   "Test `markdown-demote-subtree'."
   (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"

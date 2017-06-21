@@ -6811,7 +6811,8 @@ demote."
             (remove 't))
         (markdown-cycle-atx promote-or-demote remove)
         (catch 'end-of-subtree
-          (while (markdown-next-heading)
+          (while (and (markdown-next-heading)
+                      (looking-at markdown-regex-header-atx))
             ;; Exit if this not a higher level heading; promote otherwise.
             (if (and (looking-at markdown-regex-header-atx)
                      (<= (length (match-string-no-properties 1)) level))
