@@ -380,7 +380,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     moving backward or forward through the list of rule strings in
     `markdown-hr-strings`.  For bold and italic text, promotion and
     demotion means changing the markup from underscores to asterisks.
-    Press <kbd>C-c C--</kbd> or <kbd>M-LEFT</kbd> to promote the element at the point
+    Press <kbd>C-c C--</kbd> or <kbd>C-c <left></kbd> to promote the element at the point
     if possible.
 
     To remember these commands, note that <kbd>-</kbd> is for decreasing the
@@ -399,26 +399,33 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     completes the markup at the point, if it is determined to be
     incomplete.
 
-  * Editing Lists: <kbd>M-RET</kbd>, <kbd>M-UP</kbd>, <kbd>M-DOWN</kbd>, <kbd>M-LEFT</kbd>, and <kbd>M-RIGHT</kbd>
+  * Editing Lists: <kbd>M-RET</kbd>, <kbd>C-c <up></kbd>, <kbd>C-c <down></kbd>, <kbd>C-c <left></kbd>, and <kbd>C-c <right></kbd>
 
     New list items can be inserted with <kbd>M-RET</kbd> or <kbd>C-c C-j</kbd>.  This
     command determines the appropriate marker (one of the possible
     unordered list markers or the next number in sequence for an
     ordered list) and indentation level by examining nearby list
     items.  If there is no list before or after the point, start a
-    new list.  Prefix this command by <kbd>C-u</kbd> to decrease the
-    indentation by one level.  Prefix this command by <kbd>C-u C-u</kbd> to
-    increase the indentation by one level.
+    new list.  As with heading insertion, you may prefix this
+    command by <kbd>C-u</kbd> to decrease the indentation by one level.
+    Prefix this command by <kbd>C-u C-u</kbd> to increase the indentation by
+    one level.
 
-    Existing list items can be moved up or down with <kbd>M-UP</kbd> or
-    <kbd>M-DOWN</kbd> and indented or outdented with <kbd>M-RIGHT</kbd> or <kbd>M-LEFT</kbd>.
+    Existing list items (and their nested sub-items) can be moved
+    up or down with <kbd>C-c <up></kbd> or <kbd>C-c <down></kbd> and indented or
+    outdented with <kbd>C-c <right></kbd> or <kbd>C-c <left></kbd>.
 
-  * Editing Subtrees: <kbd>M-S-UP</kbd>, <kbd>M-S-DOWN</kbd>, <kbd>M-S-LEFT</kbd>, and <kbd>M-S-RIGHT</kbd>
+  * Editing Subtrees: <kbd>C-c <up></kbd>, <kbd>C-c <down></kbd>, <kbd>C-c <left></kbd>, and <kbd>C-c <right></kbd>
 
     Entire subtrees of ATX headings can be promoted and demoted
-    with <kbd>M-S-LEFT</kbd> and <kbd>M-S-RIGHT</kbd>, which mirror the bindings
-    for promotion and demotion of list items. Similarly, subtrees
-    can be moved up and down with <kbd>M-S-UP</kbd> and <kbd>M-S-DOWN</kbd>.
+    with <kbd>C-c <left></kbd> and <kbd>C-c <right></kbd>, which are the same keybindings
+    used for promotion and demotion of list items.   If the point is in
+    a list item, the operate on the list item.  Otherwise, they operate
+    on the current heading subtree.  Similarly, subtrees can be
+    moved up and down with <kbd>C-c <up></kbd> and <kbd>C-c <down></kbd>.
+
+    These commands currently do not work properly if there are
+    Setext headings in the affected region.
 
     Please note the following "boundary" behavior for promotion and
     demotion.  Any level-six headings will not be demoted further
