@@ -25,6 +25,19 @@
     -   Footnote and wiki link insertion have been moved to the
         markup insertion prefix, as <kbd>C-c C-s f</kbd> and
         <kbd>C-c C-s w</kbd>.
+    -   The list and outline editing commands have been removed from
+        the top-level positions (previously <kbd>M-<left></kbd>,
+        <kbd>M-<right></kbd>, <kbd>M-<up></kbd>, <kbd>M-<down></kbd>)
+        and moved to major mode keybindings under <kbd>C-c</kbd> to
+        <kbd>C-c <left></kbd>, <kbd>C-c <right></kbd>,
+        <kbd>C-c <up></kbd>, and <kbd>C-c <down></kbd>, respectively.
+        ([GH-164][])
+    -   The list and outline editing commands have also been unified
+        so that they all operate on entire subtrees of list items and
+        subtrees of atx headings, symmetrically.  Previously there were
+        separate commands for editing heading subtrees, but promoting
+        a single section is easy enough by directly inserting or
+        removing a hash mark or using the markup replacement commands.
     -   Jumping between references and reference definitions via
         `markdown-jump`, previously bound to <kbd>C-c C-l</kbd>, has
         been moved to <kbd>C-c C-d</kbd> and rebranded as
@@ -196,6 +209,7 @@
   [gh-130]: https://github.com/jrblevin/markdown-mode/issues/130
   [gh-134]: https://github.com/jrblevin/markdown-mode/issues/134
   [gh-144]: https://github.com/jrblevin/markdown-mode/issues/144
+  [gh-164]: https://github.com/jrblevin/markdown-mode/issues/164
   [gh-172]: https://github.com/jrblevin/markdown-mode/issues/172
   [gh-176]: https://github.com/jrblevin/markdown-mode/issues/176
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185

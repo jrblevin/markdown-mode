@@ -396,7 +396,7 @@
 ;;     moving backward or forward through the list of rule strings in
 ;;     `markdown-hr-strings'.  For bold and italic text, promotion and
 ;;     demotion means changing the markup from underscores to asterisks.
-;;     Press `C-c C--` or `M-LEFT` to promote the element at the point
+;;     Press `C-c C--` or `C-c <left>` to promote the element at the point
 ;;     if possible.
 ;;
 ;;     To remember these commands, note that `-` is for decreasing the
@@ -415,26 +415,33 @@
 ;;     completes the markup at the point, if it is determined to be
 ;;     incomplete.
 ;;
-;;   * Editing Lists: `M-RET`, `M-UP`, `M-DOWN`, `M-LEFT`, and `M-RIGHT`
+;;   * Editing Lists: `M-RET`, `C-c <up>`, `C-c <down>`, `C-c <left>`, and `C-c <right>`
 ;;
 ;;     New list items can be inserted with `M-RET` or `C-c C-j`.  This
 ;;     command determines the appropriate marker (one of the possible
 ;;     unordered list markers or the next number in sequence for an
 ;;     ordered list) and indentation level by examining nearby list
 ;;     items.  If there is no list before or after the point, start a
-;;     new list.  Prefix this command by `C-u` to decrease the
-;;     indentation by one level.  Prefix this command by `C-u C-u` to
-;;     increase the indentation by one level.
+;;     new list.  As with heading insertion, you may prefix this
+;;     command by `C-u` to decrease the indentation by one level.
+;;     Prefix this command by `C-u C-u` to increase the indentation by
+;;     one level.
 ;;
-;;     Existing list items can be moved up or down with `M-UP` or
-;;     `M-DOWN` and indented or outdented with `M-RIGHT` or `M-LEFT`.
+;;     Existing list items (and their nested sub-items) can be moved
+;;     up or down with `C-c <up>` or `C-c <down>` and indented or
+;;     outdented with `C-c <right>` or `C-c <left>`.
 ;;
-;;   * Editing Subtrees: `M-S-UP`, `M-S-DOWN`, `M-S-LEFT`, and `M-S-RIGHT`
+;;   * Editing Subtrees: `C-c <up>`, `C-c <down>`, `C-c <left>`, and `C-c <right>`
 ;;
 ;;     Entire subtrees of ATX headings can be promoted and demoted
-;;     with `M-S-LEFT` and `M-S-RIGHT`, which mirror the bindings
-;;     for promotion and demotion of list items. Similarly, subtrees
-;;     can be moved up and down with `M-S-UP` and `M-S-DOWN`.
+;;     with `C-c <left>` and `C-c <right>`, which are the same keybindings
+;;     used for promotion and demotion of list items.   If the point is in
+;;     a list item, the operate on the list item.  Otherwise, they operate
+;;     on the current heading subtree.  Similarly, subtrees can be
+;;     moved up and down with `C-c <up>` and `C-c <down>`.
+;;
+;;     These commands currently do not work properly if there are
+;;     Setext headings in the affected region.
 ;;
 ;;     Please note the following "boundary" behavior for promotion and
 ;;     demotion.  Any level-six headings will not be demoted further
@@ -5574,20 +5581,15 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-c n") 'markdown-cleanup-list-numbers)
     (define-key map (kbd "C-c C-c ]") 'markdown-complete-buffer)
     (define-key map (kbd "C-c '") 'markdown-edit-code-block)
-    ;; List editing
-    (define-key map (kbd "M-<up>") 'markdown-move-up)
-    (define-key map (kbd "M-<down>") 'markdown-move-down)
-    (define-key map (kbd "M-<left>") 'markdown-promote)
-    (define-key map (kbd "M-<right>") 'markdown-demote)
-    (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
-    (define-key map (kbd "C-c C-j") 'markdown-insert-list-item)
-    ;; Subtree editing
-    (define-key map (kbd "M-S-<up>") 'markdown-move-subtree-up)
-    (define-key map (kbd "M-S-<down>") 'markdown-move-subtree-down)
-    (define-key map (kbd "M-S-<left>") 'markdown-promote-subtree)
-    (define-key map (kbd "M-S-<right>") 'markdown-demote-subtree)
+    ;; Subtree and list editing
+    (define-key map (kbd "C-c <up>") 'markdown-move-up)
+    (define-key map (kbd "C-c <down>") 'markdown-move-down)
+    (define-key map (kbd "C-c <left>") 'markdown-promote)
+    (define-key map (kbd "C-c <right>") 'markdown-demote)
     (define-key map (kbd "C-c C-M-h") 'markdown-mark-subtree)
     (define-key map (kbd "C-x n s") 'markdown-narrow-to-subtree)
+    (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
+    (define-key map (kbd "C-c C-j") 'markdown-insert-list-item)
     ;; Blocks
     (define-key map [remap backward-paragraph] 'markdown-backward-block)
     (define-key map [remap forward-paragraph] 'markdown-forward-block)
@@ -5615,7 +5617,6 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-x d") 'markdown-move-down)
     (define-key map (kbd "C-c C-x l") 'markdown-promote)
     (define-key map (kbd "C-c C-x r") 'markdown-demote)
-    (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item)
     ;; Deprecated keys that may be removed in a future version
     (define-key map (kbd "C-c C-a L") 'markdown-insert-link) ;; C-c C-l
     (define-key map (kbd "C-c C-a l") 'markdown-insert-link) ;; C-c C-l
@@ -5638,6 +5639,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-i i") 'markdown-insert-image)
     (define-key map (kbd "C-c C-i I") 'markdown-insert-reference-image)
     (define-key map (kbd "C-c C-i C-t") 'markdown-toggle-inline-images)
+    (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item) ;; C-c C-j
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox) ;; C-c C-d
     (define-key map (kbd "C-c -") 'markdown-insert-hr)
     map)
@@ -5710,12 +5712,10 @@ See also `markdown-mode-map'.")
       ["Second Level Setext" markdown-insert-header-setext-2 :keys "C-c C-s @"])
      ["Horizontal Rule" markdown-insert-hr :keys "C-c C-s -"]
      "---"
-     ["Move Subtree Up" markdown-move-subtree-up :keys "M-S-<up>"]
-     ["Move Subtree Down" markdown-move-subtree-down :keys "M-S-<down>"]
-     ["Promote Subtree" markdown-promote-subtree :keys "M-S-<left>"]
-     ["Demote Subtree" markdown-demote-subtree :keys "M-S-<right>"]
-     ["Promote Header" markdown-promote :keys "M-<left>"]
-     ["Demote Header" markdown-demote :keys "M-<right>"])
+     ["Move Subtree Up" markdown-move-up :keys "C-c <up>"]
+     ["Move Subtree Down" markdown-move-down :keys "C-c <down>"]
+     ["Promote Subtree" markdown-promote :keys "C-c <left>"]
+     ["Demote Subtree" markdown-demote :keys "C-c <right>"])
     ("Region & Mark"
      ["Indent Region" markdown-indent-region]
      ["Outdent Region" markdown-outdent-region]
@@ -5726,10 +5726,10 @@ See also `markdown-mode-map'.")
      ["Mark Subtree" markdown-mark-subtree])
     ("Lists"
      ["Insert List Item" markdown-insert-list-item]
-     ["Move List Item Up" markdown-move-up :keys "M-<up>"]
-     ["Move List Item Down" markdown-move-down :keys "M-<down>"]
-     ["Indent List Item" markdown-demote :keys "M-<right>"]
-     ["Outdent List Item" markdown-promote :keys "M-<left>"]
+     ["Move Subtree Up" markdown-move-up :keys "C-c <up>"]
+     ["Move Subtree Down" markdown-move-down :keys "C-c <down>"]
+     ["Indent Subtree" markdown-demote :keys "C-c <right>"]
+     ["Outdent Subtree" markdown-promote :keys "C-c <left>"]
      ["Renumber List" markdown-cleanup-list-numbers]
      ["Toggle Task List Item" markdown-toggle-gfm-checkbox :keys "C-c C-d"])
     ("Links & Images"
@@ -6203,7 +6203,8 @@ increase the indentation by one level."
           (insert new-indent marker)))))))
 
 (defun markdown-move-list-item-up ()
-  "Move the current list item up in the list when possible."
+  "Move the current list item up in the list when possible.
+In nested lists, move child items with the parent item."
   (interactive)
   (let (cur prev old)
     (when (setq cur (markdown-cur-list-item-bounds))
@@ -6222,7 +6223,8 @@ increase the indentation by one level."
         (goto-char old)))))
 
 (defun markdown-move-list-item-down ()
-  "Move the current list item down in the list when possible."
+  "Move the current list item down in the list when possible.
+In nested lists, move child items with the parent item."
   (interactive)
   (let (cur next old)
     (when (setq cur (markdown-cur-list-item-bounds))
@@ -6241,7 +6243,8 @@ increase the indentation by one level."
 
 (defun markdown-demote-list-item (&optional bounds)
   "Indent (or demote) the current list item.
-Optionally, BOUNDS of the current list item may be provided if available."
+Optionally, BOUNDS of the current list item may be provided if available.
+In nested lists, demote child items as well."
   (interactive)
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
@@ -6254,7 +6257,8 @@ Optionally, BOUNDS of the current list item may be provided if available."
 
 (defun markdown-promote-list-item (&optional bounds)
   "Unindent (or promote) the current list item.
-Optionally, BOUNDS of the current list item may be provided if available."
+Optionally, BOUNDS of the current list item may be provided if available.
+In nested lists, demote child items as well."
   (interactive)
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
@@ -6985,16 +6989,28 @@ This puts point at the start of the current subtree, and mark at the end."
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
 
 (defun markdown-move-up ()
-  "Move list item up.
-Calls `markdown-move-list-item-up'."
+  "Move thing at point up.
+When in a list item, call `markdown-move-list-item-up'.
+Otherwise, move the current heading subtree up with
+`markdown-move-subtree-up'."
   (interactive)
-  (markdown-move-list-item-up))
+  (cond
+   ((markdown-list-item-at-point-p)
+    (markdown-move-list-item-up))
+   (t
+    (markdown-move-subtree-up))))
 
 (defun markdown-move-down ()
-  "Move list item down.
-Calls `markdown-move-list-item-down'."
+  "Move thing at point down.
+When in a list item, call `markdown-move-list-item-down'.
+Otherwise, move the current heading subtree up with
+`markdown-move-subtree-down'."
   (interactive)
-  (markdown-move-list-item-down))
+  (cond
+   ((markdown-list-item-at-point-p)
+    (markdown-move-list-item-down))
+   (t
+    (markdown-move-subtree-down))))
 
 (defun markdown-promote ()
   "Either promote header or list item at point or cycle markup.
@@ -7003,10 +7019,10 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
   (interactive)
   (let (bounds)
     (cond
-     ;; Promote atx header
+     ;; Promote atx heading subtree
      ((thing-at-point-looking-at markdown-regex-header-atx)
-      (markdown-cycle-atx -1))
-     ;; Promote setext header
+      (markdown-promote-subtree))
+     ;; Promote setext heading
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (markdown-cycle-setext -1))
      ;; Promote horizonal rule
@@ -7031,10 +7047,10 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
   (interactive)
   (let (bounds)
     (cond
-     ;; Demote atx header
+     ;; Demote atx heading subtree
      ((thing-at-point-looking-at markdown-regex-header-atx)
-      (markdown-cycle-atx 1))
-     ;; Demote setext header
+      (markdown-demote-subtree))
+     ;; Demote setext heading
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (markdown-cycle-setext 1))
      ;; Demote horizonal rule

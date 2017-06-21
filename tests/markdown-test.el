@@ -1703,13 +1703,19 @@ Should not cause an infinite loop."
 
 (ert-deftest test-markdown-cycle/atx-header ()
   "Test `markdown-demote' cycling for atx headers."
-  (markdown-test-string "##### test"
+  (markdown-test-string "# test"
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "## test ##"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "### test ###"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "#### test ####"))
+                        (call-interactively 'markdown-demote)
+                        (should (string-equal (buffer-string) "##### test #####"))
                         (call-interactively 'markdown-demote)
                         (should (string-equal (buffer-string) "###### test ######"))
                         (call-interactively 'markdown-demote)
-                        (should (string-equal (buffer-string) "# test #"))
-                        (call-interactively 'markdown-demote)
-                        (should (string-equal (buffer-string) "## test ##"))))
+                        (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-cycle/setext-header ()
   "Test `markdown-demote' cycling for setext headers."
@@ -1725,7 +1731,7 @@ Should not cause an infinite loop."
                         (call-interactively 'markdown-demote)
                         (should (string-equal (buffer-string) "###### test ######"))
                         (call-interactively 'markdown-demote)
-                        (should (string-equal (buffer-string) "# test #"))))
+                        (should (string-equal (buffer-string) "###### test ######"))))
 
 (ert-deftest test-markdown-cycle/hr ()
   "Test cycling of horizontal rules."
