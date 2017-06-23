@@ -4305,7 +4305,7 @@ selectively adding or removing information via the prompts."
            (ref-url (unless (or uri definedp)
                       (completing-read "Reference URL: " used-uris)))
            (title (unless (or plainp definedp)
-                    (read-string "Title or alt text (optional): " title)))
+                    (read-string "Title (tooltip text, optional): " title)))
            (title (if (= (length title) 0) nil title)))
       (when (and begin end)
         (delete-region begin end))
