@@ -5555,12 +5555,12 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
     (define-key map (kbd "C-c C-d") 'markdown-do)
     ;; Indentation
-    (define-key map (kbd "<return>") 'markdown-enter-key)
-    (define-key map (kbd "<backspace>") 'markdown-outdent-or-delete)
+    (define-key map (kbd "C-m") 'markdown-enter-key)
+    (define-key map (kbd "DEL") 'markdown-outdent-or-delete)
     (define-key map (kbd "C-c >") 'markdown-indent-region)
     (define-key map (kbd "C-c <") 'markdown-outdent-region)
     ;; Visibility cycling
-    (define-key map (kbd "<tab>") 'markdown-cycle)
+    (define-key map (kbd "TAB") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
