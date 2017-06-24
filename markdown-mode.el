@@ -7452,33 +7452,33 @@ See `markdown-wiki-link-p' for more information."
 (make-obsolete 'markdown-link-link 'markdown-link-url "v2.3")
 
 (defun markdown-link-at-pos (pos)
-  "Return properties of link at position POS.
+  "Return properties of link or image at position POS.
 Value is a list of elements describing the link:
  0. beginning position
  1. end position
  2. link text
  3. URL
  4. reference label
- 5. title text"
+ 5. title text
+ 6. bang (nil or \"!\")"
   (save-excursion
     (goto-char pos)
-    (let (begin end text url reference title)
+    (let (begin end text url reference title bang)
       (cond
        ;; Inline or reference image or link at point.
        ((or (thing-at-point-looking-at markdown-regex-link-inline)
             (thing-at-point-looking-at markdown-regex-link-reference))
-        (when (null (match-beginning 1))
-          ;; No exclamation point, so not an image.
-          (setq begin (match-beginning 0)
-                end (match-end 0)
-                text (match-string-no-properties 3))
-          (if (char-equal (char-after (match-beginning 5)) ?\[)
-              ;; Reference link
-              (setq reference (match-string-no-properties 6))
-            ;; Inline link
-            (setq url (match-string-no-properties 6))
-            (when (match-end 7)
-              (setq title (substring (match-string-no-properties 7) 1 -1))))))
+        (setq bang (match-string-no-properties 1)
+              begin (match-beginning 0)
+              end (match-end 0)
+              text (match-string-no-properties 3))
+        (if (char-equal (char-after (match-beginning 5)) ?\[)
+            ;; Reference link
+            (setq reference (match-string-no-properties 6))
+          ;; Inline link
+          (setq url (match-string-no-properties 6))
+          (when (match-end 7)
+            (setq title (substring (match-string-no-properties 7) 1 -1)))))
        ;; Angle bracket URI at point.
        ((thing-at-point-looking-at markdown-regex-angle-uri)
         (setq begin (match-beginning 0)
@@ -7489,12 +7489,13 @@ Value is a list of elements describing the link:
         (setq begin (match-beginning 0)
               end (match-end 0)
               url (match-string-no-properties 1))))
-      (list begin end text url reference title))))
+      (list begin end text url reference title bang))))
 
 (defun markdown-link-url ()
   "Return the URL part of the regular (non-wiki) link at point.
-Works with both inline and reference style links.  If point is
-not at a link or the link reference is not defined returns nil."
+Works with both inline and reference style links, and with images.
+If point is not at a link or the link reference is not defined
+returns nil."
   (let* ((values (markdown-link-at-pos (point)))
          (text (nth 2 values))
          (url (nth 3 values))
