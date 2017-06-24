@@ -176,14 +176,17 @@ are grouped under the <kbd>C-c C-c</kbd> prefix.  The most commonly used
 commands are described below.  You can obtain a list of all
 keybindings by pressing <kbd>C-c C-h</kbd>.
 
-  * Hyperlinks: <kbd>C-c C-l</kbd>
+  * Links and Images: <kbd>C-c C-l</kbd> and <kbd>C-c C-i</kbd>
 
     <kbd>C-c C-l</kbd> (`markdown-insert-link`) is a general command for
-    inserting standard Markdown links of any form: either inline
-    links, reference links, or plain URLs in angle brackets.  The
-    URL or `[reference]` label, link text, and optional title are
-    entered through a series of interactive prompts.  The type of
-    link is determined by which values are provided:
+    inserting new link markup or editing existing link markup. This
+    is especially useful when markup or URL hiding is enabled, so
+    that URLs can't easily be edited directly.  This command can be
+    used to insert links of any form: either inline links,
+    reference links, or plain URLs in angle brackets.  The URL or
+    `[reference]` label, link text, and optional title are entered
+    through a series of interactive prompts.  The type of link is
+    determined by which values are provided:
 
     *   If both a URL and link text are given, insert an inline link:
         `[text](url)`.
@@ -194,15 +197,27 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     *   If only a URL is given, insert a plain URL link:
         `<url>`.
 
-    If there is an active region, this command uses the region as
-    either the default URL (if it seems to be a URL) or link text
-    value otherwise.  The region will be deleted and replaced by the
-    link.
+    Similarly, <kbd>C-c C-i</kbd> (`markdown-insert-image`) is a general
+    command for inserting or editing image markup.  As with the link
+    insertion command, through a series interactive prompts you can
+    insert either an inline or reference image:
 
-    Note that this function can be used to convert a link from one
-    type to another (inline, reference, or plain URL) by
-    selectively adding or removing properties via the interactive
-    prompts.
+    *   If both a URL and alt text are given, insert an inline
+        image: `![alt text](url)`.
+    *   If both a `[reference]` label and alt text are given,
+        insert a reference link: `![alt text][reference]`.
+
+    If there is an existing link or image at the point, these
+    command will edit the existing markup rather than inserting new
+    markup.  Otherwise, if there is an active region, these commands
+    use the region as either the default URL (if it seems to be a
+    URL) or link text value otherwise.  In that case, the region
+    will be deleted and replaced by the link.
+
+    Note that these functions can be used to convert links and
+    images from one type to another (inline, reference, or plain
+    URL) by selectively adding or removing properties via the
+    interactive prompts.
 
     If a reference label is given that is not yet defined, you
     will be prompted for the URL and optional title and the
@@ -210,13 +225,6 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     `markdown-reference-location`.  If a title is given, it will be
     added to the end of the reference definition and will be used
     to populate the title attribute when converted to HTML.
-
-  * Images: <kbd>C-c C-i</kbd>
-
-    <kbd>C-c C-i i</kbd> inserts markup for an inline image, using the
-    active region or the word at point, if any, as the alt text.
-    <kbd>C-c C-i I</kbd> behaves similarly and inserts a reference-style
-    image.
 
     Local images associated with image links may be displayed
     inline in the buffer by pressing <kbd>C-c C-x C-i</kbd>

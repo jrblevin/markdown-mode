@@ -192,14 +192,17 @@
 ;; commands are described below.  You can obtain a list of all
 ;; keybindings by pressing `C-c C-h`.
 ;;
-;;   * Hyperlinks: `C-c C-l`
+;;   * Links and Images: `C-c C-l` and `C-c C-i`
 ;;
 ;;     `C-c C-l` (`markdown-insert-link`) is a general command for
-;;     inserting standard Markdown links of any form: either inline
-;;     links, reference links, or plain URLs in angle brackets.  The
-;;     URL or `[reference]` label, link text, and optional title are
-;;     entered through a series of interactive prompts.  The type of
-;;     link is determined by which values are provided:
+;;     inserting new link markup or editing existing link markup. This
+;;     is especially useful when markup or URL hiding is enabled, so
+;;     that URLs can't easily be edited directly.  This command can be
+;;     used to insert links of any form: either inline links,
+;;     reference links, or plain URLs in angle brackets.  The URL or
+;;     `[reference]` label, link text, and optional title are entered
+;;     through a series of interactive prompts.  The type of link is
+;;     determined by which values are provided:
 ;;
 ;;     *   If both a URL and link text are given, insert an inline link:
 ;;         `[text](url)`.
@@ -210,15 +213,27 @@
 ;;     *   If only a URL is given, insert a plain URL link:
 ;;         `<url>`.
 ;;
-;;     If there is an active region, this command uses the region as
-;;     either the default URL (if it seems to be a URL) or link text
-;;     value otherwise.  The region will be deleted and replaced by the
-;;     link.
+;;     Similarly, `C-c C-i` (`markdown-insert-image`) is a general
+;;     command for inserting or editing image markup.  As with the link
+;;     insertion command, through a series interactive prompts you can
+;;     insert either an inline or reference image:
 ;;
-;;     Note that this function can be used to convert a link from one
-;;     type to another (inline, reference, or plain URL) by
-;;     selectively adding or removing properties via the interactive
-;;     prompts.
+;;     *   If both a URL and alt text are given, insert an inline
+;;         image: `![alt text](url)`.
+;;     *   If both a `[reference]` label and alt text are given,
+;;         insert a reference link: `![alt text][reference]`.
+;;
+;;     If there is an existing link or image at the point, these
+;;     command will edit the existing markup rather than inserting new
+;;     markup.  Otherwise, if there is an active region, these commands
+;;     use the region as either the default URL (if it seems to be a
+;;     URL) or link text value otherwise.  In that case, the region
+;;     will be deleted and replaced by the link.
+;;
+;;     Note that these functions can be used to convert links and
+;;     images from one type to another (inline, reference, or plain
+;;     URL) by selectively adding or removing properties via the
+;;     interactive prompts.
 ;;
 ;;     If a reference label is given that is not yet defined, you
 ;;     will be prompted for the URL and optional title and the
@@ -226,13 +241,6 @@
 ;;     `markdown-reference-location'.  If a title is given, it will be
 ;;     added to the end of the reference definition and will be used
 ;;     to populate the title attribute when converted to HTML.
-;;
-;;   * Images: `C-c C-i`
-;;
-;;     `C-c C-i i` inserts markup for an inline image, using the
-;;     active region or the word at point, if any, as the alt text.
-;;     `C-c C-i I` behaves similarly and inserts a reference-style
-;;     image.
 ;;
 ;;     Local images associated with image links may be displayed
 ;;     inline in the buffer by pressing `C-c C-x C-i`
@@ -4186,6 +4194,15 @@ Optionally, the user can provide a TITLE."
     (cond ((not text) (goto-char (+ 1 cur)))
           ((not url) (goto-char (+ 3 (length text) cur))))))
 
+(defun markdown-insert-inline-image (text url &optional title)
+  "Insert an inline link with alt TEXT pointing to URL.
+Optionally, also provide a TITLE."
+  (let ((cur (point)))
+    (setq title (and title (concat " \"" title "\"")))
+    (insert (concat "![" text "](" url title ")"))
+    (cond ((not text) (goto-char (+ 2 cur)))
+          ((not url) (goto-char (+ 4 (length text) cur))))))
+
 (defun markdown-insert-reference-link (text label &optional url title)
   "Insert a reference link and, optionally, a reference definition.
 The link TEXT will be inserted followed by the optional LABEL.
@@ -4196,6 +4213,21 @@ and will be used to populate the title attribute when converted
 to XHTML.  If URL is nil, insert only the link portion (for
 example, when a reference label is already defined)."
   (insert (concat "[" text "][" label "]"))
+  (when url
+    (markdown-insert-reference-definition
+     (if (string-equal label "") text label)
+     url title)))
+
+(defun markdown-insert-reference-image (text label &optional url title)
+  "Insert a reference image and, optionally, a reference definition.
+The alt TEXT will be inserted followed by the optional LABEL.
+If a URL is given, also insert a definition for the reference
+LABEL according to `markdown-reference-location'.  If a TITLE is
+given, it will be added to the end of the reference definition
+and will be used to populate the title attribute when converted
+to XHTML.  If URL is nil, insert only the link portion (for
+example, when a reference label is already defined)."
+  (insert (concat "![" text "][" label "]"))
   (when url
     (markdown-insert-reference-definition
      (if (string-equal label "") text label)
@@ -4237,34 +4269,11 @@ be used to populate the title attribute when converted to XHTML."
 (define-obsolete-function-alias
   'markdown-insert-reference-link-dwim 'markdown-insert-link "v2.3")
 
-(defun markdown-insert-link ()
-  "Insert new or update an existing link, with interactive prompts.
-If the point is at an existing link or URL, update the link text,
-URL, reference label, and/or title.  Otherwise, insert a new link.
-The type of link inserted (inline, reference, or plain URL)
-depends on which values are provided:
-
-*   If a URL and TEXT are given, insert an inline link: [TEXT](URL).
-*   If [REF] and TEXT are given, insert a reference link: [TEXT][REF].
-*   If only TEXT is given, insert an implicit reference link: [TEXT][].
-*   If only a URL is given, insert a plain link: <URL>.
-
-In other words, to create an implicit reference link, leave the
-URL prompt empty and to create a plain URL link, leave the link
-text empty.
-
-If there is an active region, use the text as the default URL, if
-it seems to be a URL, or link text value otherwise.
-
-If a given reference is not defined, this function will
-additionally prompt for the URL and optional title.  In this case,
-the reference definition is placed at the location determined by
-`markdown-reference-location'.
-
-Through updating the link, this function can be used to convert a
-link of one type (inline, reference, or plain) to another type by
-selectively adding or removing information via the prompts."
-  (interactive)
+(defun markdown--insert-link-or-image (image)
+  "Interactively insert new or update an existing link or image.
+When IMAGE is non-nil, insert an image.  Otherwise, insert a link.
+This is an internal function called by
+`markdown-insert-link' and `markdown-insert-image'."
   (cl-multiple-value-bind (begin end text uri ref title)
       (if (markdown-use-region-p)
           ;; Use region as either link text or URL as appropriate.
@@ -4293,9 +4302,11 @@ selectively adding or removing information via the prompts."
                       ((string-equal "" uri-or-ref)
                        "")))
            (uri (unless ref uri-or-ref))
-           (text-prompt (if ref
-                            "Link text: "
-                          "Link text (blank for plain URL): "))
+           (text-prompt (if image
+                            "Alt text: "
+                          (if ref
+                              "Link text: "
+                            "Link text (blank for plain URL): ")))
            (text (read-string text-prompt text))
            (text (if (= (length text) 0) nil text))
            (plainp (and uri (not text)))
@@ -4307,17 +4318,79 @@ selectively adding or removing information via the prompts."
            (title (unless (or plainp definedp)
                     (read-string "Title (tooltip text, optional): " title)))
            (title (if (= (length title) 0) nil title)))
+      (when (and image implicitp)
+        (error "Reference required: implicit image references are invalid"))
       (when (and begin end)
         (delete-region begin end))
       (cond
-       ((and uri text)
+       ((and (not image) uri text)
         (markdown-insert-inline-link text uri title))
+       ((and image uri text)
+        (markdown-insert-inline-image text uri title))
        ((and ref text)
-        (markdown-insert-reference-link text (unless implicitp ref) nil title)
+        (if image
+            (markdown-insert-reference-image text (unless implicitp ref) nil title)
+          (markdown-insert-reference-link text (unless implicitp ref) nil title))
         (unless definedp
           (markdown-insert-reference-definition ref ref-url title)))
-       (uri
+       ((and (not image) uri)
         (markdown-insert-uri uri))))))
+
+(defun markdown-insert-link ()
+  "Insert new or update an existing link, with interactive prompts.
+If the point is at an existing link or URL, update the link text,
+URL, reference label, and/or title.  Otherwise, insert a new link.
+The type of link inserted (inline, reference, or plain URL)
+depends on which values are provided:
+
+*   If a URL and TEXT are given, insert an inline link: [TEXT](URL).
+*   If [REF] and TEXT are given, insert a reference link: [TEXT][REF].
+*   If only TEXT is given, insert an implicit reference link: [TEXT][].
+*   If only a URL is given, insert a plain link: <URL>.
+
+In other words, to create an implicit reference link, leave the
+URL prompt empty and to create a plain URL link, leave the link
+text empty.
+
+If there is an active region, use the text as the default URL, if
+it seems to be a URL, or link text value otherwise.
+
+If a given reference is not defined, this function will
+additionally prompt for the URL and optional title.  In this case,
+the reference definition is placed at the location determined by
+`markdown-reference-location'.
+
+Through updating the link, this function can be used to convert a
+link of one type (inline, reference, or plain) to another type by
+selectively adding or removing information via the prompts."
+  (interactive)
+  (markdown--insert-link-or-image nil))
+
+(defun markdown-insert-image ()
+  "Insert new or update an existing image, with interactive prompts.
+If the point is at an existing image, update the alt text, URL,
+reference label, and/or title. Otherwise, insert a new image.
+The type of image inserted (inline or reference) depends on which
+values are provided:
+
+*   If a URL and ALT-TEXT are given, insert an inline image:
+    ![ALT-TEXT](URL).
+*   If [REF] and ALT-TEXT are given, insert a reference image:
+    ![ALT-TEXT][REF].
+
+If there is an active region, use the text as the default URL, if
+it seems to be a URL, or alt text value otherwise.
+
+If a given reference is not defined, this function will
+additionally prompt for the URL and optional title.  In this case,
+the reference definition is placed at the location determined by
+`markdown-reference-location'.
+
+Through updating the image, this function can be used to convert an
+image of one type (inline or reference) to another type by
+selectively adding or removing information via the prompts."
+  (interactive)
+  (markdown--insert-link-or-image t))
 
 (defun markdown-insert-uri (&optional uri)
   "Insert markup for an inline URI.
@@ -4356,27 +4429,6 @@ insert link markup."
             (markdown-unwrap-thing-at-point nil 1 3)
           (markdown-unwrap-thing-at-point nil 1 5))
       (markdown-wrap-or-insert "[[" "]]"))))
-
-(defun markdown-insert-image (&optional arg)
-  "Insert image markup using region or word as alt text if possible.
-If there is an active region, use the region as the alt text.  If the
-point is at a word, use the word as the alt text.  In these cases, the
-point will be left at the position for inserting a URL.  If there is no
-active region and the point is not at word, simply insert image markup and
-place the point in the position to enter alt text.  If ARG is nil, insert
-inline image markup.  Otherwise, insert reference image markup."
-  (interactive "*P")
-  (let ((bounds (if arg
-                    (markdown-wrap-or-insert "![" "][]")
-                  (markdown-wrap-or-insert "![" "]()"))))
-    (when bounds
-      (goto-char (- (cdr bounds) 1)))))
-
-(defun markdown-insert-reference-image ()
-  "Insert reference-style image markup using region or word as alt text.
-Calls `markdown-insert-image' with prefix argument."
-  (interactive)
-  (markdown-insert-image t))
 
 (defun markdown-remove-header ()
   "Remove header markup if point is at a header.
@@ -5638,9 +5690,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-t H") 'markdown-insert-header-setext-dwim)
     (define-key map (kbd "C-c C-t s") 'markdown-insert-header-setext-2)
     (define-key map (kbd "C-c C-t t") 'markdown-insert-header-setext-1)
-    (define-key map (kbd "C-c C-i i") 'markdown-insert-image)
-    (define-key map (kbd "C-c C-i I") 'markdown-insert-reference-image)
-    (define-key map (kbd "C-c C-i C-t") 'markdown-toggle-inline-images)
+    (define-key map (kbd "C-c C-i") 'markdown-insert-image)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item) ;; C-c C-j
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox) ;; C-c C-d
     (define-key map (kbd "C-c -") 'markdown-insert-hr)
@@ -5736,8 +5786,7 @@ See also `markdown-mode-map'.")
      ["Toggle Task List Item" markdown-toggle-gfm-checkbox :keys "C-c C-d"])
     ("Links & Images"
      ["Insert Link" markdown-insert-link]
-     ["Insert Inline Image" markdown-insert-image]
-     ["Insert Reference Image" markdown-insert-reference-image]
+     ["Insert Image" markdown-insert-image]
      ["Insert Footnote" markdown-insert-footnote :keys "C-c C-s f"]
      ["Insert Wiki Link" markdown-insert-wiki-link :keys "C-c C-s w"]
      "---"

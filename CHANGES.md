@@ -22,6 +22,10 @@
         As such, the previous separate link insertion keybindings have
         been removed: <kbd>C-c C-a l</kbd>, <kbd>C-c C-a L</kbd>,
         <kbd>C-c C-a r</kbd>, and <kbd>C-c C-a u</kbd>.
+    -   Image insertion and editing has been consolidated into one
+        command, `markdown-insert-image`, bound to <kbd>C-c C-i</kbd>.
+        As such, the previous separate image insertion keybindings have
+        been removed: <kbd>C-c C-i i</kbd> and <kbd>C-c C-i I</kbd>.
     -   Footnote and wiki link insertion have been moved to the
         markup insertion prefix, as <kbd>C-c C-s f</kbd> and
         <kbd>C-c C-s w</kbd>.
@@ -46,9 +50,10 @@
     -   Rename internal `markdown-link-link` to `markdown-link-url`
         for clarity.
     -   The old inline image toggling command <kbd>C-c C-i C-t</kbd>
-        should be considered deprecated by <kbd>C-c C-x C-i</kbd> and
-        may be removed in the near future.  Toggling keybindings are
-        currently being grouped under <kbd>C-c C-x</kbd>.
+        has been removed and replaced <kbd>C-c C-x C-i</kbd> in order
+        to allow for the new interactive image insertion command at
+        <kbd>C-c C-i</kbd>.  Toggling keybindings are currently being
+        grouped under <kbd>C-c C-x</kbd>.
     -   `markdown-blockquote-face` is now applied to the entire
         blockquote, including the leading `>`, so it can be used to
         apply a background if desired.
@@ -69,6 +74,13 @@
     -   Functions `markdown-exdent-region` and `markdown-exdent-or-delete`
         are now named `markdown-outdent-region` and
         `markdown-outdent-or-delete`, respectively.
+    -   The non-interactive image insertion commands have been
+        refactored to mirror the corresponding link insertion
+        commands.  `markdown-insert-image` (for inline images) has
+        been renamed `markdown-insert-inline-image` and it now takes
+        three arguments (previously one optional argument).
+        `markdown-insert-reference-image` now takes four arguments
+        (previously none).
 
 *   New features:
 
