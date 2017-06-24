@@ -7998,7 +7998,7 @@ return the number of paragraphs left to move."
 (defun markdown-reload-extensions ()
   "Check settings, update font-lock keywords and hooks, and re-fontify buffer."
   (interactive)
-  (when (eq major-mode 'markdown-mode)
+  (when (member major-mode '(markdown-mode gfm-mode))
     ;; Update font lock keywords with extensions
     (setq markdown-mode-font-lock-keywords
           (append
