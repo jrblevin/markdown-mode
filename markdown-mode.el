@@ -8440,7 +8440,8 @@ position."
 
 (defun markdown-eldoc-function ()
   "Return a helpful string when appropriate based on context.
-* Report URL when point is at a hidden URL."
+* Report URL when point is at a hidden URL.
+* Report language name when point is a code block with hidden markup."
   (cond
    ;; Hidden URL or reference for inline link
    ((and (or (thing-at-point-looking-at markdown-regex-link-inline)
@@ -8462,7 +8463,17 @@ position."
                                'face 'markdown-reference-face)
                    (propertize "]" 'face 'markdown-markup-face))
                 (propertize (match-string-no-properties 6)
-                            'face 'markdown-url-face)))))))
+                            'face 'markdown-url-face)))))
+   ;; Hidden language name for fenced code blocks
+   ((and (markdown-code-block-at-point-p)
+         (not (get-text-property (point) 'markdown-pre))
+         markdown-hide-markup)
+    (let ((lang (save-excursion (markdown-code-block-lang))))
+      (unless lang (setq lang "[unspecified]"))
+      (format "Hidden code block language: %s (%s to toggle markup)"
+              (propertize lang 'face 'markdown-language-keyword-face)
+              (markdown--substitute-command-keys
+               "\\[markdown-toggle-markup-hiding]"))))))
 
 
 ;;; Mode Definition  ==========================================================
