@@ -4260,7 +4260,7 @@ be used to populate the title attribute when converted to XHTML."
     (goto-char end)
     (when url
       (message
-       (substitute-command-keys
+       (markdown--substitute-command-keys
         "Reference [%s] was defined, press \\[markdown-do] to jump there")
        label))))
 
@@ -7944,6 +7944,15 @@ spaces, tabs, and newlines are replaced with single spaces."
   (markdown-replace-regexp-in-string "\\(^[ \t\n]+\\|[ \t\n]+$\\)" ""
                             (markdown-replace-regexp-in-string "[ \t\n]+" " " str)))
 
+(defun markdown--substitute-command-keys (string)
+  "Like `substitute-command-keys' but, but prefers control characters.
+First pass STRING to `substitute-command-keys' and then
+substitute `C-i` for `TAB` and `C-m` for `RET`."
+  (replace-regexp-in-string
+   "\\<TAB\\>" "C-i"
+   (replace-regexp-in-string
+    "\\<RET\\>" "C-m" (substitute-command-keys string) t) t))
+
 (defun markdown-line-number-at-pos (&optional pos)
   "Return (narrowed) buffer line number at position POS.
 If POS is nil, use current buffer location.
@@ -8437,12 +8446,16 @@ position."
    ((and (or (thing-at-point-looking-at markdown-regex-link-inline)
              (thing-at-point-looking-at markdown-regex-link-reference))
          (or markdown-hide-urls markdown-hide-markup))
-    (let* ((edit-keys (substitute-command-keys "\\[markdown-insert-link]"))
+    (let* ((imagep (string-equal (match-string 1) "!"))
+           (edit-keys (markdown--substitute-command-keys
+                       (if imagep
+                           "\\[markdown-insert-image]"
+                         "\\[markdown-insert-link]")))
            (edit-str (propertize edit-keys 'face 'font-lock-constant-face))
-           (reference-p (string-equal (match-string 5) "["))
-           (object (if reference-p "reference" "URL")))
+           (referencep (string-equal (match-string 5) "["))
+           (object (if referencep "reference" "URL")))
       (format "Hidden %s (%s to edit): %s" object edit-str
-              (if reference-p
+              (if referencep
                   (concat
                    (propertize "[" 'face 'markdown-markup-face)
                    (propertize (match-string-no-properties 6)
