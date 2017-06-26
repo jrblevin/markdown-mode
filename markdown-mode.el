@@ -3223,6 +3223,44 @@ Leave match data intact for `markdown-regex-list'."
   "Return t if there is a list item at the point and nil otherwise."
   (save-match-data (markdown-cur-list-item-bounds)))
 
+(defun markdown-prev-list-item-bounds ()
+  "Return bounds of previous item in the same list of any level.
+The return value has the same form as that of
+`markdown-cur-list-item-bounds'."
+  (save-excursion
+    (let ((cur-bounds (markdown-cur-list-item-bounds))
+          (beginning-of-list (save-excursion (markdown-beginning-of-list)))
+          stop)
+      (when cur-bounds
+        (goto-char (nth 0 cur-bounds))
+        (while (and (not stop) (not (bobp))
+                    (re-search-backward markdown-regex-list
+                                        beginning-of-list t))
+          (unless (or (looking-at markdown-regex-hr)
+                      (markdown-code-block-at-point-p))
+            (setq stop (point))))
+        (markdown-cur-list-item-bounds)))))
+
+(defun markdown-next-list-item-bounds ()
+  "Return bounds of next item in the same list of any level.
+The return value has the same form as that of
+`markdown-cur-list-item-bounds'."
+  (save-excursion
+    (let ((cur-bounds (markdown-cur-list-item-bounds))
+          (end-of-list (save-excursion (markdown-end-of-list)))
+          stop)
+      (when cur-bounds
+        (goto-char (nth 0 cur-bounds))
+        (end-of-line)
+        (while (and (not stop) (not (eobp))
+                    (re-search-forward markdown-regex-list
+                                       end-of-list t))
+          (unless (or (looking-at markdown-regex-hr)
+                      (markdown-code-block-at-point-p))
+            (setq stop (point))))
+        (when stop
+          (markdown-cur-list-item-bounds))))))
+
 (defun markdown-beginning-of-list ()
   "Move point to beginning of list at point, if any."
   (interactive)

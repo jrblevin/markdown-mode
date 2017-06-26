@@ -3644,6 +3644,28 @@ puts 'hello, world'
     (forward-line)
     (should (markdown-cur-list-item-bounds))))
 
+(ert-deftest test-markdown-lists/bounds-prev ()
+  "Test list item bounds function `markdown-prev-list-item-bounds'."
+  (markdown-test-file "lists.text"
+    (markdown-test-goto-heading "Case 9")
+    (markdown-next-list-item 4)
+    (markdown-next-list-item 4)
+    (should (eq (point) 3903))
+    (should (equal (markdown-prev-list-item-bounds)
+                   (list 3700 3901 0 4 "-   " nil)))))
+
+(ert-deftest test-markdown-lists/bounds-next ()
+  "Test list item bounds function `markdown-next-list-item-bounds'."
+  (markdown-test-file "lists.text"
+    (markdown-test-goto-heading "Case 2")
+    (goto-char 1283)
+    (should-not (markdown-next-list-item-bounds))
+    (markdown-test-goto-heading "Case 9")
+    (markdown-next-list-item 4)
+    (should (eq (point) 3700))
+    (should (equal (markdown-next-list-item-bounds)
+                   (list 3903 3937 0 4 "*   " nil)))))
+
 (ert-deftest test-markdown-lists/bounds-gfm-task-list-item ()
   "Test `markdown-cur-list-item-bounds' with a GFM task list item."
   (markdown-test-string "  - [ ] task name"
