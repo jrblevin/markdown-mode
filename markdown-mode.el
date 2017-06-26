@@ -3063,9 +3063,13 @@ upon failure."
          ((and (looking-at-p markdown-regex-list)
                (setq bounds (markdown-cur-list-item-bounds)))
           (cond
-           ;; Stop and return point at item of lesser or equal indentation
-           ((<= (nth 3 bounds) level)
+           ;; Stop and return point at item of equal indentation
+           ((= (nth 3 bounds) level)
             (setq prev (point))
+            nil)
+           ;; Stop and return nil at item with lesser indentation
+           ((< (nth 3 bounds) level)
+            (setq prev nil)
             nil)
            ;; Stop at beginning of buffer
            ((bobp) (setq prev nil))
@@ -3292,9 +3296,12 @@ The return value has the same form as that of
 (defun markdown-up-list ()
   "Move point to beginning of parent list item."
   (interactive)
-  (let ((bounds (markdown-cur-list-item-bounds)))
-    (when (and bounds (markdown-prev-list-item (1- (nth 3 bounds))))
-      (point))))
+  (let ((cur-bounds (markdown-cur-list-item-bounds)))
+    (when cur-bounds
+      (markdown-prev-list-item (1- (nth 3 cur-bounds)))
+      (let ((up-bounds (markdown-cur-list-item-bounds)))
+        (when (and up-bounds (< (nth 3 up-bounds) (nth 3 cur-bounds)))
+          (point))))))
 
 (defun markdown-bounds-of-thing-at-point (thing)
   "Call `bounds-of-thing-at-point' for THING with slight modifications.
@@ -6286,7 +6293,8 @@ increase the indentation by one level."
           (setq indent (max (- cur-indent 4) 0))
           (let ((prev-bounds
                  (save-excursion
-                   (when (markdown-prev-list-item (- (nth 3 bounds) 1))
+                   (goto-char (nth 0 bounds))
+                   (when (markdown-up-list)
                      (markdown-cur-list-item-bounds)))))
             (when prev-bounds
               (setq marker (nth 4 prev-bounds)))))
