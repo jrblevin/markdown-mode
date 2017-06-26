@@ -460,12 +460,14 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Outline Navigation: <kbd>C-c C-n</kbd>, <kbd>C-c C-p</kbd>, <kbd>C-c C-f</kbd>, <kbd>C-c C-b</kbd>, and <kbd>C-c C-u</kbd>
 
-    Navigation between headings is possible using `outline-mode`.
-    Use <kbd>C-c C-n</kbd> and <kbd>C-c C-p</kbd> to move between the next and previous
-    visible headings.  Similarly, <kbd>C-c C-f</kbd> and <kbd>C-c C-b</kbd> move to the
-    next and previous visible headings at the same level as the one
-    at the point.  Finally, <kbd>C-c C-u</kbd> will move up to a lower-level
-    (higher precedence) visible heading.
+    These keys are used for hierarchical navigation in lists and
+    headings.  When the point is in a list, they move between list
+    items.  Otherwise, they move between headings.  Use <kbd>C-c C-n</kbd> and
+    <kbd>C-c C-p</kbd> to move between the next and previous visible
+    headings or list items of any level.  Similarly, <kbd>C-c C-f</kbd> and
+    <kbd>C-c C-b</kbd> move to the next and previous visible headings or
+    list items at the same level as the one at the point.  Finally,
+    <kbd>C-c C-u</kbd> will move up to the parent heading or list item.
 
   * Movement by Markdown paragraph: <kbd>M-{</kbd>, <kbd>M-}</kbd>, and <kbd>M-h</kbd>
 

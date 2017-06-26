@@ -183,6 +183,10 @@
         replacement for <kbd>C-c C-l</kbd>, `markdown-jump`.  In
         addition to jumping between reference/footnote labels and
         definitions, it also toggles GFM checkboxes.
+    -   Outline movement keys <kbd>C-c C-p</kbd>, <kbd>C-c C-n</kbd>,
+        <kbd>C-c C-f</kbd>, <kbd>C-c C-b</kbd>, and <kbd>C-c C-u</kbd>
+        now move between list items, when the point is in a list,
+        and move between headings otherwise.
 
 *   Improvements:
 

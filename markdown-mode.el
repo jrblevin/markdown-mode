@@ -476,12 +476,14 @@
 ;;
 ;;   * Outline Navigation: `C-c C-n`, `C-c C-p`, `C-c C-f`, `C-c C-b`, and `C-c C-u`
 ;;
-;;     Navigation between headings is possible using `outline-mode'.
-;;     Use `C-c C-n` and `C-c C-p` to move between the next and previous
-;;     visible headings.  Similarly, `C-c C-f` and `C-c C-b` move to the
-;;     next and previous visible headings at the same level as the one
-;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
-;;     (higher precedence) visible heading.
+;;     These keys are used for hierarchical navigation in lists and
+;;     headings.  When the point is in a list, they move between list
+;;     items.  Otherwise, they move between headings.  Use `C-c C-n` and
+;;     `C-c C-p` to move between the next and previous visible
+;;     headings or list items of any level.  Similarly, `C-c C-f` and
+;;     `C-c C-b` move to the next and previous visible headings or
+;;     list items at the same level as the one at the point.  Finally,
+;;     `C-c C-u` will move up to the parent heading or list item.
 ;;
 ;;   * Movement by Markdown paragraph: `M-{`, `M-}`, and `M-h`
 ;;
@@ -5695,12 +5697,12 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
-    ;; Header navigation
-    (define-key map (kbd "C-c C-n") 'markdown-next-visible-heading)
-    (define-key map (kbd "C-c C-p") 'markdown-previous-visible-heading)
-    (define-key map (kbd "C-c C-f") 'markdown-forward-same-level)
-    (define-key map (kbd "C-c C-b") 'markdown-backward-same-level)
-    (define-key map (kbd "C-c C-u") 'markdown-up-heading)
+    ;; Heading and list navigation
+    (define-key map (kbd "C-c C-n") 'markdown-outline-next)
+    (define-key map (kbd "C-c C-p") 'markdown-outline-previous)
+    (define-key map (kbd "C-c C-f") 'markdown-outline-next-same-level)
+    (define-key map (kbd "C-c C-b") 'markdown-outline-previous-same-level)
+    (define-key map (kbd "C-c C-u") 'markdown-outline-up)
     ;; Buffer-wide commands
     (define-key map (kbd "C-c C-c m") 'markdown-other-window)
     (define-key map (kbd "C-c C-c p") 'markdown-preview)
@@ -5805,11 +5807,11 @@ See also `markdown-mode-map'.")
      ["Next Link" markdown-next-link]
      ["Previous Link" markdown-previous-link]
      "---"
-     ["Next Visible Heading" markdown-next-visible-heading]
-     ["Previous Visible Heading" markdown-previous-visible-heading]
-     ["Forward Same Level" markdown-forward-same-level]
-     ["Backward Same Level" markdown-backward-same-level]
-     ["Up to Parent Heading" markdown-up-heading]
+     ["Next Heading or List Item" markdown-outline-next]
+     ["Previous Heading or List Item" markdown-outline-previous]
+     ["Next at Same Level" markdown-outline-next-same-level]
+     ["Previous at Same Level" markdown-outline-previous-same-level]
+     ["Up to Parent" markdown-outline-up]
      "---"
      ["Forward Paragraph" markdown-forward-paragraph]
      ["Backward Paragraph" markdown-backward-paragraph]
@@ -7131,6 +7133,44 @@ demote."
   "Move the current subtree of ATX headings down."
   (interactive)
   (outline-move-subtree-down 1))
+
+(defun markdown-outline-next ()
+  "Move to next list item, when in a list, or next visible heading."
+  (interactive)
+  (let ((bounds (markdown-next-list-item-bounds)))
+    (if bounds
+        (goto-char (nth 0 bounds))
+      (markdown-next-visible-heading 1))))
+
+(defun markdown-outline-previous ()
+  "Move to previous list item, when in a list, or previous visible heading."
+  (interactive)
+  (let ((bounds (markdown-prev-list-item-bounds)))
+    (if bounds
+        (goto-char (nth 0 bounds))
+      (markdown-previous-visible-heading 1))))
+
+(defun markdown-outline-next-same-level ()
+  "Move to next list item or heading of same level."
+  (interactive)
+  (let ((bounds (markdown-cur-list-item-bounds)))
+    (if bounds
+        (markdown-next-list-item (nth 3 bounds))
+      (markdown-forward-same-level 1))))
+
+(defun markdown-outline-previous-same-level ()
+  "Move to previous list item or heading of same level."
+  (interactive)
+  (let ((bounds (markdown-cur-list-item-bounds)))
+    (if bounds
+        (markdown-prev-list-item (nth 3 bounds))
+      (markdown-backward-same-level 1))))
+
+(defun markdown-outline-up ()
+  "Move to previous list item, when in a list, or next heading."
+  (interactive)
+  (unless (markdown-up-list)
+    (markdown-up-heading 1)))
 
 
 ;;; Marking and Narrowing =====================================================
