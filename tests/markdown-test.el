@@ -3743,6 +3743,72 @@ puts 'hello, world'
     (should (string-equal (markdown-toggle-gfm-checkbox) "[x]"))
     (should (string-equal (buffer-string) "   -   [x] GFM task list item"))))
 
+(ert-deftest test-markdown-lists/beginning-of-list ()
+  "Test `markdown-beginning-of-list'."
+  (markdown-test-file "lists.text"
+    ;; Case 1: not in a list
+    (goto-char 399)
+    (should-not (markdown-beginning-of-list))
+    (should (= (point) 399))
+    ;; Case 2
+    (goto-char 1281)
+    (should (= (markdown-beginning-of-list) 1063))
+    (should (= (point) 1063))
+    (goto-char 1395)
+    (should (= (markdown-beginning-of-list) 1063))
+    (should (= (point) 1063))
+    ;; Case 3
+    (goto-char 1848)
+    (should (= (markdown-beginning-of-list) 1659))
+    (should (= (point) 1659))
+    ;; Case 4
+    (goto-char 2041)
+    (should (= (markdown-beginning-of-list) 1919))
+    (should (= (point) 1919))
+    ;; Case 8
+    (goto-char 3553)
+    (should (= (markdown-beginning-of-list) 3096))
+    (should (= (point) 3096))))
+
+(ert-deftest test-markdown-lists/end-of-list ()
+  "Test `markdown-end-of-list'."
+  (markdown-test-file "lists.text"
+    ;; Case 1: not in a list
+    (goto-char 399)
+    (should-not (markdown-end-of-list))
+    (should (= (point) 399))
+    ;; Case 2
+    (goto-char 1281)
+    (should (= (markdown-end-of-list) 1396))
+    (should (= (point) 1396))
+    (goto-char 1395)
+    (should (= (markdown-end-of-list) 1396))
+    (should (= (point) 1396))
+    ;; Case 3
+    (goto-char 1659)
+    (should (= (markdown-end-of-list) 1849))
+    (should (= (point) 1849))
+    ;; Case 4
+    (goto-char 2041)
+    (should (= (markdown-end-of-list) 2092))
+    (should (= (point) 2092))
+    ;; Case 8
+    (goto-char 3553)
+    (should (= (markdown-end-of-list) 3614))
+    (should (= (point) 3614))))
+
+(ert-deftest test-markdown-lists/up-list ()
+  "Test `markdown-up-list'."
+  (markdown-test-file "nested-list.text"
+    (goto-char 581)
+    (should (= (markdown-up-list) 484))
+    (should (= (point) 484))
+    (should (= (markdown-up-list) 191))
+    (should (= (point) 191))
+    ;; Return nil upon failure, but move out of list.
+    (should-not (markdown-up-list))
+    (should (= (point) (point-min)))))
+
 ;;; Outline minor mode tests:
 
 (ert-deftest test-markdown-outline/navigation ()

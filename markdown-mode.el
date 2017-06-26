@@ -3223,6 +3223,41 @@ Leave match data intact for `markdown-regex-list'."
   "Return t if there is a list item at the point and nil otherwise."
   (save-match-data (markdown-cur-list-item-bounds)))
 
+(defun markdown-beginning-of-list ()
+  "Move point to beginning of list at point, if any."
+  (interactive)
+  (let ((orig-point (point))
+        (list-begin (save-excursion
+                      (markdown-search-backward-baseline)
+                      ;; Stop at next list item, regardless of the indentation.
+                      (markdown-next-list-item (point-max))
+                      (when (looking-at markdown-regex-list)
+                        (point)))))
+    (when (and list-begin (<= list-begin orig-point))
+      (goto-char list-begin))))
+
+(defun markdown-end-of-list ()
+  "Move point to end of list at point, if any."
+  (interactive)
+  (let ((start (point))
+        (end (save-excursion
+               (when (markdown-beginning-of-list)
+                 ;; Items can't have nonlist-indent <= 1, so this
+                 ;; moves past all list items.
+                 (markdown-next-list-item 1)
+                 (skip-syntax-backward "-")
+                 (unless (eobp) (forward-char 1))
+                 (point)))))
+    (when (and end (>= end start))
+      (goto-char end))))
+
+(defun markdown-up-list ()
+  "Move point to beginning of parent list item."
+  (interactive)
+  (let ((bounds (markdown-cur-list-item-bounds)))
+    (when (and bounds (markdown-prev-list-item (1- (nth 3 bounds))))
+      (point))))
+
 (defun markdown-bounds-of-thing-at-point (thing)
   "Call `bounds-of-thing-at-point' for THING with slight modifications.
 Does not include trailing newlines when THING is 'line.  Handles the
