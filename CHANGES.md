@@ -139,10 +139,16 @@
         `markdown-mark-subtree` (<kbd>C-c C-M-h</kbd>) and
         `markdown-narrow-to-subtree` (<kbd>C-x n s</kbd>).
         ([GH-191][])
-    -   Add plain text block movement commands: <kbd>C-M-{</kbd>
-        (`markdown-beginning-of-text-block`) and <kbd>C-M-}</kbd>
-        (`markdown-end-of-text-block`).  To mark a plain text block,
-        use <kbd>C-c M-h</kbd> (`markdown-mark-text-block`).
+    -   Add syntax-aware Markdown paragraph movement commands:
+        <kbd>M-{</kbd> (`markdown-backward-paragraph`) and
+        <kbd>M-}</kbd> (`markdown-forward-paragraph`).  To mark a
+        paragraph, use <kbd>M-h</kbd> (`markdown-mark-paragraph`).
+        These move at a more granular level than the block movement
+        commands.  ([GH-191][])
+    -   The previous block movement and marking commands are now at
+        <kbd>C-M-{</kbd>, <kbd>C-M-}</kbd>, and <kbd>C-c M-h</kbd>.
+        In terms of lists, paragraph movement commands now stop at
+        each list item while block commands move over entire lists.
         ([GH-191][])
     -   Add `subtree` as a possible value for
         `markdown-reference-location` and
@@ -184,7 +190,7 @@
         `:package-version` tags.
     -   Better consistency of function names: predicate functions
         ending in `-p` shouldn't modify match data.
-    -   Generalize rebinding of block movement commands in case users
+    -   Generalize rebinding of paragraph movement commands in case users
         have customized `{forward,backward,mark}-paragraph` bindings.
     -   Adjust point so that it is left at beginning of setext
         headings in heading navigation commands.

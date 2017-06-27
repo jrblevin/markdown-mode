@@ -483,18 +483,26 @@
 ;;     at the point.  Finally, `C-c C-u` will move up to a lower-level
 ;;     (higher precedence) visible heading.
 ;;
-;;   * Movement by Markdown Blocks: `M-{` and `M-}`
+;;   * Movement by Markdown paragraph: `M-{`, `M-}`, and `M-h`
 ;;
-;;     These keys are usually bound to `forward-paragraph' and
-;;     `backward-paragraph', but those built-in Emacs functions are
-;;     based on simple regular expressions and can fail in Markdown.
-;;     Blocks in `markdown-mode' are code blocks, blockquotes, list
-;;     items (which may contain other blocks), headings, horizontal
-;;     rules, or plain text paragraphs separated by whitespace.
-;;     Instead, they are bound to `markdown-forward-block' and
-;;     `markdown-backward-block'.  To mark or narrow to a block, you
-;;     can use `M-h` (`markdown-mark-block') and `C-x n b`
-;;     (`markdown-narrow-to-block').
+;;     Paragraphs in `markdown-mode' are regular paragraphs,
+;;     paragraphs inside blockquotes, individual list items, headings,
+;;     etc.  These keys are usually bound to `forward-paragraph' and
+;;     `backward-paragraph', but the built-in Emacs functions are
+;;     based on simple regular expressions that fail in Markdown
+;;     files.  Instead, they are bound to `markdown-forward-paragraph'
+;;     and `markdown-backward-paragraph'.  To mark a paragraph,
+;;     you can use `M-h` (`markdown-mark-paragraph').
+;;
+;;   * Movement by Markdown block: `C-M-{`, `C-M-}`, and `C-c M-h`
+;;
+;;     Markdown blocks are regular paragraphs in many cases, but
+;;     contain many paragraphs in other cases: blocks are considered
+;;     to be entire lists, entire code blocks, and entire blockquotes.
+;;     To move backward one block use `C-M-{`
+;;     (`markdown-beginning-block`) and to move forward use `C-M-}`
+;;     (`markdown-end-of-block`).  To mark a block, use `C-c M-h`
+;;     (`markdown-mark-block`).
 ;;
 ;;   * Movement by Defuns: `C-M-a`, `C-M-e`, and `C-M-h`
 ;;
@@ -504,17 +512,6 @@
 ;;     beginning of the current or preceding defun, `C-M-e` will move
 ;;     to the end of the current or following defun, and `C-M-h` will
 ;;     put the region around the entire defun.
-;;
-;;   * Movement by Plain Text Blocks: `C-M-{`, `C-M-}`, and `C-c M-h`
-;;
-;;     While the block and defun movement commands respect Markdown
-;;     syntax, these commands simply move over whitespace-separated
-;;     plain text blocks without regard for the context.  You can use
-;;     these commands to move over entire lists, whitespace separated
-;;     segments of code, etc.  To move backward use `C-M-{`
-;;     (`markdown-beginning-of-text-block`) and to move forward use
-;;     `C-M-}` (`markdown-end-of-text-block`).  To mark a plain text
-;;     block, use `C-c M-h` (`markdown-mark-text-block`).
 ;;
 ;;   * Miscellaneous Commands:
 ;;
@@ -3102,6 +3099,8 @@ Set point to the beginning of the item, and return point, or nil
 upon failure."
   (let (bounds indent next)
     (setq next (point))
+    (if (looking-at markdown-regex-header-setext)
+        (goto-char (match-end 0)))
     (forward-line)
     (setq indent (current-indentation))
     (while
@@ -5723,15 +5722,15 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-x n s") 'markdown-narrow-to-subtree)
     (define-key map (kbd "M-<return>") 'markdown-insert-list-item)
     (define-key map (kbd "C-c C-j") 'markdown-insert-list-item)
-    ;; Blocks
-    (define-key map [remap backward-paragraph] 'markdown-backward-block)
-    (define-key map [remap forward-paragraph] 'markdown-forward-block)
-    (define-key map [remap mark-paragraph] 'markdown-mark-block)
+    ;; Paragraphs (Markdown context aware)
+    (define-key map [remap backward-paragraph] 'markdown-backward-paragraph)
+    (define-key map [remap forward-paragraph] 'markdown-forward-paragraph)
+    (define-key map [remap mark-paragraph] 'markdown-mark-paragraph)
+    ;; Blocks (one or more paragraphs)
+    (define-key map (kbd "C-M-{") 'markdown-backward-block)
+    (define-key map (kbd "C-M-}") 'markdown-forward-block)
+    (define-key map (kbd "C-c M-h") 'markdown-mark-block)
     (define-key map (kbd "C-x n b") 'markdown-narrow-to-block)
-    ;; Text Blocks (contextually unaware)
-    (define-key map (kbd "C-M-{") 'markdown-beginning-of-text-block)
-    (define-key map (kbd "C-M-}") 'markdown-end-of-text-block)
-    (define-key map (kbd "C-c M-h") 'markdown-mark-text-block)
     ;; Pages (top-level sections)
     (define-key map [remap backward-page] 'markdown-backward-page)
     (define-key map [remap forward-page] 'markdown-forward-page)
@@ -5812,6 +5811,8 @@ See also `markdown-mode-map'.")
      ["Backward Same Level" markdown-backward-same-level]
      ["Up to Parent Heading" markdown-up-heading]
      "---"
+     ["Forward Paragraph" markdown-forward-paragraph]
+     ["Backward Paragraph" markdown-backward-paragraph]
      ["Forward Block" markdown-forward-block]
      ["Backward Block" markdown-backward-block])
     ("Show & Hide"
@@ -5852,8 +5853,8 @@ See also `markdown-mode-map'.")
      ["Indent Region" markdown-indent-region]
      ["Outdent Region" markdown-outdent-region]
      "--"
+     ["Mark Paragraph" mark-paragraph]
      ["Mark Block" markdown-mark-block]
-     ["Mark Plain Text Block" markdown-mark-text-block]
      ["Mark Section" mark-defun]
      ["Mark Subtree" markdown-mark-subtree])
     ("Lists"
@@ -6553,6 +6554,109 @@ the surrounding context in light of Markdown syntax.  For that, see
   (skip-syntax-backward "-")
   (forward-line))
 
+(defun markdown-backward-paragraph (&optional arg)
+  "Move the point to the start of the current paragraph.
+With argument ARG, do it ARG times; a negative argument ARG = -N
+means move forward N blocks."
+  (interactive "p")
+  (or arg (setq arg 1))
+  (if (< arg 0)
+      (markdown-forward-paragraph (- arg))
+    (dotimes (_ arg)
+      ;; Skip over whitespace in between paragraphs when moving backward.
+      (skip-syntax-backward "-")
+      (beginning-of-line)
+      ;; Skip over code block endings.
+      (when (markdown-range-properties-exist
+            (point-at-bol) (point-at-eol)
+            '(markdown-gfm-block-end
+              markdown-tilde-fence-end))
+        (forward-line -1))
+      ;; Skip over blank lines inside blockquotes.
+      (while (and (not (eobp))
+                  (looking-at markdown-regex-blockquote)
+                  (= (length (match-string 3)) 0))
+        (forward-line -1))
+      ;; Proceed forward based on the type of block of paragraph.
+      (let (bounds skip)
+        (cond
+         ;; Blockquotes
+         ((looking-at markdown-regex-blockquote)
+          (while (and (not (bobp))
+                      (looking-at markdown-regex-blockquote)
+                      (> (length (match-string 3)) 0)) ;; not blank
+            (forward-line -1))
+          (forward-line))
+         ;; List items
+         ((setq bounds (markdown-cur-list-item-bounds))
+          (goto-char (nth 0 bounds)))
+         ;; Other
+         (t
+          (while (and (not (bobp))
+                      (not skip)
+                      (not (markdown-cur-line-blank-p))
+                      (not (looking-at markdown-regex-blockquote))
+                      (not (markdown-range-properties-exist
+                            (point-at-bol) (point-at-eol)
+                            '(markdown-gfm-block-end
+                              markdown-tilde-fence-end))))
+            (setq skip (markdown-range-properties-exist
+                            (point-at-bol) (point-at-eol)
+                            '(markdown-gfm-block-begin
+                              markdown-tilde-fence-begin)))
+            (forward-line -1))
+          (unless (bobp)
+            (forward-line 1))))))))
+
+(defun markdown-forward-paragraph (&optional arg)
+  "Move forward to the next end of a paragraph.
+With argument ARG, do it ARG times; a negative argument ARG = -N
+means move backward N blocks."
+  (interactive "p")
+  (or arg (setq arg 1))
+  (if (< arg 0)
+      (markdown-backward-paragraph (- arg))
+    (dotimes (_ arg)
+      ;; Skip whitespace in between paragraphs.
+      (when (markdown-cur-line-blank-p)
+        (skip-syntax-forward "-")
+        (beginning-of-line))
+      ;; Proceed forward based on the type of block.
+      (let (bounds skip)
+        (cond
+         ;; Blockquotes
+         ((looking-at markdown-regex-blockquote)
+          ;; Skip over blank lines inside blockquotes.
+          (while (and (not (eobp))
+                      (looking-at markdown-regex-blockquote)
+                      (= (length (match-string 3)) 0))
+            (forward-line))
+          ;; Move to end of quoted text block
+          (while (and (not (eobp))
+                      (looking-at markdown-regex-blockquote)
+                      (> (length (match-string 3)) 0)) ;; not blank
+            (forward-line)))
+         ;; List items
+         ((and (markdown-cur-list-item-bounds)
+               (setq bounds (markdown-next-list-item-bounds)))
+          (goto-char (nth 0 bounds)))
+         ;; Other
+         (t
+          (forward-line)
+          (while (and (not (eobp))
+                      (not skip)
+                      (not (markdown-cur-line-blank-p))
+                      (not (looking-at markdown-regex-blockquote))
+                      (not (markdown-range-properties-exist
+                            (point-at-bol) (point-at-eol)
+                            '(markdown-gfm-block-begin
+                              markdown-tilde-fence-begin))))
+            (setq skip (markdown-range-properties-exist
+                        (point-at-bol) (point-at-eol)
+                        '(markdown-gfm-block-end
+                          markdown-tilde-fence-end)))
+            (forward-line))))))))
+
 (defun markdown-backward-block (&optional arg)
   "Move the point to the start of the current Markdown block.
 Moves across complete code blocks, list items, and blockquotes,
@@ -6564,39 +6668,41 @@ ARG = -N means move forward N blocks."
   (if (< arg 0)
       (markdown-forward-block (- arg))
     (dotimes (_ arg)
-      ;; Skip over whitespace in between blocks when moving backward.
+      ;; Skip over whitespace in between blocks when moving backward,
+      ;; unless at a block boundary with no whitespace.
       (skip-syntax-backward "-")
       (beginning-of-line)
       ;; Proceed forward based on the type of block.
-      (let (bounds)
-        (cond
-         ;; Code blocks
-         ((markdown-code-block-at-point-p)
-          (forward-line -1)
-          (while (and (markdown-code-block-at-point-p) (not (bobp)))
-            (forward-line -1))
+      (cond
+       ;; Code blocks
+       ((and (markdown-code-block-at-pos (point)) ;; this line
+             (markdown-code-block-at-pos (point-at-bol 0))) ;; previous line
+        (forward-line -1)
+        (while (and (markdown-code-block-at-point-p) (not (bobp)))
+          (forward-line -1))
+        (forward-line))
+       ;; Headings
+       ((markdown-heading-at-point)
+        (goto-char (match-beginning 0)))
+       ;; Horizontal rules
+       ((looking-at markdown-regex-hr))
+       ;; Blockquotes
+       ((looking-at markdown-regex-blockquote)
+        (forward-line -1)
+        (while (and (looking-at markdown-regex-blockquote)
+                    (not (bobp)))
+          (forward-line -1))
+        (forward-line))
+       ;; List items
+       ((markdown-cur-list-item-bounds)
+        (markdown-beginning-of-list))
+       ;; Other
+       (t
+        ;; Move forward in case it is a one line regular paragraph.
+        (unless (markdown-next-line-blank-p)
           (forward-line))
-         ;; Headings
-         ((markdown-heading-at-point)
-          (goto-char (match-beginning 0)))
-         ;; Horizontal rules
-         ((looking-at markdown-regex-hr))
-         ;; Blockquotes
-         ((looking-at markdown-regex-blockquote)
-          (forward-line -1)
-          (while (and (looking-at markdown-regex-blockquote) (not (bobp)))
-            (forward-line -1))
-          (forward-line))
-         ;; List items
-         ((setq bounds (markdown-cur-list-item-bounds))
-          (goto-char (cl-first bounds)))
-         ;; Other
-         (t
-          (unless (markdown-prev-line-blank-p)
-            ;; Already moved to beginning-of-line, so don't move back
-            ;; again when already at the beginning of a block.
-            (markdown-beginning-of-text-block))))))
-    (skip-syntax-forward "-")))
+        (unless (markdown-prev-line-blank-p)
+          (markdown-backward-paragraph)))))))
 
 (defun markdown-forward-block (&optional arg)
   "Move forward to the next end of a Markdown block.
@@ -6614,31 +6720,33 @@ ARG = -N means move backward N blocks."
           (skip-syntax-forward "-")
         (beginning-of-line))
       ;; Proceed forward based on the type of block.
-      (let (bounds)
-        (cond
-         ;; Code blocks
-         ((markdown-code-block-at-point-p)
-          (forward-line)
-          (while (and (markdown-code-block-at-point-p) (not (eobp)))
-            (forward-line)))
-         ;; Headings
-         ((looking-at markdown-regex-header)
-          (goto-char (or (match-end 4) (match-end 2) (match-end 3)))
-          (forward-line))
-         ;; Horizontal rules
-         ((looking-at markdown-regex-hr)
-          (forward-line))
-         ;; Blockquotes
-         ((looking-at markdown-regex-blockquote)
-          (forward-line)
-          (while (and (looking-at markdown-regex-blockquote) (not (eobp)))
-            (forward-line)))
-         ;; List items
-         ((setq bounds (markdown-cur-list-item-bounds))
-          (goto-char (cl-second bounds))
-          (forward-line))
-         ;; Other
-         (t (markdown-end-of-text-block)))))))
+      (cond
+       ;; Code blocks
+       ((markdown-code-block-at-point-p)
+        (forward-line)
+        (while (and (markdown-code-block-at-point-p) (not (eobp)))
+          (forward-line)))
+       ;; Headings
+       ((looking-at markdown-regex-header)
+        (goto-char (or (match-end 4) (match-end 2) (match-end 3)))
+        (forward-line))
+       ;; Horizontal rules
+       ((looking-at markdown-regex-hr)
+        (forward-line))
+       ;; Blockquotes
+       ((looking-at markdown-regex-blockquote)
+        (forward-line)
+        (while (and (looking-at markdown-regex-blockquote) (not (eobp)))
+          (forward-line)))
+       ;; List items
+       ((markdown-cur-list-item-bounds)
+        (markdown-end-of-list)
+        (forward-line))
+       ;; Other
+       (t (markdown-forward-paragraph))))
+    (skip-syntax-backward "-")
+    (unless (eobp)
+      (forward-char 1))))
 
 (defun markdown-backward-page (&optional count)
   "Move backward to boundary of the current toplevel section.
@@ -7017,6 +7125,25 @@ demote."
 
 
 ;;; Marking and Narrowing =====================================================
+
+(defun markdown-mark-paragraph ()
+  "Put mark at end of this block, point at beginning.
+The block marked is the one that contains point or follows point.
+
+Interactively, if this command is repeated or (in Transient Mark
+mode) if the mark is active, it marks the next block after the
+ones already marked."
+  (interactive)
+  (if (or (and (eq last-command this-command) (mark t))
+          (and transient-mark-mode mark-active))
+      (set-mark
+       (save-excursion
+         (goto-char (mark))
+         (markdown-forward-paragraph)
+         (point)))
+    (let ((beginning-of-defun-function 'markdown-backward-paragraph)
+          (end-of-defun-function 'markdown-forward-paragraph))
+      (mark-defun))))
 
 (defun markdown-mark-block ()
   "Put mark at end of this block, point at beginning.

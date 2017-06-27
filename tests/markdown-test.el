@@ -4086,6 +4086,96 @@ date = 2015-08-13 11:35:25 EST
     (should (= (point) 143))
     (should (= (mark) 269))))
 
+(ert-deftest test-markdown-movement/paragraph ()
+  "Test Markdown paragraph movement."
+  (markdown-test-file "outline.text"
+   (markdown-forward-paragraph)
+   (should (looking-at "\n# A top-level header"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\nfollowed by some body text"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\n## A second-level header"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\nfollowed by some body text"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\n### Third level ###"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\n\\* A list item"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\\* and another"))
+   (markdown-forward-paragraph)
+   (should (looking-at "   \\+ and a sublist"))
+   (markdown-forward-paragraph)
+   (should (looking-at "- And a third"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\n### Third level number two ###"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\n### Level two again"))
+   (markdown-forward-paragraph)
+   (should (looking-at "\nfollowed by some body text"))
+
+   (markdown-test-goto-heading "Level two")
+   (markdown-forward-paragraph)
+   (should (looking-at "\nbar"))
+   (markdown-forward-paragraph)
+   (should (= (point) (point-max)))
+   (markdown-backward-paragraph)
+   (should (looking-at "bar"))
+   (markdown-backward-paragraph)
+   (should (looking-at "## Level two"))
+   (markdown-backward-paragraph)
+   (should (looking-at "foo"))
+   (markdown-backward-paragraph)
+   (should (looking-at "# Level one"))
+   (markdown-backward-paragraph)
+   (should (looking-at "\\* List"))
+   (markdown-backward-paragraph)
+   (should (looking-at "\\* an unordered"))
+   (markdown-backward-paragraph)
+   (should (looking-at "\\* With"))
+   (markdown-backward-paragraph)
+   (should (looking-at "And a level two underline header"))
+
+   (goto-char (point-min))
+   (markdown-test-goto-heading "A top-level header")
+   (beginning-of-line)
+   (markdown-backward-paragraph)
+   (should (= (point) (point-min)))))
+
+(ert-deftest test-markdown-movement/forward-paragraph-with-whitespace ()
+  "Test Markdown paragraph movement."
+  (markdown-test-file "blocks.md"
+    (markdown-test-goto-heading "With Whitespace")
+    (dolist (pos '(58 67 78 94 109 114 123 131 135 147 157 170 184 199))
+      (markdown-forward-paragraph)
+      (should (= (point) pos)))))
+
+(ert-deftest test-markdown-movement/backward-paragraph-with-whitespace ()
+  "Test Markdown paragraph movement."
+  (markdown-test-file "blocks.md"
+    (markdown-test-goto-heading "With Whitespace")
+    (markdown-next-heading)
+    (should (= (point) 200))
+    (dolist (pos '(185 172 158 148 136 132 124 115 110 94 78 67 59))
+      (markdown-backward-paragraph)
+      (should (= (point) pos)))))
+
+(ert-deftest test-markdown-movement/forward-paragraph-without-whitespace ()
+  "Test Markdown paragraph movement."
+  (markdown-test-file "blocks.md"
+    (markdown-test-goto-heading "Without Whitespace")
+    (dolist (pos '(222 230 240 255 270 275 283 291 294 305 314 326 340 354))
+      (markdown-forward-paragraph)
+      (should (= (point) pos)))))
+
+(ert-deftest test-markdown-movement/backward-paragraph-without-whitespace ()
+  "Test Markdown paragraph movement."
+  (markdown-test-file "blocks.md"
+    (goto-char (point-max))
+    (dolist (pos '(340 328 314 305 294 291 284 275 271 255 240 230 223 200))
+      (markdown-backward-paragraph)
+      (should (= (point) pos)))))
+
 (ert-deftest test-markdown-movement/block ()
   "Test Markdown block movement."
   (markdown-test-file "outline.text"
@@ -4101,10 +4191,6 @@ date = 2015-08-13 11:35:25 EST
    (should (looking-at "\n### Third level ###"))
    (markdown-forward-block)
    (should (looking-at "\n\\* A list item"))
-   (markdown-forward-block)
-   (should (looking-at "\\* and another"))
-   (markdown-forward-block)
-   (should (looking-at "- And a third"))
    (markdown-forward-block)
    (should (looking-at "\n### Third level number two ###"))
    (markdown-forward-block)
@@ -4126,10 +4212,6 @@ date = 2015-08-13 11:35:25 EST
    (markdown-backward-block)
    (should (looking-at "# Level one"))
    (markdown-backward-block)
-   (should (looking-at "\\* List"))
-   (markdown-backward-block)
-   (should (looking-at "\\* an unordered"))
-   (markdown-backward-block)
    (should (looking-at "\\* With"))
    (markdown-backward-block)
    (should (looking-at "And a level two underline header"))
@@ -4139,6 +4221,39 @@ date = 2015-08-13 11:35:25 EST
    (beginning-of-line)
    (markdown-backward-block)
    (should (= (point) (point-min)))))
+
+(ert-deftest test-markdown-movement/forward-block-with-whitespace ()
+  "Test Markdown block movement."
+  (markdown-test-file "blocks.md"
+    (markdown-test-goto-heading "With Whitespace")
+    (dolist (pos '(58 109 114 131 135 147 157 184 199))
+      (markdown-forward-block)
+      (should (= (point) pos)))))
+
+(ert-deftest test-markdown-movement/backward-block-with-whitespace ()
+  "Test Markdown block movement."
+  (markdown-test-file "blocks.md"
+    (markdown-test-goto-heading "With Whitespace")
+    (markdown-next-heading)
+    (dolist (pos '(185 158 148 136 132 115 110 59))
+      (markdown-backward-block)
+      (should (= (point) pos)))))
+
+(ert-deftest test-markdown-movement/forward-block-without-whitespace ()
+  "Test Markdown block movement."
+  (markdown-test-file "blocks.md"
+    (markdown-test-goto-heading "Without Whitespace")
+    (dolist (pos '(222 270 275 291 294 305 314 340 354))
+      (markdown-forward-block)
+      (should (= (point) pos)))))
+
+(ert-deftest test-markdown-movement/backward-block-without-whitespace ()
+  "Test Markdown block movement."
+  (markdown-test-file "blocks.md"
+    (goto-char (point-max))
+    (dolist (pos '(340 314 305 294 291 275 271 223 200))
+      (markdown-backward-block)
+      (should (= (point) pos)))))
 
 (ert-deftest test-markdown-movement/page ()
   "Test Markdown page movement."
