@@ -1150,9 +1150,11 @@ cause lag when typing on slower machines."
   :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-uri-types
-  '("acap" "cid" "data" "dav" "fax" "file" "ftp" "gopher" "http" "https"
-    "imap" "ldap" "mailto" "mid" "modem" "news" "nfs" "nntp" "pop" "prospero"
-    "rtsp" "service" "sip" "tel" "telnet" "tip" "urn" "vemmi" "wais")
+  '("acap" "cid" "data" "dav" "fax" "file" "ftp"
+    "gopher" "http" "https" "imap" "ldap" "mailto"
+    "mid" "message" "modem" "news" "nfs" "nntp"
+    "pop" "prospero" "rtsp" "service" "sip" "tel"
+    "telnet" "tip" "urn" "vemmi" "wais")
   "Link types for syntax highlighting of URIs."
   :group 'markdown
   :type 'list)
