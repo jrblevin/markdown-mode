@@ -8692,27 +8692,26 @@ If BUFFER is nil, use the current buffer"
 	(while (re-search-forward "^\\(#+\\)[ \t]*\\(.*\\)$" nil t)
 	  (setq heads (->> `((text . ,(match-string 2))
 			     (level . ,(length (match-string 1))))
-			   list
+                           (list)
 			   (append heads))))))
     (with-temp-buffer
       (insert "## Conents\n\n")
-      (->> heads
-	   rest
+      (->> (cdr heads)
 	   (-map #'(lambda (elt)
-		     (let ((text (->> elt (assoc 'text) cdr))
-			   (level (->> elt (assoc 'level) cdr)))
-		       (dotimes (i (* 2 (- level 2)))
-			 (insert " "))
-		       (->> (markdown-title-to-link text)
-			    (format "* [%s](#%s)\n" text)
-			    insert)))))
+		     (let ((text (cdr (assoc 'text elt)))
+			   (level (cdr (assoc 'level elt))))
+                       (->> (make-list (* 2 (- level 2)) " ")
+                            (apply #'concat))
+		       (insert (format "* [%s](#%s)\n" text
+                                       (markdown-title-to-link text)))))))
       (buffer-string))))
 
 (defun markdown-contents-insert ()
   "Create the markdown contents at the current point.
 See `markdown-contents-create'."
   (interactive)
-  (insert (markdown-contents-create)))
+  (save-excursion
+    (insert (markdown-contents-create))))
 
 
 (provide 'markdown-mode)
