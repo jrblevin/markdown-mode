@@ -8672,6 +8672,48 @@ position."
     (markdown-live-preview-remove)))
 
 
+;;; Content ===================================================================
+(defun markdown-title-to-link (title)
+  "Format a markdown link from TITLE."
+  (with-temp-buffer
+    (insert title)
+    (downcase-region (point-min) (point-max))
+    (goto-char (point-min))
+    (while (search-forward " " nil t)
+      (replace-match "-"))
+    (buffer-string)))
+
+(defun markdown-contents-create (&optional buffer)
+  "Create a contents string from markdown conents in BUFFER.
+If BUFFER is nil, use the current buffer"
+  (let (heads)
+    (with-current-buffer (or buffer (current-buffer))
+      (save-excursion
+	(goto-char (point-min))
+	(while (re-search-forward "^\\(#+\\)[ \t]*\\(.*\\)$" nil t)
+	  (setq heads
+                (append heads
+                        (list `((text . ,(match-string 2))
+                                (level . ,(length (match-string 1))))))))))
+    (with-temp-buffer
+      (insert "## Conents\n\n")
+      (mapc #'(lambda (elt)
+                (let ((text (cdr (assoc 'text elt)))
+                      (level (cdr (assoc 'level elt))))
+                  (insert (apply #'concat (make-list (* 2 (- level 2)) " ")))
+                  (insert (format "* [%s](#%s)\n" text
+                                  (markdown-title-to-link text)))))
+              (cdr heads))
+      (buffer-string))))
+
+(defun markdown-contents-insert ()
+  "Create the markdown contents at the current point.
+See `markdown-contents-create'."
+  (interactive)
+  (save-excursion
+    (insert (markdown-contents-create))))
+
+
 (provide 'markdown-mode)
 ;; Local Variables:
 ;; indent-tabs-mode: nil
