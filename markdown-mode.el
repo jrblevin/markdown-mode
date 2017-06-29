@@ -8509,6 +8509,7 @@ position."
   (make-local-variable 'comment-column)
   (setq comment-column 0)
   (set (make-local-variable 'comment-auto-fill-only-comments) nil)
+  (set (make-local-variable 'comment-use-syntax) t)
   ;; Syntax
   (add-hook 'syntax-propertize-extend-region-functions
             'markdown-syntax-propertize-extend-region)

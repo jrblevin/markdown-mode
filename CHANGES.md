@@ -203,6 +203,7 @@
         a file.  Thanks to Tianxiang Xiong for a patch.
         ([GH-200][], [GH-201][])
     -   Adaptive filling for Leanpub blocks.
+    -   Set variable `comment-use-syntax`.  ([GH-213][])
 
 *   Bug fixes:
 
@@ -234,6 +235,7 @@
   [gh-200]: https://github.com/jrblevin/markdown-mode/issues/200
   [gh-201]: https://github.com/jrblevin/markdown-mode/issues/201
   [gh-209]: https://github.com/jrblevin/markdown-mode/issues/209
+  [gh-213]: https://github.com/jrblevin/markdown-mode/issues/213
 
 # Markdown Mode 2.2
 
