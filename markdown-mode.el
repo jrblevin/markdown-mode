@@ -8696,13 +8696,13 @@ If BUFFER is nil, use the current buffer"
                                 (level . ,(length (match-string 1))))))))))
     (with-temp-buffer
       (insert "## Conents\n\n")
-      (->> (cdr heads)
-	   (-map #'(lambda (elt)
-		     (let ((text (cdr (assoc 'text elt)))
-			   (level (cdr (assoc 'level elt))))
-                       (insert (apply #'concat (make-list (* 2 (- level 2)) " ")))
-		       (insert (format "* [%s](#%s)\n" text
-                                       (markdown-title-to-link text)))))))
+      (mapc #'(lambda (elt)
+                (let ((text (cdr (assoc 'text elt)))
+                      (level (cdr (assoc 'level elt))))
+                  (insert (apply #'concat (make-list (* 2 (- level 2)) " ")))
+                  (insert (format "* [%s](#%s)\n" text
+                                  (markdown-title-to-link text)))))
+              (cdr heads))
       (buffer-string))))
 
 (defun markdown-contents-insert ()
