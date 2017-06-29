@@ -8513,9 +8513,9 @@ position."
   (setq-local markdown-mode-font-lock-keywords nil)
   (setq-local font-lock-defaults nil)
   (setq-local font-lock-multiline t)
-  (add-to-list 'font-lock-extra-managed-props 'composition)
-  (add-to-list 'font-lock-extra-managed-props 'invisible)
-  (add-to-list 'font-lock-extra-managed-props 'display)
+  (setq-local font-lock-extra-managed-props
+              (append font-lock-extra-managed-props
+                      '(composition display invisible)))
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
