@@ -8700,8 +8700,7 @@ If BUFFER is nil, use the current buffer"
 	   (-map #'(lambda (elt)
 		     (let ((text (cdr (assoc 'text elt)))
 			   (level (cdr (assoc 'level elt))))
-                       (->> (make-list (* 2 (- level 2)) " ")
-                            (apply #'concat))
+                       (insert (apply #'concat (make-list (* 2 (- level 2)) " ")))
 		       (insert (format "* [%s](#%s)\n" text
                                        (markdown-title-to-link text)))))))
       (buffer-string))))
