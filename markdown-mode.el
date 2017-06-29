@@ -7,7 +7,7 @@
 ;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
 ;; Created: May 24, 2007
 ;; Version: 2.3-dev
-;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5") (dash))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: http://jblevins.org/projects/markdown-mode/
 
@@ -963,6 +963,7 @@
 (require 'url-parse)
 (require 'button)
 (require 'color)
+(require 'dash)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -8692,18 +8693,20 @@ If BUFFER is nil, use the current buffer"
 	(while (re-search-forward "^\\(#+\\)[ \t]*\\(.*\\)$" nil t)
 	  (setq heads (->> `((text . ,(match-string 2))
 			     (level . ,(length (match-string 1))))
-                           (list)
+			   list
 			   (append heads))))))
     (with-temp-buffer
       (insert "## Conents\n\n")
-      (->> (cdr heads)
+      (->> heads
+	   rest
 	   (-map #'(lambda (elt)
-		     (let ((text (cdr (assoc 'text elt)))
-			   (level (cdr (assoc 'level elt))))
-                       (->> (make-list (* 2 (- level 2)) " ")
-                            (apply #'concat))
-		       (insert (format "* [%s](#%s)\n" text
-                                       (markdown-title-to-link text)))))))
+		     (let ((text (->> elt (assoc 'text) cdr))
+			   (level (->> elt (assoc 'level) cdr)))
+		       (dotimes (i (* 2 (- level 2)))
+			 (insert " "))
+		       (->> (markdown-title-to-link text)
+			    (format "* [%s](#%s)\n" text)
+			    insert)))))
       (buffer-string))))
 
 (defun markdown-contents-insert ()
@@ -8711,7 +8714,7 @@ If BUFFER is nil, use the current buffer"
 See `markdown-contents-create'."
   (interactive)
   (save-excursion
-    (insert (markdown-contents-create))))
+   (insert (markdown-contents-create))))
 
 
 (provide 'markdown-mode)
