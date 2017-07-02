@@ -4,6 +4,7 @@
 
 *   **Breaking changes:**
 
+    -   `markdown-mode` now requires Emacs 24.3 or later.
     -   Markup insertion and replacement keybindings under <kbd>C-c
         C-s</kbd> (_s_ for style) have been revised to make them
         easier to remember.  Now, when the prefix <kbd>C-c C-s</kbd>

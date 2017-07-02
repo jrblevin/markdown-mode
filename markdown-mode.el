@@ -169,11 +169,8 @@
 
 ;; **Dependencies**
 
-;; `markdown-mode' depends on `cl-lib', which has been bundled with
-;; GNU Emacs since 24.3.  Users of GNU Emacs 24.1 and 24.2 can install
-;; `cl-lib' with `package.el'.  Additionally, to enable editing of code
-;; blocks in indirect buffers using `C-c '`, you will need to install
-;; the [`edit-indirect'][ei] package.
+;; To enable editing of code blocks in indirect buffers using `C-c '`,
+;; you will need to install the [`edit-indirect'][ei] package.
 
 ;;   [ei]: https://github.com/Fanael/edit-indirect/
 
@@ -4322,7 +4319,7 @@ This is an internal function called by
                     (read-string "Title (tooltip text, optional): " title)))
            (title (if (= (length title) 0) nil title)))
       (when (and image implicitp)
-        (error "Reference required: implicit image references are invalid"))
+        (user-error "Reference required: implicit image references are invalid"))
       (when (and begin end)
         (delete-region begin end))
       (cond
@@ -4976,7 +4973,7 @@ number)."
   (interactive)
   (let ((fn (car (markdown-footnote-marker-positions))))
     (unless fn
-      (error "Not at a footnote marker"))
+      (user-error "Not at a footnote marker"))
     (let ((new-pos (markdown-footnote-find-text fn)))
       (unless new-pos
         (error "No definition found for footnote `%s'" fn))
@@ -4988,7 +4985,7 @@ number)."
   (let ((fn (save-excursion
               (car (markdown-footnote-text-positions)))))
     (unless fn
-      (error "Not in a footnote"))
+      (user-error "Not in a footnote"))
     (let ((new-pos (markdown-footnote-find-marker fn)))
       (unless new-pos
         (error "Footnote marker `%s' not found" fn))
@@ -5143,7 +5140,7 @@ text to kill ring), and list items."
      ((setq val (markdown-cur-list-item-bounds))
       (kill-new (delete-and-extract-region (cl-first val) (cl-second val))))
      (t
-      (error "Nothing found at point to kill")))))
+      (user-error "Nothing found at point to kill")))))
 
 
 ;;; Indentation ====================================================================
@@ -5430,8 +5427,8 @@ Handle all elements of `markdown-complete-alist' in order."
           (setq changed (funcall function))
           (setq list nil))))
     (if found
-        (or changed (error "Markup at point is complete"))
-      (error "Nothing to complete at point"))))
+        (or changed (user-error "Markup at point is complete"))
+      (user-error "Nothing to complete at point"))))
 
 (defun markdown-complete-region (beg end)
   "Complete markup of objects in region from BEG to END.
@@ -6108,7 +6105,7 @@ the link text, location, and line number."
   (unless reference
     (if (thing-at-point-looking-at markdown-regex-reference-definition)
         (setq reference (match-string-no-properties 2))
-      (error "No reference definition at point")))
+      (user-error "No reference definition at point")))
   (let ((links (markdown-reference-find-links reference)))
     (cond ((= (length links) 1)
            (goto-char (cadr (car links))))
@@ -6133,7 +6130,7 @@ Links which have empty reference definitions are considered to be
 defined."
   (interactive "P")
   (when (not (eq major-mode 'markdown-mode))
-    (error "Not available in current mode"))
+    (user-error "Not available in current mode"))
   (let ((oldbuf (current-buffer))
         (refs (markdown-get-undefined-refs))
         (refbuf (markdown-reference-check-buffer)))
@@ -6691,7 +6688,7 @@ Leaves match data intact for `markdown-regex-header'."
                        (not (markdown-code-block-at-point-p)))
               (setq found (point))))
           (if (not found)
-              (unless no-error (error "Before first heading"))
+              (unless no-error (user-error "Before first heading"))
             (setq found (point))))
         (when found (goto-char found)))))
 
@@ -6715,7 +6712,7 @@ Stop at the first and last headings of a superior heading."
           (progn
             (goto-char point-to-move-to)
             (setq arg (1- arg)))
-        (error "No previous same-level heading")))))
+        (user-error "No previous same-level heading")))))
 
 (defun markdown-up-heading (arg)
   "Move to the visible heading line of which the present line is a subheading.
@@ -7092,7 +7089,7 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
      ((thing-at-point-looking-at markdown-regex-italic)
       (markdown-cycle-italic))
      (t
-      (error "Nothing to promote at point")))))
+      (user-error "Nothing to promote at point")))))
 
 (defun markdown-demote ()
   "Either demote header or list item at point or cycle or remove markup.
@@ -7120,7 +7117,7 @@ See `markdown-cycle-atx', `markdown-cycle-setext', and
      ((thing-at-point-looking-at markdown-regex-italic)
       (markdown-cycle-italic))
      (t
-      (error "Nothing to demote at point")))))
+      (user-error "Nothing to demote at point")))))
 
 
 ;;; Commands ==================================================================
@@ -7145,7 +7142,7 @@ Return the name of the output buffer used."
        ;; Handle case when `markdown-command' does not read from stdin
        (markdown-command-needs-filename
         (if (not buffer-file-name)
-            (error "Must be visiting a file")
+            (user-error "Must be visiting a file")
           (shell-command (concat markdown-command " "
                                  (shell-quote-argument buffer-file-name))
                          output-buffer-name)))
@@ -7473,9 +7470,9 @@ update this buffer's contents."
   "Open file for the current buffer with `markdown-open-command'."
   (interactive)
   (if (not markdown-open-command)
-      (error "Variable `markdown-open-command' must be set")
+      (user-error "Variable `markdown-open-command' must be set")
     (if (not buffer-file-name)
-        (error "Must be visiting a file")
+        (user-error "Must be visiting a file")
       (call-process markdown-open-command
                     nil nil nil buffer-file-name))))
 
@@ -7575,7 +7572,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
         (if full
             (browse-url url)
           (when (and file (> (length file) 0)) (find-file file))))
-    (error "Point is not at a Markdown link or URL")))
+    (user-error "Point is not at a Markdown link or URL")))
 
 (defun markdown-fontify-inline-links (last)
   "Add text properties to next inline link from point to LAST."
@@ -7781,7 +7778,7 @@ window when OTHER is non-nil."
         (wp (when buffer-file-name
               (file-name-directory buffer-file-name))))
     (if (not wp)
-        (error "Must be visiting a file")
+        (user-error "Must be visiting a file")
       (when other (other-window 1))
       (let ((default-directory wp))
         (find-file filename)))
@@ -7795,7 +7792,7 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
   (interactive "P")
   (if (markdown-wiki-link-p)
       (markdown-follow-wiki-link (markdown-wiki-link-link) arg)
-    (error "Point is not at a Wiki Link")))
+    (user-error "Point is not at a Wiki Link")))
 
 (defun markdown-highlight-wiki-link (from to face)
   "Highlight the wiki link in the region between FROM and TO using FACE."
@@ -7908,7 +7905,7 @@ See `markdown-follow-link-at-point' and
         ((markdown-wiki-link-p)
          (markdown-follow-wiki-link-at-point arg))
         (t
-         (error "Nothing to follow at point"))))
+         (user-error "Nothing to follow at point"))))
 
 (make-obsolete 'markdown-jump 'markdown-do "v2.3")
 
@@ -7935,7 +7932,7 @@ markers and footnote text."
     (markdown-toggle-gfm-checkbox))
    ;; Otherwise
    (t
-    (error "Nothing to do in context at point"))))
+    (user-error "Nothing to do in context at point"))))
 
 
 ;;; Miscellaneous =============================================================
@@ -8435,7 +8432,7 @@ position."
                       (lambda (_parent-buffer _beg _end)
                         (funcall mode))))
                 (edit-indirect-region begin end 'display-buffer))
-            (error "Not inside a GFM or tilde fenced code block")))
+            (user-error "Not inside a GFM or tilde fenced code block")))
       (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
         (progn (package-refresh-contents)
                (package-install 'edit-indirect)
@@ -8500,27 +8497,22 @@ position."
   ;; Natural Markdown tab width
   (setq tab-width 4)
   ;; Comments
-  (make-local-variable 'comment-start)
-  (setq comment-start "<!-- ")
-  (make-local-variable 'comment-end)
-  (setq comment-end " -->")
-  (make-local-variable 'comment-start-skip)
-  (setq comment-start-skip "<!--[ \t]*")
-  (make-local-variable 'comment-column)
-  (setq comment-column 0)
-  (set (make-local-variable 'comment-auto-fill-only-comments) nil)
-  (set (make-local-variable 'comment-use-syntax) t)
+  (setq-local comment-start "<!-- ")
+  (setq-local comment-end " -->")
+  (setq-local comment-start-skip "<!--[ \t]*")
+  (setq-local comment-column 0)
+  (setq-local comment-auto-fill-only-comments nil)
+  (setq-local comment-use-syntax t)
   ;; Syntax
   (add-hook 'syntax-propertize-extend-region-functions
             'markdown-syntax-propertize-extend-region)
   (add-hook 'jit-lock-after-change-extend-region-functions
             'markdown-font-lock-extend-region-function t t)
-  (set (make-local-variable 'syntax-propertize-function)
-       'markdown-syntax-propertize)
+  (setq-local syntax-propertize-function #'markdown-syntax-propertize)
   ;; Font lock.
-  (set (make-local-variable 'markdown-mode-font-lock-keywords) nil)
-  (set (make-local-variable 'font-lock-defaults) nil)
-  (set (make-local-variable 'font-lock-multiline) t)
+  (setq-local markdown-mode-font-lock-keywords nil)
+  (setq-local font-lock-defaults nil)
+  (setq-local font-lock-multiline t)
   (add-to-list 'font-lock-extra-managed-props 'composition)
   (add-to-list 'font-lock-extra-managed-props 'invisible)
   (add-to-list 'font-lock-extra-managed-props 'display)
@@ -8540,62 +8532,51 @@ position."
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Defun movement
-  (set (make-local-variable 'beginning-of-defun-function)
-       'markdown-beginning-of-defun)
-  (set (make-local-variable 'end-of-defun-function)
-       'markdown-end-of-defun)
+  (setq-local beginning-of-defun-function #'markdown-beginning-of-defun)
+  (setq-local end-of-defun-function #'markdown-end-of-defun)
   ;; Paragraph filling
-  (set (make-local-variable 'fill-paragraph-function)
-       'markdown-fill-paragraph)
-  (set
-   ;; Should match start of lines that start or separate paragraphs
-   (make-local-variable 'paragraph-start)
-       (mapconcat #'identity
-                  '(
-                    "\f" ; starts with a literal line-feed
-                    "[ \t\f]*$" ; space-only line
-                    "\\(?:[ \t]*>\\)+[ \t\f]*$"; empty line in blockquote
-                    "[ \t]*[*+-][ \t]+" ; unordered list item
-                    "[ \t]*\\(?:[0-9]+\\|#\\)\\.[ \t]+" ; ordered list item
-                    "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
-                    "[ \t]*:[ \t]+" ; definition
-                    "^|" ; table or Pandoc line block
-                    )
-                  "\\|"))
-  (set
-   ;; Should match lines that separate paragraphs without being
-   ;; part of any paragraph:
-   (make-local-variable 'paragraph-separate)
-   (mapconcat #'identity
-              '("[ \t\f]*$" ; space-only line
-                "\\(?:[ \t]*>\\)+[ \t\f]*$"; empty line in blockquote
-                ;; The following is not ideal, but the Fill customization
-                ;; options really only handle paragraph-starting prefixes,
-                ;; not paragraph-ending suffixes:
-                ".*  $" ; line ending in two spaces
-                "^#+"
-                "[ \t]*\\[\\^\\S-*\\]:[ \t]*$") ; just the start of a footnote def
-              "\\|"))
-  (set (make-local-variable 'adaptive-fill-first-line-regexp)
-       "\\`[ \t]*[A-Z]?>[ \t]*?\\'")
-  (set (make-local-variable 'adaptive-fill-regexp) "\\s-*")
-  (set (make-local-variable 'adaptive-fill-function)
-       'markdown-adaptive-fill-function)
-  (set (make-local-variable 'fill-forward-paragraph-function)
-       #'markdown-fill-forward-paragraph)
+  (setq-local fill-paragraph-function #'markdown-fill-paragraph)
+  (setq-local paragraph-start
+              ;; Should match start of lines that start or separate paragraphs
+              (mapconcat #'identity
+                         '(
+                           "\f" ; starts with a literal line-feed
+                           "[ \t\f]*$" ; space-only line
+                           "\\(?:[ \t]*>\\)+[ \t\f]*$"; empty line in blockquote
+                           "[ \t]*[*+-][ \t]+" ; unordered list item
+                           "[ \t]*\\(?:[0-9]+\\|#\\)\\.[ \t]+" ; ordered list item
+                           "[ \t]*\\[\\S-*\\]:[ \t]+" ; link ref def
+                           "[ \t]*:[ \t]+" ; definition
+                           "^|" ; table or Pandoc line block
+                           )
+                         "\\|"))
+  (setq-local paragraph-separate
+              ;; Should match lines that separate paragraphs without being
+              ;; part of any paragraph:
+              (mapconcat #'identity
+                         '("[ \t\f]*$" ; space-only line
+                           "\\(?:[ \t]*>\\)+[ \t\f]*$"; empty line in blockquote
+                           ;; The following is not ideal, but the Fill customization
+                           ;; options really only handle paragraph-starting prefixes,
+                           ;; not paragraph-ending suffixes:
+                           ".*  $" ; line ending in two spaces
+                           "^#+"
+                           "[ \t]*\\[\\^\\S-*\\]:[ \t]*$") ; just the start of a footnote def
+                         "\\|"))
+  (setq-local adaptive-fill-first-line-regexp "\\`[ \t]*[A-Z]?>[ \t]*?\\'")
+  (setq-local adaptive-fill-regexp "\\s-*")
+  (setq-local adaptive-fill-function #'markdown-adaptive-fill-function)
+  (setq-local fill-forward-paragraph-function #'markdown-fill-forward-paragraph)
   ;; Outline mode
-  (make-local-variable 'outline-regexp)
-  (setq outline-regexp markdown-regex-header)
-  (make-local-variable 'outline-level)
-  (setq outline-level 'markdown-outline-level)
+  (setq-local outline-regexp markdown-regex-header)
+  (setq-local outline-level #'markdown-outline-level)
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
   ;; ElDoc support
   (if (eval-when-compile (fboundp 'add-function))
       (add-function :before-until (local 'eldoc-documentation-function)
                     #'markdown-eldoc-function)
-    (set (make-local-variable 'eldoc-documentation-function)
-         #'markdown-eldoc-function))
+    (setq-local eldoc-documentation-function #'markdown-eldoc-function))
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
@@ -8607,11 +8588,11 @@ position."
             'markdown-pipe-at-bol-p nil t)
 
   ;; Indentation
-  (setq indent-line-function markdown-indent-function)
+  (setq-local indent-line-function markdown-indent-function)
 
   ;; Flyspell
-  (set (make-local-variable 'flyspell-generic-check-word-predicate)
-       'markdown-flyspell-check-word-p)
+  (setq-local flyspell-generic-check-word-predicate
+              #'markdown-flyspell-check-word-p)
 
   ;; Backwards compatibility with markdown-css-path
   (when (boundp 'markdown-css-path)
@@ -8654,8 +8635,7 @@ position."
   "Major mode for editing GitHub Flavored Markdown files."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
-  (set (make-local-variable 'font-lock-defaults)
-       '(gfm-font-lock-keywords))
+  (setq-local font-lock-defaults '(gfm-font-lock-keywords))
   ;; do the initial link fontification
   (markdown-gfm-parse-buffer-for-languages))
 
@@ -8668,7 +8648,7 @@ position."
       (if (markdown-live-preview-get-filename)
           (markdown-display-buffer-other-window (markdown-live-preview-export))
         (markdown-live-preview-mode -1)
-        (error "Buffer %s does not visit a file" (current-buffer)))
+        (user-error "Buffer %s does not visit a file" (current-buffer)))
     (markdown-live-preview-remove)))
 
 
