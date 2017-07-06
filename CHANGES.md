@@ -702,10 +702,10 @@ bug reports. Thanks to everyone for your contributions.
 
 *March 24, 2013*
 
-Version 2.0 is a major new stable releaes with many new features,
+Version 2.0 is a major new stable release with many new features,
 including some changes to keybindings for element insertion and
 outline navigation.  In summary, Markdown Mode now has improved
-keybdinings, smarter markup insertion commands, a general markup
+keybindings, smarter markup insertion commands, a general markup
 removal command, markup completion (normalization), markup promotion
 and demotion, list and region editing, many syntax highlighting
 improvements, new and improved movement commands, and generalized link
@@ -723,7 +723,7 @@ following and movement.
          preferred over <kbd>C-c C-a r</kbd>, which is deprecated.
     -    Footnote keybindings have been moved away from the
          <kbd>C-c C-f n</kbd> prefix.
-    -    Several other new keybdings have been introduced and are
+    -    Several other new keybindings have been introduced and are
          described in more detail below.
     -    Removed wiki link following with `RET` and
          `markdown-follow-wiki-link-on-enter` setting.  Use the
@@ -746,15 +746,15 @@ following and movement.
          extra whitespace for atx headings).
     -    Markup promotion and demotion via <kbd>C-c C--</kbd> and
          <kbd>C-c C-=</kbd>, respectively.  The sequences
-         <kbd>M-&lt;up&gt;</kbd> and <kbd>M-&lt;down&gt;</kbd> may
+         <kbd>M-<up></kbd> and <kbd>M-<down></kbd> may
          also be used.
     -    List editing: move list items up and down with
-         <kbd>M-&lt;up&gt;</kbd> and <kbd>M-&lt;down&gt;</kbd>.
-         Indent and exdent list items with <kbd>M-&lt;left&gt;</kbd>
-         and <kbd>M-&lt;right&gt;</kbd>.
+         <kbd>M-<up></kbd> and <kbd>M-<down></kbd>.
+         Indent and exdent list items with <kbd>M-<left></kbd>
+         and <kbd>M-<right></kbd>.
     -    Region editing: indent and exdent regions, with tab stops
-         determined by context, using <kbd>C-c &lt;</kbd> and <kbd>C-c
-         &gt;</kbd> (as in `python-mode`).
+         determined by context, using <kbd>C-c <</kbd> and
+         <kbd>C-c ></kbd> (as in `python-mode`).
     -    Smart list item insertion with <kbd>M-RET</kbd>, with
          indentation and marker determined by the surrounding context.
          Prefix with <kbd>C-u</kbd> to decrease the indentation by one
@@ -837,7 +837,7 @@ following and movement.
          inserted headings and horizontal rules).
     -    Unified link following: open links in a browser and wiki
          links in a new buffer with the same keybinding (<kbd>C-c
-         C-o</kbd>).  This supercedes the separate wiki link following
+         C-o</kbd>).  This supersedes the separate wiki link following
          command (<kbd>C-c C-w</kbd>).
     -    Generalized link movement and following: move between and
          open all link types (inline, reference, wiki, angle URIs)
@@ -946,7 +946,7 @@ Version 1.9 is a major new stable release with important bug fixes.
          wiki links in another window.
     -    Open inline and reference links and inline URIs in browser
          (<kbd>C-c C-o</kbd>).  Thanks to Peter Jones.
-    -    Open files in a standaline previewer or editor
+    -    Open files in a standalone previewer or editor
          (<kbd>C-c C-c o</kbd>).
     -    Clean up numbered/ordered lists (<kbd>C-c C-c n</kbd>).
          Thanks to Donald Ephraim Curtis.
@@ -1220,7 +1220,7 @@ expressions, and highlighting for bracketed wiki links.
 
 *June 29, 2007*
 
-Version 1.4 includes a small fix to the regular expression syntaxto
+Version 1.4 includes a small fix to the regular expression syntax to
 fix the Emacs 21 "Invalid escape character syntax." error.  Thanks to
 Edward O'Connor for the fix.
 
