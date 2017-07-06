@@ -6820,20 +6820,29 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
 
 ;;; Outline ===================================================================
 
-(defun markdown-move-heading-common (move-fn &optional arg)
+(defun markdown-move-heading-common (move-fn &optional arg adjust)
   "Wrapper for `outline-mode' functions to skip false positives.
 MOVE-FN is a function and ARG is its argument. For example,
 headings inside preformatted code blocks may match
-`outline-regexp' but should not be considered as headings."
+`outline-regexp' but should not be considered as headings.
+When ADJUST is non-nil, adjust the point for interactive calls
+to avoid leaving the point at invisible markup.  This adjustment
+generally should only be done for interactive calls, since other
+functions may expect the point to be at the beginning of the
+regular expression."
   (let ((prev -1) (start (point)))
     (if arg (funcall move-fn arg) (funcall move-fn))
     (while (and (/= prev (point)) (markdown-code-block-at-point-p))
       (setq prev (point))
       (if arg (funcall move-fn arg) (funcall move-fn)))
-    ;; Adjust point for setext headings
+    ;; Adjust point for setext headings and invisible text.
     (save-match-data
-      (when (thing-at-point-looking-at markdown-regex-header-setext)
-        (goto-char (match-beginning 0))))
+      (when (and adjust (thing-at-point-looking-at markdown-regex-header))
+        (if markdown-hide-markup
+            ;; Move to beginning of heading text if markup is hidden.
+            (goto-char (or (match-beginning 1) (match-beginning 5)))
+          ;; Move to beginning of markup otherwise.
+          (goto-char (or (match-beginning 1) (match-beginning 4))))))
     (if (= (point) start) nil (point))))
 
 (defun markdown-next-visible-heading (arg)
@@ -6841,14 +6850,14 @@ headings inside preformatted code blocks may match
 With argument, repeats or can move backward if negative. ARG is
 passed to `outline-next-visible-heading'."
   (interactive "p")
-  (markdown-move-heading-common 'outline-next-visible-heading arg))
+  (markdown-move-heading-common 'outline-next-visible-heading arg 'adjust))
 
 (defun markdown-previous-visible-heading (arg)
   "Move to the previous visible heading line of any level.
 With argument, repeats or can move backward if negative. ARG is
 passed to `outline-previous-visible-heading'."
   (interactive "p")
-  (markdown-move-heading-common 'outline-previous-visible-heading arg))
+  (markdown-move-heading-common 'outline-previous-visible-heading arg 'adjust))
 
 (defun markdown-next-heading ()
   "Move to the next heading line of any level."
@@ -6886,7 +6895,7 @@ Leaves match data intact for `markdown-regex-header'."
 Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-back-to-heading-over-code-block)
-  (markdown-move-heading-common 'outline-forward-same-level arg))
+  (markdown-move-heading-common 'outline-forward-same-level arg 'adjust))
 
 (defun markdown-backward-same-level (arg)
   "Move backward to the ARG'th heading at same level as this one.
@@ -6894,9 +6903,9 @@ Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-back-to-heading-over-code-block)
   (while (> arg 0)
-    ;; outline-get-last-sibling needs match-data set for outline-regexp.
-    (let ((point-to-move-to (save-excursion
-                              (outline-get-last-sibling))))
+    (let ((point-to-move-to
+           (save-excursion
+             (markdown-move-heading-common 'outline-get-last-sibling nil 'adjust))))
       (if point-to-move-to
           (progn
             (goto-char point-to-move-to)
@@ -6909,7 +6918,7 @@ With argument, move up ARG levels."
   (interactive "p")
   (and (called-interactively-p 'any)
        (not (eq last-command 'markdown-up-heading)) (push-mark))
-  (markdown-move-heading-common 'outline-up-heading arg))
+  (markdown-move-heading-common 'outline-up-heading arg 'adjust))
 
 (defun markdown-back-to-heading (&optional invisible-ok)
   "Move to previous heading line, or beg of this line if it's a heading.
