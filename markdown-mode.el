@@ -6850,22 +6850,22 @@ regular expression."
 With argument, repeats or can move backward if negative. ARG is
 passed to `outline-next-visible-heading'."
   (interactive "p")
-  (markdown-move-heading-common 'outline-next-visible-heading arg 'adjust))
+  (markdown-move-heading-common #'outline-next-visible-heading arg 'adjust))
 
 (defun markdown-previous-visible-heading (arg)
   "Move to the previous visible heading line of any level.
 With argument, repeats or can move backward if negative. ARG is
 passed to `outline-previous-visible-heading'."
   (interactive "p")
-  (markdown-move-heading-common 'outline-previous-visible-heading arg 'adjust))
+  (markdown-move-heading-common #'outline-previous-visible-heading arg 'adjust))
 
 (defun markdown-next-heading ()
   "Move to the next heading line of any level."
-  (markdown-move-heading-common 'outline-next-heading))
+  (markdown-move-heading-common #'outline-next-heading))
 
 (defun markdown-previous-heading ()
   "Move to the previous heading line of any level."
-  (markdown-move-heading-common 'outline-previous-heading))
+  (markdown-move-heading-common #'outline-previous-heading))
 
 (defun markdown-back-to-heading-over-code-block (&optional invisible-ok no-error)
   "Move back to the beginning of the previous heading.
@@ -6895,7 +6895,7 @@ Leaves match data intact for `markdown-regex-header'."
 Stop at the first and last headings of a superior heading."
   (interactive "p")
   (markdown-back-to-heading-over-code-block)
-  (markdown-move-heading-common 'outline-forward-same-level arg 'adjust))
+  (markdown-move-heading-common #'outline-forward-same-level arg 'adjust))
 
 (defun markdown-backward-same-level (arg)
   "Move backward to the ARG'th heading at same level as this one.
@@ -6905,7 +6905,7 @@ Stop at the first and last headings of a superior heading."
   (while (> arg 0)
     (let ((point-to-move-to
            (save-excursion
-             (markdown-move-heading-common 'outline-get-last-sibling nil 'adjust))))
+             (markdown-move-heading-common #'outline-get-last-sibling nil 'adjust))))
       (if point-to-move-to
           (progn
             (goto-char point-to-move-to)
@@ -6918,12 +6918,12 @@ With argument, move up ARG levels."
   (interactive "p")
   (and (called-interactively-p 'any)
        (not (eq last-command 'markdown-up-heading)) (push-mark))
-  (markdown-move-heading-common 'outline-up-heading arg 'adjust))
+  (markdown-move-heading-common #'outline-up-heading arg 'adjust))
 
 (defun markdown-back-to-heading (&optional invisible-ok)
   "Move to previous heading line, or beg of this line if it's a heading.
 Only visible heading lines are considered, unless INVISIBLE-OK is non-nil."
-  (markdown-move-heading-common 'outline-back-to-heading invisible-ok))
+  (markdown-move-heading-common #'outline-back-to-heading invisible-ok))
 
 (defalias 'markdown-end-of-heading 'outline-end-of-heading)
 
@@ -8722,9 +8722,9 @@ position."
   (setq-local comment-use-syntax t)
   ;; Syntax
   (add-hook 'syntax-propertize-extend-region-functions
-            'markdown-syntax-propertize-extend-region)
+            #'markdown-syntax-propertize-extend-region)
   (add-hook 'jit-lock-after-change-extend-region-functions
-            'markdown-font-lock-extend-region-function t t)
+            #'markdown-font-lock-extend-region-function t t)
   (setq-local syntax-propertize-function #'markdown-syntax-propertize)
   ;; Font lock.
   (setq-local markdown-mode-font-lock-keywords nil)
@@ -8740,12 +8740,12 @@ position."
   ;; Reload extensions
   (markdown-reload-extensions)
   ;; Add a buffer-local hook to reload after file-local variables are read
-  (add-hook 'hack-local-variables-hook 'markdown-handle-local-variables nil t)
+  (add-hook 'hack-local-variables-hook #'markdown-handle-local-variables nil t)
   ;; For imenu support
   (setq imenu-create-index-function
         (if markdown-nested-imenu-heading-index
-            'markdown-imenu-create-nested-index
-          'markdown-imenu-create-flat-index))
+            #'markdown-imenu-create-nested-index
+          #'markdown-imenu-create-flat-index))
   ;; For menu support in XEmacs
   (easy-menu-add markdown-mode-menu markdown-mode-map)
   ;; Defun movement
@@ -8798,11 +8798,11 @@ position."
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
   (add-hook 'fill-nobreak-predicate
-            'markdown-inside-link-p nil t)
+            #'markdown-inside-link-p nil t)
   (add-hook 'fill-nobreak-predicate
-            'markdown-line-is-reference-definition-p nil t)
+            #'markdown-line-is-reference-definition-p nil t)
   (add-hook 'fill-nobreak-predicate
-            'markdown-pipe-at-bol-p nil t)
+            #'markdown-pipe-at-bol-p nil t)
 
   ;; Indentation
   (setq-local indent-line-function markdown-indent-function)
@@ -8825,7 +8825,7 @@ position."
   ;; Make checkboxes buttons
   (when markdown-make-gfm-checkboxes-buttons
     (markdown-make-gfm-checkboxes-buttons (point-min) (point-max))
-    (add-hook 'after-change-functions 'markdown-gfm-checkbox-after-change-function t t))
+    (add-hook 'after-change-functions #'markdown-gfm-checkbox-after-change-function t t))
 
   ;; add live preview export hook
   (add-hook 'after-save-hook #'markdown-live-preview-if-markdown t t)
