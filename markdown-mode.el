@@ -3100,47 +3100,47 @@ upon failure."
 Set point to the beginning of the item, and return point, or nil
 upon failure."
   (let (bounds indent next)
-    (setq next (point))
-    (if (looking-at markdown-regex-header-setext)
-        (goto-char (match-end 0)))
-    (forward-line)
-    (setq indent (current-indentation))
-    (while
-        (cond
-         ;; Stop at end of the buffer.
-         ((eobp) nil)
-         ;; Continue if the current line is blank
-         ((markdown-cur-line-blank-p) t)
-         ;; List item
-         ((and (looking-at-p markdown-regex-list)
-               (setq bounds (markdown-cur-list-item-bounds)))
-          (cond
-           ;; Continue at item with greater indentation
-           ((> (nth 3 bounds) level) t)
-           ;; Stop and return point at item of equal indentation
-           ((= (nth 3 bounds) level)
-            (setq next (point))
-            nil)
-           ;; Stop and return nil at item with lesser indentation
-           ((< (nth 3 bounds) level)
-            (setq next nil)
-            nil)))
-         ;; Continue while indentation is the same or greater
-         ((>= indent level) t)
-         ;; Stop if current indentation is less than list item
-         ;; and the previous line was blank.
-         ((and (< indent level)
-               (markdown-prev-line-blank-p))
-          (setq next nil))
-         ;; Stop at a header
-         ((looking-at-p markdown-regex-header) (setq next nil))
-         ;; Stop at a horizontal rule
-         ((looking-at-p markdown-regex-hr) (setq next nil))
-         ;; Otherwise, continue.
-         (t t))
+    (save-excursion
+      (if (looking-at markdown-regex-header-setext)
+          (goto-char (match-end 0)))
       (forward-line)
-      (setq indent (current-indentation)))
-    next))
+      (setq indent (current-indentation))
+      (while
+          (cond
+           ;; Stop at end of the buffer.
+           ((eobp) nil)
+           ;; Continue if the current line is blank
+           ((markdown-cur-line-blank-p) t)
+           ;; List item
+           ((and (looking-at-p markdown-regex-list)
+                 (setq bounds (markdown-cur-list-item-bounds)))
+            (cond
+             ;; Continue at item with greater indentation
+             ((> (nth 3 bounds) level) t)
+             ;; Stop and return point at item of equal indentation
+             ((= (nth 3 bounds) level)
+              (setq next (point))
+              nil)
+             ;; Stop and return nil at item with lesser indentation
+             ((< (nth 3 bounds) level)
+              (setq next nil)
+              nil)))
+           ;; Continue while indentation is the same or greater
+           ((>= indent level) t)
+           ;; Stop if current indentation is less than list item
+           ;; and the previous line was blank.
+           ((and (< indent level)
+                 (markdown-prev-line-blank-p))
+            (setq next nil))
+           ;; Stop at a header
+           ((looking-at-p markdown-regex-header) (setq next nil))
+           ;; Stop at a horizontal rule
+           ((looking-at-p markdown-regex-hr) (setq next nil))
+           ;; Otherwise, continue.
+           (t t))
+        (forward-line)
+        (setq indent (current-indentation))))
+    (when next (goto-char next))))
 
 (defun markdown-cur-list-item-end (level)
   "Move to the end of the current list item with nonlist indentation LEVEL.
@@ -3233,14 +3233,14 @@ Leave match data intact for `markdown-regex-list'."
 The return value has the same form as that of
 `markdown-cur-list-item-bounds'."
   (save-excursion
-    (let ((cur-bounds (markdown-cur-list-item-bounds))
-          (beginning-of-list (save-excursion (markdown-beginning-of-list)))
-          stop)
-      (when cur-bounds
-        (goto-char (nth 0 cur-bounds))
+    (let* ((cur-bounds (markdown-cur-list-item-bounds))
+           (cur-begin (when cur-bounds (nth 0 cur-bounds)))
+           (list-begin (save-excursion (markdown-beginning-of-list)))
+           stop)
+      (when (and cur-begin list-begin (> cur-begin list-begin))
+        (goto-char cur-begin)
         (while (and (not stop) (not (bobp))
-                    (re-search-backward markdown-regex-list
-                                        beginning-of-list t))
+                    (re-search-backward markdown-regex-list list-begin t))
           (unless (or (looking-at markdown-regex-hr)
                       (markdown-code-block-at-point-p))
             (setq stop (point))))
@@ -3251,20 +3251,16 @@ The return value has the same form as that of
 The return value has the same form as that of
 `markdown-cur-list-item-bounds'."
   (save-excursion
-    (let ((cur-bounds (markdown-cur-list-item-bounds))
-          (end-of-list (save-excursion (markdown-end-of-list)))
+    (end-of-line)
+    (let ((list-end (save-excursion (markdown-end-of-list)))
           stop)
-      (when cur-bounds
-        (goto-char (nth 0 cur-bounds))
-        (end-of-line)
-        (while (and (not stop) (not (eobp))
-                    (re-search-forward markdown-regex-list
-                                       end-of-list t))
-          (unless (or (looking-at markdown-regex-hr)
-                      (markdown-code-block-at-point-p))
-            (setq stop (point))))
-        (when stop
-          (markdown-cur-list-item-bounds))))))
+      (while (and list-end (not stop) (not (eobp))
+                  (re-search-forward markdown-regex-list list-end t))
+        (unless (or (looking-at markdown-regex-hr)
+                    (markdown-code-block-at-point-p))
+          (setq stop (point))))
+      (when (and stop (<= stop list-end))
+        (markdown-cur-list-item-bounds)))))
 
 (defun markdown-beginning-of-list ()
   "Move point to beginning of list at point, if any."
@@ -3283,14 +3279,19 @@ The return value has the same form as that of
   "Move point to end of list at point, if any."
   (interactive)
   (let ((start (point))
-        (end (save-excursion
-               (when (markdown-beginning-of-list)
-                 ;; Items can't have nonlist-indent <= 1, so this
-                 ;; moves past all list items.
-                 (markdown-next-list-item 1)
-                 (skip-syntax-backward "-")
-                 (unless (eobp) (forward-char 1))
-                 (point)))))
+        (end
+         (save-excursion
+           (markdown-beginning-of-list)
+           (let* ((first-bounds (markdown-cur-list-item-bounds))
+                  (first-level (nth 3 first-bounds))
+                  (last-bounds first-bounds))
+             (when first-bounds
+               (while (markdown-next-list-item first-level)
+                 (setq last-bounds (markdown-cur-list-item-bounds)))
+               (goto-char (nth 1 last-bounds))
+               (unless (eobp)
+                 (forward-char 1))
+               (point))))))
     (when (and end (>= end start))
       (goto-char end))))
 
@@ -7153,17 +7154,23 @@ demote."
 (defun markdown-outline-next-same-level ()
   "Move to next list item or heading of same level."
   (interactive)
-  (let ((bounds (markdown-cur-list-item-bounds)))
-    (if bounds
-        (markdown-next-list-item (nth 3 bounds))
+  (let* ((cur-bounds (markdown-cur-list-item-bounds))
+         (cur-end (when cur-bounds (nth 1 cur-bounds)))
+         (list-end (save-excursion (markdown-end-of-list))))
+    (if (and cur-end list-end)
+        (when (< cur-end list-end)
+          (markdown-next-list-item (nth 3 cur-bounds)))
       (markdown-forward-same-level 1))))
 
 (defun markdown-outline-previous-same-level ()
   "Move to previous list item or heading of same level."
   (interactive)
-  (let ((bounds (markdown-cur-list-item-bounds)))
-    (if bounds
-        (markdown-prev-list-item (nth 3 bounds))
+  (let* ((cur-bounds (markdown-cur-list-item-bounds))
+         (cur-begin (when cur-bounds (nth 0 cur-bounds)))
+         (list-begin (save-excursion (markdown-beginning-of-list))))
+    (if (and cur-begin list-begin)
+        (when (> cur-begin list-begin)
+          (markdown-prev-list-item (nth 3 cur-bounds)))
       (markdown-backward-same-level 1))))
 
 (defun markdown-outline-up ()
