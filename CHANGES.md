@@ -476,6 +476,7 @@ suggestions, and especially patches.
   [gh-115]: https://github.com/jrblevin/markdown-mode/issues/115
   [gh-116]: https://github.com/jrblevin/markdown-mode/pull/116
   [gh-117]: https://github.com/jrblevin/markdown-mode/issues/117
+  [gh-118]: https://github.com/jrblevin/markdown-mode/pull/118
   [gh-119]: https://github.com/jrblevin/markdown-mode/issues/119
   [gh-121]: https://github.com/jrblevin/markdown-mode/issues/121
   [gh-122]: https://github.com/jrblevin/markdown-mode/issues/122
@@ -484,6 +485,7 @@ suggestions, and especially patches.
   [gh-127]: https://github.com/jrblevin/markdown-mode/issues/127
   [gh-128]: https://github.com/jrblevin/markdown-mode/pull/128
   [gh-129]: https://github.com/jrblevin/markdown-mode/issues/129
+  [gh-132]: https://github.com/jrblevin/markdown-mode/pull/132
   [gh-135]: https://github.com/jrblevin/markdown-mode/issues/135
   [gh-136]: https://github.com/jrblevin/markdown-mode/issues/136
   [gh-137]: https://github.com/jrblevin/markdown-mode/issues/137
@@ -502,6 +504,8 @@ suggestions, and especially patches.
   [gh-159]: https://github.com/jrblevin/markdown-mode/issues/159
   [gh-161]: https://github.com/jrblevin/markdown-mode/issues/161
   [gh-162]: https://github.com/jrblevin/markdown-mode/pull/162
+  [gh-166]: https://github.com/jrblevin/markdown-mode/issues/166
+  [gh-167]: https://github.com/jrblevin/markdown-mode/pull/167
   [gh-168]: https://github.com/jrblevin/markdown-mode/pull/168
   [gh-169]: https://github.com/jrblevin/markdown-mode/issues/169
   [gh-170]: https://github.com/jrblevin/markdown-mode/issues/170
@@ -689,6 +693,7 @@ bug reports. Thanks to everyone for your contributions.
   [gh-38]: https://github.com/jrblevin/markdown-mode/issues/38
   [gh-39]: https://github.com/jrblevin/markdown-mode/issues/39
   [gh-40]: https://github.com/jrblevin/markdown-mode/pull/40
+  [gh-41]: https://github.com/jrblevin/markdown-mode/pull/41
   [gh-53]: https://github.com/jrblevin/markdown-mode/pull/53
   [gh-54]: https://github.com/jrblevin/markdown-mode/pull/54
   [gh-57]: https://github.com/jrblevin/markdown-mode/pull/57
