@@ -2763,7 +2763,7 @@ extension support.")
   "Regular expression matching any character that is allowed in a footnote identifier.")
 
 (defconst markdown-regex-footnote-definition
-  (concat "^\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
+  (concat "^ \\{0,3\\}\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
   "Regular expression matching a footnote definition, capturing the label.")
 
 
@@ -5090,7 +5090,7 @@ character of the text, after the footnote's identifier.  If no
 footnote text is found, NIL is returned."
   (save-excursion
     (goto-char (point-min))
-    (when (re-search-forward (concat "^\\[" id "\\]:") nil t)
+    (when (re-search-forward (concat "^ \\{0,3\\}\\[" id "\\]:") nil t)
       (skip-chars-forward "[ \t]")
       (point))))
 
