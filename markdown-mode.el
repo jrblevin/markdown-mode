@@ -1745,7 +1745,11 @@ and END are the previous region to refontify."
       ;; (point-max) is deleted, but font-lock-extend-region-functions
       ;; are called.  Force a syntax property update in that case.
       (when (= end (point-max))
-        (markdown-syntax-propertize (car res) (cdr res)))
+        ;; This function is called in a buffer modification hook.
+        ;; `markdown-syntax-propertize' doesn't save the match data,
+        ;; so we have to do it here.
+        (save-match-data
+          (markdown-syntax-propertize (car res) (cdr res))))
       (setq jit-lock-start (car res)
             jit-lock-end (cdr res)))))
 
