@@ -8308,6 +8308,14 @@ return the number of paragraphs left to move."
         (goto-char start)))))
   arg)
 
+(defun markdown--inhibit-electric-quote ()
+  "Function added to `electric-quote-inhibit-functions'.
+Return non-nil if the quote has been inserted inside a code block
+or span."
+  (let ((pos (1- (point))))
+    (or (markdown-inline-code-at-pos pos)
+        (markdown-code-block-at-pos pos))))
+
 
 ;;; Extension Framework =======================================================
 
@@ -8850,6 +8858,10 @@ position."
   ;; Flyspell
   (setq-local flyspell-generic-check-word-predicate
               #'markdown-flyspell-check-word-p)
+
+  ;; Electric quoting
+  (add-hook 'electric-quote-inhibit-functions
+            #'markdown--inhibit-electric-quote nil :local)
 
   ;; Backwards compatibility with markdown-css-path
   (when (boundp 'markdown-css-path)
