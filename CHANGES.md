@@ -215,6 +215,10 @@
         ([GH-200][], [GH-201][])
     -   Adaptive filling for Leanpub blocks.
     -   Set variable `comment-use-syntax`.  ([GH-213][])
+    -   Support `electric-quote-inhibit-functions` for inhibiting
+        electric quoting in code spans and blocks.  Thanks to Philipp
+        Stephani for patches to both Emacs and Markdown Mode.
+        ([GH-220][])
 
 *   Bug fixes:
 
@@ -229,6 +233,9 @@
         a buffer.
     -   Fix font lock for subsequent inline links after a malformed
         inline link.  ([GH-209][])
+    -   Prevent clobbering match data in
+        `markdown-font-lock-extend-region-function`.  Thanks to
+        Philipp Stephani for a patch.  ([GH-221][])
 
   [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
@@ -247,6 +254,8 @@
   [gh-201]: https://github.com/jrblevin/markdown-mode/issues/201
   [gh-209]: https://github.com/jrblevin/markdown-mode/issues/209
   [gh-213]: https://github.com/jrblevin/markdown-mode/issues/213
+  [gh-220]: https://github.com/jrblevin/markdown-mode/pull/220
+  [gh-221]: https://github.com/jrblevin/markdown-mode/pull/221
 
 # Markdown Mode 2.2
 
