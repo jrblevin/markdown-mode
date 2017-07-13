@@ -7008,12 +7008,13 @@ setext header, but should not be folded."
                              (point)))
                          nil)))
 
+;; This function was originally derived from `org-cycle' from org.el.
 (defun markdown-cycle (&optional arg)
   "Visibility cycling for Markdown mode.
 If ARG is t, perform global visibility cycling.  If the point is
 at an atx-style header, cycle visibility of the corresponding
-subtree.  Otherwise, insert a tab using `indent-relative'.
-Derived from `org-cycle'."
+subtree.  Otherwise, indent the current line or insert a tab,
+as appropriate, by calling `indent-for-tab-command'."
   (interactive "P")
   (cond
    ((eq arg t) ;; Global cycling
