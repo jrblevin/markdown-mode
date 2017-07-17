@@ -930,7 +930,7 @@ following and movement.
     -    More accurate font-lock for ATX headings in edge cases.
     -    Fix killing of footnotes from footnote text.
 
---- --- 
+--- ---
 
 # Markdown Mode 1.9
 
