@@ -274,7 +274,7 @@ suggestions, and especially patches.
         been changed to <kbd>C-c C-l</kbd> (think "leap" or "loop"
         instead of jump).  It's also close to <kbd>C-c C-o</kbd> (used
         for opening links).  ([GH-26][])
-    -   Insertion of `<kbd>` tags with <kbd>C-c C-s k</kbd> or
+    -   Insertion of `kbd` tags with <kbd>C-c C-s k</kbd> or
         `markdown-insert-kbd`.
     -   Add YAML metadata parsing.  Also allow multiple Pandoc
         metadata, with tests.  Thanks to Danny McClanahan and Syohei
