@@ -589,7 +589,7 @@ bug reports. Thanks to everyone for your contributions.
         A list of pre-defined languages is included, but this can be
         augmented by setting `markdown-gfm-additional-languages`.
         ([GH-38][], [GH-54][], [GH-59][], [GH-60][], [GH-64][])
-    -   strikethrough support in `gfm-mode`.
+    -   Strikethrough support in `gfm-mode`.
     -   Support for GFM toggling checkboxes `mouse-1` or
         <kbd>RET</kbd>.  This is controlled by a new custom variable,
         `markdown-make-gfm-checkboxes-buttons`.  Thanks to Howard
