@@ -3,8 +3,8 @@
 ;; Copyright (C) 2007-2017 Jason R. Blevins and markdown-mode
 ;; contributors (see the commit log for details).
 
-;; Author: Jason R. Blevins <jrblevin@sdf.org>
-;; Maintainer: Jason R. Blevins <jrblevin@sdf.org>
+;; Author: Jason R. Blevins <jblevins@xbeta.org>
+;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
 ;; Version: 2.3-dev
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))

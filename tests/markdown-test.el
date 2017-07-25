@@ -1,6 +1,6 @@
 ;;;; markdown-test.el --- Tests for markdown-mode
 
-;; Copyright (C) 2013-2015 Jason R. Blevins <jrblevin@sdf.org>
+;; Copyright (C) 2013-2017 Jason R. Blevins <jblevins@xbeta.org>
 ;; Copyright (C) 2013 Makoto Motohashi <mkt.motohashi@gmail.com>
 ;; Copyright (C) 2015 Google, Inc. (Contributor: Samuel Freilich <sfreilich@google.com>)
 
