@@ -861,7 +861,9 @@ by `markdown-mode` and `gfm-mode` as described below.
   (and it is set to t by default).  These checkboxes can be
   toggled by clicking `mouse-1`, pressing <kbd>RET</kbd> over the button,
   or by pressing <kbd>C-c C-d</kbd> (`markdown-do`) with the point anywhere
-  in the task list item.
+  in the task list item.  A normal list item can be turned to a check
+  list item by the same command, or more specifically `C-c C-x [`
+  (`markdown-add-gfm-checkbox`).
 
 * **Wiki links:** Generic wiki links are supported in
   `markdown-mode`, but in `gfm-mode` specifically they will be
