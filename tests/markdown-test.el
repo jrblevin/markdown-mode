@@ -4956,6 +4956,11 @@ This includes preserving whitespace after the pipe."
    (should (equal (car (markdown-gfm-get-corpus)) "elisp"))
    (should (string-equal (buffer-string)
                          "line 1\n\n``` elisp\n\n```\n\nline 2\n")))
+  ;; Test ‘markdown-spaces-after-code-fence’.
+  (markdown-test-string-gfm ""
+    (let ((markdown-spaces-after-code-fence 0))
+      (markdown-insert-gfm-code-block "elisp")
+      (should (equal (buffer-string) "```elisp\n\n```"))))
   ;; Test with active region
   (markdown-test-string-gfm "line 1\nline 2\nline 3\n"
    (forward-line)
