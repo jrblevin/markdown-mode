@@ -187,8 +187,9 @@
         <kbd>C-c C-f</kbd>, <kbd>C-c C-b</kbd>, and <kbd>C-c C-u</kbd>
         now move between list items, when the point is in a list,
         and move between headings otherwise.
-    -   New customization option `markdown-spaces-after-code-fence` to control
-        the number of spaces inserted after a code fence (` ``` `).
+    -   New customization option `markdown-spaces-after-code-fence` to
+        control the number of spaces inserted after a code fence (` ``` `).
+        Thanks to Philip Stephani for a patch.
 
 *   Improvements:
 
