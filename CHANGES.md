@@ -241,6 +241,8 @@
     -   Prevent clobbering match data in
         `markdown-font-lock-extend-region-function`.  Thanks to
         Philipp Stephani for a patch.  ([GH-221][])
+    -   Fix incorrect indentation of inserted GFM code blocks in lists.
+        ([GH-215][])
 
   [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
@@ -260,6 +262,7 @@
   [gh-201]: https://github.com/jrblevin/markdown-mode/issues/201
   [gh-209]: https://github.com/jrblevin/markdown-mode/issues/209
   [gh-213]: https://github.com/jrblevin/markdown-mode/issues/213
+  [gh-215]: https://github.com/jrblevin/markdown-mode/issues/215
   [gh-220]: https://github.com/jrblevin/markdown-mode/pull/220
   [gh-221]: https://github.com/jrblevin/markdown-mode/pull/221
 
