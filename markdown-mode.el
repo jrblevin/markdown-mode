@@ -8862,8 +8862,6 @@ position."
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)
   (add-hook 'fill-nobreak-predicate
-            #'markdown-inside-link-p nil t)
-  (add-hook 'fill-nobreak-predicate
             #'markdown-line-is-reference-definition-p nil t)
   (add-hook 'fill-nobreak-predicate
             #'markdown-pipe-at-bol-p nil t)

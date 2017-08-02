@@ -222,6 +222,8 @@
         electric quoting in code spans and blocks.  Thanks to Philipp
         Stephani for patches to both Emacs and Markdown Mode.
         ([GH-220][])
+    -   Stop inhibiting line breaks inside links when filling.
+        ([GH-173][])
 
 *   Bug fixes:
 
@@ -247,6 +249,7 @@
   [gh-144]: https://github.com/jrblevin/markdown-mode/issues/144
   [gh-164]: https://github.com/jrblevin/markdown-mode/issues/164
   [gh-172]: https://github.com/jrblevin/markdown-mode/issues/172
+  [gh-173]: https://github.com/jrblevin/markdown-mode/issues/173
   [gh-176]: https://github.com/jrblevin/markdown-mode/issues/176
   [gh-185]: https://github.com/jrblevin/markdown-mode/issues/185
   [gh-191]: https://github.com/jrblevin/markdown-mode/issues/191

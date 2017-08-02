@@ -4721,11 +4721,14 @@ paragraph 2")))))
       (should (string-equal (buffer-string) text)))))
 
 (ert-deftest test-markdown-filling/long-paragraph-with-link ()
-  "Test `fill-paragraph' on a long paragraph with a long link."
+  "Test `fill-paragraph' on a long paragraph with a long link.
+See GH-173."
   (markdown-test-string
    "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."
-   (fill-paragraph)
-   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa\naaa aaa [aaa aaa aaa aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa\naaa aaa aaa aaa."))))
+   (let ((fill-column 79)) (fill-paragraph))
+   (should (string-equal (buffer-string) "aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa
+aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa aaa [aaa aaa aaa
+aaa](aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa) aaa aaa aaa aaa aaa."))))
 
 (ert-deftest test-markdown-filling/pandoc-line-blocks ()
   "Filling should leave Pandoc line blocks undisturbed.
