@@ -4973,7 +4973,27 @@ This includes preserving whitespace after the pipe."
    (should (markdown-use-region-p))
    (markdown-insert-gfm-code-block "elisp")
    (should (string-equal (buffer-string)
-                         "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n"))))
+                         "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n")))
+  ;; Test indented list item
+  (markdown-test-string-gfm "1. foo\n   "
+    (goto-char (point-max))
+    (markdown-insert-gfm-code-block "elisp")
+    (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                   "1. foo\n\n   ``` elisp\n   \n   ```"))
+    (should (equal (buffer-substring-no-properties (point) (point-max))
+                   "\n   ```")))
+  ;; Test indented list item with active region
+  (markdown-test-string-gfm "1.  foo\n    bar\n"
+    (let ((transient-mark-mode t))
+      (forward-line)
+      (push-mark nil :nomsg :activate)
+      (end-of-line)
+      (should (markdown-use-region-p))
+      (markdown-insert-gfm-code-block "elisp"))
+    (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                   "1.  foo\n\n    ``` elisp\n    bar\n    ```\n\n"))
+    (should (equal (buffer-substring-no-properties (point) (point-max))
+                   "\n    bar\n    ```\n\n"))))
 
 (ert-deftest test-markdown-gfm/gfm-parse-buffer-for-languages ()
   "Parse buffer for existing languages for `markdown-gfm-used-languages' test."
