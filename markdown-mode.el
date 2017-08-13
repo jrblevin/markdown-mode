@@ -1347,6 +1347,11 @@ This applies to insertions done with
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-gfm-uppercase-checkbox nil
+  "If non-nil, use [X] for completed checkboxes, [x] otherwise."
+  :group 'markdown
+  :type 'boolean)
+
 (defcustom markdown-hide-urls nil
   "Hide URLs of inline links and reference tags of reference links.
 Such URLs will be replaced by a single customizable
@@ -8495,7 +8500,9 @@ Returns nil if there is no task list item at the point."
           ;; Advance to column of first non-whitespace after marker
           (forward-char (cl-fourth bounds))
           (cond ((looking-at "\\[ \\]")
-                 (replace-match "[x]" nil t)
+                 (replace-match
+                  (if markdown-gfm-uppercase-checkbox "[X]" "[x]")
+                  nil t)
                  (match-string-no-properties 0))
                 ((looking-at "\\[[xX]\\]")
                  (replace-match "[ ]" nil t)
