@@ -242,6 +242,7 @@
         `markdown-font-lock-extend-region-function`.  Thanks to
         Philipp Stephani for a patch.  ([GH-221][])
     -   Fix incorrect indentation of inserted GFM code blocks in lists.
+        Thanks to Philip Stephani for a patch.
         ([GH-215][])
 
   [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
