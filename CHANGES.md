@@ -190,6 +190,9 @@
     -   New customization option `markdown-spaces-after-code-fence` to
         control the number of spaces inserted after a code fence (` ``` `).
         Thanks to Philip Stephani for a patch.
+    -   New customization option `markdown-gfm-uppercase-checkbox` which,
+        when non-nil, uses `[X]` to complete task list items instead of
+        `[x]`.  Thanks to Paul Rankin for a patch.  ([GH-236][])
 
 *   Improvements:
 
@@ -266,6 +269,7 @@
   [gh-215]: https://github.com/jrblevin/markdown-mode/issues/215
   [gh-220]: https://github.com/jrblevin/markdown-mode/pull/220
   [gh-221]: https://github.com/jrblevin/markdown-mode/pull/221
+  [gh-236]: https://github.com/jrblevin/markdown-mode/pull/236
 
 # Markdown Mode 2.2
 

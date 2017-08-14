@@ -766,6 +766,11 @@
 ;;      interactively by pressing `C-c C-x C-f`
 ;;      (`markdown-toggle-fontify-code-blocks-natively').
 ;;
+;;   * `markdown-gfm-uppercase-checkbox' - When non-nil, complete GFM
+;;     task list items with `[X]` instead of `[x]` (default: `nil').
+;;     This is useful for compatibility with `org-mode', which doesn't
+;;     recognize the lowercase variant.
+;;
 ;; Additionally, the faces used for syntax highlighting can be modified to
 ;; your liking by issuing `M-x customize-group RET markdown-faces`
 ;; or by using the "Markdown Faces" link at the bottom of the mode
@@ -1350,7 +1355,8 @@ This applies to insertions done with
 (defcustom markdown-gfm-uppercase-checkbox nil
   "If non-nil, use [X] for completed checkboxes, [x] otherwise."
   :group 'markdown
-  :type 'boolean)
+  :type 'boolean
+  :safe 'booleanp)
 
 (defcustom markdown-hide-urls nil
   "Hide URLs of inline links and reference tags of reference links.
