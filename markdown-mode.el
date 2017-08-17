@@ -353,7 +353,7 @@
 ;;     `markdown-live-preview-window-function' can be customized to open
 ;;     in a browser other than `eww'.  If you want to force the
 ;;     preview window to appear at the bottom or right, you can
-;;     customize `markdown-split-window-direction`.
+;;     customize `markdown-split-window-direction'.
 ;;
 ;;     To summarize:
 ;;
