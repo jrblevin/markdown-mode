@@ -750,6 +750,11 @@ provides an interface to all of the possible customizations:
      interactively by pressing <kbd>C-c C-x C-f</kbd>
      (`markdown-toggle-fontify-code-blocks-natively`).
 
+  * `markdown-gfm-uppercase-checkbox` - When non-nil, complete GFM
+    task list items with `[X]` instead of `[x]` (default: `nil`).
+    This is useful for compatibility with `org-mode`, which doesn't
+    recognize the lowercase variant.
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode
