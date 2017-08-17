@@ -63,7 +63,16 @@
 
 ;;; Installation:
 
-;; The recommended way to install markdown-mode is to install the package
+;; _Note:_ To use all of the features of `markdown-mode', you'll need
+;; to install the Emacs package itself and also have a local Markdown
+;; processor installed (e.g., Markdown.pl, MultiMarkdown, or Pandoc).
+;; The external processor is not required for editing, but will be
+;; used for rendering HTML for preview and export. After installing
+;; the Emacs package, be sure to configure `markdown-command' to point
+;; to the preferred Markdown executable on your system.  See the
+;; Customization section below for more details.
+
+;; The recommended way to install `markdown-mode' is to install the package
 ;; from [MELPA Stable](https://stable.melpa.org/#/markdown-mode)
 ;; using `package.el'. First, configure `package.el' and the MELPA Stable
 ;; repository by adding the following to your `.emacs', `init.el',
