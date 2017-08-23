@@ -5697,6 +5697,18 @@ Assumes match data is available for `markdown-regex-italic'."
    (propertize "- = hr" 'face 'markdown-hr-face) ", "
    "C-h = more"))
 
+(defun markdown--command-map-prompt ()
+  "Return prompt for Markdown buffer-wide commands."
+  (concat
+   "Command: "
+   (propertize "m" 'face 'markdown-bold-face) "arkdown, "
+   (propertize "p" 'face 'markdown-bold-face) "review, "
+   (propertize "o" 'face 'markdown-bold-face) "pen, "
+   (propertize "e" 'face 'markdown-bold-face) "xport, "
+   "export & pre" (propertize "v" 'face 'markdown-bold-face) "iew, "
+   (propertize "c" 'face 'markdown-bold-face) "heck refs, "
+   "C-h = more"))
+
 (defvar markdown-mode-style-map
   (let ((map (make-keymap (markdown--style-map-prompt))))
     (define-key map (kbd "1") 'markdown-insert-header-atx-1)
@@ -5728,6 +5740,21 @@ Assumes match data is available for `markdown-regex-italic'."
     map)
   "Keymap for Markdown text styling commands.")
 
+(defvar markdown-mode-command-map
+  (let ((map (make-keymap (markdown--command-map-prompt))))
+    (define-key map (kbd "m") 'markdown-other-window)
+    (define-key map (kbd "p") 'markdown-preview)
+    (define-key map (kbd "e") 'markdown-export)
+    (define-key map (kbd "v") 'markdown-export-and-preview)
+    (define-key map (kbd "o") 'markdown-open)
+    (define-key map (kbd "l") 'markdown-live-preview-mode)
+    (define-key map (kbd "w") 'markdown-kill-ring-save)
+    (define-key map (kbd "c") 'markdown-check-refs)
+    (define-key map (kbd "n") 'markdown-cleanup-list-numbers)
+    (define-key map (kbd "]") 'markdown-complete-buffer)
+    map)
+  "Keymap for Markdown buffer-wide commands.")
+
 (defvar markdown-mode-map
   (let ((map (make-keymap)))
     ;; Markup insertion & removal
@@ -5741,6 +5768,7 @@ Assumes match data is available for `markdown-regex-italic'."
     ;; Following and doing things
     (define-key map (kbd "C-c C-o") 'markdown-follow-thing-at-point)
     (define-key map (kbd "C-c C-d") 'markdown-do)
+    (define-key map (kbd "C-c '") 'markdown-edit-code-block)
     ;; Indentation
     (define-key map (kbd "C-m") 'markdown-enter-key)
     (define-key map (kbd "DEL") 'markdown-outdent-or-delete)
@@ -5758,17 +5786,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-b") 'markdown-outline-previous-same-level)
     (define-key map (kbd "C-c C-u") 'markdown-outline-up)
     ;; Buffer-wide commands
-    (define-key map (kbd "C-c C-c m") 'markdown-other-window)
-    (define-key map (kbd "C-c C-c p") 'markdown-preview)
-    (define-key map (kbd "C-c C-c e") 'markdown-export)
-    (define-key map (kbd "C-c C-c v") 'markdown-export-and-preview)
-    (define-key map (kbd "C-c C-c o") 'markdown-open)
-    (define-key map (kbd "C-c C-c l") 'markdown-live-preview-mode)
-    (define-key map (kbd "C-c C-c w") 'markdown-kill-ring-save)
-    (define-key map (kbd "C-c C-c c") 'markdown-check-refs)
-    (define-key map (kbd "C-c C-c n") 'markdown-cleanup-list-numbers)
-    (define-key map (kbd "C-c C-c ]") 'markdown-complete-buffer)
-    (define-key map (kbd "C-c '") 'markdown-edit-code-block)
+    (define-key map (kbd "C-c C-c") markdown-mode-command-map)
     ;; Subtree and list editing
     (define-key map (kbd "C-c <up>") 'markdown-move-up)
     (define-key map (kbd "C-c <down>") 'markdown-move-down)
