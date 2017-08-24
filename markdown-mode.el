@@ -1341,6 +1341,14 @@ Used in `markdown-demote-list-item' and
   :group 'markdown
   :type 'integer)
 
+(defcustom markdown-enable-prefix-prompts t
+  "Display prompts for certain prefix commands.
+Set to nil to disable these prompts."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.3"))
+
 (defcustom markdown-gfm-additional-languages nil
   "Extra languages made available when inserting GFM code blocks.
 Language strings must have be trimmed of whitespace and not
@@ -5684,30 +5692,32 @@ Assumes match data is available for `markdown-regex-italic'."
 
 (defun markdown--style-map-prompt ()
   "Return a formatted prompt for Markdown markup insertion."
-  (concat
-   "Markdown: "
-   (propertize "bold" 'face 'markdown-bold-face) ", "
-   (propertize "italic" 'face 'markdown-italic-face) ", "
-   (propertize "code" 'face 'markdown-inline-code-face) ", "
-   (propertize "C = GFM code" 'face 'markdown-code-face) ", "
-   (propertize "pre" 'face 'markdown-pre-face) ", "
-   (propertize "footnote" 'face 'markdown-footnote-text-face) ", "
-   (propertize "q = blockquote" 'face 'markdown-blockquote-face) ", "
-   (propertize "h & 1-6 = heading" 'face 'markdown-header-face) ", "
-   (propertize "- = hr" 'face 'markdown-hr-face) ", "
-   "C-h = more"))
+  (when markdown-enable-prefix-prompts
+    (concat
+     "Markdown: "
+     (propertize "bold" 'face 'markdown-bold-face) ", "
+     (propertize "italic" 'face 'markdown-italic-face) ", "
+     (propertize "code" 'face 'markdown-inline-code-face) ", "
+     (propertize "C = GFM code" 'face 'markdown-code-face) ", "
+     (propertize "pre" 'face 'markdown-pre-face) ", "
+     (propertize "footnote" 'face 'markdown-footnote-text-face) ", "
+     (propertize "q = blockquote" 'face 'markdown-blockquote-face) ", "
+     (propertize "h & 1-6 = heading" 'face 'markdown-header-face) ", "
+     (propertize "- = hr" 'face 'markdown-hr-face) ", "
+     "C-h = more")))
 
 (defun markdown--command-map-prompt ()
   "Return prompt for Markdown buffer-wide commands."
-  (concat
-   "Command: "
-   (propertize "m" 'face 'markdown-bold-face) "arkdown, "
-   (propertize "p" 'face 'markdown-bold-face) "review, "
-   (propertize "o" 'face 'markdown-bold-face) "pen, "
-   (propertize "e" 'face 'markdown-bold-face) "xport, "
-   "export & pre" (propertize "v" 'face 'markdown-bold-face) "iew, "
-   (propertize "c" 'face 'markdown-bold-face) "heck refs, "
-   "C-h = more"))
+  (when markdown-enable-prefix-prompts
+    (concat
+     "Command: "
+     (propertize "m" 'face 'markdown-bold-face) "arkdown, "
+     (propertize "p" 'face 'markdown-bold-face) "review, "
+     (propertize "o" 'face 'markdown-bold-face) "pen, "
+     (propertize "e" 'face 'markdown-bold-face) "xport, "
+     "export & pre" (propertize "v" 'face 'markdown-bold-face) "iew, "
+     (propertize "c" 'face 'markdown-bold-face) "heck refs, "
+     "C-h = more")))
 
 (defvar markdown-mode-style-map
   (let ((map (make-keymap (markdown--style-map-prompt))))
