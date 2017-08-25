@@ -9007,5 +9007,6 @@ position."
 (provide 'markdown-mode)
 ;; Local Variables:
 ;; indent-tabs-mode: nil
+;; coding: utf-8
 ;; End:
 ;;; markdown-mode.el ends here
