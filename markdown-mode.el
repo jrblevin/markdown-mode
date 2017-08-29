@@ -2494,6 +2494,20 @@ See `markdown-hide-markup' for additional details."
   :group 'markdown-faces)
 
 (defface markdown-code-face
+  (let* ((default-bg (or (face-background 'default) "unspecified-bg"))
+         (light-bg (if (equal default-bg "unspecified-bg")
+                       "unspecified-bg"
+                     (color-darken-name default-bg 3)))
+         (dark-bg (if (equal default-bg "unspecified-bg")
+                       "unspecified-bg"
+                     (color-lighten-name default-bg 3))))
+    `((default :inherit fixed-pitch)
+      (((type graphic) (class color) (background dark)) (:background ,dark-bg))
+      (((type graphic) (class color) (background light)) (:background ,light-bg))))
+  "Face for inline code, pre blocks, and fenced code blocks."
+  :group 'markdown-faces)
+
+(defface markdown-code-face
   `((t (:inherit fixed-pitch)))
   "Face for inline code, pre blocks, and fenced code blocks."
   :group 'markdown-faces)
@@ -2667,22 +2681,6 @@ size of `markdown-header-face'."
                         (t (float (nth num markdown-header-scaling-values))))))
       (unless (get face-name 'saved-face) ; Don't update customized faces
         (set-face-attribute face-name nil :height scale)))))
-
-(defun markdown-update-code-face ()
-  "Generate `markdown-code-face' for code block backgrounds.
-When using a light-background theme, darken the background slightly for
-code blocks.  Similarly, when using a dark-background theme, lighten it
-slightly.  If the face has been customized already, leave it alone."
-  ;; Don't update customized faces
-  (unless (get 'markdown-code-face 'saved-face)
-    (let ((bg (face-background 'default)))
-      (when (and bg (not (equal bg "unspecified-bg")))
-        (set-face-attribute
-         'markdown-code-face nil
-         :background
-         (cl-case (cdr (assq 'background-mode (frame-parameters)))
-           ('light (color-darken-name bg 3))
-           ('dark (color-lighten-name bg 3))))))))
 
 (defun markdown-syntactic-face (state)
   "Return font-lock face for characters with given STATE.
@@ -8869,7 +8867,6 @@ position."
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
-  (markdown-update-code-face)
   ;; Reload extensions
   (markdown-reload-extensions)
   ;; Add a buffer-local hook to reload after file-local variables are read
