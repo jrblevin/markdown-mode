@@ -7928,6 +7928,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            ;; Markup part
            (mp (list 'face 'markdown-markup-face
                      'invisible 'markdown-markup
+                     'rear-nonsticky t
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
@@ -7966,6 +7967,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            ;; Markup part
            (mp (list 'face 'markdown-markup-face
                      'invisible 'markdown-markup
+                     'rear-nonsticky t
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
@@ -7999,6 +8001,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            ;; Markup part
            (mp (list 'face 'markdown-markup-face
                      'invisible 'markdown-markup
+                     'rear-nonsticky t
                      'font-lock-multiline t))
            ;; URI part
            (up (list 'keymap markdown-mode-mouse-map
@@ -8018,6 +8021,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string."
            (props (list 'keymap markdown-mode-mouse-map
                         'face 'markdown-plain-url-face
                         'mouse-face 'markdown-highlight-face
+                        'rear-nonsticky t
                         'font-lock-multiline t)))
       (add-text-properties start end props)
       t)))
