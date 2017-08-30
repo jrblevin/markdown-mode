@@ -7170,7 +7170,9 @@ Calls `markdown-cycle' with argument t."
 (defun markdown-outline-level ()
   "Return the depth to which a statement is nested in the outline."
   (cond
-   ((markdown-code-block-at-point-p) 7) ;; Only 6 header levels are defined.
+   ((and (match-beginning 0)
+         (markdown-code-block-at-pos (match-beginning 0)))
+    7) ;; Only 6 header levels are defined.
    ((match-end 2) 1)
    ((match-end 3) 2)
    ((match-end 4)

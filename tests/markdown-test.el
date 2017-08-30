@@ -2940,6 +2940,25 @@ takes precedence)."
     (should (markdown-on-heading-p))
     (should-not (markdown-range-property-any 453 484 'face '(markdown-hr-face)))))
 
+(ert-deftest test-markdown-font-lock/heading-code-block-no-whitespace ()
+  "Headings immediately before code blocks should be identified correctly.
+See GH-234."
+  (markdown-test-string
+   "#### code snippet
+```javascript
+const styles = require('gadgets/dist/styles.css');
+```"
+   (goto-char (point-min))
+   (forward-word)
+   (should (markdown-on-heading-p))
+   (should (markdown-match-propertized-text 'markdown-heading (point-at-eol)))
+   (goto-char (match-beginning 0))
+   (should (markdown-outline-level))
+   (should (= (markdown-outline-level) 4))
+   (markdown-test-range-has-face 6 17 'markdown-header-face-4)
+   (end-of-line)
+   (should-not (markdown-code-block-at-point-p))))
+
 (ert-deftest test-markdown-font-lock/inline-attributes ()
   "Test inline attributes before a fenced code block."
   (markdown-test-file "Leanpub.md"
