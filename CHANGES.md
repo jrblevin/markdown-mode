@@ -193,6 +193,9 @@
     -   New customization option `markdown-gfm-uppercase-checkbox` which,
         when non-nil, uses `[X]` to complete task list items instead of
         `[x]`.  Thanks to Paul Rankin for a patch.  ([GH-236][])
+    -   Add prefix-specific prompts for styles (`C-c C-s`) and toggles
+        (`C-c C-x`).  These may be disabled if desired by setting
+        `markdown-enable-prefix-prompts` to `nil`.
 
 *   Improvements:
 
@@ -247,6 +250,8 @@
     -   Fix incorrect indentation of inserted GFM code blocks in lists.
         Thanks to Philip Stephani for a patch.
         ([GH-215][])
+    -   Fix an issue with font lock for headings with code blocks immediately
+        afterwards, without whitespace. ([GH-234][])
 
   [gh-81]:  https://github.com/jrblevin/markdown-mode/issues/81
   [gh-123]: https://github.com/jrblevin/markdown-mode/issues/123
@@ -269,6 +274,7 @@
   [gh-215]: https://github.com/jrblevin/markdown-mode/issues/215
   [gh-220]: https://github.com/jrblevin/markdown-mode/pull/220
   [gh-221]: https://github.com/jrblevin/markdown-mode/pull/221
+  [gh-234]: https://github.com/jrblevin/markdown-mode/issues/234
   [gh-236]: https://github.com/jrblevin/markdown-mode/pull/236
 
 # Markdown Mode 2.2
