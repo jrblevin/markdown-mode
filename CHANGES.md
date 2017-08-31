@@ -189,7 +189,7 @@
         and move between headings otherwise.
     -   New customization option `markdown-spaces-after-code-fence` to
         control the number of spaces inserted after a code fence (` ``` `).
-        Thanks to Philip Stephani for a patch.
+        Thanks to Philipp Stephani for a patch.  ([GH-232][])
     -   New customization option `markdown-gfm-uppercase-checkbox` which,
         when non-nil, uses `[X]` to complete task list items instead of
         `[x]`.  Thanks to Paul Rankin for a patch.  ([GH-236][])
@@ -248,8 +248,7 @@
         `markdown-font-lock-extend-region-function`.  Thanks to
         Philipp Stephani for a patch.  ([GH-221][])
     -   Fix incorrect indentation of inserted GFM code blocks in lists.
-        Thanks to Philip Stephani for a patch.
-        ([GH-215][])
+        Thanks to Philipp Stephani for a patch. ([GH-215][])
     -   Fix an issue with font lock for headings with code blocks immediately
         afterwards, without whitespace. ([GH-234][])
 
@@ -274,6 +273,7 @@
   [gh-215]: https://github.com/jrblevin/markdown-mode/issues/215
   [gh-220]: https://github.com/jrblevin/markdown-mode/pull/220
   [gh-221]: https://github.com/jrblevin/markdown-mode/pull/221
+  [gh-232]: https://github.com/jrblevin/markdown-mode/pull/232
   [gh-234]: https://github.com/jrblevin/markdown-mode/issues/234
   [gh-236]: https://github.com/jrblevin/markdown-mode/pull/236
 
