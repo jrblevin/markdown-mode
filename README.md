@@ -13,35 +13,34 @@
      markdown-mode.el. Make edits there, not here. -->
 
 markdown-mode is a major mode for editing [Markdown][]-formatted
-text. The latest stable version is markdown-mode 2.2, released on
-May 26, 2017. See the [release notes][] for details.
-markdown-mode is free software, licensed under the GNU GPL v2.
+text.  The latest stable version is markdown-mode 2.3, released on
+August 31, 2017.  See the [release notes][] for details.
+markdown-mode is free software, licensed under the GNU GPL,
+version 3 or later.
 
-![Markdown Mode Screenshot](http://jblevins.org/projects/markdown-mode/screenshots/20160108-001.png)
+![Markdown Mode Screenshot](https://jblevins.org/projects/markdown-mode/screenshots/20170818-001.png)
 
 [Markdown]: http://daringfireball.net/projects/markdown/
-[release notes]: http://jblevins.org/projects/markdown-mode/rev-2-2
+[release notes]: https://jblevins.org/projects/markdown-mode/rev-2-3
 
 ## Documentation
 
-<a href="https://leanpub.com/markdown-mode"><img src="http://jblevins.org/projects/markdown-mode/guide-v2.2.png" align="right" height="350" width="252"></a>
+<a href="https://leanpub.com/markdown-mode">
+<img src="https://jblevins.org/projects/markdown-mode/guide-v2.3.png" align="right" height="350" width="231">
+</a>
 
-Documentation for Markdown Mode is available below, but Emacs is also
-a self-documenting editor.  That means that the source code itself
-contains additional documentation: each function has its own docstring
-available via <kbd>C-h f</kbd> (`describe-function`), individual keybindings
-can be investigated with <kbd>C-h k</kbd> (`describe-key`), and a complete list
-of keybindings is available using <kbd>C-h m</kbd> (`describe-mode`).
-
-Additionally, to celebrate Markdown Mode's 10th birthday the package
-creator is writing a [Guide to Markdown Mode for Emacs][guide].  This
-ebook will supplement the existing documentation with in-depth
-discussion of advanced movement and editing commands, configuration
-examples, tips and tricks, and a survey of other packages that work
-with Markdown Mode.  It will be [published at Leanpub][guide] and
-possibly available through other channels.  Please visit
-the [book homepage][guide] to sign up to be notified when it is ready
-and to help determine the price.
+The primary documentation for Markdown Mode is available below, and
+is generated from comments in the source code.  For a more in-depth
+treatment, the [_Guide to Markdown Mode for Emacs_][guide] covers
+Markdown syntax, advanced movement and editing in Emacs,
+extensions, configuration examples, tips and tricks, and a survey
+of other packages that work with Markdown Mode.  Finally, Emacs is
+also a self-documenting editor.  This means that the source code
+itself contains additional documentation: each function has its own
+docstring available via <kbd>C-h f</kbd> (`describe-function`), individual
+keybindings can be investigated with <kbd>C-h k</kbd> (`describe-key`), and
+a complete list of keybindings is available using <kbd>C-h m</kbd>
+(`describe-mode`).
 
  [guide]: https://leanpub.com/markdown-mode
 
@@ -112,7 +111,7 @@ to load automatically by adding the following to your init file:
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 ```
 
-[markdown-mode.el]: http://jblevins.org/projects/markdown-mode/markdown-mode.el
+[markdown-mode.el]: https://jblevins.org/projects/markdown-mode/markdown-mode.el
 
 **Development Version**
 
@@ -171,16 +170,15 @@ you will need to install the [`edit-indirect`][ei] package.
 
 Keybindings are grouped by prefixes based on their function.  For
 example, the commands for styling text are grouped under <kbd>C-c C-s</kbd>
-and commands dealing with headings begin with <kbd>C-c C-t</kbd> (mnemonic:
-titling).  The primary commands in each group will are described
-below.  You can obtain a list of all keybindings by pressing `C-c
-C-h`.  Movement and shifting commands tend to be associated with
-paired delimiters such as <kbd>M-{</kbd> and <kbd>M-}</kbd> or <kbd>C-c <</kbd> and <kbd>C-c ></kbd>.
-Outline navigation keybindings the same as in `org-mode`.  Finally,
-commands for running Markdown or doing maintenance on an open file
-are grouped under the <kbd>C-c C-c</kbd> prefix.  The most commonly used
-commands are described below.  You can obtain a list of all
-keybindings by pressing <kbd>C-c C-h</kbd>.
+and toggle commands begin with <kbd>C-c C-x</kbd>.  The primary commands in
+each group will are described below.  You can obtain a list of all
+keybindings by pressing <kbd>C-c C-h</kbd>.  Movement and shifting commands
+tend to be associated with paired delimiters such as <kbd>M-{</kbd> and
+<kbd>M-}</kbd> or <kbd>C-c <</kbd> and <kbd>C-c ></kbd>.  Outline navigation keybindings the
+same as in `org-mode`.  Finally, commands for running Markdown or
+doing maintenance on an open file are grouped under the <kbd>C-c C-c</kbd>
+prefix.  The most commonly used commands are described below. You
+can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Links and Images: <kbd>C-c C-l</kbd> and <kbd>C-c C-i</kbd>
 
@@ -394,7 +392,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     moving backward or forward through the list of rule strings in
     `markdown-hr-strings`.  For bold and italic text, promotion and
     demotion means changing the markup from underscores to asterisks.
-    Press <kbd>C-c C--</kbd> or <kbd>C-c <left></kbd> to promote the element at the point
+    Press <kbd>C-c C--</kbd> or <kbd>C-c LEFT</kbd> to promote the element at the point
     if possible.
 
     To remember these commands, note that <kbd>-</kbd> is for decreasing the
@@ -413,7 +411,7 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     completes the markup at the point, if it is determined to be
     incomplete.
 
-  * Editing Lists: <kbd>M-RET</kbd>, <kbd>C-c <up></kbd>, <kbd>C-c <down></kbd>, <kbd>C-c <left></kbd>, and <kbd>C-c <right></kbd>
+  * Editing Lists: <kbd>M-RET</kbd>, <kbd>C-c UP</kbd>, <kbd>C-c DOWN</kbd>, <kbd>C-c LEFT</kbd>, and <kbd>C-c RIGHT</kbd>
 
     New list items can be inserted with <kbd>M-RET</kbd> or <kbd>C-c C-j</kbd>.  This
     command determines the appropriate marker (one of the possible
@@ -426,17 +424,17 @@ keybindings by pressing <kbd>C-c C-h</kbd>.
     one level.
 
     Existing list items (and their nested sub-items) can be moved
-    up or down with <kbd>C-c <up></kbd> or <kbd>C-c <down></kbd> and indented or
-    outdented with <kbd>C-c <right></kbd> or <kbd>C-c <left></kbd>.
+    up or down with <kbd>C-c UP</kbd> or <kbd>C-c DOWN</kbd> and indented or
+    outdented with <kbd>C-c RIGHT</kbd> or <kbd>C-c LEFT</kbd>.
 
-  * Editing Subtrees: <kbd>C-c <up></kbd>, <kbd>C-c <down></kbd>, <kbd>C-c <left></kbd>, and <kbd>C-c <right></kbd>
+  * Editing Subtrees: <kbd>C-c UP</kbd>, <kbd>C-c DOWN</kbd>, <kbd>C-c LEFT</kbd>, and <kbd>C-c RIGHT</kbd>
 
     Entire subtrees of ATX headings can be promoted and demoted
-    with <kbd>C-c <left></kbd> and <kbd>C-c <right></kbd>, which are the same keybindings
+    with <kbd>C-c LEFT</kbd> and <kbd>C-c RIGHT</kbd>, which are the same keybindings
     used for promotion and demotion of list items.   If the point is in
     a list item, the operate on the list item.  Otherwise, they operate
     on the current heading subtree.  Similarly, subtrees can be
-    moved up and down with <kbd>C-c <up></kbd> and <kbd>C-c <down></kbd>.
+    moved up and down with <kbd>C-c UP</kbd> and <kbd>C-c DOWN</kbd>.
 
     These commands currently do not work properly if there are
     Setext headings in the affected region.
@@ -582,7 +580,7 @@ provides an interface to all of the possible customizations:
     with a single argument, the filename of the current buffer.
     A representative program is the Mac app [Marked 2][], a
     live-updating Markdown previewer which can be [called from a
-    simple shell script](http://jblevins.org/log/marked-2-command).
+    simple shell script](https://jblevins.org/log/marked-2-command).
 
   * `markdown-hr-strings` - list of strings to use when inserting
     horizontal rules.  Different strings will not be distinguished
@@ -751,13 +749,13 @@ provides an interface to all of the possible customizations:
     `markdown-definition-display-char`.
 
   * `markdown-fontify-code-blocks-natively` - Whether to fontify
-     code in code blocks using the native major mode.  This only
-     works for fenced code blocks where the language is specified
-     where we can automatically determine the appropriate mode to
-     use.  The language to mode mapping may be customized by setting
-     the variable `markdown-code-lang-modes`.  This can be toggled
-     interactively by pressing <kbd>C-c C-x C-f</kbd>
-     (`markdown-toggle-fontify-code-blocks-natively`).
+    code in code blocks using the native major mode.  This only
+    works for fenced code blocks where the language is specified
+    where we can automatically determine the appropriate mode to
+    use.  The language to mode mapping may be customized by setting
+    the variable `markdown-code-lang-modes`.  This can be toggled
+    interactively by pressing <kbd>C-c C-x C-f</kbd>
+    (`markdown-toggle-fontify-code-blocks-natively`).
 
   * `markdown-gfm-uppercase-checkbox` - When non-nil, complete GFM
     task list items with `[X]` instead of `[x]` (default: `nil`).
@@ -910,7 +908,9 @@ contributions!  See the [contributors graph][contrib] for details.
 markdown-mode is developed and tested primarily for compatibility
 with GNU Emacs 24.3 and later.  If you find any bugs in
 markdown-mode, please construct a test case or a patch and open a
-ticket on the [GitHub issue tracker][issues].
+ticket on the [GitHub issue tracker][issues].  See the
+contributing guidelines in `CONTRIBUTING.md` for details on
+creating pull requests.
 
  [issues]: https://github.com/jrblevin/markdown-mode/issues
 
@@ -932,18 +932,20 @@ first version was released on May 24, 2007.
   * 2013-03-24: [Version 2.0][]
   * 2016-01-09: [Version 2.1][]
   * 2017-05-26: [Version 2.2][]
+  * 2017-08-31: [Version 2.3][]
 
-[Version 1.1]: http://jblevins.org/projects/markdown-mode/rev-1-1
-[Version 1.2]: http://jblevins.org/projects/markdown-mode/rev-1-2
-[Version 1.3]: http://jblevins.org/projects/markdown-mode/rev-1-3
-[Version 1.4]: http://jblevins.org/projects/markdown-mode/rev-1-4
-[Version 1.5]: http://jblevins.org/projects/markdown-mode/rev-1-5
-[Version 1.6]: http://jblevins.org/projects/markdown-mode/rev-1-6
-[Version 1.7]: http://jblevins.org/projects/markdown-mode/rev-1-7
-[Version 1.8]: http://jblevins.org/projects/markdown-mode/rev-1-8
-[Version 1.8.1]: http://jblevins.org/projects/markdown-mode/rev-1-8-1
-[Version 1.9]: http://jblevins.org/projects/markdown-mode/rev-1-9
-[Version 2.0]: http://jblevins.org/projects/markdown-mode/rev-2-0
-[Version 2.1]: http://jblevins.org/projects/markdown-mode/rev-2-1
-[Version 2.2]: http://jblevins.org/projects/markdown-mode/rev-2-2
+[Version 1.1]: https://jblevins.org/projects/markdown-mode/rev-1-1
+[Version 1.2]: https://jblevins.org/projects/markdown-mode/rev-1-2
+[Version 1.3]: https://jblevins.org/projects/markdown-mode/rev-1-3
+[Version 1.4]: https://jblevins.org/projects/markdown-mode/rev-1-4
+[Version 1.5]: https://jblevins.org/projects/markdown-mode/rev-1-5
+[Version 1.6]: https://jblevins.org/projects/markdown-mode/rev-1-6
+[Version 1.7]: https://jblevins.org/projects/markdown-mode/rev-1-7
+[Version 1.8]: https://jblevins.org/projects/markdown-mode/rev-1-8
+[Version 1.8.1]: https://jblevins.org/projects/markdown-mode/rev-1-8-1
+[Version 1.9]: https://jblevins.org/projects/markdown-mode/rev-1-9
+[Version 2.0]: https://jblevins.org/projects/markdown-mode/rev-2-0
+[Version 2.1]: https://jblevins.org/projects/markdown-mode/rev-2-1
+[Version 2.2]: https://jblevins.org/projects/markdown-mode/rev-2-2
+[Version 2.3]: https://jblevins.org/projects/markdown-mode/rev-2-3
 

@@ -1,6 +1,6 @@
 # Markdown Mode 2.3
 
-*Under development*
+*August 31, 2017*
 
 *   **Breaking changes:**
 
@@ -31,11 +31,11 @@
         markup insertion prefix, as <kbd>C-c C-s f</kbd> and
         <kbd>C-c C-s w</kbd>.
     -   The list and outline editing commands have been removed from
-        the top-level positions (previously <kbd>M-<left></kbd>,
-        <kbd>M-<right></kbd>, <kbd>M-<up></kbd>, <kbd>M-<down></kbd>)
+        the top-level positions (previously <kbd>M-LEFT</kbd>,
+        <kbd>M-RIGHT</kbd>, <kbd>M-UP</kbd>, <kbd>M-DOWN</kbd>)
         and moved to major mode keybindings under <kbd>C-c</kbd> to
-        <kbd>C-c <left></kbd>, <kbd>C-c <right></kbd>,
-        <kbd>C-c <up></kbd>, and <kbd>C-c <down></kbd>, respectively.
+        <kbd>C-c LEFT</kbd>, <kbd>C-c RIGHT</kbd>,
+        <kbd>C-c UP</kbd>, and <kbd>C-c DOWN</kbd>, respectively.
         ([GH-164][])
     -   The list and outline editing commands have also been unified
         so that they all operate on entire subtrees of list items and
@@ -784,12 +784,12 @@ following and movement.
          extra whitespace for atx headings).
     -    Markup promotion and demotion via <kbd>C-c C--</kbd> and
          <kbd>C-c C-=</kbd>, respectively.  The sequences
-         <kbd>M-<up></kbd> and <kbd>M-<down></kbd> may
+         <kbd>M-UP</kbd> and <kbd>M-DOWN</kbd> may
          also be used.
     -    List editing: move list items up and down with
-         <kbd>M-<up></kbd> and <kbd>M-<down></kbd>.
-         Indent and exdent list items with <kbd>M-<left></kbd>
-         and <kbd>M-<right></kbd>.
+         <kbd>M-UP</kbd> and <kbd>M-DOWN</kbd>.
+         Indent and exdent list items with <kbd>M-LEFT</kbd>
+         and <kbd>M-RIGHT</kbd>.
     -    Region editing: indent and exdent regions, with tab stops
          determined by context, using <kbd>C-c <</kbd> and
          <kbd>C-c ></kbd> (as in `python-mode`).
