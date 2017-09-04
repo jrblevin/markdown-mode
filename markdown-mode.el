@@ -2515,7 +2515,7 @@ See `markdown-hide-markup' for additional details."
   :group 'markdown-faces)
 
 (defface markdown-inline-code-face
-  '((t (:inherit markdown-code-face font-lock-constant-face)))
+  '((t (:inherit (markdown-code-face font-lock-constant-face))))
   "Face for inline code."
   :group 'markdown-faces)
 
