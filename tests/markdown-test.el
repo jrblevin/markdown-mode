@@ -922,6 +922,11 @@ Test point position upon removal and insertion."
                         (should (looking-at "^        > $"))
                         (should (markdown-next-line-blank-p))))
 
+(ert-deftest test-markdown-insertion/blockquote-region-with-newline ()
+  (markdown-test-string "a\n\nb\n"
+    (markdown-blockquote-region 1 (point-max))
+    (should (equal (buffer-string) "> a\n>\n> b\n\n"))))
+
 (ert-deftest test-markdown-insertion/empty-italic ()
   "Test `markdown-insert-italic' with no word at point and no region."
   (markdown-test-string ""
