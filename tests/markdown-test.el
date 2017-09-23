@@ -1134,6 +1134,26 @@ Test point position upon removal and insertion."
       (should (= (point) 38))
       (should (looking-back "https://www.gnu.org/\n\\[2\\]: " nil)))))
 
+(ert-deftest test-markdown-insertion/reference-link-before-file-locals ()
+  "Test inserting a reference link before file-local variables."
+  (markdown-test-string "
+
+<!-- Local Variables: -->
+<!-- mode: markdown -->
+<!-- End: -->
+"
+    (markdown-insert-reference-link "link" "" "http://jblevins.org/")
+    (should (equal (buffer-substring-no-properties 1 (point-max))
+                   "[link][]
+
+\[link]: http://jblevins.org/
+
+<!-- Local Variables: -->
+<!-- mode: markdown -->
+<!-- End: -->
+"))
+    (should (equal (point) 9))))
+
 (ert-deftest test-markdown-insertion/inline-to-reference-link ()
   "Inline link to reference link conversion with tab completion."
   (markdown-test-string "[text](http://jblevins.org/ \"title\")"
