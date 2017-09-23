@@ -4376,6 +4376,14 @@ be used to populate the title attribute when converted to XHTML."
       (immediately (markdown-end-of-text-block))
       (subtree     (markdown-end-of-subtree))
       (header      (markdown-end-of-defun)))
+    ;; Skip backwards over local variables.  This logic is similar to the one
+    ;; used in ‘hack-local-variables’.
+    (when (and enable-local-variables (eobp))
+      (search-backward "\n\f" (max (- (point) 3000) (point-min)) :move)
+      (when (let ((case-fold-search t))
+              (search-forward "Local Variables:" nil :move))
+        (beginning-of-line 0)
+        (when (eq (char-before) ?\n) (backward-char))))
     (unless (or (markdown-cur-line-blank-p)
                 (thing-at-point-looking-at markdown-regex-reference-definition))
       (insert "\n"))
