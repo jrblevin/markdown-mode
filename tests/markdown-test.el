@@ -5255,6 +5255,25 @@ comments = false
       (should (member "Header2" headers))
       (should-not (member "comments = false" headers)))))
 
+(ert-deftest test-markdown-command/function ()
+  "Test ‘markdown’ with ‘markdown-command’ being a function."
+  (markdown-test-string "foo"
+    (let* ((calls ())
+           (markdown-command (lambda (&rest args) (push args calls)))
+           (buffer-name (markdown))
+           (buffer (get-buffer buffer-name)))
+      (should (stringp buffer-name))
+      (should (buffer-live-p buffer))
+      (should (equal calls `((1 4 ,buffer)))))))
+
+(ert-deftest test-markdown-open-command/function ()
+  "Test ‘markdown-open’ with ‘markdown-open-command’ being a function."
+  (markdown-test-string ""
+    (let* ((calls 0)
+           (markdown-open-command (lambda () (cl-incf calls))))
+      (markdown-open)
+      (should (equal calls 1)))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
