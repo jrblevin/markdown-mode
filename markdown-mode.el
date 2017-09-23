@@ -1049,7 +1049,7 @@ For example, a standalone Markdown previewer.  This command will
 be called with a single argument: the filename of the current
 buffer."
   :group 'markdown
-  :type 'string)
+  :type '(choice file (const :tag "None" nil)))
 
 (defcustom markdown-hr-strings
   '("-------------------------------------------------------------------------------"
@@ -1064,7 +1064,7 @@ horizontal rule.  Strings should be listed in decreasing order of
 prominence (as in headings from level one to six) for use with
 promotion and demotion functions."
   :group 'markdown
-  :type 'list)
+  :type '(repeat string))
 
 (defcustom markdown-bold-underscore nil
   "Use two underscores when inserting bold text instead of two asterisks."
@@ -1169,7 +1169,7 @@ cause lag when typing on slower machines."
     "telnet" "tip" "urn" "vemmi" "wais")
   "Link types for syntax highlighting of URIs."
   :group 'markdown
-  :type 'list)
+  :type '(repeat (string :tag "URI scheme")))
 
 (defcustom markdown-url-compose-char
   (cond
