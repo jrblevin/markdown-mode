@@ -4451,29 +4451,31 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
 
 (ert-deftest test-markdown-wiki-link/font-lock ()
   "Test font lock faces for wiki links."
-  (markdown-test-temp-file "wiki-links.text"
-   (let* ((fn (concat (file-name-directory buffer-file-name)
-                     "inline.text"))
-          (markdown-enable-wiki-links t))
-     ;; Create inline.text in the same temp directory, refontify
-     (write-region "" nil fn nil 1)
-     (markdown-fontify-buffer-wiki-links)
-     ;; Confirm location of first wiki link
-     (should (eq (markdown-next-link) 8))
-     ;; First wiki link doesn't have a corresponding file
-     (markdown-test-range-has-property 8 20 'font-lock-face markdown-missing-link-face)
-     ;; Second wiki link doesn't have a corresponding file
-     (should (eq (markdown-next-link) 73))
-     (markdown-test-range-has-property 73 88 'font-lock-face markdown-missing-link-face)
-     ;; Move to third wiki link, and create the missing file
-     (should (eq (markdown-next-link) 155))
-     (should (string-equal (markdown-wiki-link-link) "inline"))
-     (markdown-test-range-has-property 155 164 'font-lock-face markdown-link-face)
-     ;; Check wiki links in code blocks
-     (markdown-test-range-has-face 360 395 markdown-pre-face)
-     ;; Remove temporary files
-     (delete-file fn)
-     )))
+  (let ((temporary-file-directory
+         (file-name-as-directory (make-temp-file "markdown-test" :dir-flag))))
+    (markdown-test-temp-file "wiki-links.text"
+      (let* ((fn (concat (file-name-directory buffer-file-name)
+                         "inline.text"))
+             (markdown-enable-wiki-links t))
+        ;; Create inline.text in the same temp directory, refontify
+        (write-region "" nil fn nil 1)
+        (markdown-fontify-buffer-wiki-links)
+        ;; Confirm location of first wiki link
+        (should (eq (markdown-next-link) 8))
+        ;; First wiki link doesn't have a corresponding file
+        (markdown-test-range-has-property 8 20 'font-lock-face markdown-missing-link-face)
+        ;; Second wiki link doesn't have a corresponding file
+        (should (eq (markdown-next-link) 73))
+        (markdown-test-range-has-property 73 88 'font-lock-face markdown-missing-link-face)
+        ;; Move to third wiki link, and create the missing file
+        (should (eq (markdown-next-link) 155))
+        (should (string-equal (markdown-wiki-link-link) "inline"))
+        (markdown-test-range-has-property 155 164 'font-lock-face markdown-link-face)
+        ;; Check wiki links in code blocks
+        (markdown-test-range-has-face 360 395 markdown-pre-face)
+        ;; Remove temporary files
+        (delete-file fn)))
+    (delete-directory temporary-file-directory)))
 
 (ert-deftest test-markdown-wiki-link/kill ()
   "Simple tests for `markdown-kill-thing-at-point' for wiki links."
