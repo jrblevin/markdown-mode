@@ -20,10 +20,13 @@
         ([GH-227][], [GH-260][])
     -   Make wiki link test work even when `/tmp` contains an
         inaccessible subdirectory.  ([GH-261][])
+    -   Fix `markdown-inline-code-face`'s `:inherit` attribute.
+        ([GH-252][])
 
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
+  [gh-252]: https://github.com/jrblevin/markdown-mode/pull/252
   [gh-254]: https://github.com/jrblevin/markdown-mode/issues/254
   [gh-257]: https://github.com/jrblevin/markdown-mode/pull/257
   [gh-258]: https://github.com/jrblevin/markdown-mode/pull/258
