@@ -10,6 +10,27 @@
 
 *   Bug fixes:
 
+    -   Remove GFM checkbox overlays when switching major modes.
+        ([GH-238][], [GH-257][])
+    -   Don't test the value of the `composition` property to avoid
+        failing tests.  ([GH-246][], [GH-258][])
+    -   Fix types for `markdown-open-command`, `markdown-uri-types`,
+        and `markdown-hr-strings` defcustoms.  ([GH-254][], [GH-259][])
+    -   Don't insert trailing whitespace when inserting a blockquote.
+        ([GH-227][], [GH-260][])
+    -   Make wiki link test work even when `/tmp` contains an
+        inaccessible subdirectory.  ([GH-261][])
+
+  [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
+  [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
+  [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
+  [gh-254]: https://github.com/jrblevin/markdown-mode/issues/254
+  [gh-257]: https://github.com/jrblevin/markdown-mode/pull/257
+  [gh-258]: https://github.com/jrblevin/markdown-mode/pull/258
+  [gh-259]: https://github.com/jrblevin/markdown-mode/pull/259
+  [gh-260]: https://github.com/jrblevin/markdown-mode/pull/260
+  [gh-261]: https://github.com/jrblevin/markdown-mode/pull/261
+
 # Markdown Mode 2.3
 
 *August 31, 2017*
