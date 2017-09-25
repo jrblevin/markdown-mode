@@ -563,7 +563,10 @@ provides an interface to all of the possible customizations:
 
   * `markdown-command` - the command used to run Markdown (default:
     `markdown`).  This variable may be customized to pass
-    command-line options to your Markdown processor of choice.
+    command-line options to your Markdown processor of choice.  It can
+    also be a function; in this case `markdown` will call it with three
+    arguments: the beginning and end of the region to process, and
+    a buffer to write the output to.
 
   * `markdown-command-needs-filename` - set to `t` if
     `markdown-command` does not accept standard input (default:
@@ -572,7 +575,9 @@ provides an interface to all of the possible customizations:
     When set to `t`, `markdown-mode` will pass the name of the file
     as the final command-line argument to `markdown-command`.  Note
     that in the latter case, you will only be able to run
-    `markdown-command` from buffers which are visiting a file.
+    `markdown-command` from buffers which are visiting a file.  If
+    `markdown-command` is a function, `markdown-command-needs-filename`
+    is ignored.
 
   * `markdown-open-command` - the command used for calling a standalone
     Markdown previewer which is capable of opening Markdown source files
@@ -581,6 +586,8 @@ provides an interface to all of the possible customizations:
     A representative program is the Mac app [Marked 2][], a
     live-updating Markdown previewer which can be [called from a
     simple shell script](https://jblevins.org/log/marked-2-command).
+    This variable can also be a function; in this case `markdown-open`
+    will call it without arguments to preview the current buffer.
 
   * `markdown-hr-strings` - list of strings to use when inserting
     horizontal rules.  Different strings will not be distinguished

@@ -8,6 +8,9 @@
 
 *   Improvements:
 
+    -   Allow `markdown-command` and `markdown-open-command` to be
+        functions.  ([GH-255][], [GH-263][])
+
 *   Bug fixes:
 
     -   Remove GFM checkbox overlays when switching major modes.
@@ -28,11 +31,13 @@
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
   [gh-252]: https://github.com/jrblevin/markdown-mode/pull/252
   [gh-254]: https://github.com/jrblevin/markdown-mode/issues/254
+  [gh-255]: https://github.com/jrblevin/markdown-mode/issues/255
   [gh-257]: https://github.com/jrblevin/markdown-mode/pull/257
   [gh-258]: https://github.com/jrblevin/markdown-mode/pull/258
   [gh-259]: https://github.com/jrblevin/markdown-mode/pull/259
   [gh-260]: https://github.com/jrblevin/markdown-mode/pull/260
   [gh-261]: https://github.com/jrblevin/markdown-mode/pull/261
+  [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
 
 # Markdown Mode 2.3
 
