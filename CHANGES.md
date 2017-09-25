@@ -1,3 +1,15 @@
+# Markdown Mode 2.4
+
+*Under development*
+
+*   **Breaking changes:**
+
+*   New features:
+
+*   Improvements:
+
+*   Bug fixes:
+
 # Markdown Mode 2.3
 
 *August 31, 2017*
