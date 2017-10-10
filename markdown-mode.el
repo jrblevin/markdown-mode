@@ -5966,13 +5966,13 @@ See also `markdown-mode-map'.")
      ["Mark Subtree" markdown-mark-subtree])
     ("Lists"
      ["Insert List Item" markdown-insert-list-item]
-     ["Add Checkbox" markdown-insert-gfm-checkbox :keys "C-c C-x ["]
      ["Move Subtree Up" markdown-move-up :keys "C-c <up>"]
      ["Move Subtree Down" markdown-move-down :keys "C-c <down>"]
      ["Indent Subtree" markdown-demote :keys "C-c <right>"]
      ["Outdent Subtree" markdown-promote :keys "C-c <left>"]
      ["Renumber List" markdown-cleanup-list-numbers]
-     ["Toggle Task List Item" markdown-toggle-gfm-checkbox :keys "C-c C-d"])
+     ["Insert Task List Item" markdown-insert-gfm-checkbox :keys "C-c C-x ["]
+     ["Toggle Task List Item" markdown-toggle-gfm-checkbox (markdown-gfm-task-list-item-at-point) :keys "C-c C-d"])
     ("Links & Images"
      ["Insert Link" markdown-insert-link]
      ["Insert Image" markdown-insert-image]
