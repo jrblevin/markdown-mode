@@ -6,6 +6,10 @@
 
 *   New features:
 
+    -   GFM task list item (checkbox) insertion with `C-c C-s [`, or
+        as a final fallback for `markdown-do` (`C-c C-d`).  Thanks to
+        Akinori Musha for a patch.  ([GH-229][])
+
 *   Improvements:
 
     -   Allow `markdown-command` and `markdown-open-command` to be
@@ -27,6 +31,7 @@
         ([GH-252][])
 
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
+  [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
   [gh-252]: https://github.com/jrblevin/markdown-mode/pull/252
