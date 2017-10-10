@@ -3806,7 +3806,7 @@ puts 'hello, world'
   (markdown-test-file "check-items.text"
     (goto-char (point-min))
     (end-of-line)
-    (should (markdown-add-gfm-checkbox))
+    (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 1))
     (should (eolp))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
@@ -3814,7 +3814,7 @@ puts 'hello, world'
 
     (forward-line 2)
     (back-to-indentation)
-    (should (markdown-add-gfm-checkbox))
+    (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 3))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
                           "  - [ ] "))
@@ -3824,7 +3824,7 @@ puts 'hello, world'
     (forward-line 2)
     (back-to-indentation)
     (forward-char 1)
-    (should (markdown-add-gfm-checkbox))
+    (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 5))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
                           "  - [ ] i"))
@@ -3834,7 +3834,7 @@ puts 'hello, world'
     (forward-line 2)
     (back-to-indentation)
     (forward-char 2)
-    (should (markdown-add-gfm-checkbox))
+    (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 7))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
                           "  - [ ] "))
@@ -3844,7 +3844,7 @@ puts 'hello, world'
     (forward-line 2)
     (back-to-indentation)
     (forward-char 3)
-    (should (markdown-add-gfm-checkbox))
+    (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 9))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
                           "  - [ ] i"))
@@ -3853,7 +3853,7 @@ puts 'hello, world'
 
     (forward-line 2)
     (end-of-line)
-    (should-not (markdown-add-gfm-checkbox))
+    (should-not (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 11))
     (should (eolp))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
@@ -3861,7 +3861,7 @@ puts 'hello, world'
 
     (forward-line 1)
     (back-to-indentation)
-    (should (markdown-add-gfm-checkbox))
+    (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 12))
     (should (eolp))
     (should (string-equal (buffer-substring-no-properties

@@ -868,7 +868,7 @@ by `markdown-mode` and `gfm-mode` as described below.
   or by pressing <kbd>C-c C-d</kbd> (`markdown-do`) with the point anywhere
   in the task list item.  A normal list item can be turned to a
   check list item by the same command, or more specifically
-  <kbd>C-c C-s [</kbd> (`markdown-add-gfm-checkbox`).
+  <kbd>C-c C-s [</kbd> (`markdown-insert-gfm-checkbox`).
 
 * **Wiki links:** Generic wiki links are supported in
   `markdown-mode`, but in `gfm-mode` specifically they will be

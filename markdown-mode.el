@@ -884,7 +884,7 @@
 ;;   or by pressing `C-c C-d` (`markdown-do`) with the point anywhere
 ;;   in the task list item.  A normal list item can be turned to a
 ;;   check list item by the same command, or more specifically
-;;   `C-c C-s [` (`markdown-add-gfm-checkbox`).
+;;   `C-c C-s [` (`markdown-insert-gfm-checkbox`).
 ;;
 ;; * **Wiki links:** Generic wiki links are supported in
 ;;   `markdown-mode', but in `gfm-mode' specifically they will be
@@ -5767,7 +5767,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "Q") 'markdown-blockquote-region)
     (define-key map (kbd "w") 'markdown-insert-wiki-link)
     (define-key map (kbd "-") 'markdown-insert-hr)
-    (define-key map (kbd "[") 'markdown-add-gfm-checkbox)
+    (define-key map (kbd "[") 'markdown-insert-gfm-checkbox)
     ;; Deprecated keys that may be removed in a future version
     (define-key map (kbd "e") 'markdown-insert-italic)
     map)
@@ -5966,7 +5966,7 @@ See also `markdown-mode-map'.")
      ["Mark Subtree" markdown-mark-subtree])
     ("Lists"
      ["Insert List Item" markdown-insert-list-item]
-     ["Add Checkbox" markdown-add-gfm-checkbox :keys "C-c C-x ["]
+     ["Add Checkbox" markdown-insert-gfm-checkbox :keys "C-c C-x ["]
      ["Move Subtree Up" markdown-move-up :keys "C-c <up>"]
      ["Move Subtree Down" markdown-move-down :keys "C-c <down>"]
      ["Indent Subtree" markdown-demote :keys "C-c <right>"]
@@ -8306,7 +8306,7 @@ markers and footnote text."
     (markdown-toggle-gfm-checkbox))
    ;; Otherwise
    (t
-    (markdown-add-gfm-checkbox))))
+    (markdown-insert-gfm-checkbox))))
 
 
 ;;; Miscellaneous =============================================================
@@ -8572,8 +8572,7 @@ is found, the return value is the same value returned by
     (setq bounds (markdown-cur-list-item-bounds)))
   (> (length (nth 5 bounds)) 0))
 
-
-(defun markdown-add-gfm-checkbox ()
+(defun markdown-insert-gfm-checkbox ()
   "Add GFM checkbox at point.
 Returns t if added.
 Returns nil if non-applicable."
