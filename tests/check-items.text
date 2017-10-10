@@ -1,12 +1,11 @@
-  
 
-  item1
 
-  item2
+item1
 
-  - item3
+item2
 
-  - item4
+- item3
 
-  *   [ ] item5
-  
+- item4
+
+*   [ ] item5

@@ -3810,14 +3810,14 @@ puts 'hello, world'
     (should (= (line-number-at-pos (point)) 1))
     (should (eolp))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
-                          "  - [ ] "))
+                          "  * [ ] "))
 
     (forward-line 2)
     (back-to-indentation)
     (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 3))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
-                          "  - [ ] "))
+                          "  * [ ] "))
     (should (string-equal (buffer-substring-no-properties (point) (line-end-position))
                           "item1"))
 
@@ -3827,7 +3827,7 @@ puts 'hello, world'
     (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 5))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
-                          "  - [ ] i"))
+                          "  * [ ] i"))
     (should (string-equal (buffer-substring-no-properties (point) (line-end-position))
                           "tem2"))
 
@@ -3837,7 +3837,7 @@ puts 'hello, world'
     (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 7))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
-                          "  - [ ] "))
+                          "- [ ] "))
     (should (string-equal (buffer-substring-no-properties (point) (line-end-position))
                           "item3"))
 
@@ -3847,7 +3847,7 @@ puts 'hello, world'
     (should (markdown-insert-gfm-checkbox))
     (should (= (line-number-at-pos (point)) 9))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
-                          "  - [ ] i"))
+                          "- [ ] i"))
     (should (string-equal (buffer-substring-no-properties (point) (line-end-position))
                           "tem4"))
 
@@ -3857,7 +3857,7 @@ puts 'hello, world'
     (should (= (line-number-at-pos (point)) 11))
     (should (eolp))
     (should (string-equal (buffer-substring-no-properties (line-beginning-position) (point))
-                          "  *   [ ] item5"))
+                          "*   [ ] item5"))
 
     (forward-line 1)
     (back-to-indentation)
@@ -3867,7 +3867,7 @@ puts 'hello, world'
     (should (string-equal (buffer-substring-no-properties
                            (line-beginning-position)
                            (point))
-                          "  *   [ ] "))))
+                          "*   [ ] "))))
 
 (ert-deftest test-markdown-lists/toggle-gfm-checkbox ()
   (markdown-test-string "   -   [X] GFM task list item"
