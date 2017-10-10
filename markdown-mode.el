@@ -8601,7 +8601,7 @@ Returns nil if non-applicable."
                 (markup (concat (or (save-excursion
                                       (beginning-of-line 0)
                                       (cl-fifth (markdown-cur-list-item-bounds)))
-                                    "- ")
+                                    markdown-unordered-list-item-prefix)
                                 "[ ] ")))
             (if (< pos (point))
                 (save-excursion
