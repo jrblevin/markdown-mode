@@ -2520,11 +2520,6 @@ See `markdown-hide-markup' for additional details."
   "Face for inline code, pre blocks, and fenced code blocks."
   :group 'markdown-faces)
 
-(defface markdown-code-face
-  `((t (:inherit fixed-pitch)))
-  "Face for inline code, pre blocks, and fenced code blocks."
-  :group 'markdown-faces)
-
 (defface markdown-inline-code-face
   '((t (:inherit (markdown-code-face font-lock-constant-face))))
   "Face for inline code."
