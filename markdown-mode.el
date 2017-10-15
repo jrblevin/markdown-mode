@@ -1087,6 +1087,11 @@ promotion and demotion functions."
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-marginalize-header nil
+  "Place header characters in a left margin, separate from text."
+  :group 'markdown
+  :type)
+
 (defcustom markdown-asymmetric-header nil
   "Determines if atx header style will be asymmetric.
 Set to a non-nil value to use asymmetric header styling, placing
