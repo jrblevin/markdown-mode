@@ -1092,7 +1092,7 @@ promotion and demotion functions."
   :group 'markdown
   :type 'boolean)
 
-(defconst markdown-margin-size 20
+(defconst markdown-margin-size 10
   "Size of the left margin the place atx headers in .")
 
 
