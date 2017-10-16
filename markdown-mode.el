@@ -1090,7 +1090,11 @@ promotion and demotion functions."
 (defcustom markdown-marginalize-header nil
   "Place header characters in a left margin, separate from text."
   :group 'markdown
-  :type)
+  :type 'boolean)
+
+(defconst markdown-margin-size 20
+  "Size of the left margin the place atx headers in .")
+
 
 (defcustom markdown-asymmetric-header nil
   "Determines if atx header style will be asymmetric.
@@ -2219,7 +2223,54 @@ start which was previously propertized."
           (put-text-property (match-beginning 3) (match-end 3)
                              'markdown-metadata-value (match-data t))))))
 
+(defun copy-margin-string (start heading-char-count margin-width)
+  "Generates string to place in the left margin.
+
+String has length MARGIN-WIDTH, and ends with the substring that
+begins at START and goes to START + HEADING-CHAR-COUNT"
+  (let* ((margin-left-space-count (- margin-width heading-char-count))
+         (margin-string (concat (make-string margin-left-space-count ? )
+                                (buffer-substring-no-properties start (+ start heading-char-count)))))
+    margin-string))
+
 (defun markdown-syntax-propertize-headings (start end)
+  "Match headings of type SYMBOL with REGEX from START to END."
+  (goto-char start)
+  (while (re-search-forward markdown-regex-header end t)
+    (unless (markdown-code-block-at-pos (match-beginning 0))
+      (put-text-property
+       (match-beginning 0) (match-end 0) 'markdown-heading
+       (match-data t))
+      (put-text-property
+       (match-beginning 0) (match-end 0)
+       (cond ((match-string-no-properties 2) 'markdown-heading-1-setext)
+             ((match-string-no-properties 3) 'markdown-heading-2-setext)
+             (t (let ((atx-level (length (markdown-trim-whitespace
+                                          (match-string-no-properties 4)))))
+                  (intern (format "markdown-heading-%d-atx" atx-level)))))
+       (match-data t))
+
+      (when (and markdown-marginalize-header     ; only do this when markdown-marginalize-header is on
+                 (match-string-no-properties 4)) ; only when we find marks for an atx header
+        (let* ((s (match-beginning 4)) ; beginning of the opening atx header marks
+              (e  (match-end 4))       ; end of the left opening atx header marks and whitespace
+              (margin-string (copy-margin-string s (- e s)  markdown-margin-size)))
+          (message
+           (format  "Trying to set a text property. s=%s, e=%s, margin-string=%s" s e margin-string))
+          (put-text-property
+           s e
+           'display
+           (list '(margin left-margin) margin-string)))
+        ))))
+
+;; Probems:
+;; 1. Does not affect all atx headers. Seems to be failure of display not detection.
+;; 2. beginning-of-line moves to invisible char containing hidden hidder
+;;
+;; is adding properties now breaking the re match later?
+;;
+
+(defun markdown-syntax-propertize-headings-old (start end)
   "Match headings of type SYMBOL with REGEX from START to END."
   (goto-char start)
   (while (re-search-forward markdown-regex-header end t)
