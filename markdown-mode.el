@@ -4033,7 +4033,7 @@ Group 7: closing filename delimiter"
 ;;; Markdown Font Fontification Functions =====================================
 
 (defun generate-margin-string (margin-width heading-char-count)
-  "Generates string to place in the left margin.
+  "Generate string to place in the left margin.
 
 The string has length MARGIN-WIDTH - 1 and has HEADING-CHAR-COUNT
 heading characters."
@@ -4043,7 +4043,7 @@ heading characters."
     margin-string))
 
 (defun markdown-marginalize-update-current ()
-  "Updates the window configuration to create a left margin"
+  "Update the window configuration to create a left margin"
   (set-window-margins nil markdown-marginalize-header-margin-size))
 
 (defun markdown-fontify-headings (last)
