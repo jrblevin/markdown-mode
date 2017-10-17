@@ -2280,23 +2280,6 @@ begins at START and goes to START + HEADING-CHAR-COUNT"
                   (intern (format "markdown-heading-%d-atx" atx-level)))))
        (match-data t)))))
 
-(defun markdown-syntax-propertize-headings-old (start end)
-  "Match headings of type SYMBOL with REGEX from START to END."
-  (goto-char start)
-  (while (re-search-forward markdown-regex-header end t)
-    (unless (markdown-code-block-at-pos (match-beginning 0))
-      (put-text-property
-       (match-beginning 0) (match-end 0) 'markdown-heading
-       (match-data t))
-      (put-text-property
-       (match-beginning 0) (match-end 0)
-       (cond ((match-string-no-properties 2) 'markdown-heading-1-setext)
-             ((match-string-no-properties 3) 'markdown-heading-2-setext)
-             (t (let ((atx-level (length (markdown-trim-whitespace
-                                          (match-string-no-properties 4)))))
-                  (intern (format "markdown-heading-%d-atx" atx-level)))))
-       (match-data t)))))
-
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
   (let* ((in-comment (markdown-in-comment-p)))
