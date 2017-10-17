@@ -2253,16 +2253,6 @@ start which was previously propertized."
           (put-text-property (match-beginning 3) (match-end 3)
                              'markdown-metadata-value (match-data t))))))
 
-(defun copy-margin-string (start heading-char-count margin-width)
-  "Generates string to place in the left margin.
-
-String has length MARGIN-WIDTH, and ends with the substring that
-begins at START and goes to START + HEADING-CHAR-COUNT"
-  (let* ((margin-left-space-count (- margin-width heading-char-count))
-         (margin-string (concat (make-string margin-left-space-count ? )
-                                (buffer-substring-no-properties start (+ start heading-char-count)))))
-    margin-string))
-
 (defun markdown-syntax-propertize-headings (start end)
   "Match headings of type SYMBOL with REGEX from START to END."
   (goto-char start)
