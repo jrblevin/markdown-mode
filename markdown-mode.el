@@ -1088,13 +1088,43 @@ promotion and demotion functions."
   :type 'boolean)
 
 (defcustom markdown-marginalize-header nil
-  "Place header characters in a left margin, separate from text."
+  "When non-nil, put opening atx header markup in a left margin.
+
+This setting goes well with `markdown-asymmetric-header'. But
+sadly it conflicts with linum-mode since they both use the
+same margin."
   :group 'markdown
   :type 'boolean)
 
-(defconst markdown-margin-size 10
-  "Size of the left margin the place atx headers in .")
+(defconst markdown-marginalize-margin-chars-needed 7
+  "Number of characters needed for marginalized headers.
 
+This is distinct from the size of the left margin, as measured in
+a number of text-sized characters, which is needed for rendering
+atx headers in header-sized characters into that margin.")
+
+(defcustom markdown-marginalize-header-in-header-face nil
+  "When non-nil, render marginalized atx header markup in header face.
+
+If enabled, and if your header face is larger than the text face,
+then you will likely need also to customize
+`markdown-marginalize-header-margin-size' to ensure it is big
+enough to show the header marks. That is because this mode is not
+smart enough to calculate the margin needed in text-sized
+characters for header-sized strings. Sorry!"
+  :group 'markdown
+  :type 'boolean)
+
+(defcustom markdown-marginalize-header-margin-size 7
+  "Size of the window left margin, for marginalized atx headers.
+
+The default, 7, is a suitable number if
+`markdown-marginalize-header-in-header-face' is nil. If it is
+non-nil, then you may need to experiment with increasing this
+number to a larger value, like 10 or 20, to ensure the margin is
+large enough to render your marginalized headers."
+  :group 'markdown
+  :type 'integer)
 
 (defcustom markdown-asymmetric-header nil
   "Determines if atx header style will be asymmetric.
@@ -2248,27 +2278,7 @@ begins at START and goes to START + HEADING-CHAR-COUNT"
              (t (let ((atx-level (length (markdown-trim-whitespace
                                           (match-string-no-properties 4)))))
                   (intern (format "markdown-heading-%d-atx" atx-level)))))
-       (match-data t))
-
-      (when (and markdown-marginalize-header     ; only do this when markdown-marginalize-header is on
-                 (match-string-no-properties 4)) ; only when we find marks for an atx header
-        (let* ((s (match-beginning 4)) ; beginning of the opening atx header marks
-              (e  (match-end 4))       ; end of the left opening atx header marks and whitespace
-              (margin-string (copy-margin-string s (- e s)  markdown-margin-size)))
-          (message
-           (format  "Trying to set a text property. s=%s, e=%s, margin-string=%s" s e margin-string))
-          (put-text-property
-           s e
-           'display
-           (list '(margin left-margin) margin-string)))
-        ))))
-
-;; Probems:
-;; 1. Does not affect all atx headers. Seems to be failure of display not detection.
-;; 2. beginning-of-line moves to invisible char containing hidden hidder
-;;
-;; is adding properties now breaking the re match later?
-;;
+       (match-data t)))))
 
 (defun markdown-syntax-propertize-headings-old (start end)
   "Match headings of type SYMBOL with REGEX from START to END."
@@ -4049,6 +4059,20 @@ Group 7: closing filename delimiter"
 
 ;;; Markdown Font Fontification Functions =====================================
 
+(defun generate-margin-string (margin-width heading-char-count)
+  "Generates string to place in the left margin.
+
+The string has length MARGIN-WIDTH - 1 and has HEADING-CHAR-COUNT
+heading characters."
+  (let* ((margin-left-space-count (- margin-width heading-char-count))
+         (margin-string (concat (make-string margin-left-space-count ? )
+                                (make-string heading-char-count ?#))))
+    margin-string))
+
+(defun markdown-marginalize-update-current ()
+  "Updates the window configuration to create a left margin"
+  (set-window-margins nil markdown-marginalize-header-margin-size))
+
 (defun markdown-fontify-headings (last)
   "Add text properties to headings from point to LAST."
   (when (markdown-match-propertized-text 'markdown-heading last)
@@ -4056,8 +4080,22 @@ Group 7: closing filename delimiter"
            (heading-face
             (intern (format "markdown-header-face-%d" level)))
            (heading-props `(face ,heading-face))
-           (markup-props `(face markdown-header-delimiter-face
-                                ,@(when markdown-hide-markup `(display ""))))
+           (markup-props
+            (if markdown-marginalize-header
+                ;; plist of text property for atx header
+                ;; when markdown-marginalize-header
+                `(
+                  ;; maybe render characters in the header face
+                  ,@(when markdown-marginalize-header-in-header-face
+                      `(face ,heading-face))
+                  ;; definitely place in the margin
+                  display ((margin left-margin)
+                           ,(generate-margin-string
+                             markdown-marginalize-margin-chars-needed level)))
+
+              ;; plist defining text properties of normal atx headers
+              `(face markdown-header-delimiter-face
+                     ,@(when markdown-hide-markup `(display "")))))
            (rule-props `(face markdown-header-rule-face
                               ,@(when markdown-hide-markup `(display "")))))
       (if (match-end 1)
@@ -9109,6 +9147,11 @@ position."
   (add-hook 'edit-indirect-after-commit-functions
             #'markdown--edit-indirect-after-commit-function
             nil 'local)
+
+  (when markdown-marginalize-header
+    (add-hook 'window-configuration-change-hook
+              'markdown-marginalize-update-current nil t)
+    )
 
   ;; add live preview export hook
   (add-hook 'after-save-hook #'markdown-live-preview-if-markdown t t)
