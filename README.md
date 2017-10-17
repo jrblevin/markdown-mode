@@ -617,6 +617,12 @@ provides an interface to all of the possible customizations:
     used when `markdown-header-scaling` is non-nil
     (default: `(2.0 1.7 1.4 1.1 1.0 1.0)`).
 
+  * `markdown-marginalize-headers` - put opening atx header markup
+    in the left margin when non-nil (default: `nil`).
+
+  * `markdown-marginalize-headers-margin-width` - width of margin
+    used for marginalized headers (default: 6).
+
   * `markdown-list-indent-width` - depth of indentation for lists
     when inserting, promoting, and demoting list items (default: 4).
 

@@ -9,6 +9,9 @@
     -   GFM task list item (checkbox) insertion with `C-c C-s [`, or
         as a final fallback for `markdown-do` (`C-c C-d`).  Thanks to
         Akinori Musha for a patch.  ([GH-229][])
+    -   Optionally move leading atx heading markup to the left margin
+        when `markdown-marginalize-headers` is non-`nil`.  Thanks to
+        Alexis Gallagher for a patch.  ([GH-272][], [GH-274][])
 
 *   Improvements:
 
@@ -51,6 +54,8 @@
   [gh-261]: https://github.com/jrblevin/markdown-mode/pull/261
   [gh-262]: https://github.com/jrblevin/markdown-mode/pull/262
   [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
+  [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
+  [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274
 
 # Markdown Mode 2.3
 
