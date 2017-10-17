@@ -4043,7 +4043,7 @@ heading characters."
     margin-string))
 
 (defun markdown-marginalize-update-current ()
-  "Update the window configuration to create a left margin"
+  "Update the window configuration to create a left margin."
   (set-window-margins nil markdown-marginalize-header-margin-size))
 
 (defun markdown-fontify-headings (last)
