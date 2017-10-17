@@ -14,6 +14,9 @@
 
     -   Allow `markdown-command` and `markdown-open-command` to be
         functions.  ([GH-255][], [GH-263][])
+    -   Save the buffer before running `markdown-open-command`.
+        Thanks to Dmitry Safronov for a patch.
+        ([GH-248][])
 
 *   Bug fixes:
 
@@ -34,6 +37,7 @@
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
+  [gh-248]: https://github.com/jrblevin/markdown-mode/issues/248
   [gh-252]: https://github.com/jrblevin/markdown-mode/pull/252
   [gh-254]: https://github.com/jrblevin/markdown-mode/issues/254
   [gh-255]: https://github.com/jrblevin/markdown-mode/issues/255

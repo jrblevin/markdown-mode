@@ -7837,6 +7837,7 @@ update this buffer's contents."
   (if (stringp markdown-open-command)
       (if (not buffer-file-name)
           (user-error "Must be visiting a file")
+        (save-buffer)
         (call-process markdown-open-command nil nil nil buffer-file-name))
     (funcall markdown-open-command))
   nil)
