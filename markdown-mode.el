@@ -1091,7 +1091,7 @@ promotion and demotion functions."
   "When non-nil, put opening atx header markup in a left margin.
 
 This setting goes well with `markdown-asymmetric-header'. But
-sadly it conflicts with linum-mode since they both use the
+sadly it conflicts with `linum-mode' since they both use the
 same margin."
   :group 'markdown
   :type 'boolean)
