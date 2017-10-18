@@ -12,11 +12,13 @@
 
 *   Improvements:
 
+    -   Insert references before local variables.  Thanks to Philipp
+        Stephani for a patch.  ([GH-216][], [GH-262][])
     -   Allow `markdown-command` and `markdown-open-command` to be
         functions.  ([GH-255][], [GH-263][])
-    -   Save the buffer before running `markdown-open-command`.
-        Thanks to Dmitry Safronov for a patch.
-        ([GH-248][])
+    -   Save the buffer before running `markdown-open-command` and run
+        `markdown-open-command` asynchronously.  Thanks to Dmitry
+        Safronov for a patch.  ([GH-248][])
 
 *   Bug fixes:
 
@@ -33,6 +35,7 @@
     -   Fix `markdown-inline-code-face`'s `:inherit` attribute.
         ([GH-252][])
 
+  [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
@@ -46,6 +49,7 @@
   [gh-259]: https://github.com/jrblevin/markdown-mode/pull/259
   [gh-260]: https://github.com/jrblevin/markdown-mode/pull/260
   [gh-261]: https://github.com/jrblevin/markdown-mode/pull/261
+  [gh-262]: https://github.com/jrblevin/markdown-mode/pull/262
   [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
 
 # Markdown Mode 2.3
