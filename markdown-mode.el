@@ -7838,7 +7838,7 @@ update this buffer's contents."
       (if (not buffer-file-name)
           (user-error "Must be visiting a file")
         (save-buffer)
-        (call-process markdown-open-command nil nil nil buffer-file-name))
+        (call-process markdown-open-command nil 0 nil buffer-file-name))
     (funcall markdown-open-command))
   nil)
 
