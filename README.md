@@ -506,6 +506,69 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     to the end of the current or following defun, and <kbd>C-M-h</kbd> will
     put the region around the entire defun.
 
+  * Table Editing:
+
+    Markdown Mode includes support for editing tables, which
+    have the following basic format:
+
+        | Right | Left | Center | Default |
+        |------:|:-----|:------:|---------|
+        |    12 | 12   | 12     | 12      |
+        |   123 | 123  | 123    | 123     |
+        |     1 | 1    | 1      | 1       |
+
+    The first line contains column headers. The second line
+    contains a separator line between the headers and the content.
+    Each following line is a row in the table.  Columns are always
+    separated by the pipe character.  The colons indicate column
+    alignment.
+
+    A table is re-aligned automatically each time you press <kbd>TAB</kbd>
+    or <kbd>RET</kbd> inside the table.  <kbd>TAB</kbd> also moves to the next
+    field (<kbd>RET</kbd> to the next row) and creates new table rows at
+    the end of the table or before horizontal separator lines.  The
+    indentation of the table is set by the first line.  Column
+    centering inside Emacs is not supported.
+
+    Beginning pipe characters are required for proper detection of
+    table borders inside Emacs.  Any line starting with `|-` or `|:`
+    is considered as a horizontal separator line and will be
+    expanded on the next re-align to span the whole table width.  No
+    padding is allowed between the beginning pipe character and
+    header separator symbol.  So, to create the above table, you
+    would only type
+
+        |Right|Left|Center|Default|
+        |-
+
+    and then press <kbd>TAB</kbd> to align the table and start filling in
+    cells.
+
+    Then you can jump with <kbd>TAB</kbd> from one cell to the next or with
+    <kbd>S-TAB</kbd> to the previous one.  <kbd>RET</kbd> will jump to the to the
+    next cell in the same column, and create a new row if there is
+    no such cell or if the next row is beyond a separator line.
+
+    You can also convert selected region to a table. Basic editing
+    capabilities include inserting, deleting, and moving of columns
+    and rows, and table re-alignment, sorting, transposition:
+
+      - <kbd>C-c UP</kbd> or <kbd>C-c DOWN</kbd> - Move the current row up or down.
+      - <kbd>C-c LEFT</kbd> or <kbd>C-c RIGHT</kbd> - Move the current column left or right.
+      - <kbd>C-c S-UP</kbd> - Kill the current row.
+      - <kbd>C-c S-DOWN</kbd> - Insert a row above the current row. With a
+        prefix argument, row line is created below the current one.
+      - <kbd>C-c S-LEFT</kbd> - Kill the current column.
+      - <kbd>C-c S-RIGHT</kbd> - Insert a new column to the left of the current one.
+      - <kbd>C-c C-d</kbd> - Re-align the current table (`markdown-do`).
+      - <kbd>C-c C-c ^</kbd> - Sort table lines alpabetically or numerically.
+      - <kbd>C-c C-c |</kbd> - Convert selected region to a table.
+      - <kbd>C-c C-c t</kbd> - Transpose table at point.
+
+    The table editing functions try to handle markup hiding
+    correctly when calculating column widths, however, columns
+    containig hidden markup may not always be aligned properly.
+
   * Miscellaneous Commands:
 
     When the [`edit-indirect`][ei] package is installed, <kbd>C-c </kbd>`
