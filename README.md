@@ -381,6 +381,7 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
       - Jumps between footnote markers and footnote text.
       - Toggles the completion status of GFM task list items
         (checkboxes).
+      - Re-aligns table columns.
 
   * Promotion and Demotion: <kbd>C-c C--</kbd> and <kbd>C-c C-=</kbd>
 

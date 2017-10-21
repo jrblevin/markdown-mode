@@ -397,6 +397,7 @@
 ;;       - Jumps between footnote markers and footnote text.
 ;;       - Toggles the completion status of GFM task list items
 ;;         (checkboxes).
+;;       - Re-aligns table columns.
 ;;
 ;;   * Promotion and Demotion: `C-c C--` and `C-c C-=`
 ;;
