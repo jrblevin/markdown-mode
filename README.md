@@ -562,13 +562,13 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
       - <kbd>C-c S-LEFT</kbd> - Kill the current column.
       - <kbd>C-c S-RIGHT</kbd> - Insert a new column to the left of the current one.
       - <kbd>C-c C-d</kbd> - Re-align the current table (`markdown-do`).
-      - <kbd>C-c C-c ^</kbd> - Sort table lines alpabetically or numerically.
+      - <kbd>C-c C-c ^</kbd> - Sort table lines alphabetically or numerically.
       - <kbd>C-c C-c |</kbd> - Convert selected region to a table.
       - <kbd>C-c C-c t</kbd> - Transpose table at point.
 
     The table editing functions try to handle markup hiding
     correctly when calculating column widths, however, columns
-    containig hidden markup may not always be aligned properly.
+    containing hidden markup may not always be aligned properly.
 
   * Miscellaneous Commands:
 

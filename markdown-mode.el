@@ -578,13 +578,13 @@
 ;;       - `C-c S-LEFT` - Kill the current column.
 ;;       - `C-c S-RIGHT` - Insert a new column to the left of the current one.
 ;;       - `C-c C-d` - Re-align the current table (`markdown-do`).
-;;       - `C-c C-c ^` - Sort table lines alpabetically or numerically.
+;;       - `C-c C-c ^` - Sort table lines alphabetically or numerically.
 ;;       - `C-c C-c |` - Convert selected region to a table.
 ;;       - `C-c C-c t` - Transpose table at point.
 ;;
 ;;     The table editing functions try to handle markup hiding
 ;;     correctly when calculating column widths, however, columns
-;;     containig hidden markup may not always be aligned properly.
+;;     containing hidden markup may not always be aligned properly.
 ;;
 ;;   * Miscellaneous Commands:
 ;;
