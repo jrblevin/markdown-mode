@@ -12,6 +12,8 @@
     -   Optionally move leading atx heading markup to the left margin
         when `markdown-marginalize-headers` is non-`nil`.  Thanks to
         Alexis Gallagher for a patch.  ([GH-272][], [GH-274][])
+    -   Added pipe table editing features.  Thanks to Dmitry Safronov
+        for a patch.  ([GH-171][], [GH-266][])
 
 *   Improvements:
 
@@ -38,6 +40,7 @@
     -   Fix `markdown-inline-code-face`'s `:inherit` attribute.
         ([GH-252][])
 
+  [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
@@ -54,6 +57,7 @@
   [gh-261]: https://github.com/jrblevin/markdown-mode/pull/261
   [gh-262]: https://github.com/jrblevin/markdown-mode/pull/262
   [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
+  [gh-266]: https://github.com/jrblevin/markdown-mode/issues/266
   [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
   [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274
 
