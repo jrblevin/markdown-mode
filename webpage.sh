@@ -45,8 +45,6 @@ cat markdown-mode.el |\
     sed -e 's/^;;[ ]\{0,1\}//' |\
     # Escape wiki links
     #sed -e 's/\(\[\[[^]\n]*\]\]\)/\\\1/g' |\
-    # Use Markdown-style backticks for single-quoted lisp code
-    sed -e 's/`\([^'\'']*\)'\''/`\1`/g' |\
     # Use <kbd> tags for single characters (except `t`)
     sed -e 's/`\([^`t]\)`/<kbd>\1<\/kbd>/g' |\
     # Use <kbd> tags for TAB and RET keys
@@ -54,6 +52,8 @@ cat markdown-mode.el |\
     sed -e 's/`RET`/<kbd>RET<\/kbd>/g' |\
     # Use <kbd> tags for keybindings prefixed by C, M, or S
     sed -e 's/`\([CMS]-[^`]*\)`/<kbd>\1<\/kbd>/g' |\
+    # Use Markdown-style backticks for single-quoted lisp code
+    sed -e 's/`\([^'\'']*\)'\''/`\1`/g' |\
     # checkdoc wants Lisp to always be capitalized
     sed -e 's/^\([ ]*\)``` Lisp$/\1```lisp/' |\
     # Remove email addresses

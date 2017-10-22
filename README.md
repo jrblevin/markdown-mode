@@ -161,7 +161,7 @@ maintainer if not).
 
 **Dependencies**
 
-To enable editing of code blocks in indirect buffers using <kbd>C-c </kbd>`,
+To enable editing of code blocks in indirect buffers using <kbd>C-c '</kbd>,
 you will need to install the [`edit-indirect`][ei] package.
 
   [ei]: https://github.com/Fanael/edit-indirect/
@@ -572,7 +572,7 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
 
   * Miscellaneous Commands:
 
-    When the [`edit-indirect`][ei] package is installed, <kbd>C-c </kbd>`
+    When the [`edit-indirect`][ei] package is installed, <kbd>C-c '</kbd>
     (`markdown-edit-code-block`) can be used to edit a code block
     in an indirect buffer in the native major mode. Press <kbd>C-c C-c</kbd>
     to commit changes and return or <kbd>C-c C-k</kbd> to cancel.

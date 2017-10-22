@@ -710,9 +710,9 @@
 ;;     indentation (default: `markdown-indent-line').
 ;;
 ;;   * `markdown-indent-on-enter' - Set to a non-nil value to
-;;     automatically indent new lines when `RET' is pressed.
+;;     automatically indent new lines when `RET` is pressed.
 ;;     Set to `indent-and-new-item' to additionally continue lists
-;;     when `RET' is pressed (default: `t').
+;;     when `RET` is pressed (default: `t').
 ;;
 ;;   * `markdown-enable-wiki-links' - syntax highlighting for wiki
 ;;     links (default: `nil').  Set this to a non-nil value to turn on
