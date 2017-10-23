@@ -562,8 +562,12 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
       - <kbd>C-c S-LEFT</kbd> - Kill the current column.
       - <kbd>C-c S-RIGHT</kbd> - Insert a new column to the left of the current one.
       - <kbd>C-c C-d</kbd> - Re-align the current table (`markdown-do`).
-      - <kbd>C-c C-c ^</kbd> - Sort table lines alphabetically or numerically.
-      - <kbd>C-c C-c |</kbd> - Convert selected region to a table.
+      - <kbd>C-c C-c ^</kbd> - Sort the rows of a table by a specified column.
+        This command prompts you for the column number and a sort
+        method (alphabetical or numerical, optionally in reverse).
+      - <kbd>C-c C-c |</kbd> - Convert the region to a table.  This function
+        attempts to recognize comma, tab, and space separated data
+        and then splits the data into cells accordingly.
       - <kbd>C-c C-c t</kbd> - Transpose table at point.
 
     The table editing functions try to handle markup hiding

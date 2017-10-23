@@ -578,8 +578,12 @@
 ;;       - `C-c S-LEFT` - Kill the current column.
 ;;       - `C-c S-RIGHT` - Insert a new column to the left of the current one.
 ;;       - `C-c C-d` - Re-align the current table (`markdown-do`).
-;;       - `C-c C-c ^` - Sort table lines alphabetically or numerically.
-;;       - `C-c C-c |` - Convert selected region to a table.
+;;       - `C-c C-c ^` - Sort the rows of a table by a specified column.
+;;         This command prompts you for the column number and a sort
+;;         method (alphabetical or numerical, optionally in reverse).
+;;       - `C-c C-c |` - Convert the region to a table.  This function
+;;         attempts to recognize comma, tab, and space separated data
+;;         and then splits the data into cells accordingly.
 ;;       - `C-c C-c t` - Transpose table at point.
 ;;
 ;;     The table editing functions try to handle markup hiding
