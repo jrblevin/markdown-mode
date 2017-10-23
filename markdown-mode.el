@@ -9188,7 +9188,7 @@ a table."
               val (replace-regexp-in-string "[ \t]+\\'" "" val)))
     (forward-char 1) ""))
 
-(defun markdown-table-goto-dline (N)
+(defun markdown-table-goto-dline (n)
   "Go to the Nth data line in the table at point.
 Return t when the line exists, nil otherwise. This function
 assumes point is on a table."
@@ -9196,8 +9196,8 @@ assumes point is on a table."
   (let ((end (markdown-table-end)) (cnt 0))
     (while (and (re-search-forward
                  markdown-table-dline-regexp end t)
-                (< (setq cnt (1+ cnt)) N)))
-    (= cnt N)))
+                (< (setq cnt (1+ cnt)) n)))
+    (= cnt n)))
 
 (defun markdown-table-goto-column (n &optional on-delim)
   "Go to the Nth column in the table line at point.
