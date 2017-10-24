@@ -1741,13 +1741,13 @@ Group 1 matches the text to become a button.")
   "\\(?:^\\|[^\\]\\)\\(\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\)"
   "Regular expression for itex $..$ math mode expressions.
 Groups 1 and 3 match the opening and closing dollar signs.
-Group 3 matches the mathematical expression contained within.")
+Group 2 matches the mathematical expression contained within.")
 
 (defconst markdown-regex-math-inline-double
   "\\(?:^\\|[^\\]\\)\\(\\$\\$\\)\\(\\(?:[^\\$]\\|\\\\.\\)*\\)\\(\\$\\$\\)"
   "Regular expression for itex $$..$$ math mode expressions.
 Groups 1 and 3 match opening and closing dollar signs.
-Group 3 matches the mathematical expression contained within.")
+Group 2 matches the mathematical expression contained within.")
 
 (defconst markdown-regex-math-display
   "^\\(\\\\\\[\\)\\(\\(?:.\\|\n\\)*?\\)?\\(\\\\\\]\\)$"
