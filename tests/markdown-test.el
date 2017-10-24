@@ -4975,9 +4975,9 @@ This includes preserving whitespace after the pipe."
     (markdown-test-file "math.text"
       ;; Flag should be set to t
       (should markdown-enable-math)
-      ;; Font-lock keywords should be updated
-      (should (member (car (markdown-mode-font-lock-keywords-math))
-                      markdown-mode-font-lock-keywords)))))
+      ;; Font-lock keywords should be updated.
+      (should (member (car markdown-mode-font-lock-keywords-math)
+                      (cadr font-lock-keywords))))))
 
 (ert-deftest test-markdown-math/font-lock ()
   "Test markdown math mode."

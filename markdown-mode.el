@@ -8722,6 +8722,18 @@ These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
 
 (make-obsolete 'markdown-enable-math 'markdown-toggle-math "v2.1")
 
+(defconst markdown-mode-font-lock-keywords-math
+  (list
+   ;; Equation reference (eq:foo)
+   '("\\((eq:\\)\\([[:alnum:]:_]+\\)\\()\\)" . ((1 markdown-markup-face)
+                                                (2 markdown-reference-face)
+                                                (3 markdown-markup-face)))
+   ;; Equation reference \eqref{foo}
+   '("\\(\\\\eqref{\\)\\([[:alnum:]:_]+\\)\\(}\\)" . ((1 markdown-markup-face)
+                                                      (2 markdown-reference-face)
+                                                      (3 markdown-markup-face))))
+  "Font lock keywords to add and remove when toggling math support.")
+
 (defun markdown-toggle-math (&optional arg)
   "Toggle support for inline and display LaTeX math expressions.
 With a prefix argument ARG, enable math mode if ARG is positive,
@@ -8733,22 +8745,18 @@ if ARG is omitted or nil."
             (not markdown-enable-math)
           (> (prefix-numeric-value arg) 0)))
   (if markdown-enable-math
-      (message "markdown-mode math support enabled")
+      (progn
+        (font-lock-add-keywords
+         'markdown-mode markdown-mode-font-lock-keywords-math)
+        (message "markdown-mode math support enabled"))
+    (font-lock-remove-keywords
+     'markdown-mode markdown-mode-font-lock-keywords-math)
     (message "markdown-mode math support disabled"))
   (markdown-reload-extensions))
 
 (defun markdown-mode-font-lock-keywords-math ()
   "Return math font lock keywords if support is enabled."
-  (when markdown-enable-math
-    (list
-     ;; Equation reference (eq:foo)
-     (cons "\\((eq:\\)\\([[:alnum:]:_]+\\)\\()\\)" '((1 markdown-markup-face)
-                                                     (2 markdown-reference-face)
-                                                     (3 markdown-markup-face)))
-     ;; Equation reference \eqref{foo}
-     (cons "\\(\\\\eqref{\\)\\([[:alnum:]:_]+\\)\\(}\\)" '((1 markdown-markup-face)
-                                                           (2 markdown-reference-face)
-                                                           (3 markdown-markup-face))))))
+  '())
 
 
 ;;; GFM Checkboxes ============================================================
