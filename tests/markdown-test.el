@@ -4976,9 +4976,7 @@ This includes preserving whitespace after the pipe."
       ;; Flag should be set to t
       (should markdown-enable-math)
       ;; Font-lock keywords should be updated
-      (should (member (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
-                                                          (2 markdown-math-face append)
-                                                          (3 markdown-markup-face prepend)))
+      (should (member (car (markdown-mode-font-lock-keywords-math))
                       markdown-mode-font-lock-keywords)))))
 
 (ert-deftest test-markdown-math/font-lock ()

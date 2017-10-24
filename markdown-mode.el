@@ -2886,6 +2886,10 @@ Depending on your font, some reasonable choices are:
     (markdown-match-math-double . ((1 markdown-markup-face prepend)
                                    (2 markdown-math-face append)
                                    (3 markdown-markup-face prepend)))
+    ;; Math mode \[..\]
+    (markdown-match-math-display . ((1 markdown-markup-face prepend)
+                                    (2 markdown-math-face append)
+                                    (3 markdown-markup-face prepend)))
     (markdown-match-bold . ((1 markdown-markup-properties prepend)
                             (2 markdown-bold-face append)
                             (3 markdown-markup-properties prepend)))
@@ -3774,6 +3778,10 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
 (defun markdown-match-math-double (last)
   "Match double quoted $$..$$ math from point to LAST."
   (markdown-match-math-generic markdown-regex-math-inline-double last))
+
+(defun markdown-match-math-display (last)
+  "Match single quoted \[..\] math from point to LAST."
+  (markdown-match-math-generic markdown-regex-math-display last))
 
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
@@ -8725,10 +8733,6 @@ if ARG is omitted or nil."
   "Return math font lock keywords if support is enabled."
   (when markdown-enable-math
     (list
-     ;; Display mode equations with brackets: \[ \]
-     (cons markdown-regex-math-display '((1 markdown-markup-face prepend)
-                                         (2 markdown-math-face append)
-                                         (3 markdown-markup-face prepend)))
      ;; Equation reference (eq:foo)
      (cons "\\((eq:\\)\\([[:alnum:]:_]+\\)\\()\\)" '((1 markdown-markup-face)
                                                      (2 markdown-reference-face)
