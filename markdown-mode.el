@@ -8671,8 +8671,10 @@ or span."
 Checks to see if there is actually a ‘markdown-mode’ file local variable
 before regenerating font-lock rules for extensions."
   (when (and (boundp 'file-local-variables-alist)
-             (assoc 'markdown-enable-wiki-links file-local-variables-alist)
-             (assoc 'markdown-enable-math file-local-variables-alist))
+             (or (assoc 'markdown-enable-wiki-links file-local-variables-alist)
+                 (assoc 'markdown-enable-math file-local-variables-alist)))
+    (when (assoc 'markdown-enable-math file-local-variables-alist)
+      (markdown-toggle-math markdown-enable-math))
     (markdown-reload-extensions)))
 
 
