@@ -5019,6 +5019,15 @@ This includes preserving whitespace after the pipe."
       (markdown-test-range-has-face 394 398 markdown-math-face)
       (markdown-test-range-has-face 399 400 markdown-markup-face))))
 
+(ert-deftest test-markdown-math/double-slash-display-math ()
+  "Test double slash display math font lock."
+  (let ((markdown-enable-math t))
+    (markdown-test-file "math.text"
+      (markdown-test-range-has-face 403 474 nil)
+      (markdown-test-range-has-face 475 477 markdown-markup-face)
+      (markdown-test-range-has-face 478 543 markdown-math-face)
+      (markdown-test-range-has-face 544 546 markdown-markup-face))))
+
 (ert-deftest test-markdown-math/font-lock-italics ()
   "Test markdown math mode with underscores."
   (let ((markdown-enable-math t))

@@ -24,6 +24,12 @@ $**η = (-1)^{k(n-k)}sη$, where $**η$, is the Hodge star applied twice.
 This is neither math nor italic
 \[ a_2 \]
 
+Support brackets with two backslashes, as do MultiMarkdown and Pandoc:
+
+\\[
+\Gamma(x) = \int_0^\infty t^{x-1}{\mathrm{e}}^{-t}\,{\mathrm{d}}
+\\]
+
 <!-- Local Variables: -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->

@@ -26,6 +26,7 @@
         Safronov for a patch.  ([GH-248][])
     -   New user option `markdown-translate-filename-function` to translate
         filenames when following file links.  ([GH-268][], [GH-277][])
+    -   Support double-backslash math delimiters.  ([GH-270][])
 
 *   Bug fixes:
 
@@ -65,6 +66,7 @@
   [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
   [gh-266]: https://github.com/jrblevin/markdown-mode/issues/266
   [gh-268]: https://github.com/jrblevin/markdown-mode/issues/268
+  [gh-270]: https://github.com/jrblevin/markdown-mode/issues/270
   [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
   [gh-273]: https://github.com/jrblevin/markdown-mode/issues/273
   [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274

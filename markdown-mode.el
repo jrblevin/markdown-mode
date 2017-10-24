@@ -1750,10 +1750,16 @@ Groups 1 and 3 match opening and closing dollar signs.
 Group 2 matches the mathematical expression contained within.")
 
 (defconst markdown-regex-math-display
-  "^\\(\\\\\\[\\)\\(\\(?:.\\|\n\\)*?\\)?\\(\\\\\\]\\)$"
-  "Regular expression for itex \[..\] display mode expressions.
-Groups 1 and 3 match the opening and closing delimiters.
-Group 2 matches the mathematical expression contained within.")
+  (rx line-start
+      (group (group (repeat 1 2 "\\")) "[")
+      (group (*? anything))
+      (group (backref 2) "]")
+      line-end)
+  "Regular expression for \[..\] or \\[..\\] display math.
+Groups 1 and 4 match the opening and closing markup.
+Group 3 matches the mathematical expression contained within.
+Group 2 matches the opening slashes, and is used internally to
+match the closing slashes.")
 
 (defsubst markdown-make-tilde-fence-regex (num-tildes &optional end-of-line)
   "Return regexp matching a tilde code fence at least NUM-TILDES long.
@@ -2886,10 +2892,10 @@ Depending on your font, some reasonable choices are:
     (markdown-match-math-double . ((1 markdown-markup-face prepend)
                                    (2 markdown-math-face append)
                                    (3 markdown-markup-face prepend)))
-    ;; Math mode \[..\]
+    ;; Math mode \[..\] and \\[..\\]
     (markdown-match-math-display . ((1 markdown-markup-face prepend)
-                                    (2 markdown-math-face append)
-                                    (3 markdown-markup-face prepend)))
+                                    (3 markdown-math-face append)
+                                    (4 markdown-markup-face prepend)))
     (markdown-match-bold . ((1 markdown-markup-properties prepend)
                             (2 markdown-bold-face append)
                             (3 markdown-markup-properties prepend)))
@@ -3780,7 +3786,7 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
   (markdown-match-math-generic markdown-regex-math-inline-double last))
 
 (defun markdown-match-math-display (last)
-  "Match single quoted \[..\] math from point to LAST."
+  "Match bracketed display math \[..\] and \\[..\\] from point to LAST."
   (markdown-match-math-generic markdown-regex-math-display last))
 
 (defun markdown-match-propertized-text (property last)
