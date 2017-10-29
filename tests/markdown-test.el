@@ -4489,6 +4489,23 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
   (markdown-test-string "http://jblevins.org/projects/markdown-mode/"
     (should (equal (markdown-link-at-pos (point)) '(1 44 nil "http://jblevins.org/projects/markdown-mode/" nil nil nil)))))
 
+(ert-deftest test-markdown-link/follow-filename ()
+  "Test that `markdown-follow-thing-at-pos' uses
+`markdown-translate-filename-function' to translate filenames."
+  (markdown-test-string "[text](/foo/bar/baz)"
+    (cl-letf* ((visited-files ())
+               ((symbol-function #'find-file)
+                (lambda (filename)
+                  (push filename visited-files)))
+               (translated-files ())
+               (markdown-translate-filename-function
+                (lambda (filename)
+                  (push filename translated-files)
+                  (format "/root%s.md" filename))))
+      (markdown-follow-thing-at-point nil)
+      (should (equal translated-files '("/foo/bar/baz")))
+      (should (equal visited-files '("/root/foo/bar/baz.md"))))))
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/file-local-variables ()
