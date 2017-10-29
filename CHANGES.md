@@ -24,6 +24,8 @@
     -   Save the buffer before running `markdown-open-command` and run
         `markdown-open-command` asynchronously.  Thanks to Dmitry
         Safronov for a patch.  ([GH-248][])
+    -   New user option `markdown-translate-filename-function` to translate
+        filenames when following file links.
 
 *   Bug fixes:
 
