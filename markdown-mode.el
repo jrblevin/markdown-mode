@@ -1335,7 +1335,7 @@ Math support can be enabled, disabled, or toggled later using
 (defcustom markdown-css-paths nil
   "URL of CSS file to link to in the output XHTML."
   :group 'markdown
-  :type 'list)
+  :type '(repeat (string :tag "CSS File Path")))
 
 (defcustom markdown-content-type ""
   "Content type string for the http-equiv header in XHTML output.

@@ -39,6 +39,8 @@
         inaccessible subdirectory.  ([GH-261][])
     -   Fix `markdown-inline-code-face`'s `:inherit` attribute.
         ([GH-252][])
+    -   Fix type of customizable `markdown-css-paths` variable.
+        ([GH-276][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -60,6 +62,7 @@
   [gh-266]: https://github.com/jrblevin/markdown-mode/issues/266
   [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
   [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274
+  [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
 
 # Markdown Mode 2.3
 
