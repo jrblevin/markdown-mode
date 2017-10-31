@@ -4685,14 +4685,16 @@ See `paragraph-separate'."
 (ert-deftest test-markdown-filling/no-break-before-list-item ()
   "There's no point in putting the first item of a list on the next line,
 indented the same amount."
-  :expected-result :failed
   (let ((str "*   [Link](http://way-too-long.example.com)\n"))
     (markdown-test-string str
       (auto-fill-mode 1)
       (let ((fill-column 10))
         (end-of-line)
         (funcall auto-fill-function)
-        (should (string-equal (buffer-string) str))))))
+        ;; This test was known to fail in Emacs 25 and earlier.
+        (if (version< emacs-version "26.0")
+            (should-not (string-equal (buffer-string) str))
+          (should (string-equal (buffer-string) str)))))))
 
 (ert-deftest test-markdown-filling/break-within-list-item ()
   "This doesn't suppress auto-fill within a multi-word list item."
