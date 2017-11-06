@@ -25,7 +25,7 @@
         `markdown-open-command` asynchronously.  Thanks to Dmitry
         Safronov for a patch.  ([GH-248][])
     -   New user option `markdown-translate-filename-function` to translate
-        filenames when following file links.
+        filenames when following file links.  ([GH-268][], [GH-277][])
 
 *   Bug fixes:
 
@@ -62,9 +62,11 @@
   [gh-262]: https://github.com/jrblevin/markdown-mode/pull/262
   [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
   [gh-266]: https://github.com/jrblevin/markdown-mode/issues/266
+  [gh-268]: https://github.com/jrblevin/markdown-mode/issues/268
   [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
   [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274
   [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
+  [gh-277]: https://github.com/jrblevin/markdown-mode/pull/277
 
 # Markdown Mode 2.3
 
