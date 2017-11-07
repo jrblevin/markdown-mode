@@ -4970,7 +4970,7 @@ This includes preserving whitespace after the pipe."
    (should markdown-enable-math)))
 
 (ert-deftest test-markdown-math/reload ()
-  "Test enabling math mode via function `markdown-enable-math'."
+  "Test enabling math mode via variable `markdown-enable-math'."
   (let ((markdown-enable-math t))
     (markdown-test-file "math.text"
       ;; Flag should be set to t
