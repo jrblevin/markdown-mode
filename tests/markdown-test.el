@@ -4979,6 +4979,25 @@ This includes preserving whitespace after the pipe."
       (should (member (car markdown-mode-font-lock-keywords-math)
                       (cadr font-lock-keywords))))))
 
+(ert-deftest test-markdown-math/preserve-user-keywords ()
+  "Test preserving user-specified font-lock keywords."
+  (let ((user-keyword '("\\<\\(FIXME\\):" 1 font-lock-warning-face t)))
+    ;; Add user font-lock keyword using `font-lock-add-keywords'.
+    (font-lock-add-keywords 'markdown-mode (list user-keyword))
+    ;; Visit a file using `markdown-mode'.
+    (markdown-test-file "math.text"
+      ;; User keyword should be present initially.
+      (should (member user-keyword (cadr font-lock-keywords)))
+      ;; User keyword should persist after calling `markdown-reload-extensions'.
+      (markdown-reload-extensions)
+      (should (member user-keyword (cadr font-lock-keywords))))
+    ;; Remove the user keyword using `font-lock-remove-keywords'.
+    (font-lock-remove-keywords 'markdown-mode (list user-keyword))
+    ;; Visit a file using `markdown-mode'.
+    (markdown-test-file "inline.text"
+      ;; User keyword should not be present after removal.
+      (should-not (member user-keyword (cadr font-lock-keywords))))))
+
 (ert-deftest test-markdown-math/font-lock ()
   "Test markdown math mode."
   (let ((markdown-enable-math t))

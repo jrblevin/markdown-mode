@@ -2913,11 +2913,6 @@ Depending on your font, some reasonable choices are:
     (markdown-match-wiki-link . ((0 markdown-link-face prepend))))
   "Syntax highlighting for Markdown files.")
 
-(defvar markdown-mode-font-lock-keywords nil
-  "Default highlighting expressions for Markdown mode.
-This variable is defined as a buffer-local variable for dynamic
-extension support.")
-
 ;; Footnotes
 (defvar markdown-footnote-counter 0
   "Counter for footnote numbers.")
@@ -8649,20 +8644,9 @@ or span."
   "Check settings, update font-lock keywords and hooks, and re-fontify buffer."
   (interactive)
   (when (member major-mode '(markdown-mode gfm-mode))
-    ;; Update font lock keywords with extensions
-    (setq markdown-mode-font-lock-keywords
-          (append
-           (markdown-mode-font-lock-keywords-math)
-           markdown-mode-font-lock-keywords-basic))
-    ;; Update font lock defaults
-    (setq font-lock-defaults
-          '(markdown-mode-font-lock-keywords
-            nil nil nil nil
-            (font-lock-syntactic-face-function . markdown-syntactic-face)))
     ;; Refontify buffer
     (when (and font-lock-mode (fboundp 'font-lock-refresh-defaults))
       (font-lock-refresh-defaults))
-
     ;; Add or remove hooks related to extensions
     (markdown-setup-wiki-link-hooks)))
 
@@ -8753,10 +8737,6 @@ if ARG is omitted or nil."
      'markdown-mode markdown-mode-font-lock-keywords-math)
     (message "markdown-mode math support disabled"))
   (markdown-reload-extensions))
-
-(defun markdown-mode-font-lock-keywords-math ()
-  "Return math font lock keywords if support is enabled."
-  '())
 
 
 ;;; GFM Checkboxes ============================================================
@@ -9789,7 +9769,6 @@ spaces, or alternatively a TAB should be used as the separator."
             #'markdown-font-lock-extend-region-function t t)
   (setq-local syntax-propertize-function #'markdown-syntax-propertize)
   ;; Font lock.
-  (setq-local markdown-mode-font-lock-keywords nil)
   (setq-local font-lock-defaults nil)
   (setq-local font-lock-multiline t)
   (setq-local font-lock-extra-managed-props
@@ -9798,8 +9777,14 @@ spaces, or alternatively a TAB should be used as the separator."
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
-  ;; Reload extensions
-  (markdown-reload-extensions)
+  (setq font-lock-defaults
+        '(markdown-mode-font-lock-keywords-basic
+          nil nil nil nil
+          (font-lock-syntactic-face-function . markdown-syntactic-face)))
+  ;; Wiki links
+  (markdown-setup-wiki-link-hooks)
+  ;; Math mode
+  (when markdown-enable-math (markdown-toggle-math t))
   ;; Add a buffer-local hook to reload after file-local variables are read
   (add-hook 'hack-local-variables-hook #'markdown-handle-local-variables nil t)
   ;; For imenu support

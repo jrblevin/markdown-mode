@@ -46,9 +46,12 @@
         ([GH-276][])
     -   Don't set `markdown-code-face` background color at package
         load time.  ([GH-273][])
+    -   Don't clobber user specified font-lock keywords when toggling
+        features.  ([GH-222][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
+  [gh-222]: https://github.com/jrblevin/markdown-mode/issues/222
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
