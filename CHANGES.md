@@ -43,6 +43,8 @@
         ([GH-252][])
     -   Fix type of customizable `markdown-css-paths` variable.
         ([GH-276][])
+    -   Don't set `markdown-code-face` background color at package
+        load time.  ([GH-273][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -64,6 +66,7 @@
   [gh-266]: https://github.com/jrblevin/markdown-mode/issues/266
   [gh-268]: https://github.com/jrblevin/markdown-mode/issues/268
   [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
+  [gh-273]: https://github.com/jrblevin/markdown-mode/issues/273
   [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274
   [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
   [gh-277]: https://github.com/jrblevin/markdown-mode/pull/277
