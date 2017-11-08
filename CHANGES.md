@@ -27,6 +27,8 @@
     -   New user option `markdown-translate-filename-function` to translate
         filenames when following file links.  ([GH-268][], [GH-277][])
     -   Support double-backslash math delimiters.  ([GH-270][])
+    -   New user option `markdown-export-kill-buffer` to kill or preserve
+        HTML export output buffer.  ([GH-224][])
 
 *   Bug fixes:
 
@@ -52,6 +54,7 @@
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
   [gh-222]: https://github.com/jrblevin/markdown-mode/issues/222
+  [gh-224]: https://github.com/jrblevin/markdown-mode/issues/224
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
