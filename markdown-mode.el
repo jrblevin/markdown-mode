@@ -1490,6 +1490,14 @@ This applies to insertions done with
   :group 'markdown
   :type 'boolean)
 
+(defcustom markdown-edit-code-block-default-mode 'normal-mode
+  "Default mode to use for editing code blocks.
+This mode is used when automatic detection fails, such as for GFM
+code blocks with no language specified."
+  :group 'markdown
+  :type 'symbol
+  :package-version '(markdown-mode . "2.4"))
+
 (defcustom markdown-gfm-uppercase-checkbox nil
   "If non-nil, use [X] for completed checkboxes, [x] otherwise."
   :group 'markdown
@@ -9059,7 +9067,9 @@ position."
                (end (and bounds (goto-char (nth 1 bounds)) (point-at-bol 1))))
           (if (and begin end)
               (let* ((lang (markdown-code-block-lang))
-                     (mode (and lang (markdown-get-lang-mode lang)))
+                     (mode (if lang
+                               (markdown-get-lang-mode lang)
+                             markdown-edit-code-block-default-mode))
                      (edit-indirect-guess-mode-function
                       (lambda (_parent-buffer _beg _end)
                         (funcall mode))))

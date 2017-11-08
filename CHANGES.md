@@ -29,6 +29,8 @@
     -   Support double-backslash math delimiters.  ([GH-270][])
     -   New user option `markdown-export-kill-buffer` to kill or preserve
         HTML export output buffer.  ([GH-224][])
+    -   Add `markdown-edit-code-block-default-mode` to specify default
+        mode for indirect editing of code blocks.  ([GH-251][])
 
 *   Bug fixes:
 
@@ -60,6 +62,7 @@
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
   [gh-248]: https://github.com/jrblevin/markdown-mode/issues/248
+  [gh-251]: https://github.com/jrblevin/markdown-mode/issues/251
   [gh-252]: https://github.com/jrblevin/markdown-mode/pull/252
   [gh-254]: https://github.com/jrblevin/markdown-mode/issues/254
   [gh-255]: https://github.com/jrblevin/markdown-mode/issues/255
