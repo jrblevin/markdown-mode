@@ -31,6 +31,8 @@
         HTML export output buffer.  ([GH-224][])
     -   Add `markdown-edit-code-block-default-mode` to specify default
         mode for indirect editing of code blocks.  ([GH-251][])
+    -   Insert-and-indirect-edit GFM code blocks simultaneously by
+        giving a prefix argument to `C-c C-s C`.  ([GH-251][])
 
 *   Bug fixes:
 

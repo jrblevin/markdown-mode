@@ -595,7 +595,10 @@
 ;;     When the [`edit-indirect'][ei] package is installed, `C-c '`
 ;;     (`markdown-edit-code-block`) can be used to edit a code block
 ;;     in an indirect buffer in the native major mode. Press `C-c C-c`
-;;     to commit changes and return or `C-c C-k` to cancel.
+;;     to commit changes and return or `C-c C-k` to cancel.  You can
+;;     also give a prefix argument to the insertion command, as in
+;;     `C-u C-c C-s C`, to edit the code block in an indirect buffer
+;;     upon insertion.
 ;;
 ;; As noted, many of the commands above behave differently depending
 ;; on whether Transient Mark mode is enabled or not.  When it makes
@@ -5116,12 +5119,14 @@ opening code fence and an info string."
   :safe #'natnump
   :package-version '(markdown-mode . "2.3"))
 
-(defun markdown-insert-gfm-code-block (&optional lang)
+(defun markdown-insert-gfm-code-block (&optional lang edit)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
 region is active, wrap this region with the markup instead.  If
 the region boundaries are not on empty lines, these are added
-automatically in order to have the correct markup."
+automatically in order to have the correct markup.  When EDIT is
+non-nil (e.g., when \\[universal-argument] is given), edit the
+code block in an indirect buffer after insertion."
   (interactive
    (list (let ((completion-ignore-case nil))
            (condition-case nil
@@ -5166,12 +5171,13 @@ automatically in order to have the correct markup."
       (setq start (point))
       (insert "```" lang "\n")
       (indent-to indent)
-      (insert ?\n)
+      (unless edit (insert ?\n))
       (indent-to indent)
       (insert "```")
       (markdown-ensure-blank-line-after)
       (markdown-syntax-propertize-fenced-block-constructs start (point)))
-    (end-of-line 0)))
+    (end-of-line 0)
+    (when edit (markdown-edit-code-block))))
 
 (defun markdown-code-block-lang (&optional pos-prop)
   "Return the language name for a GFM or tilde fenced code block.

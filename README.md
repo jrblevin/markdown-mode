@@ -579,7 +579,10 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     When the [`edit-indirect`][ei] package is installed, <kbd>C-c '</kbd>
     (`markdown-edit-code-block`) can be used to edit a code block
     in an indirect buffer in the native major mode. Press <kbd>C-c C-c</kbd>
-    to commit changes and return or <kbd>C-c C-k</kbd> to cancel.
+    to commit changes and return or <kbd>C-c C-k</kbd> to cancel.  You can
+    also give a prefix argument to the insertion command, as in
+    <kbd>C-u C-c C-s C</kbd>, to edit the code block in an indirect buffer
+    upon insertion.
 
 As noted, many of the commands above behave differently depending
 on whether Transient Mark mode is enabled or not.  When it makes
