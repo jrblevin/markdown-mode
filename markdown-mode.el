@@ -1355,6 +1355,15 @@ and `iso-latin-1'.  Use `list-coding-systems' for more choices."
   :group 'markdown
   :type 'coding-system)
 
+(defcustom markdown-export-kill-buffer t
+  "Kill output buffer after HTML export.
+When non-nil, kill the HTML output buffer after
+exporting with `markdown-export'."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.4"))
+
 (defcustom markdown-xhtml-header-content ""
   "Additional content to include in the XHTML <head> block."
   :group 'markdown
@@ -7843,7 +7852,8 @@ current filename, but with the extension removed and replaced with .html."
       (markdown-standalone output-buffer-name)
       (with-current-buffer output-buffer
         (run-hooks 'markdown-after-export-hook)
-        (save-buffer))
+        (save-buffer)
+        (when markdown-export-kill-buffer (kill-buffer)))
       ;; if modified, restore initial buffer
       (when (buffer-modified-p init-buf)
         (erase-buffer)

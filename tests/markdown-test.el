@@ -4892,6 +4892,24 @@ This includes preserving whitespace after the pipe."
   (should-not (string-match markdown-xhtml-standalone-regexp
                             "<div id=\"name\">")))
 
+(ert-deftest test-markdown-export/kill-buffer-nil ()
+  "Test `markdown-export-kill-buffer' equal to nil."
+  (markdown-test-temp-file "inline.text"
+    (let* ((markdown-export-kill-buffer nil)
+           (export-file (markdown-export))
+           (export-buffer (get-file-buffer export-file)))
+      ;; Output buffer should remain open.
+      (should (member export-buffer (buffer-list))))))
+
+(ert-deftest test-markdown-export/kill-buffer-t ()
+  "Test `markdown-export-kill-buffer' equal to t."
+  (markdown-test-temp-file "inline.text"
+    (let* ((markdown-export-kill-buffer t)
+           (export-file (markdown-export))
+           (export-buffer (get-file-buffer export-file)))
+      ;; Output buffer should be killed.
+      (should-not export-buffer))))
+
 ;;; Hook tests:
 
 (ert-deftest test-markdown-hook/before-export ()
@@ -4932,6 +4950,7 @@ This includes preserving whitespace after the pipe."
   "Test hook run after export XHTML."
   (markdown-test-temp-file "lists.text"
    (let* ((after-hook-run nil)
+          (markdown-export-kill-buffer nil)
           (func (lambda ()
                   ;; Change variable value
                   (setq after-hook-run t)
