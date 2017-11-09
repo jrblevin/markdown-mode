@@ -3970,20 +3970,6 @@ links with URLs."
   (when (markdown-match-inline-generic markdown-regex-uri last t)
     (goto-char (1+ (match-end 0)))))
 
-(defun markdown-get-match-boundaries (start-header end-header last &optional pos)
-  (save-excursion
-    (goto-char (or pos (point-min)))
-    (cl-loop
-     with cur-result = nil
-     and st-hdr = (or start-header "\\`")
-     and end-hdr = (or end-header "\n\n\\|\n\\'\\|\\'")
-     while (and (< (point) last)
-                (re-search-forward st-hdr last t)
-                (progn
-                  (setq cur-result (match-data))
-                  (re-search-forward end-hdr nil t)))
-     collect (list cur-result (match-data)))))
-
 (defvar markdown-conditional-search-function #'re-search-forward
   "Conditional search function used in `markdown-search-until-condition'.
 Made into a variable to allow for dynamic let-binding.")
@@ -3995,41 +3981,64 @@ Made into a variable to allow for dynamic let-binding.")
     ret))
 
 (defun markdown-match-generic-metadata
-    (regexp last &optional start-header end-header)
-  "Match generic metadata specified by REGEXP from the point to LAST.
-If START-HEADER is nil, we assume metadata can only occur at the
-very top of a file (\"\\`\"). If END-HEADER is nil, we assume it
-is \"\n\n\""
-  (let* ((header-bounds
-          (markdown-get-match-boundaries start-header end-header last))
-         (enclosing-header
-          (cl-find-if                   ; just take first if multiple
-           (lambda (match-bounds)
-             (cl-destructuring-bind (begin end) (cl-second match-bounds)
-               (and (< (point) begin)
-                    (save-excursion (re-search-forward regexp end t)))))
-           header-bounds))
-         (header-begin
-          (when enclosing-header (cl-second (cl-first enclosing-header))))
-         (header-end
-          (when enclosing-header (cl-first (cl-second enclosing-header)))))
-    (cond ((null enclosing-header)
-           ;; Don't match anything outside of a header.
-           nil)
-          ((markdown-search-until-condition
-            (lambda () (> (point) header-begin)) regexp (min last header-end) t)
-           ;; If a metadata item is found, it may span several lines.
-           (let ((key-beginning (match-beginning 1))
-                 (key-end (match-end 1))
-                 (markup-begin (match-beginning 2))
-                 (markup-end (match-end 2))
-                 (value-beginning (match-beginning 3)))
-             (set-match-data (list key-beginning (point) ; complete metadata
-                                   key-beginning key-end ; key
-                                   markup-begin markup-end ; markup
-                                   value-beginning (point))) ; value
-             t))
-          (t nil))))
+    (regexp last &optional block-begin-re block-end-re)
+  "Match metadata declarations specified by REGEXP from point to LAST.
+These declarations must appear inside a metadata block specified
+by BLOCK-BEGIN-RE and BLOCK-END-RE.  BLOCK-BEGIN-RE is a regular
+expression denoting the beginning of a metadata block.  If it is
+nil, we assume metadata can only appear at the beginning of the
+buffer.  Similarly, BLOCK-END-RE is a regular expression denoting
+the end of a metadata block.  If it is nil, assume blocks end with
+a blank line or the end of the buffer.  There may be at most one such
+block in a file.  Subsequent blocks will be ignored."
+  (let* ((first (point))
+         (begin-re (or block-begin-re "\\`"))
+         (end-re (or block-end-re "\n[ \t]*\n\\|\n\\'\\|\\'"))
+
+         ;; (prev-block-begin (when (re-search-backward begin-re (point-min) t) (match-end 0)))
+         ;; (next-block-begin (when (re-search-forward begin-re last t) (match-end 0)))
+         ;; (block-begin (or prev-block-begin next-block-begin))
+
+         (block-begin (when (or (re-search-backward begin-re (point-min) t)
+                                (re-search-forward begin-re last t))
+                        (match-end 0)))
+
+         (block-end (and block-begin (goto-char block-begin)
+                         (re-search-forward end-re nil t))))
+    (cond
+     ;; Don't match declarations if there is no metadata block or if
+     ;; the point is beyond the block.  Move point to point-max to
+     ;; prevent additional searches and return return nil since nothing
+     ;; was found.
+     ((or (null block-begin) (and block-end (> first block-end)))
+      (goto-char (point-max))
+      nil)
+     ;; No declarations to match if a block was found but not in
+     ;; range.  Move point to LAST, to resume there, and return nil.
+     ((> block-begin last)
+      (goto-char last)
+      nil)
+     ;; If a block was found that begins before LAST and ends after
+     ;; point, search for declarations inside it.
+     (t
+      ;; If the starting is before the beginning of the block, start
+      ;; there.  Otherwise, move back to FIRST.
+      (goto-char (if (< first block-begin) block-begin first))
+      (if (re-search-forward regexp (min last block-end) t)
+          ;; If a metadata declaration is found, set match-data and return t.
+          (let ((key-beginning (match-beginning 1))
+                (key-end (match-end 1))
+                (markup-begin (match-beginning 2))
+                (markup-end (match-end 2))
+                (value-beginning (match-beginning 3)))
+            (set-match-data (list key-beginning (point) ; complete metadata
+                                  key-beginning key-end ; key
+                                  markup-begin markup-end ; markup
+                                  value-beginning (point))) ; value
+            t)
+        ;; Otherwise, move the point to last and return nil
+        (goto-char last)
+        nil)))))
 
 (defun markdown-match-declarative-metadata (last)
   "Match declarative metadata from the point to LAST."

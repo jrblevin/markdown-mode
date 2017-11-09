@@ -2692,6 +2692,18 @@ Base Header Level: 2"
    (markdown-test-range-has-face 40 65 nil)
    (markdown-test-range-has-face 67 86 nil)))
 
+(ert-deftest test-markdown-font-lock/mmd-metadata-after-header-with-whitespace ()
+  "Ensure that similar lines are not matched after the header.
+The blank line here has two spaces, which should not change how
+it is parsed."
+  (markdown-test-string
+   "Title: peg-multimarkdown User's Guide\n  \nAuthor: Fletcher T. Penney\nBase Header Level: 2\n"
+   (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
+   (markdown-test-range-has-face 6 6 markdown-markup-face)
+   (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
+   (markdown-test-range-has-face 42 67 nil)
+   (markdown-test-range-has-face 69 88 nil)))
+
 (ert-deftest test-markdown-font-lock/pandoc-metadata ()
   "Basic Pandoc metadata tests."
   (markdown-test-string "% title
