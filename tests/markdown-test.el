@@ -2275,6 +2275,17 @@ See GH-275."
    (should-not (markdown-range-property-any
                 (point-min) (point-max) 'face '(markdown-bold-face)))))
 
+(ert-deftest test-markdown-font-lock/code-in-bold ()
+  "Test inline code inside bold."
+  (markdown-test-string
+   "**text `code` text**"
+   (markdown-test-range-has-face 1 2 markdown-markup-face)
+   (markdown-test-range-has-face 3 18 markdown-bold-face)
+   (markdown-test-range-has-face 8 8 markdown-markup-face)
+   (markdown-test-range-has-face 9 12 markdown-inline-code-face)
+   (markdown-test-range-has-face 13 13 markdown-markup-face)
+   (markdown-test-range-has-face 19 20 markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/bold-in-comment ()
   "Test not matching bold in comments."
   (markdown-test-string
