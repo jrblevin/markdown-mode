@@ -14,6 +14,8 @@
         Alexis Gallagher for a patch.  ([GH-272][], [GH-274][])
     -   Added pipe table editing features.  Thanks to Dmitry Safronov
         for a patch.  ([GH-171][], [GH-266][])
+    -   Font lock for HTML entities, with a new face
+        `markdown-html-entity-face`.
 
 *   Improvements:
 

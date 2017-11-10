@@ -3107,6 +3107,36 @@ note.]  And then you can close it and continue writing."
 across blocks]"
     (markdown-test-range-has-face (point-min) (point-max) nil)))
 
+(ert-deftest test-markdown-font-lock/html-entity-named ()
+  "Test basic font-lock support for named HTML entities."
+  (markdown-test-string "&nbsp;"
+    (markdown-test-range-has-face 1 6 'markdown-html-entity-face)))
+
+(ert-deftest test-markdown-font-lock/html-entity-hex ()
+  "Test basic font-lock support for hexadecimal HTML entities."
+  (markdown-test-string "&#x272a;"
+    (markdown-test-range-has-face 1 8 'markdown-html-entity-face)))
+
+(ert-deftest test-markdown-font-lock/html-entity-decimal ()
+  "Test basic font-lock support for decimal HTML entities."
+  (markdown-test-string "&#9;"
+    (markdown-test-range-has-face 1 4 'markdown-html-entity-face)))
+
+(ert-deftest test-markdown-font-lock/html-entity-in-inline-code ()
+  "Test that HTML entities are not matched inside inline code."
+  (markdown-test-string "`&#9;`"
+    (markdown-test-range-has-face 1 1 'markdown-markup-face)
+    (markdown-test-range-has-face 2 5 'markdown-inline-code-face)
+    (markdown-test-range-has-face 6 6 'markdown-markup-face)
+    (should-not (markdown-range-property-any 1 6 'face '(markdown-html-entity-face)))))
+
+(ert-deftest test-markdown-font-lock/html-entity-in-gfm-code-block ()
+  "Test that HTML entities are not matched inside GFM code blocks."
+  (markdown-test-string "```\n&nbsp;\n&#x272a;\n&#9;\n```"
+    (should-not
+     (markdown-range-property-any
+      (point-min) (point-max) 'face '(markdown-html-entity-face)))))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()

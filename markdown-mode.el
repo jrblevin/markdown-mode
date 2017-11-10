@@ -1886,6 +1886,10 @@ Group 2 matches the opening square bracket.
 Group 3 matches the footnote text, without the surrounding markup.
 Group 4 matches the closing square bracket.")
 
+(defconst markdown-regex-html-entity
+  "\\(&#?[[:alnum:]]+;\\)"
+  "Regular expression for matching HTML entities.")
+
 
 ;;; Syntax ====================================================================
 
@@ -2761,6 +2765,11 @@ For example, this applies to plain angle bracket URLs:
 (defface markdown-hr-face
   '((t (:inherit markdown-markup-face)))
   "Face for horizontal rules."
+  :group 'markdown-faces)
+
+(defface markdown-html-entity-face
+  '((t (:inherit font-lock-variable-name-face)))
+  "Face for HTML entities."
   :group 'markdown-faces)
 
 (defcustom markdown-header-scaling nil
