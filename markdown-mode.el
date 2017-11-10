@@ -1285,14 +1285,15 @@ cause lag when typing on slower machines."
   :type '(repeat (string :tag "URI scheme")))
 
 (defcustom markdown-url-compose-char
-  (cond
-   ((char-displayable-p ?∞) ?∞)
-   ((char-displayable-p ?…) ?…)
-   (t ?#))
+  '(?∞ ?… ?⋯ ?# ?★ ?⚓)
   "Placeholder character for hidden URLs.
-Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
-  :type 'character
-  :safe 'characterp
+This may be a single character or a list of characters. In case
+of a list, the first one that satisfies `char-displayable-p' will
+be used."
+  :type '(choice
+          (character :tag "Single URL replacement character")
+          (repeat :tag "List of possible URL replacement characters"
+                  character))
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-blockquote-display-char
@@ -1513,7 +1514,7 @@ code blocks with no language specified."
 (defcustom markdown-hide-urls nil
   "Hide URLs of inline links and reference tags of reference links.
 Such URLs will be replaced by a single customizable
-character (∞), or `markdown-url-compose-char', but are still part
+character, defined by `markdown-url-compose-char', but are still part
 of the buffer.  Links can be edited interactively with
 \\[markdown-insert-link] or, for example, by deleting the final
 parenthesis to remove the invisibility property. You can also
@@ -8227,6 +8228,8 @@ Translate filenames using `markdown-filename-translate-function'."
                      'invisible 'markdown-markup
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
+           ;; URL composition character
+           (url-char (markdown--first-displayable markdown-url-compose-char))
            ;; Title part
            (tp (list 'face 'markdown-link-title-face
                      'invisible 'markdown-markup
@@ -8238,8 +8241,7 @@ Translate filenames using `markdown-filename-translate-function'."
       (when url-start (add-text-properties url-start url-end up))
       (when title-start (add-text-properties url-end title-end tp))
       (when (and markdown-hide-urls url-start)
-        (compose-region url-start (or title-end url-end)
-                        markdown-url-compose-char))
+        (compose-region url-start (or title-end url-end) url-char))
       t)))
 
 (defun markdown-fontify-reference-links (last)
@@ -8265,6 +8267,8 @@ Translate filenames using `markdown-filename-translate-function'."
                                       (goto-char pos)
                                       (or (markdown-link-url)
                                           "Undefined reference"))))))
+           ;; URL composition character
+           (url-char (markdown--first-displayable markdown-url-compose-char))
            ;; Reference part
            (rp (list 'face 'markdown-reference-face
                      'invisible 'markdown-markup
@@ -8275,7 +8279,7 @@ Translate filenames using `markdown-filename-translate-function'."
       (when link-start (add-text-properties link-start link-end lp))
       (when ref-start (add-text-properties ref-start ref-end rp)
             (when (and markdown-hide-urls (> (- ref-end ref-start) 2))
-              (compose-region ref-start ref-end markdown-url-compose-char)))
+              (compose-region ref-start ref-end url-char)))
       t)))
 
 (defun markdown-fontify-angle-uris (last)
