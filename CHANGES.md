@@ -33,6 +33,8 @@
         mode for indirect editing of code blocks.  ([GH-251][])
     -   Insert-and-indirect-edit GFM code blocks simultaneously by
         giving a prefix argument to `C-c C-s C`.  ([GH-251][])
+    -   Improve package load time by deferring calls to
+        `char-displayable-p`.  ([GH-264][])
 
 *   Bug fixes:
 
@@ -75,6 +77,7 @@
   [gh-261]: https://github.com/jrblevin/markdown-mode/pull/261
   [gh-262]: https://github.com/jrblevin/markdown-mode/pull/262
   [gh-263]: https://github.com/jrblevin/markdown-mode/pull/263
+  [gh-264]: https://github.com/jrblevin/markdown-mode/pull/264
   [gh-266]: https://github.com/jrblevin/markdown-mode/issues/266
   [gh-268]: https://github.com/jrblevin/markdown-mode/issues/268
   [gh-270]: https://github.com/jrblevin/markdown-mode/issues/270
