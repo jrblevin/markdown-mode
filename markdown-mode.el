@@ -1298,7 +1298,10 @@ be used."
 
 (defcustom markdown-blockquote-display-char
   '("▌" "┃" ">")
-  "String to display when hiding blockquote markup."
+  "String to display when hiding blockquote markup.
+This may be a single string or a list of string. In case of a
+list, the first one that satisfies `char-displayable-p' will be
+used."
   :type 'string
   :type '(choice
           (string :tag "Single blockquote display string")
