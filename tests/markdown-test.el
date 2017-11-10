@@ -4567,6 +4567,14 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
 
 (ert-deftest test-markdown-wiki-link/font-lock ()
   "Test font lock faces for wiki links."
+  ;; If `temporary-file-directory' contains an inaccessible
+  ;; subdirectory, `markdown-fontify-buffer-wiki-links' fails because
+  ;; it calls `directory-files-recursively' on the directory, which
+  ;; fails because of
+  ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=28567>.  To fix
+  ;; this, we run the entire test in a new subdirectory of
+  ;; `temporary-file-directory', which is guaranteed to not contain
+  ;; any inaccessible directories.
   (let ((temporary-file-directory
          (file-name-as-directory (make-temp-file "markdown-test" :dir-flag))))
     (markdown-test-temp-file "wiki-links.text"
