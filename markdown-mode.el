@@ -1297,15 +1297,12 @@ be used."
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-blockquote-display-char
-  (cond
-   ((char-displayable-p ?▌) "▌")
-   ((char-displayable-p ?┃) "┃")
-   ((char-displayable-p ?│) "│")
-   ((char-displayable-p ?|) "|")
-   (t ">"))
-  "Character for hiding blockquote markup."
+  '("▌" "┃" ">")
+  "String to display when hiding blockquote markup."
   :type 'string
-  :safe 'stringp
+  :type '(choice
+          (string :tag "Single blockquote display string")
+          (repeat :tag "List of possible blockquote display strings" string))
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-hr-display-char
@@ -4229,17 +4226,16 @@ SEQ may be an atom or a sequence."
 (defun markdown-fontify-blockquotes (last)
   "Apply font-lock properties to blockquotes from point to LAST."
   (when (markdown-match-blockquotes last)
-    (add-text-properties
-     (match-beginning 1) (match-end 1)
-     (if markdown-hide-markup
-         `(face markdown-blockquote-face
-                display ,markdown-blockquote-display-char)
-       `(face markdown-markup-face
-              ,@(when markdown-hide-markup
-                  `(display ,markdown-blockquote-display-char)))))
-    (font-lock-append-text-property
-     (match-beginning 0) (match-end 0) 'face 'markdown-blockquote-face)
-    t))
+    (let ((display-string
+           (markdown--first-displayable markdown-blockquote-display-char)))
+      (add-text-properties
+       (match-beginning 1) (match-end 1)
+       (if markdown-hide-markup
+           `(face markdown-blockquote-face display ,display-string)
+         `(face markdown-markup-face)))
+      (font-lock-append-text-property
+       (match-beginning 0) (match-end 0) 'face 'markdown-blockquote-face)
+      t)))
 
 (defun markdown-fontify-list-items (last)
   "Apply font-lock properties to list markers from point to LAST."
