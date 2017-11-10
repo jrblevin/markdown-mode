@@ -1308,12 +1308,15 @@ Depending on your font, some good choices are …, ⋯, #, ∞, ★, and ⚓."
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-hr-display-char
-  (cond ((char-displayable-p ?─) ?─)
-        ((char-displayable-p ?━) ?━)
-        (t ?-))
-  "Character for hiding horizontal rule markup."
-  :type 'character
-  :safe 'characterp
+  '(?─ ?━ ?-)
+  "Character for hiding horizontal rule markup.
+This may be a single character or a list of characters.  In case
+of a list, the first one that satisfies `char-displayable-p' will
+be used."
+  :group 'markdown
+  :type '(choice
+          (character :tag "Single HR display character")
+          (repeat :tag "List of possible HR display characters" character))
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-definition-display-char
@@ -4262,14 +4265,15 @@ SEQ may be an atom or a sequence."
 (defun markdown-fontify-hrs (last)
   "Add text properties to horizontal rules from point to LAST."
   (when (markdown-match-hr last)
-    (add-text-properties
-     (match-beginning 0) (match-end 0)
-     `(face markdown-hr-face
-            font-lock-multiline t
-            ,@(when markdown-hide-markup
-                `(display ,(make-string
-                            (window-body-width) markdown-hr-display-char)))))
-     t))
+    (let ((hr-char (markdown--first-displayable markdown-hr-display-char)))
+      (add-text-properties
+       (match-beginning 0) (match-end 0)
+       `(face markdown-hr-face
+              font-lock-multiline t
+              ,@(when (and markdown-hide-markup hr-char)
+                  `(display ,(make-string
+                              (window-body-width) hr-char)))))
+      t)))
 
 (defun markdown-fontify-sub-superscripts (last)
   "Apply text properties to sub- and superscripts from point to LAST."
