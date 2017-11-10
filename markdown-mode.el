@@ -1318,15 +1318,14 @@ be used."
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-definition-display-char
-  (cond ((char-displayable-p ?⁘) ?⁘)
-        ((char-displayable-p ?⁙) ?⁙)
-        ((char-displayable-p ?≡) ?≡)
-        ((char-displayable-p ?⌑) ?⌑)
-        ((char-displayable-p ?◊) ?◊)
-        (t nil))
-  "Character for replacing definition list markup."
-  :type 'character
-  :safe 'characterp
+  '(?⁘ ?⁙ ?≡ ?⌑ ?◊ ?:)
+  "Character for replacing definition list markup.
+This may be a single character or a list of characters.  In case
+of a list, the first one that satisfies `char-displayable-p' will
+be used."
+  :type '(choice
+          (character :tag "Single definition list character")
+          (repeat :tag "List of possible definition list characters" character))
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-enable-math nil
@@ -4254,9 +4253,11 @@ SEQ may be an atom or a sequence."
            (match-beginning 2) (match-end 2) `(display ,bullet)))
          ;; Definition lists
          ((string-equal ":" (match-string 2))
-          (add-text-properties
-           (match-beginning 2) (match-end 2)
-           `(display ,(char-to-string markdown-definition-display-char)))))))
+          (let ((display-string
+                 (char-to-string (markdown--first-displayable
+                                  markdown-definition-display-char))))
+            (add-text-properties (match-beginning 2) (match-end 2)
+                                 `(display ,display-string)))))))
     t))
 
 (defun markdown-fontify-hrs (last)
