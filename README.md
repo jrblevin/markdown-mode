@@ -724,6 +724,9 @@ provides an interface to all of the possible customizations:
     interactively later using <kbd>C-c C-x C-e</kbd>
     (`markdown-toggle-math`).
 
+  * `markdown-enable-html` - font lock for HTML tags and attributes
+    (default: `t`).
+
   * `markdown-css-paths` - CSS files to link to in XHTML output
     (default: `nil`).
 

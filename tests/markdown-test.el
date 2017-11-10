@@ -3137,6 +3137,76 @@ across blocks]"
      (markdown-range-property-any
       (point-min) (point-max) 'face '(markdown-html-entity-face)))))
 
+(ert-deftest test-markdown-font-lock/html-tags-in-syntax-file ()
+  "Test matching HTML tags in syntax.text."
+  (markdown-test-file "syntax.text"
+    ;; <ul id="ProjectSubmenu">
+    (markdown-test-range-has-face 36 36 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 37 38 'markdown-html-tag-name-face)
+    (markdown-test-range-has-face 40 41 'markdown-html-attr-name-face)
+    (markdown-test-range-has-face 42 42 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 43 58 'markdown-html-attr-value-face)
+    (markdown-test-range-has-face 59 59 'markdown-html-tag-delimiter-face)
+    ;; <li>
+    (markdown-test-range-has-face 65 65 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 66 67 'markdown-html-tag-name-face)
+    (markdown-test-range-has-face 68 68 'markdown-html-tag-delimiter-face)
+    ;; <a href="/projects/markdown/" title="Markdown Project Page">
+    (markdown-test-range-has-face 69 69 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 70 70 'markdown-html-tag-name-face)
+    (markdown-test-range-has-face 72 75 'markdown-html-attr-name-face)
+    (markdown-test-range-has-face 76 76 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 77 97 'markdown-html-attr-value-face)
+    (markdown-test-range-has-face 99 103 'markdown-html-attr-name-face)
+    (markdown-test-range-has-face 104 104 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 105 127 'markdown-html-attr-value-face)
+    (markdown-test-range-has-face 128 128 'markdown-html-tag-delimiter-face)))
+
+(ert-deftest test-markdown-font-lock/html-tag-in-gfm-code-block ()
+  "Test that HTML tags are not matched inside GFM code blocks."
+  (markdown-test-string "```\n<ul id=\"ProjectSubmenu\">\n```"
+    (should-not
+     (markdown-range-property-any
+      (point-min) (point-max) 'face
+      '(markdown-html-tag-name-face
+        markdown-html-tag-delimiter-face
+        markdown-html-attr-name-face
+        markdown-html-attr-value-face)))))
+
+(ert-deftest test-markdown-font-lock/html-tag-in-code-block ()
+  "Test that HTML tags are not matched inside code blocks."
+  (markdown-test-string "    <ul id=\"ProjectSubmenu\">"
+    (should-not
+     (markdown-range-property-any
+      (point-min) (point-max) 'face
+      '(markdown-html-tag-name-face
+        markdown-html-tag-delimiter-face
+        markdown-html-attr-name-face
+        markdown-html-attr-value-face)))))
+
+(ert-deftest test-markdown-font-lock/html-tag-in-inline-code ()
+  "Test that HTML tags are not matched inside inline code spans."
+  (markdown-test-string "`<ul id=\"ProjectSubmenu\">`"
+    (should-not
+     (markdown-range-property-any
+      (point-min) (point-max) 'face
+      '(markdown-html-tag-name-face
+        markdown-html-tag-delimiter-face
+        markdown-html-attr-name-face
+        markdown-html-attr-value-face)))))
+
+(ert-deftest test-markdown-font-lock/html-disabled ()
+  "Test disabling font-lock for HTML tags"
+  (let ((markdown-enable-html nil))
+    (markdown-test-file "syntax.text"
+      (should-not
+       (markdown-range-property-any
+        (point-min) (point-max) 'face
+        '(markdown-html-tag-name-face
+          markdown-html-tag-delimiter-face
+          markdown-html-attr-name-face
+          markdown-html-attr-value-face))))))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()

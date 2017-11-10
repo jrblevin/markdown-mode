@@ -14,6 +14,11 @@
         Alexis Gallagher for a patch.  ([GH-272][], [GH-274][])
     -   Added pipe table editing features.  Thanks to Dmitry Safronov
         for a patch.  ([GH-171][], [GH-266][])
+    -   Font lock for HTML tags and attributes, with new faces
+        `markdown-html-tag-name-face`,
+        `markdown-html-tag-delimiter-face`,
+        `markdown-html-attr-name-face`, and
+        `markdown-html-attr-value-face`.  ([GH-249][])
     -   Font lock for HTML entities, with a new face
         `markdown-html-entity-face`.
 
@@ -70,6 +75,7 @@
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
   [gh-248]: https://github.com/jrblevin/markdown-mode/issues/248
+  [gh-249]: https://github.com/jrblevin/markdown-mode/issues/249
   [gh-251]: https://github.com/jrblevin/markdown-mode/issues/251
   [gh-252]: https://github.com/jrblevin/markdown-mode/pull/252
   [gh-254]: https://github.com/jrblevin/markdown-mode/issues/254
