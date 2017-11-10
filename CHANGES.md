@@ -56,6 +56,7 @@
         load time.  ([GH-273][])
     -   Don't clobber user specified font-lock keywords when toggling
         features.  ([GH-222][])
+    -   Fix font-lock for inline code inside italics.  ([GH-275][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -84,6 +85,7 @@
   [gh-272]: https://github.com/jrblevin/markdown-mode/issues/272
   [gh-273]: https://github.com/jrblevin/markdown-mode/issues/273
   [gh-274]: https://github.com/jrblevin/markdown-mode/pull/274
+  [gh-275]: https://github.com/jrblevin/markdown-mode/issues/275
   [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
   [gh-277]: https://github.com/jrblevin/markdown-mode/pull/277
 

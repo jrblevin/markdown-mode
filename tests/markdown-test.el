@@ -2149,6 +2149,18 @@ Should not cause an infinite loop."
    (markdown-test-range-has-face 1 10 nil)
    (markdown-test-range-has-face 12 16 markdown-inline-code-face)))
 
+(ert-deftest test-markdown-font-lock/code-in-italics ()
+  "Test inline code inside italics.
+See GH-275."
+  (markdown-test-string
+   "*text `code` text*"
+   (markdown-test-range-has-face 1 1 markdown-markup-face)
+   (markdown-test-range-has-face 2 17 markdown-italic-face)
+   (markdown-test-range-has-face 7 7 markdown-markup-face)
+   (markdown-test-range-has-face 8 11 markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 markdown-markup-face)
+   (markdown-test-range-has-face 18 18 markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/italics-in-reference-definitions ()
   "Test not matching italics in reference definitions across lines."
   (markdown-test-string
