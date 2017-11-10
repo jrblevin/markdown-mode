@@ -4151,6 +4151,18 @@ Group 7: closing filename delimiter"
 
 ;;; Markdown Font Fontification Functions =====================================
 
+(defun markdown--first-displayable (seq)
+  "Return the first displayable character or string in SEQ.
+SEQ may be an atom or a sequence."
+  (let ((seq (if (listp seq) seq (list seq))))
+    (cond ((stringp (car seq))
+           (cl-find-if
+            (lambda (str)
+              (and (mapcar #'char-displayable-p (string-to-list str))))
+            seq))
+          ((characterp (car seq))
+           (cl-find-if #'char-displayable-p seq)))))
+
 (defun markdown--marginalize-string (level)
   "Generate atx markup string of given LEVEL for left margin."
   (let ((margin-left-space-count
