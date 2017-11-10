@@ -3746,8 +3746,6 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                 (markdown-range-property-any
                  begin begin 'face '(markdown-url-face
                                      markdown-plain-url-face))
-                (markdown-inline-code-at-pos-p begin)
-                (markdown-inline-code-at-pos-p end)
                 (markdown-range-property-any
                  begin end 'face '(markdown-bold-face
                                    markdown-list-face
