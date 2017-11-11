@@ -8701,7 +8701,12 @@ or span."
   (interactive)
   (when (member major-mode '(markdown-mode gfm-mode))
     ;; Refontify buffer
-    (font-lock-flush)
+    (if (eval-when-compile (fboundp 'font-lock-flush))
+        ;; Use font-lock-flush in Emacs >= 25.1
+        (font-lock-flush)
+      ;; Backwards compatibility for Emacs 24.3-24.5
+      (when (and font-lock-mode (fboundp 'font-lock-refresh-defaults))
+        (font-lock-refresh-defaults)))
     ;; Add or remove hooks related to extensions
     (markdown-setup-wiki-link-hooks)))
 
