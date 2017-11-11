@@ -7352,32 +7352,32 @@ subtree.  Otherwise, indent the current line or insert a tab,
 as appropriate, by calling `indent-for-tab-command'."
   (interactive "P")
   (cond
-   ((eq arg t) ;; Global cycling
+
+   ;; Global cycling
+   ((eq arg t)
     (cond
+     ;; Move from overview to contents
      ((and (eq last-command this-command)
            (eq markdown-cycle-global-status 2))
-      ;; Move from overview to contents
       (markdown-hide-sublevels 1)
       (message "CONTENTS")
       (setq markdown-cycle-global-status 3)
       (markdown-outline-fix-visibility))
-
+     ;; Move from contents to all
      ((and (eq last-command this-command)
            (eq markdown-cycle-global-status 3))
-      ;; Move from contents to all
       (markdown-show-all)
       (message "SHOW ALL")
       (setq markdown-cycle-global-status 1))
-
+     ;; Defaults to overview
      (t
-      ;; Defaults to overview
       (markdown-hide-body)
       (message "OVERVIEW")
       (setq markdown-cycle-global-status 2)
       (markdown-outline-fix-visibility))))
 
+   ;; At a heading: rotate between three different views
    ((save-excursion (beginning-of-line 1) (markdown-on-heading-p))
-    ;; At a heading: rotate between three different views
     (markdown-back-to-heading)
     (let ((goal-column 0) eoh eol eos)
       ;; Determine boundaries
@@ -7395,28 +7395,29 @@ as appropriate, by calling `indent-for-tab-command'."
         (setq eos (1- (point))))
       ;; Find out what to do next and set `this-command'
       (cond
+       ;; Nothing is hidden behind this heading
        ((= eos eoh)
-        ;; Nothing is hidden behind this heading
         (message "EMPTY ENTRY")
         (setq markdown-cycle-subtree-status nil))
+       ;; Entire subtree is hidden in one line: open it
        ((>= eol eos)
-        ;; Entire subtree is hidden in one line: open it
         (markdown-show-entry)
         (markdown-show-children)
         (message "CHILDREN")
         (setq markdown-cycle-subtree-status 'children))
+       ;; We just showed the children, now show everything.
        ((and (eq last-command this-command)
              (eq markdown-cycle-subtree-status 'children))
-        ;; We just showed the children, now show everything.
         (markdown-show-subtree)
         (message "SUBTREE")
         (setq markdown-cycle-subtree-status 'subtree))
+       ;; Default action: hide the subtree.
        (t
-        ;; Default action: hide the subtree.
         (markdown-hide-subtree)
         (message "FOLDED")
         (setq markdown-cycle-subtree-status 'folded)))))
 
+   ;; Otherwise, indent as appropriate
    (t
     (indent-for-tab-command))))
 
