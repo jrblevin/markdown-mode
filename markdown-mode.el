@@ -257,7 +257,7 @@
 ;;     there is an active region, make the region italic.  If the point
 ;;     is at a non-italic word, make the word italic.  If the point is
 ;;     at an italic word or phrase, remove the italic markup.
-;;     Otherwise, simply insert italic delimiters and place the cursor
+;;     Otherwise, simply insert italic delimiters and place the point
 ;;     in between them.  Similarly, use `C-c C-s b` for bold, `C-c C-s c`
 ;;     for inline code, and `C-c C-s k` for inserting `<kbd>` tags.
 ;;
@@ -4324,7 +4324,7 @@ wrap the strings S1 and S2 around that region.
 If there is an active region, wrap the strings S1 and S2 around
 the region.  If there is not an active region but the point is at
 THING, wrap that thing (which defaults to word).  Otherwise, just
-insert S1 and S2 and place the cursor in between.  Return the
+insert S1 and S2 and place the point in between.  Return the
 bounds of the entire wrapped string, or nil if nothing was wrapped
 and S1 and S2 were only inserted."
   (let (a b bounds new-point)
@@ -4433,7 +4433,7 @@ prefixed with an integer from 1 to the length of
 If there is an active region, make the region bold.  If the point
 is at a non-bold word, make the word bold.  If the point is at a
 bold word or phrase, remove the bold markup.  Otherwise, simply
-insert bold delimiters and place the cursor in between them."
+insert bold delimiters and place the point in between them."
   (interactive)
   (let ((delim (if markdown-bold-underscore "__" "**")))
     (if (markdown-use-region-p)
@@ -4452,7 +4452,7 @@ insert bold delimiters and place the cursor in between them."
 If there is an active region, make the region italic.  If the point
 is at a non-italic word, make the word italic.  If the point is at an
 italic word or phrase, remove the italic markup.  Otherwise, simply
-insert italic delimiters and place the cursor in between them."
+insert italic delimiters and place the point in between them."
   (interactive)
   (let ((delim (if markdown-italic-underscore "_" "*")))
     (if (markdown-use-region-p)
@@ -4471,7 +4471,7 @@ insert italic delimiters and place the cursor in between them."
 If there is an active region, make the region strikethrough.  If the point
 is at a non-bold word, make the word strikethrough.  If the point is at a
 strikethrough word or phrase, remove the strikethrough markup.  Otherwise,
-simply insert bold delimiters and place the cursor in between them."
+simply insert bold delimiters and place the point in between them."
   (interactive)
   (let ((delim "~~"))
     (if (markdown-use-region-p)
@@ -4490,7 +4490,7 @@ simply insert bold delimiters and place the cursor in between them."
 If there is an active region, make the region an inline code
 fragment.  If the point is at a word, make the word an inline
 code fragment.  Otherwise, simply insert code delimiters and
-place the cursor in between them."
+place the point in between them."
   (interactive)
   (if (markdown-use-region-p)
       ;; Active region
@@ -4507,7 +4507,7 @@ place the cursor in between them."
   "Insert markup to wrap region or word in <kbd> tags.
 If there is an active region, use the region.  If the point is at
 a word, use the word.  Otherwise, simply insert <kbd> tags and
-place the cursor in between them."
+place the point in between them."
   (interactive)
   (if (markdown-use-region-p)
       ;; Active region
@@ -4594,7 +4594,7 @@ be used to populate the title attribute when converted to XHTML."
     (insert "\n[" label "]: ")
     (if url
         (insert url)
-      ;; When no URL is given, leave cursor at END following the colon
+      ;; When no URL is given, leave point at END following the colon
       (setq end (point)))
     (when (> (length title) 0)
       (insert " \"" title "\""))
@@ -4791,7 +4791,7 @@ If there is an active region, it is used as the header text.
 Otherwise, the current line will be used as the header text.
 If there is not an active region and the point is at a header,
 remove the header markup and replace with level N header.
-Otherwise, insert empty header markup and place the cursor in
+Otherwise, insert empty header markup and place the point in
 between.
 The style of the header will be atx (hash marks) unless
 SETEXT is non-nil, in which case a setext-style (underlined)
@@ -5270,7 +5270,7 @@ at the beginning of the block."
     (markdown-ensure-blank-line-after)))
 
 (defun markdown-footnote-text-find-new-location ()
-  "Position the cursor at the proper location for a new footnote text."
+  "Position the point at the proper location for a new footnote text."
   (cond
    ((eq markdown-footnote-location 'end) (goto-char (point-max)))
    ((eq markdown-footnote-location 'immediately) (markdown-end-of-text-block))
@@ -5551,19 +5551,19 @@ these cases, indent to the default position.
 Positions are calculated by `markdown-calc-indents'."
   (interactive)
   (let ((positions (markdown-calc-indents))
-        (cursor-pos (current-column))
+        (point-pos (current-column))
         (_ (back-to-indentation))
         (cur-pos (current-column)))
     (if (not (equal this-command 'markdown-cycle))
         (indent-line-to (car positions))
       (setq positions (sort (delete-dups positions) '<))
       (let* ((next-pos (markdown-indent-find-next-position cur-pos positions))
-             (new-cursor-pos
+             (new-point-pos
               (if (< cur-pos next-pos)
-                  (+ cursor-pos (- next-pos cur-pos))
-                (- cursor-pos cur-pos))))
+                  (+ point-pos (- next-pos cur-pos))
+                (- point-pos cur-pos))))
         (indent-line-to next-pos)
-        (move-to-column new-cursor-pos)))))
+        (move-to-column new-point-pos)))))
 
 (defun markdown-calc-indents ()
   "Return a list of indentation columns to cycle through.

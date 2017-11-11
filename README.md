@@ -241,7 +241,7 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     there is an active region, make the region italic.  If the point
     is at a non-italic word, make the word italic.  If the point is
     at an italic word or phrase, remove the italic markup.
-    Otherwise, simply insert italic delimiters and place the cursor
+    Otherwise, simply insert italic delimiters and place the point
     in between them.  Similarly, use <kbd>C-c C-s b</kbd> for bold, <kbd>C-c C-s c</kbd>
     for inline code, and <kbd>C-c C-s k</kbd> for inserting `<kbd>` tags.
 
