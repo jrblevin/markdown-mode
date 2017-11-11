@@ -6029,7 +6029,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c >") 'markdown-indent-region)
     (define-key map (kbd "C-c <") 'markdown-outdent-region)
     ;; Visibility cycling
-    (define-key map (kbd "TAB") 'markdown-tab)
+    (define-key map (kbd "TAB") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
@@ -6123,14 +6123,6 @@ Assumes match data is available for `markdown-regex-italic'."
     map)
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
-
-(defun markdown-tab ()
-  "Handle TAB key based on context."
-  (interactive)
-  (cond
-   ((markdown-table-at-point-p)
-    (call-interactively #'markdown-table-forward-cell))
-   (t (call-interactively #'markdown-cycle))))
 
 
 ;;; Menu ==================================================================
@@ -7416,6 +7408,10 @@ as appropriate, by calling `indent-for-tab-command'."
         (markdown-hide-subtree)
         (message "FOLDED")
         (setq markdown-cycle-subtree-status 'folded)))))
+
+   ;; In a table, move forward by one cell
+   ((markdown-table-at-point-p)
+    (call-interactively #'markdown-table-forward-cell))
 
    ;; Otherwise, indent as appropriate
    (t
