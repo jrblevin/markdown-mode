@@ -8701,8 +8701,7 @@ or span."
   (interactive)
   (when (member major-mode '(markdown-mode gfm-mode))
     ;; Refontify buffer
-    (when (and font-lock-mode (fboundp 'font-lock-refresh-defaults))
-      (font-lock-refresh-defaults))
+    (font-lock-flush)
     ;; Add or remove hooks related to extensions
     (markdown-setup-wiki-link-hooks)))
 
