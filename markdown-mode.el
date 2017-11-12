@@ -5558,10 +5558,7 @@ Positions are calculated by `markdown-calc-indents'."
         (indent-line-to (car positions))
       (setq positions (sort (delete-dups positions) '<))
       (let* ((next-pos (markdown-indent-find-next-position cur-pos positions))
-             (new-point-pos
-              (if (< cur-pos next-pos)
-                  (+ point-pos (- next-pos cur-pos))
-                (- point-pos cur-pos))))
+             (new-point-pos (max (+ point-pos (- next-pos cur-pos)) 0)))
         (indent-line-to next-pos)
         (move-to-column new-point-pos)))))
 

@@ -1870,6 +1870,21 @@ Should not cause an infinite loop."
    (should (eq (point) 62))
    (should (looking-back "^    "))))
 
+(ert-deftest test-markdown-indentation/indent-hanging-line ()
+  "Test `markdown-indent-line' with hanging indentation.
+See GH-245."
+  (markdown-test-string "Stuff
+  More"
+    (forward-line)
+    (should (looking-at "^  More"))
+    (should (= (current-column) 0))
+    (should (= (current-indentation) 2))
+    (let ((last-command this-command)
+          (this-command 'markdown-cycle))
+      (call-interactively #'markdown-cycle))
+    (should (= (current-column) 0))
+    (should (= (current-indentation) 0))))
+
 (ert-deftest test-markdown-indentation/continue-gfm-task-lists ()
   (markdown-test-string "   -   [X] item"
     (end-of-line)
