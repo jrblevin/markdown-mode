@@ -2044,13 +2044,13 @@ See GH-245."
    (markdown-test-range-has-face (point-min) (point-max) nil)))
 
 (ert-deftest test-markdown-font-lock/italics-4 ()
-  "Test that escaped asterisk inside italics is not bold."
+  "Test escaped asterisk inside italics."
   (markdown-test-string
-   "italic **\\**"
+   "italic *\\**"
    (markdown-test-range-has-face 1 7 nil)
    (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 9 11 markdown-italic-face)
-   (markdown-test-range-has-face 12 12 markdown-markup-face)))
+   (markdown-test-range-has-face 9 10 markdown-italic-face)
+   (markdown-test-range-has-face 11 11 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-5 ()
   "Test italic single letter."
@@ -2211,16 +2211,10 @@ See GH-275."
 (ert-deftest test-markdown-font-lock/bold-2 ()
   "Test space after leading asterisks or underscores."
   (markdown-test-string
-   "This is ** not bold**, nor __ is this__ (but they match italics)."
-   (markdown-test-range-has-face 1 8 nil)
-   (markdown-test-range-has-face 9 9 markdown-markup-face)
-   (markdown-test-range-has-face 10 19 markdown-italic-face)
-   (markdown-test-range-has-face 20 20 markdown-markup-face)
-   (markdown-test-range-has-face 21 27 nil)
-   (markdown-test-range-has-face 28 28 markdown-markup-face)
-   (markdown-test-range-has-face 29 37 markdown-italic-face)
-   (markdown-test-range-has-face 38 38 markdown-markup-face)
-   (markdown-test-range-has-face 39 (point-max) nil)))
+   "This is ** not bold**, nor __ is this__."
+   (should-not
+    (markdown-range-property-any
+     (point-min) (point-max) 'face '(markdown-bold-face)))))
 
 (ert-deftest test-markdown-font-lock/bold-3 ()
   "Test escaped asterisk inside bold."
