@@ -1412,6 +1412,15 @@ exporting with `markdown-export'."
                  (const :tag "At the end of the subtree" subtree)
                  (const :tag "Before next header" header)))
 
+(defcustom markdown-footnote-display '((raise 0.2) (height 0.8))
+  "Display specification for footnote markers and inline footnotes.
+By default, footnote text is reduced in size and raised.  Set to
+nil to disable this."
+  :group 'markdown
+  :type '(choice (sexp :tag "Display specification")
+                 (const :tag "Don't set display property" nil))
+  :package-version '(markdown-mode . "2.4"))
+
 (defcustom markdown-unordered-list-item-prefix "  * "
   "String inserted before unordered list items."
   :group 'markdown
@@ -2489,10 +2498,6 @@ START and END delimit region to propertize."
   '(face markdown-link-title-face invisible markdown-markup)
   "List of properties and values to apply to included code titles.")
 
-(defconst markdown-inline-footnote-properties
-  '(face nil display ((raise 0.2) (height 0.8)))
-  "Properties to apply to footnote markers and inline footnotes.")
-
 (defcustom markdown-hide-markup nil
   "Determines whether markup in the buffer will be hidden.
 When set to nil, all markup is displayed in the buffer as it
@@ -2904,6 +2909,18 @@ Depending on your font, some reasonable choices are:
   :type '(repeat (string :tag "Bullet character"))
   :package-version '(markdown-mode . "2.3"))
 
+(defun markdown--footnote-marker-properties ()
+  "Return a font-lock facespec expression for footnote marker text."
+  `(face markdown-footnote-marker-face
+         ,@(when markdown-hide-markup
+             `(display ,markdown-footnote-display))))
+
+(defun markdown--pandoc-inline-footnote-properties ()
+  "Return a font-lock facespec expression for Pandoc inline footnote text."
+  `(face markdown-footnote-text-face
+         ,@(when markdown-hide-markup
+             `(display ,markdown-footnote-display))))
+
 (defvar markdown-mode-font-lock-keywords-basic
   `((markdown-match-yaml-metadata-begin . ((1 markdown-markup-face)))
     (markdown-match-yaml-metadata-end . ((1 markdown-markup-face)))
@@ -2957,14 +2974,12 @@ Depending on your font, some reasonable choices are:
                                     (4 'markdown-html-attr-value-face nil t)))))
     (,markdown-regex-html-entity . 'markdown-html-entity-face)
     (markdown-fontify-list-items)
-    (,markdown-regex-footnote . ((0 markdown-inline-footnote-properties)
-                                 (1 markdown-markup-properties)    ; [^
-                                 (2 markdown-footnote-marker-face) ; label
+    (,markdown-regex-footnote . ((1 markdown-markup-properties)    ; [^
+                                 (2 (markdown--footnote-marker-properties)) ; label
                                  (3 markdown-markup-properties)))  ; ]
-    (,markdown-regex-pandoc-inline-footnote . ((0 markdown-inline-footnote-properties)
-                                               (1 markdown-markup-properties)   ; ^
+    (,markdown-regex-pandoc-inline-footnote . ((1 markdown-markup-properties)   ; ^
                                                (2 markdown-markup-properties)   ; [
-                                               (3 'markdown-footnote-text-face) ; text
+                                               (3 (markdown--pandoc-inline-footnote-properties)) ; text
                                                (4 markdown-markup-properties))) ; ]
     (markdown-match-includes . ((1 markdown-markup-properties)
                                 (2 markdown-markup-properties nil t)

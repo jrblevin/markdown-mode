@@ -42,6 +42,9 @@
         giving a prefix argument to `C-c C-s C`.  ([GH-251][])
     -   Improve package load time by deferring calls to
         `char-displayable-p`.  ([GH-264][])
+    -   Only raise footnotes when markup hiding is on.
+        Footnote display properties may now be customized via
+        `markdown-footnote-display`.  ([GH-247][])
 
 *   Bug fixes:
 
@@ -76,6 +79,7 @@
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
+  [gh-247]: https://github.com/jrblevin/markdown-mode/issues/247
   [gh-248]: https://github.com/jrblevin/markdown-mode/issues/248
   [gh-249]: https://github.com/jrblevin/markdown-mode/issues/249
   [gh-251]: https://github.com/jrblevin/markdown-mode/issues/251
