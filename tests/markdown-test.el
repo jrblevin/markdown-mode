@@ -2192,6 +2192,20 @@ See GH-275."
    (markdown-test-range-has-face 1 30 'markdown-comment-face)
    (should-not (markdown-range-property-any 1 30 'face '(markdown-italic-face)))))
 
+(ert-deftest test-markdown-font-lock/italics-after-bold ()
+  "Test bold and italics on the same line.
+See GH-223."
+  (markdown-test-string
+   "**foo** is a *bar*"
+   (markdown-test-range-has-face 1 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 5 'markdown-bold-face)
+   (markdown-test-range-has-face 6 7 'markdown-markup-face)
+   (should-not
+    (markdown-range-property-any 8 13 'face '(markdown-italic-face)))
+   (markdown-test-range-has-face 14 14 'markdown-markup-face)
+   (markdown-test-range-has-face 15 17 'markdown-italic-face)
+   (markdown-test-range-has-face 18 18 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
