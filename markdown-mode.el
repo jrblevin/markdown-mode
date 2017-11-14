@@ -7577,7 +7577,7 @@ This puts point at the start of the current subtree, and mark at the end."
   (interactive)
   (let ((beg))
     (if (markdown-heading-at-point)
-	(beginning-of-line)
+        (beginning-of-line)
       (markdown-previous-visible-heading 1))
     (setq beg (point))
     (markdown-end-of-subtree)
@@ -7592,9 +7592,9 @@ This puts point at the start of the current subtree, and mark at the end."
       (narrow-to-region
        (progn (markdown-back-to-heading-over-code-block t) (point))
        (progn (markdown-end-of-subtree)
-	      (if (and (markdown-heading-at-point) (not (eobp)))
-		  (backward-char 1))
-	      (point))))))
+          (if (and (markdown-heading-at-point) (not (eobp)))
+          (backward-char 1))
+          (point))))))
 
 
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
@@ -9478,7 +9478,7 @@ Create new table lines if required."
   (if (or (looking-at "[ \t]*$")
           (save-excursion (skip-chars-backward " \t") (bolp)))
       (newline)
-	(markdown-table-align)
+    (markdown-table-align)
     (let ((col (markdown-table-get-column)))
       (beginning-of-line 2)
       (if (or (not (markdown-table-at-point-p))
