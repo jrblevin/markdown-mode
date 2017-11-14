@@ -9281,6 +9281,12 @@ This version removes characters with invisibility property
 
 ;; Functions for maintaining tables
 
+(defvar markdown-table-at-point-p-function nil
+  "Function to decide if point is inside a table.
+
+The indirection serves to differentiate between standard markdown
+tables and gfm tables which are less strict about the markup.")
+
 (defconst markdown-table-line-regexp "^[ \t]*|"
   "Regexp matching any line inside a table.")
 
@@ -9295,10 +9301,55 @@ This version removes characters with invisibility property
 
 (defun markdown-table-at-point-p ()
   "Return non-nil when point is inside a table."
+  (if (functionp markdown-table-at-point-p-function)
+      (funcall markdown-table-at-point-p-function)
+    (markdown--table-at-point-p)))
+
+(defun markdown--table-at-point-p ()
+  "Return non-nil when point is inside a table."
   (save-excursion
     (beginning-of-line)
     (and (looking-at-p markdown-table-line-regexp)
          (not (markdown-code-block-at-point-p)))))
+
+(defconst gfm-table-line-regexp "^.?*|"
+  "Regexp matching any line inside a table.")
+
+(defconst gfm-table-hline-regexp "^-+\\(|-\\)+"
+  "Regexp matching hline inside a table.")
+
+;; GFM simplified tables syntax is as follows:
+;; - A header line for the column names, this is any text
+;;   separated by `|'.
+;; - Followed by a string -|-|- ..., the number of dashes is optional
+;;   but must be higher than 1. The number of separators should match
+;;   the number of columns.
+;; - Followed by the rows of data, which has the same format as the
+;;   header line.
+;; Example:
+;;
+;; foo | bar
+;; ------|---------
+;; bar | baz
+;; bar | baz
+(defun gfm--table-at-point-p ()
+  "Return non-nil when point is inside a gfm-compatible table."
+  (or (markdown--table-at-point-p)
+      (save-excursion
+        (beginning-of-line)
+        (when (looking-at-p gfm-table-line-regexp)
+          ;; we might be at the first line of the table, check if the
+          ;; line below is the hline
+          (or (save-excursion
+                (forward-line 1)
+                (looking-at-p gfm-table-hline-regexp))
+              ;; go up to find the header
+              (catch 'done
+                (while (looking-at-p gfm-table-line-regexp)
+                  (when (looking-at-p gfm-table-hline-regexp)
+                    (throw 'done t))
+                  (forward-line -1))
+                nil))))))
 
 (defun markdown-table-hline-at-point-p ()
   "Return non-nil when point is on a hline in a table.
@@ -10061,6 +10112,7 @@ spaces, or alternatively a TAB should be used as the separator."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
   (setq-local font-lock-defaults '(gfm-font-lock-keywords))
+  (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
   ;; do the initial link fontification
   (markdown-gfm-parse-buffer-for-languages))
 
