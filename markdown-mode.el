@@ -9296,9 +9296,6 @@ tables and gfm tables which are less strict about the markup.")
 (defconst markdown-table-dline-regexp "^[ \t]*|[^-:]"
   "Regexp matching dline inside a table.")
 
-(defconst markdown-table-border-regexp "^[ \t]*[^| \t]"
-  "Regexp matching any line outside a table.")
-
 (defun markdown-table-at-point-p ()
   "Return non-nil when point is inside a table."
   (if (functionp markdown-table-at-point-p-function)
@@ -9361,22 +9358,22 @@ This function assumes point is on a table."
 (defun markdown-table-begin ()
   "Find the beginning of the table and return its position.
 This function assumes point is on a table."
-  (cond
-   ((save-excursion
-      (and (re-search-backward markdown-table-border-regexp nil t)
-           (line-beginning-position 2))))
-   (t (point-min))))
+  (save-excursion
+    (while (and (not (bobp))
+                (markdown-table-at-point-p))
+      (forward-line -1))
+    (unless (bobp)
+      (forward-line 1))
+    (point)))
 
 (defun markdown-table-end ()
   "Find the end of the table and return its position.
 This function assumes point is on a table."
   (save-excursion
-    (cond
-     ((re-search-forward markdown-table-border-regexp nil t)
-      (match-beginning 0))
-     (t (goto-char (point-max))
-        (skip-chars-backward " \t")
-        (if (bolp) (point) (line-end-position))))))
+    (while (and (not (eobp))
+                (markdown-table-at-point-p))
+      (forward-line 1))
+    (point)))
 
 (defun markdown-table-get-dline ()
   "Return index of the table data line at point.
