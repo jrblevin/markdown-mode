@@ -65,6 +65,8 @@
         features.  ([GH-222][])
     -   Fix font-lock for inline code inside italics and bold.
         ([GH-275][])
+    -   Make code block language detection handle unspecified
+        or unknown code block languages.  ([GH-284][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -97,6 +99,7 @@
   [gh-275]: https://github.com/jrblevin/markdown-mode/issues/275
   [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
   [gh-277]: https://github.com/jrblevin/markdown-mode/pull/277
+  [gh-284]: https://github.com/jrblevin/markdown-mode/issues/284
 
 # Markdown Mode 2.3
 
