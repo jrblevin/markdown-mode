@@ -21,6 +21,8 @@
         `markdown-html-attr-value-face`.  ([GH-249][])
     -   Font lock for HTML entities, with a new face
         `markdown-html-entity-face`.
+    -   Scale down large inline images using `markdown-max-image-size`,
+        a cons cell of the form `(max-width . max-height)`.
 
 *   Improvements:
 

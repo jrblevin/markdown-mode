@@ -232,8 +232,12 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
 
     Local images associated with image links may be displayed
     inline in the buffer by pressing <kbd>C-c C-x C-i</kbd>
-    (`markdown-toggle-inline-images`). This is a toggle command, so
-    pressing this once again will remove inline images.
+    (`markdown-toggle-inline-images`).  This is a toggle command, so
+    pressing this once again will remove inline images.  Large
+    images may be scaled down to fit in the buffer using
+    `markdown-max-image-size`, a cons cell of the form
+    `(max-width . max-height)`.  Resizing requires Emacs to be
+    built with ImageMagick support.
 
   * Text Styles: <kbd>C-c C-s</kbd>
 

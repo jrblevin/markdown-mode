@@ -248,8 +248,12 @@
 ;;
 ;;     Local images associated with image links may be displayed
 ;;     inline in the buffer by pressing `C-c C-x C-i`
-;;     (`markdown-toggle-inline-images'). This is a toggle command, so
-;;     pressing this once again will remove inline images.
+;;     (`markdown-toggle-inline-images').  This is a toggle command, so
+;;     pressing this once again will remove inline images.  Large
+;;     images may be scaled down to fit in the buffer using
+;;     `markdown-max-image-size', a cons cell of the form
+;;     `(max-width . max-height)`.  Resizing requires Emacs to be
+;;     built with ImageMagick support.
 ;;
 ;;   * Text Styles: `C-c C-s`
 ;;
@@ -1572,6 +1576,21 @@ prepends the root directory to the given filename."
   :type 'function
   :risky t
   :package-version '(markdown-mode . "2.4"))
+
+(defcustom markdown-max-image-size nil
+  "Maximum width and height for displayed inline images.
+This variable may be nil or a cons cell (MAX-WIDTH . MAX-HEIGHT).
+When nil, use the actual size.  Otherwise, use ImageMagick to
+resize larger images to be of the given maximum dimensions.  This
+requires Emacs to be built with ImageMagick support."
+  :group 'markdown
+  :package-version '(markdown-mode . "2.4")
+  :type '(choice
+          (const :tag "Use actual image width" nil)
+          (cons (choice (sexp :tag "Maximum width in pixels")
+                        (const :tag "No maximum width" nil))
+                (choice (sexp :tag "Maximum height in pixels")
+                        (const :tag "No maximum height" nil)))))
 
 
 ;;; Regular Expressions =======================================================
@@ -9048,7 +9067,7 @@ or \\[markdown-toggle-inline-images]."
 This can be toggled with `markdown-toggle-inline-images'
 or \\[markdown-toggle-inline-images]."
   (interactive)
-  (unless (display-graphic-p)
+  (unless (display-images-p)
     (error "Cannot show images"))
   (save-excursion
     (save-restriction
@@ -9062,7 +9081,14 @@ or \\[markdown-toggle-inline-images]."
             (let* ((abspath (if (file-name-absolute-p file)
                                 file
                               (concat default-directory file)))
-                   (image (create-image abspath)))
+                   (image
+                    (if (and markdown-max-image-size
+                             (image-type-available-p 'imagemagick))
+                        (create-image
+                         abspath 'imagemagick nil
+                         :max-width (car markdown-max-image-size)
+                         :max-height (cdr markdown-max-image-size))
+                      (create-image abspath))))
               (when image
                 (let ((ov (make-overlay start end)))
                   (overlay-put ov 'display image)
