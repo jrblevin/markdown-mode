@@ -5280,6 +5280,17 @@ See GH-288."
       (markdown-test-range-has-face 301 308 nil)
       (markdown-test-range-has-face 310 312 markdown-math-face))))
 
+;;; Extension: pipe table editing
+
+(ert-deftest test-markdown-table/table-begin-top-of-file ()
+  "Test beginning of table detection at top of file."
+  (markdown-test-string "\n| 1 | 2 |\n"
+    (should-not (markdown-table-at-point-p))
+    (forward-line)
+    (should (markdown-table-at-point-p))
+    (should (= (markdown-table-begin) 2))))
+
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()

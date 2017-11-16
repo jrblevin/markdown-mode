@@ -9416,7 +9416,7 @@ This function assumes point is on a table."
     (while (and (not (bobp))
                 (markdown-table-at-point-p))
       (forward-line -1))
-    (unless (bobp)
+    (unless (eobp)
       (forward-line 1))
     (point)))
 
