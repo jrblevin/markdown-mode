@@ -45,6 +45,8 @@
     -   Only raise footnotes when markup hiding is on.
         Footnote display properties may now be customized via
         `markdown-footnote-display`.  ([GH-247][])
+    -   Customizable subscript and superscript display properties
+        via `markdown-sub-superscript-display`.
 
 *   Bug fixes:
 

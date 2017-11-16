@@ -1421,6 +1421,17 @@ nil to disable this."
                  (const :tag "Don't set display property" nil))
   :package-version '(markdown-mode . "2.4"))
 
+(defcustom markdown-sub-superscript-display
+  '(((raise -0.3) (height 0.7)) . ((raise 0.3) (height 0.7)))
+  "Display specification for subscript and superscripts.
+The car is used for subscript, the cdr is used for superscripts."
+  :group 'markdown
+  :type '(cons (choice (sexp :tag "Subscript form")
+		       (const :tag "No lowering" nil))
+	       (choice (sexp :tag "Superscript form")
+		       (const :tag "No raising" nil)))
+  :package-version '(markdown-mode . "2.4"))
+
 (defcustom markdown-unordered-list-item-prefix "  * "
   "String inserted before unordered list items."
   :group 'markdown
@@ -4391,13 +4402,15 @@ SEQ may be an atom or a sequence."
                          (not (markdown-in-comment-p))))
          markdown-regex-sub-superscript last t)
     (let* ((subscript-p (string= (match-string 2) "~"))
-           (index (if subscript-p 0 1))
+           (props
+            (if subscript-p
+                (car markdown-sub-superscript-display)
+              (cdr markdown-sub-superscript-display)))
            (mp (list 'face 'markdown-markup-face
                      'invisible 'markdown-markup)))
       (when markdown-hide-markup
         (put-text-property (match-beginning 3) (match-end 3)
-                           'display
-                           (nth index markdown-sub-superscript-display)))
+                           'display props))
       (add-text-properties (match-beginning 2) (match-end 2) mp)
       (add-text-properties (match-beginning 4) (match-end 4) mp)
       t)))
