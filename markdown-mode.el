@@ -1822,7 +1822,7 @@ Groups 1 and 3 match opening and closing dollar signs.
 Group 2 matches the mathematical expression contained within.")
 
 (defconst markdown-regex-math-display
-  (rx line-start
+  (rx line-start (* blank)
       (group (group (repeat 1 2 "\\")) "[")
       (group (*? anything))
       (group (backref 2) "]")

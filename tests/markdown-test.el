@@ -5249,6 +5249,17 @@ This includes preserving whitespace after the pipe."
       (markdown-test-range-has-face 478 543 markdown-math-face)
       (markdown-test-range-has-face 544 546 markdown-markup-face))))
 
+(ert-deftest test-markdown-math/indented-double-slash-display-math ()
+  "Test font lock for indented double slash display math.
+See GH-288."
+  (let ((markdown-enable-math t))
+    (markdown-test-string "- Einstein's equation:
+
+    \\\\[ E = m c^2 \\\\]"
+      (markdown-test-range-has-face 29 31 markdown-markup-face)
+      (markdown-test-range-has-face 32 42 markdown-math-face)
+      (markdown-test-range-has-face 43 45 markdown-markup-face))))
+
 (ert-deftest test-markdown-math/font-lock-italics ()
   "Test markdown math mode with underscores."
   (let ((markdown-enable-math t))
