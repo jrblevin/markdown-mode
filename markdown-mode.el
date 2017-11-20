@@ -2323,6 +2323,8 @@ MIDDLE-BEGIN is the start of the \"middle\" section of the block."
       (put-text-property middle-begin close-begin
                          (cl-third fence-spec)
                          (list middle-begin close-begin))
+      ;; If the block is a YAML block, propertize the declarations inside
+      (markdown-syntax-propertize-yaml-metadata middle-begin close-begin)
       ;; Propertize closing line of fenced block.
       (put-text-property close-begin close-end
                          (cl-cadadr fence-spec) close-data))))
@@ -2414,15 +2416,14 @@ start which was previously propertized."
 
 (defun markdown-syntax-propertize-yaml-metadata (start end)
   "Propertize elements inside YAML metadata blocks from START to END.
-Assumes the overall YAML block itself (begin, middle, end) has
-already been propertized by
+Assumes region from START and END is already known to be the interior
+region of a YAML metadata block as propertized by
 `markdown-syntax-propertize-fenced-block-constructs'."
   (save-excursion
     (goto-char start)
     (cl-loop
      while (re-search-forward markdown-regex-declarative-metadata end t)
-     do (when (get-text-property (match-beginning 0)
-                                 'markdown-yaml-metadata-section)
+     do (progn
           (put-text-property (match-beginning 1) (match-end 1)
                              'markdown-metadata-key (match-data t))
           (put-text-property (match-beginning 2) (match-end 2)
@@ -2506,7 +2507,6 @@ START and END delimit region to propertize."
     (save-excursion
       (remove-text-properties start end markdown--syntax-properties)
       (markdown-syntax-propertize-fenced-block-constructs start end)
-      (markdown-syntax-propertize-yaml-metadata start end)
       (markdown-syntax-propertize-pre-blocks start end)
       (markdown-syntax-propertize-blockquotes start end)
       (markdown-syntax-propertize-headings start end)
