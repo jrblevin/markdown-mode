@@ -2413,6 +2413,10 @@ start which was previously propertized."
                            (match-data t))))))
 
 (defun markdown-syntax-propertize-yaml-metadata (start end)
+  "Propertize elements inside YAML metadata blocks from START to END.
+Assumes the overall YAML block itself (begin, middle, end) has
+already been propertized by
+`markdown-syntax-propertize-fenced-block-constructs'."
   (save-excursion
     (goto-char start)
     (cl-loop
