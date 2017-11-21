@@ -3485,8 +3485,8 @@ original point.  If the point is not in a list item, do nothing."
         (skip-syntax-backward "-")))
     (point)))
 
-(defun markdown-cur-list-item-bounds ()
-  "Return bounds and indentation of the current list item.
+(defun markdown-cur-list-item-bounds (&optional matched)
+  "Return bounds of list item at point (possibly already MATCHED).
 Return a list of the following form:
 
     (begin end indent nonlist-indent marker checkbox)
@@ -3517,7 +3517,7 @@ Leave match data intact for `markdown-regex-list'."
   (save-excursion
     (let ((cur (point)))
       (end-of-line)
-      (when (re-search-backward markdown-regex-list nil t)
+      (when (or matched (re-search-backward markdown-regex-list nil t))
         (let* ((begin (match-beginning 0))
                (indent (length (match-string-no-properties 1)))
                (nonlist-indent (length (match-string 0)))
