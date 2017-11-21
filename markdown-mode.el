@@ -3579,7 +3579,7 @@ original point.  If the point is not in a list item, do nothing."
     (save-match-data
       (if (looking-back (concat markdown-regex-list "\\s-*") nil)
           (goto-char (match-end 3))
-        (skip-syntax-backward "-")))
+        (skip-chars-backward " \t\n")))
     (point)))
 
 (defun markdown-cur-list-item-bounds ()
@@ -7115,13 +7115,13 @@ the surrounding context in light of Markdown syntax.  For that, see
 `markdown-forward-block'."
   (interactive)
   (beginning-of-line)
-  (skip-syntax-forward "-")
+  (skip-chars-forward " \t\n")
   (when (= (point) (point-min))
     (forward-char))
   (if (re-search-forward markdown-regex-block-separator nil t)
       (goto-char (match-end 0))
     (goto-char (point-max)))
-  (skip-syntax-backward "-")
+  (skip-chars-backward " \t\n")
   (forward-line))
 
 (defun markdown-backward-paragraph (&optional arg)
@@ -7134,7 +7134,7 @@ means move forward N blocks."
       (markdown-forward-paragraph (- arg))
     (dotimes (_ arg)
       ;; Skip over whitespace in between paragraphs when moving backward.
-      (skip-syntax-backward "-")
+      (skip-chars-backward " \t\n")
       (beginning-of-line)
       ;; Skip over code block endings.
       (when (markdown-range-properties-exist
