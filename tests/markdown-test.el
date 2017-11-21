@@ -3785,6 +3785,25 @@ puts 'hello, world'
 
 ;;; Lists:
 
+(ert-deftest test-markdown-lists/nested-list-file ()
+  "Test list item propertization for a nested list."
+  (markdown-test-file "nested-list.text"
+    (let ((values '(((1 25 3 5 "- " nil))
+                    ((26 189 3 5 "- " nil))
+                    ((191 581 3 5 "- " nil))
+                    ((217 482 7 9 "- " nil)
+                     (191 581 3 5 "- " nil))
+                    ((484 581 7 9 "- " nil)
+                     (191 581 3 5 "- " nil))
+                    ((514 581 11 13 "- " nil)
+                     (484 581 7 9 "- " nil)
+                     (191 581 3 5 "- " nil)))))
+      (cl-loop
+       for value in values
+       do (should
+           (equal (get-text-property (point) 'markdown-list-item) value))
+          (markdown-outline-next)))))
+
 (ert-deftest test-markdown-lists/levels-1 ()
   "Test list levels function `markdown-calculate-list-levels'."
   (markdown-test-file "nested-list.text"

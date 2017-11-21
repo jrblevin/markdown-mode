@@ -2013,6 +2013,79 @@ and END are the previous region to refontify."
       (setq jit-lock-start (car res)
             jit-lock-end (cdr res)))))
 
+(defun markdown--append-list-item-bounds (marker indent cur-bounds bounds)
+  "Update list item BOUNDS given list MARKER, block INDENT, and CUR-BOUNDS.
+Here, MARKER is a string representing the type of list and INDENT
+is an integer giving the indentation, in spaces, of the current
+block.  CUR-BOUNDS is a list of the form returned by
+`markdown-cur-list-item-bounds' and BOUNDS is a list of bounds
+values for parent list items.  When BOUNDS is nil, it means we are
+at baseline (not inside of a nested list)."
+  (let ((prev-indent (or (cl-third (car bounds)) 0)))
+    (cond
+     ;; New list item at baseline.
+     ((and marker (null bounds))
+      (list cur-bounds))
+     ;; List item with greater indentation (four or more spaces).
+     ;; Increase list level by consing CUR-BOUNDS onto BOUNDS.
+     ((and marker (>= indent (+ prev-indent 4)))
+      (cons cur-bounds bounds))
+     ;; List item with greater or equal indentation (less than four spaces).
+     ;; Keep list level the same by replacing the car of BOUNDS.
+     ((and marker (>= indent prev-indent))
+      (cons cur-bounds (cdr bounds)))
+     ;; Lesser indentation level.
+     ;; Pop appropriate number of elements off BOUNDS list (e.g., lesser
+     ;; indentation could move back more than one list level).  Note
+     ;; that this block need not be the beginning of list item.
+     ((< indent prev-indent)
+      (while (and (> (length bounds) 1)
+                  (setq prev-indent (cl-third (cadr bounds)))
+                  (< indent (+ prev-indent 4)))
+        (setq bounds (cdr bounds)))
+      (cons cur-bounds bounds))
+     ;; Otherwise, do nothing.
+     (t bounds))))
+
+(defun markdown-syntax-propertize-list-items (start end)
+  "Propertize list items from START to END.
+Stores nested list item information in the `markdown-list-item'
+text property to make later syntax analysis easier.  The value of
+this property is a list with elements of the form (begin . end)
+giving the bounds of the current and parent list items."
+  (save-excursion
+    (goto-char start)
+    (let (bounds level pre-regexp)
+      ;; Find a baseline point with zero list indentation
+      (markdown-search-backward-baseline)
+      ;; Search for all list items between baseline and END
+      (while (and (< (point) end)
+                  (re-search-forward markdown-regex-list end t))
+        ;; Level of list nesting
+        (setq level (length bounds))
+        ;; Pre blocks need to be indented one level past the list level
+        (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" (1+ level)))
+        (beginning-of-line)
+        (cond
+         ;; Reset at headings, horizontal rules, and top-level blank lines.
+         ;; Propertize baseline when in range.
+         ((markdown-new-baseline-p)
+          (setq bounds nil))
+         ;; Make sure this is not a line from a pre block
+         ((looking-at-p pre-regexp))
+         ;; If not, then update levels and propertize list item when in range.
+         (t
+          (let* ((indent (current-indentation))
+                 (cur-bounds (markdown-cur-list-item-bounds 'matched))
+                 (first (cl-first cur-bounds))
+                 (last (cl-second cur-bounds))
+                 (marker (cl-fifth cur-bounds)))
+            (setq bounds (markdown--append-list-item-bounds
+                          marker indent cur-bounds bounds))
+          (when (<= start (point) end)
+            (put-text-property first last 'markdown-list-item bounds)))))
+        (end-of-line)))))
+
 (defun markdown-syntax-propertize-pre-blocks (start end)
   "Match preformatted text blocks from START to END."
   (save-excursion
@@ -2490,6 +2563,7 @@ region of a YAML metadata block as propertized by
         'markdown-gfm-block-begin nil
         'markdown-gfm-block-end nil
         'markdown-gfm-code nil
+        'markdown-list-item nil
         'markdown-pre nil
         'markdown-blockquote nil
         'markdown-hr nil
@@ -2514,6 +2588,7 @@ START and END delimit region to propertize."
     (save-excursion
       (remove-text-properties start end markdown--syntax-properties)
       (markdown-syntax-propertize-fenced-block-constructs start end)
+      (markdown-syntax-propertize-list-items start end)
       (markdown-syntax-propertize-pre-blocks start end)
       (markdown-syntax-propertize-blockquotes start end)
       (markdown-syntax-propertize-headings start end)
