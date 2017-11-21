@@ -3448,8 +3448,9 @@ upon failure."
     next))
 
 (defun markdown-cur-list-item-end (level)
-  "Move to the end of the current list item with nonlist indentation LEVEL.
-If the point is not in a list item, do nothing."
+  "Move to end of list item with pre-marker indentation LEVEL.
+Return the point at the end when a list item was found at the
+original point.  If the point is not in a list item, do nothing."
   (let (indent)
     (forward-line)
     (setq indent (current-indentation))
@@ -3478,9 +3479,11 @@ If the point is not in a list item, do nothing."
       (setq indent (current-indentation)))
     ;; Don't skip over whitespace for empty list items (marker and
     ;; whitespace only), just move to end of whitespace.
-    (if (looking-back (concat markdown-regex-list "\\s-*") nil)
-        (goto-char (match-end 3))
-      (skip-syntax-backward "-"))))
+    (save-match-data
+      (if (looking-back (concat markdown-regex-list "\\s-*") nil)
+          (goto-char (match-end 3))
+        (skip-syntax-backward "-")))
+    (point)))
 
 (defun markdown-cur-list-item-bounds ()
   "Return bounds and indentation of the current list item.
@@ -3523,9 +3526,7 @@ Leave match data intact for `markdown-regex-list'."
                (checkbox (progn (goto-char (match-end 0))
                                 (when (looking-at "\\[[xX ]\\]\\s-*")
                                   (match-string-no-properties 0))))
-               (end (save-match-data
-                      (markdown-cur-list-item-end nonlist-indent)
-                      (point))))
+               (end (markdown-cur-list-item-end nonlist-indent)))
           (when (and (>= cur begin) (<= cur end) nonlist-indent)
             (list begin end indent nonlist-indent marker checkbox)))))))
 
