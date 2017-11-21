@@ -2100,7 +2100,7 @@ giving the bounds of the current and parent list items."
                  (marker (cl-fifth cur-bounds)))
             (setq bounds (markdown--append-list-item-bounds
                           marker indent cur-bounds bounds))
-          (when (<= start (point) end)
+          (when (and (<= start (point)) (<= (point) end))
             (put-text-property first last 'markdown-list-item bounds)))))
         (end-of-line)))))
 
