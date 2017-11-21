@@ -4100,7 +4100,15 @@ links with URLs."
   (while (and (progn
                 ;; Clear match data to test for a match after functions returns.
                 (set-match-data nil)
-                (re-search-forward "\\(!\\)?\\(\\[\\)" last 'limit))
+                ;; Preliminary regular expression search so we can return
+                ;; quickly upon failure.  This doesn't handle malformed links
+                ;; or nested square brackets well, so if it passes we back up
+                ;; continue with a more precise search.
+                (re-search-forward
+                 (if ref
+                     markdown-regex-link-reference
+                   markdown-regex-link-inline)
+                 last 'limit))
               ;; Keep searching if this is in a code block, inline
               ;; code, or a comment, or if it is include syntax.
               (or (markdown-code-block-at-point-p)
