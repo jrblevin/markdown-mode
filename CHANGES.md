@@ -49,6 +49,7 @@
         `markdown-footnote-display`.  ([GH-247][])
     -   Customizable subscript and superscript display properties
         via `markdown-sub-superscript-display`.
+    -   Several font-lock performance improvements.
 
 *   Bug fixes:
 
