@@ -3918,26 +3918,21 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
   "Match inline code fragments from point to LAST."
   (unless (bobp)
     (backward-char 1))
-  (when (markdown-match-inline-generic markdown-regex-code last)
-    (let ((begin (match-beginning 1))
-          (end (match-end 1))
-          (open-begin (match-beginning 2))
-          (open-end (match-end 2))
-          (code-begin (match-beginning 3))
-          (code-end (match-end 3))
-          (close-begin (match-beginning 4))
-          (close-end (match-end 4)))
-      (if (or (markdown-in-comment-p begin)
-              (markdown-in-comment-p end)
-              (markdown-code-block-at-pos begin))
-          (progn (goto-char (min (1+ begin) last))
-                 (when (< (point) last)
-                   (markdown-match-code last)))
-        (set-match-data (list begin end
-                              open-begin open-end
-                              code-begin code-end
-                              close-begin close-end))
-        t))))
+  (when (markdown-search-until-condition
+         (lambda ()
+           (and
+            ;; Advance point in case of failure, but without exceeding last.
+            (goto-char (min (1+ (match-beginning 1)) last))
+            (not (markdown-in-comment-p (match-beginning 1)))
+            (not (markdown-in-comment-p (match-end 1)))
+            (not (markdown-code-block-at-pos (match-beginning 1)))))
+         markdown-regex-code last t)
+      (set-match-data (list (match-beginning 1) (match-end 1)
+                            (match-beginning 2) (match-end 2)
+                            (match-beginning 3) (match-end 3)
+                            (match-beginning 4) (match-end 4)))
+      (goto-char (min (1+ (match-end 0)) last (point-max)))
+      t))
 
 (defun markdown-match-bold (last)
   "Match inline bold from the point to LAST."
