@@ -3916,7 +3916,7 @@ puts 'hello, world'
   "Test function `markdown-promote-list-item'."
   (markdown-test-file "nested-list.text"
     (forward-line)
-    (should (looking-at "   - List level 1 item 2
+    (should (looking-at-p "   - List level 1 item 2
 
      Second paragraph of item 2
 
@@ -3925,7 +3925,7 @@ puts 'hello, world'
 
      Another paragraph of item 2"))
     (markdown-demote-list-item)
-    (should (looking-at "       - List level 1 item 2
+    (should (looking-at-p "       - List level 1 item 2
 
          Second paragraph of item 2
 
@@ -3934,7 +3934,7 @@ puts 'hello, world'
 
          Another paragraph of item 2"))
     (markdown-promote-list-item)
-    (should (looking-at "   - List level 1 item 2
+    (should (looking-at-p "   - List level 1 item 2
 
      Second paragraph of item 2
 
@@ -3944,15 +3944,15 @@ puts 'hello, world'
      Another paragraph of item 2"))
     (goto-char (point-min))
     (forward-line 22)
-    (should (looking-at "           - List level 3 item 1
+    (should (looking-at-p "           - List level 3 item 1
 
                  Nested pre block"))
     (markdown-demote-list-item)
-    (should (looking-at "               - List level 3 item 1
+    (should (looking-at-p "               - List level 3 item 1
 
                      Nested pre block"))
     (markdown-promote-list-item)
-    (should (looking-at "           - List level 3 item 1
+    (should (looking-at-p "           - List level 3 item 1
 
                  Nested pre block"))))
 
