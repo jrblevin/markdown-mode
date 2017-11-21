@@ -2013,6 +2013,23 @@ and END are the previous region to refontify."
       (setq jit-lock-start (car res)
             jit-lock-end (cdr res)))))
 
+(defun markdown--cur-list-item-bounds ()
+  "Return a list describing the list item at point.
+Assumes that match data is set for `markdown-regex-list'.  See the
+documentation for `markdown-cur-list-item-bounds' for the format of
+the returned list."
+  (save-excursion
+    (let* ((begin (match-beginning 0))
+           (indent (length (match-string-no-properties 1)))
+           (nonlist-indent (length (match-string 0)))
+           (marker (concat (match-string-no-properties 2)
+                           (match-string-no-properties 3)))
+           (checkbox (progn (goto-char (match-end 0))
+                            (when (looking-at "\\[[xX ]\\]\\s-*")
+                              (match-string-no-properties 0))))
+           (end (markdown-cur-list-item-end nonlist-indent)))
+      (list begin end indent nonlist-indent marker checkbox))))
+
 (defun markdown--append-list-item-bounds (marker indent cur-bounds bounds)
   "Update list item BOUNDS given list MARKER, block INDENT, and CUR-BOUNDS.
 Here, MARKER is a string representing the type of list and INDENT
@@ -2076,7 +2093,7 @@ giving the bounds of the current and parent list items."
          ;; If not, then update levels and propertize list item when in range.
          (t
           (let* ((indent (current-indentation))
-                 (cur-bounds (markdown-cur-list-item-bounds 'matched))
+                 (cur-bounds (markdown--cur-list-item-bounds))
                  (first (cl-first cur-bounds))
                  (last (cl-second cur-bounds))
                  (marker (cl-fifth cur-bounds)))
@@ -3560,8 +3577,8 @@ original point.  If the point is not in a list item, do nothing."
         (skip-syntax-backward "-")))
     (point)))
 
-(defun markdown-cur-list-item-bounds (&optional matched)
-  "Return bounds of list item at point (possibly already MATCHED).
+(defun markdown-cur-list-item-bounds ()
+  "Return bounds for list item at point.
 Return a list of the following form:
 
     (begin end indent nonlist-indent marker checkbox)
@@ -3587,23 +3604,8 @@ the returned list would be
 
     (1 14 3 5 \"- \" nil)
 
-If the point is not inside a list item, return nil.
-Leave match data intact for `markdown-regex-list'."
-  (save-excursion
-    (let ((cur (point)))
-      (end-of-line)
-      (when (or matched (re-search-backward markdown-regex-list nil t))
-        (let* ((begin (match-beginning 0))
-               (indent (length (match-string-no-properties 1)))
-               (nonlist-indent (length (match-string 0)))
-               (marker (concat (match-string-no-properties 2)
-                               (match-string-no-properties 3)))
-               (checkbox (progn (goto-char (match-end 0))
-                                (when (looking-at "\\[[xX ]\\]\\s-*")
-                                  (match-string-no-properties 0))))
-               (end (markdown-cur-list-item-end nonlist-indent)))
-          (when (and (>= cur begin) (<= cur end) nonlist-indent)
-            (list begin end indent nonlist-indent marker checkbox)))))))
+If the point is not inside a list item, return nil."
+  (car (get-text-property (point-at-bol) 'markdown-list-item)))
 
 (defun markdown-list-item-at-point-p ()
   "Return t if there is a list item at the point and nil otherwise."
