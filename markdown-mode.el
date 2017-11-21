@@ -4186,49 +4186,25 @@ Made into a variable to allow for dynamic let-binding.")
       (setq ret (funcall condition)))
     ret))
 
-(defun markdown-match-generic-metadata
-    (regexp last &optional block-begin-re block-end-re)
+(defun markdown-match-generic-metadata (regexp last)
   "Match metadata declarations specified by REGEXP from point to LAST.
-These declarations must appear inside a metadata block specified
-by BLOCK-BEGIN-RE and BLOCK-END-RE.  BLOCK-BEGIN-RE is a regular
-expression denoting the beginning of a metadata block.  If it is
-nil, we assume metadata can only appear at the beginning of the
-buffer.  Similarly, BLOCK-END-RE is a regular expression denoting
-the end of a metadata block.  If it is nil, assume blocks end with
-a blank line or the end of the buffer.  There may be at most one such
-block in a file.  Subsequent blocks will be ignored."
+These declarations must appear inside a metadata block that begins at
+the beginning of the buffer and ends with a blank line (or the end of
+the buffer)."
   (let* ((first (point))
-         (begin-re (or block-begin-re "\\`"))
-         (end-re (or block-end-re "\n[ \t]*\n\\|\n\\'\\|\\'"))
-
-         ;; (prev-block-begin (when (re-search-backward begin-re (point-min) t) (match-end 0)))
-         ;; (next-block-begin (when (re-search-forward begin-re last t) (match-end 0)))
-         ;; (block-begin (or prev-block-begin next-block-begin))
-
-         (block-begin (when (or (re-search-backward begin-re (point-min) t)
-                                (re-search-forward begin-re last t))
-                        (match-end 0)))
-
-         (block-end (and block-begin (goto-char block-begin)
-                         (re-search-forward end-re nil t))))
-    (cond
-     ;; Don't match declarations if there is no metadata block or if
-     ;; the point is beyond the block.  Move point to point-max to
-     ;; prevent additional searches and return return nil since nothing
-     ;; was found.
-     ((or (null block-begin) (and block-end (> first block-end)))
-      (goto-char (point-max))
-      nil)
-     ;; No declarations to match if a block was found but not in
-     ;; range.  Move point to LAST, to resume there, and return nil.
-     ((> block-begin last)
-      (goto-char last)
-      nil)
-     ;; If a block was found that begins before LAST and ends after
-     ;; point, search for declarations inside it.
-     (t
-      ;; If the starting is before the beginning of the block, start
-      ;; there.  Otherwise, move back to FIRST.
+         (end-re "\n[ \t]*\n\\|\n\\'\\|\\'")
+         (block-begin 1)
+         (block-end (re-search-forward end-re nil t)))
+    (if (and block-end (> first block-end))
+        ;; Don't match declarations if there is no metadata block or if
+        ;; the point is beyond the block.  Move point to point-max to
+        ;; prevent additional searches and return return nil since nothing
+        ;; was found.
+        (progn (goto-char (point-max)) nil)
+      ;; If a block was found that begins before LAST and ends after
+      ;; point, search for declarations inside it.  If the starting is
+      ;; before the beginning of the block, start there. Otherwise,
+      ;; move back to FIRST.
       (goto-char (if (< first block-begin) block-begin first))
       (if (re-search-forward regexp (min last block-end) t)
           ;; If a metadata declaration is found, set match-data and return t.
@@ -4244,7 +4220,7 @@ block in a file.  Subsequent blocks will be ignored."
             t)
         ;; Otherwise, move the point to last and return nil
         (goto-char last)
-        nil)))))
+        nil))))
 
 (defun markdown-match-declarative-metadata (last)
   "Match declarative metadata from the point to LAST."
