@@ -9070,6 +9070,7 @@ Returns nil if non-applicable."
                     (insert markup))
                 (goto-char pos)
                 (insert markup))
+              (syntax-propertize (+ (cl-second bounds) 4))
               t))
         (unless (save-excursion
                   (back-to-indentation)
@@ -9091,6 +9092,7 @@ Returns nil if non-applicable."
                   (insert markup))
               (goto-char pos)
               (insert markup))
+            (syntax-propertize (point-at-eol))
             t)))))
 
 (defun markdown-toggle-gfm-checkbox ()
