@@ -1968,7 +1968,7 @@ Group 3 matches all attributes and whitespace following the tag name.")
 (defsubst markdown-in-comment-p (&optional pos)
   "Return non-nil if POS is in a comment.
 If POS is not given, use point instead."
-  (save-excursion (nth 4 (syntax-ppss pos))))
+  (get-text-property (or pos (point)) 'markdown-comment))
 
 (defun markdown-syntax-propertize-extend-region (start end)
   "Extend START to END region to include an entire block of text.
@@ -2547,7 +2547,7 @@ region of a YAML metadata block as propertized by
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
-  (let* ((in-comment (markdown-in-comment-p)))
+  (let* ((in-comment (nth 4 (syntax-ppss))))
     (goto-char start)
     (cond
      ;; Comment start
@@ -2563,10 +2563,14 @@ region of a YAML metadata block as propertized by
      ;; Comment end
      ((and in-comment
            (re-search-forward markdown-regex-comment-end end t))
-      (put-text-property (1- (match-end 0)) (match-end 0)
-                         'syntax-table (string-to-syntax ">"))
-      (markdown-syntax-propertize-comments
-       (min (1+ (match-end 0)) end (point-max)) end))
+      (let ((comment-end (match-end 0))
+            (comment-begin (nth 8 (syntax-ppss))))
+        (put-text-property (1- comment-end) comment-end
+                           'syntax-table (string-to-syntax ">"))
+        (put-text-property comment-begin comment-end
+                           'markdown-comment (list comment-begin comment-end))
+        (markdown-syntax-propertize-comments
+         (min (1+ comment-end) end (point-max)) end)))
      ;; Nothing found
      (t nil))))
 
@@ -2584,6 +2588,7 @@ region of a YAML metadata block as propertized by
         'markdown-pre nil
         'markdown-blockquote nil
         'markdown-hr nil
+        'markdown-comment nil
         'markdown-heading nil
         'markdown-heading-1-setext nil
         'markdown-heading-2-setext nil
