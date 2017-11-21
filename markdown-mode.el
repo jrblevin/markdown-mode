@@ -4220,7 +4220,7 @@ the beginning of the buffer and ends with a blank line (or the end of
 the buffer)."
   (let* ((first (point))
          (end-re "\n[ \t]*\n\\|\n\\'\\|\\'")
-         (block-begin 1)
+         (block-begin (goto-char 1))
          (block-end (re-search-forward end-re nil t)))
     (if (and block-end (> first block-end))
         ;; Don't match declarations if there is no metadata block or if
