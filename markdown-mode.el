@@ -1988,9 +1988,10 @@ Function is called repeatedly until it returns nil. For details, see
                              (if (re-search-forward "\n\n" nil t)
                                  (max end (match-beginning 0))
                                (point-max))))
-             (code-match (markdown-code-block-at-pos new-start))
+             (code-match (markdown--code-block-at-pos-no-syntax new-start))
              (new-start (or (and code-match (cl-first code-match)) new-start))
-             (code-match (and (< end (point-max)) (markdown-code-block-at-pos end)))
+             (code-match (and (< end (point-max))
+                              (markdown--code-block-at-pos-no-syntax end)))
              (new-end (or (and code-match (cl-second code-match)) new-end)))
         (unless (and (eq new-start start) (eq new-end end))
           (cons new-start (min new-end (point-max))))))))
@@ -3803,14 +3804,37 @@ data.  See `markdown-code-block-at-point-p' for code blocks."
 
 (make-obsolete 'markdown-code-at-point-p 'markdown-inline-code-at-point-p "v2.2")
 
+(defun markdown--code-block-at-pos-no-syntax (pos)
+  "Return match data list if there may be a code block at POS.
+This includes pre blocks, tilde-fenced code blocks, and GFM
+quoted code blocks.  Return nil otherwise.  This function does not
+use text properties, which have not yet been set during the
+syntax propertization phase."
+  (setq pos (save-excursion (goto-char pos) (point-at-bol)))
+  (or (looking-at-p markdown-regex-pre)
+      (markdown-get-enclosing-fenced-block-construct pos)))
+
 (defun markdown-code-block-at-pos (pos)
   "Return match data list if there is a code block at POS.
-Uses text properties at the beginning of the line position.
 This includes pre blocks, tilde-fenced code blocks, and GFM
-quoted code blocks.  Return nil otherwise."
+quoted code blocks.  Return nil otherwise.  This function uses
+cached text properties at the beginning of the line position for
+performance reasons, but therefore it must run after the syntax
+propertization phase."
   (setq pos (save-excursion (goto-char pos) (point-at-bol)))
   (or (get-text-property pos 'markdown-pre)
-      (markdown-get-enclosing-fenced-block-construct pos)
+      ;;(markdown-get-enclosing-fenced-block-construct pos)
+      (when (markdown-range-properties-exist
+             pos pos '(markdown-gfm-block-begin
+                       markdown-gfm-code
+                       markdown-gfm-block-end
+                       markdown-tilde-fence-begin
+                       markdown-fenced-code
+                       markdown-tilde-fence-end
+                       markdown-yaml-metadata-begin
+                       markdown-yaml-metadata-section
+                       markdown-yaml-metadata-end))
+        (markdown-get-enclosing-fenced-block-construct pos))
       ;; polymode removes text properties set by markdown-mode, so
       ;; check if `poly-markdown-mode' is active and whether the
       ;; `chunkmode' property is non-nil at POS.
