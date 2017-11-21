@@ -10111,6 +10111,7 @@ spaces, or alternatively a TAB should be used as the separator."
   (add-hook 'jit-lock-after-change-extend-region-functions
             #'markdown-font-lock-extend-region-function t t)
   (setq-local syntax-propertize-function #'markdown-syntax-propertize)
+  (syntax-propertize (point-max)) ;; Propertize before hooks run, etc.
   ;; Font lock.
   (setq-local font-lock-defaults nil)
   (setq-local font-lock-multiline t)
