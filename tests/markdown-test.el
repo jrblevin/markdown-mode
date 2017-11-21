@@ -3625,6 +3625,14 @@ only partially propertized."
    (forward-line)
    (should-not (markdown-inline-code-at-point-p))))
 
+(ert-deftest test-markdown-parsing/in-comment-p-position ()
+  "Test `markdown-in-comment-p'."
+  (markdown-test-string
+   "HTML <!-- foo --> comment"
+   (should (eq (point) (point-min)))
+   (should-not (markdown-in-comment-p (point-max)))
+   (should (eq (point) (point-min)))))
+
 (ert-deftest test-markdown-parsing/match-comments ()
   "Test `markdown-match-comments'."
   (markdown-test-string
@@ -3655,7 +3663,7 @@ x: x
 `x`
 "
     (should (markdown-match-code (point-max)))
-    (should (= (point) 17))
+    (should (= (point) 18))
     (should (equal (match-data t) '(14 17 14 15 15 16 16 17)))
     (should-not (markdown-match-code (point-max)))))
 

@@ -1968,7 +1968,7 @@ Group 3 matches all attributes and whitespace following the tag name.")
 (defsubst markdown-in-comment-p (&optional pos)
   "Return non-nil if POS is in a comment.
 If POS is not given, use point instead."
-  (nth 4 (syntax-ppss pos)))
+  (save-excursion (nth 4 (syntax-ppss pos))))
 
 (defun markdown-syntax-propertize-extend-region (start end)
   "Extend START to END region to include an entire block of text.
