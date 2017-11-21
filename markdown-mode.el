@@ -1708,7 +1708,14 @@ Group 2 matches any whitespace and the final newline.")
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  "^\\([ \t]*\\)\\([0-9#]+\\.\\|[\\*\\+:-]\\)\\([ \t]+\\)"
+  (rx line-start
+      ;; 1. Leading whitespace
+      (group (* blank))
+      ;; 2. List marker: a numeral, bullet, or colon
+      (group (or (and (+ (any "0-9#")) ".")
+                 (any "*+:-")))
+      ;; 3. Trailing whitespace
+      (group (+ blank)))
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
