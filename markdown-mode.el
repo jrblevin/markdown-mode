@@ -6882,7 +6882,9 @@ increase the indentation by one level."
               (insert (concat new-indent new-prefix new-spacing)))))
          ;; Unordered list, GFM task list, or ordered list with hash mark
          ((string-match-p "[\\*\\+-]\\|#\\." marker)
-          (insert new-indent marker)))))))
+          (insert new-indent marker))))
+      ;; Propertize the newly inserted list item now
+      (markdown-syntax-propertize-list-items (point-at-bol) (point-at-eol)))))
 
 (defun markdown-move-list-item-up ()
   "Move the current list item up in the list when possible.
@@ -6930,12 +6932,18 @@ In nested lists, demote child items as well."
   (interactive)
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
-      (let ((end-marker (set-marker (make-marker) (nth 1 bounds))))
-        (goto-char (nth 0 bounds))
-        (while (< (point) end-marker)
+      (let* ((item-start (set-marker (make-marker) (nth 0 bounds)))
+             (item-end (set-marker (make-marker) (nth 1 bounds)))
+             (list-start (progn (markdown-beginning-of-list)
+                                (set-marker (make-marker) (point))))
+             (list-end (progn (markdown-end-of-list)
+                              (set-marker (make-marker) (point)))))
+        (goto-char item-start)
+        (while (< (point) item-end)
           (unless (markdown-cur-line-blank-p)
             (insert (make-string markdown-list-indent-width ? )))
-          (forward-line))))))
+          (forward-line))
+        (markdown-syntax-propertize-list-items list-start list-end)))))
 
 (defun markdown-promote-list-item (&optional bounds)
   "Unindent (or promote) the current list item.
@@ -6945,17 +6953,23 @@ In nested lists, demote child items as well."
   (when (or bounds (setq bounds (markdown-cur-list-item-bounds)))
     (save-excursion
       (save-match-data
-        (let ((end-marker (set-marker (make-marker) (nth 1 bounds)))
+        (let ((item-start (set-marker (make-marker) (nth 0 bounds)))
+              (item-end (set-marker (make-marker) (nth 1 bounds)))
+              (list-start (progn (markdown-beginning-of-list)
+                                 (set-marker (make-marker) (point))))
+              (list-end (progn (markdown-end-of-list)
+                               (set-marker (make-marker) (point))))
               num regexp)
-          (goto-char (nth 0 bounds))
+          (goto-char item-start)
           (when (looking-at (format "^[ ]\\{1,%d\\}"
                                     markdown-list-indent-width))
             (setq num (- (match-end 0) (match-beginning 0)))
             (setq regexp (format "^[ ]\\{1,%d\\}" num))
-            (while (and (< (point) end-marker)
-                        (re-search-forward regexp end-marker t))
+            (while (and (< (point) item-end)
+                        (re-search-forward regexp item-end t))
               (replace-match "" nil nil)
-              (forward-line))))))))
+              (forward-line))
+            (markdown-syntax-propertize-list-items list-start list-end)))))))
 
 (defun markdown-cleanup-list-numbers-level (&optional pfx)
   "Update the numbering for level PFX (as a string of spaces).
