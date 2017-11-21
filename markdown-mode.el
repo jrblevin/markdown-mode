@@ -3577,7 +3577,7 @@ original point.  If the point is not in a list item, do nothing."
     ;; Don't skip over whitespace for empty list items (marker and
     ;; whitespace only), just move to end of whitespace.
     (save-match-data
-      (if (looking-back (concat markdown-regex-list "\\s-*") nil)
+      (if (looking-back (concat markdown-regex-list "\\s-*") (point-at-bol))
           (goto-char (match-end 3))
         (skip-chars-backward " \t\n")))
     (point)))
