@@ -3042,6 +3042,16 @@ const styles = require('gadgets/dist/styles.css');
    (end-of-line)
    (should-not (markdown-code-block-at-point-p))))
 
+(ert-deftest test-markdown-font-lock/hr-underscore-with-spaces ()
+  "Test font-lock for HR with spaced underscores."
+  (markdown-test-string "_ _ _ _ _ _ _\n"
+    (markdown-test-range-face-equals (point-min) (- (point-max) 2) 'markdown-hr-face)))
+
+(ert-deftest test-markdown-font-lock/hr-underscore-no-spaces ()
+  "Test font-lock for HR with underscores and no spaces."
+  (markdown-test-string "_____________\n"
+    (markdown-test-range-face-equals (point-min) (- (point-max) 2) 'markdown-hr-face)))
+
 (ert-deftest test-markdown-font-lock/inline-attributes ()
   "Test inline attributes before a fenced code block."
   (markdown-test-file "Leanpub.md"

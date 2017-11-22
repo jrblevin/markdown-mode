@@ -1662,7 +1662,7 @@ Group 6 matches the closing whitespace and hash marks of an atx heading.")
   "Regular expression for generic atx-style (hash mark) headers.")
 
 (defconst markdown-regex-hr
-  "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\)$"
+  "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\|_[ ]?_[ ]?_[_ ]*\\)$"
   "Regular expression for matching Markdown horizontal rules.")
 
 (defconst markdown-regex-code
@@ -3946,7 +3946,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                begin begin 'face '(markdown-url-face
                                    markdown-plain-url-face))
               (markdown-range-property-any
-               begin end 'face '(markdown-math-face)))
+               begin end 'face '(markdown-hr-face
+                                 markdown-math-face)))
           (progn (goto-char (min (1+ begin) last))
                  (when (< (point) last)
                    (markdown-match-italic last)))
@@ -3972,6 +3973,7 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                 (markdown-range-property-any
                  begin end 'face '(markdown-bold-face
                                    markdown-list-face
+                                   markdown-hr-face
                                    markdown-math-face)))
             (progn (goto-char (min (1+ begin) last))
                    (when (< (point) last)
