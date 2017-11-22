@@ -3355,30 +3355,16 @@ Return 0 if line is the last line in the buffer."
       (forward-line 1)
       (current-indentation))))
 
-(defun markdown-cur-non-list-indent ()
-  "Return beginning position of list item text (not including the list marker).
-Return nil if the current line is not the beginning of a list item."
-  (save-match-data
-    (save-excursion
-      (beginning-of-line)
-      (when (re-search-forward markdown-regex-list (line-end-position) t)
-        (current-column)))))
-
-(defun markdown-prev-non-list-indent ()
-  "Return position of the first non-list-marker on the previous line."
-  (save-excursion
-    (forward-line -1)
-    (markdown-cur-non-list-indent)))
-
 (defun markdown-new-baseline-p ()
   "Determine if the current line begins a new baseline level."
   (save-excursion
-    (beginning-of-line)
-    (or (looking-at-p markdown-regex-header)
-        (looking-at-p markdown-regex-hr)
-        (and (null (markdown-cur-non-list-indent))
-             (= (current-indentation) 0)
-             (markdown-prev-line-blank-p)))))
+    (save-match-data
+      (beginning-of-line)
+      (or (looking-at markdown-regex-header)
+          (looking-at markdown-regex-hr)
+          (and (= (current-indentation) 0)
+               (not (looking-at markdown-regex-list))
+               (markdown-prev-line-blank-p))))))
 
 (defun markdown-search-backward-baseline ()
   "Search backward baseline point with no indentation and not a list item."
@@ -5809,7 +5795,10 @@ duplicate positions, which are handled up by calling functions."
     (setq positions (cons prev-line-pos positions))
 
     ;; Indentation of previous non-list-marker text
-    (when (setq pos (markdown-prev-non-list-indent))
+    (when (setq pos (save-excursion
+                      (forward-line -1)
+                      (when (looking-at markdown-regex-list)
+                        (- (match-end 3) (match-beginning 0)))))
       (setq positions (cons pos positions)))
 
     ;; Indentation required for a pre block in current context
