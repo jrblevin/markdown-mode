@@ -3327,7 +3327,7 @@ If we are at the first line, then consider the previous line to be blank."
   (or (= (line-beginning-position) (point-min))
       (save-excursion
         (forward-line -1)
-        (markdown-cur-line-blank-p))))
+        (looking-at-p "^\\s *$"))))
 
 (defun markdown-next-line-blank-p ()
   "Return t if the next line is blank and nil otherwise.
