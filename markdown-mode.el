@@ -1662,7 +1662,11 @@ Group 6 matches the closing whitespace and hash marks of an atx heading.")
   "Regular expression for generic atx-style (hash mark) headers.")
 
 (defconst markdown-regex-hr
-  "^\\(\\*[ ]?\\*[ ]?\\*[ ]?[\\* ]*\\|-[ ]?-[ ]?-[--- ]*\\|_[ ]?_[ ]?_[_ ]*\\)$"
+  (rx line-start
+      (group (or (and (repeat 3 (and "*" (? " "))) (* (any "* ")))
+                 (and (repeat 3 (and "-" (? " "))) (* (any "- ")))
+                 (and (repeat 3 (and "_" (? " "))) (* (any "_ ")))))
+      line-end)
   "Regular expression for matching Markdown horizontal rules.")
 
 (defconst markdown-regex-code
