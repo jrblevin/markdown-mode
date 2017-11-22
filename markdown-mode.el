@@ -2026,7 +2026,7 @@ the returned list."
   (save-excursion
     (let* ((begin (match-beginning 0))
            (indent (length (match-string-no-properties 1)))
-           (nonlist-indent (length (match-string 0)))
+           (nonlist-indent (- (match-end 0) (match-beginning 0)))
            (marker (concat (match-string-no-properties 2)
                            (match-string-no-properties 3)))
            (checkbox (progn (goto-char (match-end 0))
