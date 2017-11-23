@@ -2091,7 +2091,7 @@ giving the bounds of the current and parent list items."
         (cond
          ;; Reset at headings, horizontal rules, and top-level blank lines.
          ;; Propertize baseline when in range.
-         ((markdown-new-baseline-p)
+         ((markdown-new-baseline)
           (setq bounds nil))
          ;; Make sure this is not a line from a pre block
          ((looking-at-p pre-regexp))
@@ -2128,7 +2128,7 @@ giving the bounds of the current and parent list items."
          ;; Move past blank lines
          ((markdown-cur-line-blank-p) (forward-line))
          ;; At headers and horizontal rules, reset levels
-         ((markdown-new-baseline-p) (forward-line) (setq levels nil))
+         ((markdown-new-baseline) (forward-line) (setq levels nil))
          ;; If the current line has sufficient indentation, mark out pre block
          ;; The opening should be preceded by a blank line.
          ((and (looking-at pre-regexp)
@@ -3312,8 +3312,6 @@ Used for `flyspell-generic-check-word-predicate'."
   'markdown-prev-line-blank 'markdown-prev-line-blank-p "v2.4")
 (define-obsolete-function-alias
   'markdown-next-line-blank 'markdown-next-line-blank-p "v2.4")
-(define-obsolete-function-alias
-  'markdown-new-baseline 'markdown-new-baseline-p "v2.4")
 
 (defun markdown-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
@@ -3355,16 +3353,14 @@ Return 0 if line is the last line in the buffer."
       (forward-line 1)
       (current-indentation))))
 
-(defun markdown-new-baseline-p ()
-  "Determine if the current line begins a new baseline level."
-  (save-excursion
-    (save-match-data
-      (beginning-of-line)
-      (or (looking-at markdown-regex-header)
-          (looking-at markdown-regex-hr)
-          (and (= (current-indentation) 0)
-               (not (looking-at markdown-regex-list))
-               (markdown-prev-line-blank-p))))))
+(defun markdown-new-baseline ()
+  "Determine if the current line begins a new baseline level.
+Assume point is positioned at beginning of line."
+  (or (looking-at markdown-regex-header)
+      (looking-at markdown-regex-hr)
+      (and (= (current-indentation) 0)
+           (not (looking-at markdown-regex-list))
+           (markdown-prev-line-blank-p))))
 
 (defun markdown-search-backward-baseline ()
   "Search backward baseline point with no indentation and not a list item."
@@ -3375,7 +3371,7 @@ Return 0 if line is the last line in the buffer."
       (when (match-end 2)
         (goto-char (match-end 2))
         (cond
-         ((markdown-new-baseline-p)
+         ((markdown-new-baseline)
           (setq stop t))
          ((looking-at-p markdown-regex-list)
           (setq stop nil))
@@ -3430,7 +3426,7 @@ immediately  after a list item, return nil."
         (beginning-of-line)
         (cond
          ;; Make sure this is not a header or hr
-         ((markdown-new-baseline-p) (setq levels nil))
+         ((markdown-new-baseline) (setq levels nil))
          ;; Make sure this is not a line from a pre block
          ((looking-at-p pre-regexp))
          ;; If not, then update levels
