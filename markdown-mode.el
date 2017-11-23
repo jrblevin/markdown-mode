@@ -3548,20 +3548,20 @@ original point.  If the point is not in a list item, do nothing."
          ;; Stop at end of the buffer.
          ((eobp) nil)
          ;; Continue if the current line is blank
-         ((looking-at-p markdown-regex-blank-line) t)
+         ((looking-at markdown-regex-blank-line) t)
          ;; Continue while indentation is the same or greater
          ((>= indent level) t)
          ;; Stop if current indentation is less than list item
          ;; and the previous line was blank.
          ((and (< indent level)
-               (markdown-prev-line-blank-p))
+               (markdown-prev-line-blank))
           nil)
          ;; Stop at a new list item of the same or lesser indentation
-         ((looking-at-p markdown-regex-list) nil)
+         ((looking-at markdown-regex-list) nil)
          ;; Stop at a header
-         ((looking-at-p markdown-regex-header) nil)
+         ((looking-at markdown-regex-header) nil)
          ;; Stop at a horizontal rule
-         ((looking-at-p markdown-regex-hr) nil)
+         ((looking-at markdown-regex-hr) nil)
          ;; Otherwise, continue.
          (t t))
       (forward-line)
