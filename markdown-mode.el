@@ -1719,7 +1719,9 @@ Group 2 matches any whitespace and the final newline.")
       (group (or (and (+ (any "0-9#")) ".")
                  (any "*+:-")))
       ;; 3. Trailing whitespace
-      (group (+ blank)))
+      (group (+ blank))
+      ;; 4. Optional checkbox for GFM task list items
+      (opt (group (and "[" (any " xX") "]" (* blank)))))
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
@@ -2026,12 +2028,10 @@ the returned list."
   (save-excursion
     (let* ((begin (match-beginning 0))
            (indent (length (match-string-no-properties 1)))
-           (nonlist-indent (- (match-end 0) (match-beginning 0)))
-           (marker (concat (match-string-no-properties 2)
-                           (match-string-no-properties 3)))
-           (checkbox (progn (goto-char (match-end 0))
-                            (when (looking-at "\\[[xX ]\\]\\s-*")
-                              (match-string-no-properties 0))))
+           (nonlist-indent (- (match-end 3) (match-beginning 0)))
+           (marker (buffer-substring-no-properties
+                    (match-beginning 2) (match-end 3)))
+           (checkbox (match-string-no-properties 4))
            (end (markdown-cur-list-item-end nonlist-indent)))
       (list begin end indent nonlist-indent marker checkbox))))
 
