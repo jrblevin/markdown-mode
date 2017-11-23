@@ -2135,8 +2135,7 @@ giving the bounds of the current and parent list items."
          ((markdown-new-baseline) (forward-line) (setq levels nil))
          ;; If the current line has sufficient indentation, mark out pre block
          ;; The opening should be preceded by a blank line.
-         ((and (looking-at pre-regexp)
-               (markdown-prev-line-blank-p))
+         ((and (markdown-prev-line-blank) (looking-at pre-regexp))
           (setq open (match-beginning 0))
           (while (and (or (looking-at-p pre-regexp) (markdown-cur-line-blank-p))
                       (not (eobp)))
@@ -3313,8 +3312,6 @@ Used for `flyspell-generic-check-word-predicate'."
 (define-obsolete-function-alias
   'markdown-cur-line-blank 'markdown-cur-line-blank-p "v2.4")
 (define-obsolete-function-alias
-  'markdown-prev-line-blank 'markdown-prev-line-blank-p "v2.4")
-(define-obsolete-function-alias
   'markdown-next-line-blank 'markdown-next-line-blank-p "v2.4")
 
 (defun markdown-cur-line-blank-p ()
@@ -3323,13 +3320,17 @@ Used for `flyspell-generic-check-word-predicate'."
     (beginning-of-line)
     (looking-at-p markdown-regex-blank-line)))
 
-(defun markdown-prev-line-blank-p ()
+(defun markdown-prev-line-blank ()
   "Return t if the previous line is blank and nil otherwise.
 If we are at the first line, then consider the previous line to be blank."
   (or (= (line-beginning-position) (point-min))
       (save-excursion
         (forward-line -1)
-        (looking-at-p markdown-regex-blank-line))))
+        (looking-at markdown-regex-blank-line))))
+
+(defun markdown-prev-line-blank-p ()
+  "Like `markdown-prev-line-blank', but preserve `match-data'."
+  (save-match-data (markdown-prev-line-blank)))
 
 (defun markdown-next-line-blank-p ()
   "Return t if the next line is blank and nil otherwise.
@@ -3364,7 +3365,7 @@ Assume point is positioned at beginning of line."
       (looking-at markdown-regex-hr)
       (and (= (current-indentation) 0)
            (not (looking-at markdown-regex-list))
-           (markdown-prev-line-blank-p))))
+           (markdown-prev-line-blank))))
 
 (defun markdown-search-backward-baseline ()
   "Search backward baseline point with no indentation and not a list item."
