@@ -1814,6 +1814,10 @@ Group 6 matches the closing square brackets.")
   "Regular expression for matching GFM checkboxes.
 Group 1 matches the text to become a button.")
 
+(defconst markdown-regex-blank-line
+  "^[[:blank:]]*$"
+  "Regular expression that matches a blank line.")
+
 (defconst markdown-regex-block-separator
   "\n[\n\t\f ]*\n"
   "Regular expression for matching block boundaries.")
@@ -3317,7 +3321,7 @@ Used for `flyspell-generic-check-word-predicate'."
   "Return t if the current line is blank and nil otherwise."
   (save-excursion
     (beginning-of-line)
-    (looking-at-p "^\\s *$")))
+    (looking-at-p markdown-regex-blank-line)))
 
 (defun markdown-prev-line-blank-p ()
   "Return t if the previous line is blank and nil otherwise.
@@ -3325,7 +3329,7 @@ If we are at the first line, then consider the previous line to be blank."
   (or (= (line-beginning-position) (point-min))
       (save-excursion
         (forward-line -1)
-        (looking-at-p "^\\s *$"))))
+        (looking-at-p markdown-regex-blank-line))))
 
 (defun markdown-next-line-blank-p ()
   "Return t if the next line is blank and nil otherwise.
@@ -3543,7 +3547,7 @@ original point.  If the point is not in a list item, do nothing."
          ;; Stop at end of the buffer.
          ((eobp) nil)
          ;; Continue if the current line is blank
-         ((markdown-cur-line-blank-p) t)
+         ((looking-at-p markdown-regex-blank-line) t)
          ;; Continue while indentation is the same or greater
          ((>= indent level) t)
          ;; Stop if current indentation is less than list item
