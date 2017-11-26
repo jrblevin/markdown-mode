@@ -3802,8 +3802,22 @@ quoted code blocks.  Return nil otherwise.  This function does not
 use text properties, which have not yet been set during the
 syntax propertization phase."
   (setq pos (save-excursion (goto-char pos) (point-at-bol)))
-  (or (looking-at-p markdown-regex-pre)
-      (markdown-get-enclosing-fenced-block-construct pos)))
+  (let (match)
+    (cond
+     ;; Indented code blocks
+     ((looking-at markdown-regex-pre)
+      (let ((start (save-excursion
+                     (markdown-search-backward-baseline) (point)))
+            (end (save-excursion
+                   (while (and (or (looking-at-p markdown-regex-pre)
+                                   (markdown-cur-line-blank-p))
+                               (not (eobp)))
+                     (forward-line))
+                   (point))))
+        (list start end start start start end end end)))
+     ;; Fenced code blocks
+     ((setq match (markdown-get-enclosing-fenced-block-construct pos))
+      match))))
 
 (defun markdown-code-block-at-pos (pos)
   "Return match data list if there is a code block at POS.
