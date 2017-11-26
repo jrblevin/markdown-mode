@@ -2576,6 +2576,9 @@ region of a YAML metadata block as propertized by
             (comment-begin (nth 8 (syntax-ppss))))
         (put-text-property (1- comment-end) comment-end
                            'syntax-table (string-to-syntax ">"))
+        ;; Remove any other text properties inside the comment
+        (remove-text-properties comment-begin comment-end
+                                markdown--syntax-properties)
         (put-text-property comment-begin comment-end
                            'markdown-comment (list comment-begin comment-end))
         (markdown-syntax-propertize-comments
