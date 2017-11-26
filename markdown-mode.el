@@ -2036,8 +2036,9 @@ the returned list."
            (marker (buffer-substring-no-properties
                     (match-beginning 2) (match-end 3)))
            (checkbox (match-string-no-properties 4))
+           (match (butlast (match-data t)))
            (end (markdown-cur-list-item-end nonlist-indent)))
-      (list begin end indent nonlist-indent marker checkbox))))
+      (list begin end indent nonlist-indent marker checkbox match))))
 
 (defun markdown--append-list-item-bounds (marker indent cur-bounds bounds)
   "Update list item BOUNDS given list MARKER, block INDENT, and CUR-BOUNDS.
@@ -3578,7 +3579,7 @@ original point.  If the point is not in a list item, do nothing."
   "Return bounds for list item at point.
 Return a list of the following form:
 
-    (begin end indent nonlist-indent marker checkbox)
+    (begin end indent nonlist-indent marker checkbox match)
 
 The named components are:
 
@@ -3592,6 +3593,7 @@ The named components are:
   - checkbox: String containing the GFM checkbox portion, if any,
     including any trailing whitespace before the text
     begins (e.g., \"[x] \").
+  - match: match data for markdown-regex-list
 
 As an example, for the following unordered list item
 
@@ -3599,7 +3601,7 @@ As an example, for the following unordered list item
 
 the returned list would be
 
-    (1 14 3 5 \"- \" nil)
+    (1 14 3 5 \"- \" nil (1 6 1 4 4 5 5 6))
 
 If the point is not inside a list item, return nil."
   (car (get-text-property (point-at-bol) 'markdown-list-item)))
@@ -4008,21 +4010,23 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
 
 (defun markdown-match-list-items (last)
   "Match list items from point to LAST."
-  (when (markdown-match-inline-generic markdown-regex-list last)
-    (let ((begin (match-beginning 2))
-          (end (match-end 2)))
-        (if (or (markdown-range-property-any
-                 begin end 'face (list markdown-inline-code-face
-                                       markdown-bold-face
-                                       markdown-math-face))
-                (markdown-range-properties-exist begin end '(markdown-hr))
-                (markdown-in-comment-p))
-            (progn (goto-char (min (1+ (match-end 0)) last))
-                   (markdown-match-list-items last))
-          (set-match-data (list (match-beginning 0) (match-end 0)
-                                (match-beginning 1) (match-end 1)
-                                (match-beginning 2) (match-end 2)))
-          (goto-char (1+ (match-end 0)))))))
+  (let* ((first (point))
+         (pos first)
+         (prop 'markdown-list-item)
+         (bounds (car (get-text-property pos prop))))
+    (while
+        (and (or (null (setq bounds (car (get-text-property pos prop))))
+                 (< (cl-first bounds) pos))
+             (< (point) last)
+             (setq pos (next-single-char-property-change pos prop nil last))
+             (goto-char pos)))
+    (when bounds
+      (set-match-data (cl-seventh bounds))
+      ;; Step at least one character beyond point. Otherwise
+      ;; `font-lock-fontify-keywords-region' infloops.
+      (goto-char (min (1+ (max (point-at-eol) first))
+                      (point-max)))
+      t)))
 
 (defun markdown-match-math-single (last)
   "Match single quoted $..$ math from point to LAST."

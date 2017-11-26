@@ -3819,7 +3819,7 @@ puts 'hello, world'
       (cl-loop
        for value in values
        do (should
-           (equal (get-text-property (point) 'markdown-list-item) value))
+           (equal (mapcar #'butlast (get-text-property (point) 'markdown-list-item)) value))
           (markdown-outline-next)))))
 
 (ert-deftest test-markdown-lists/levels-1 ()
@@ -3867,11 +3867,11 @@ puts 'hello, world'
     (should (eq (point) 3699))
     (markdown-next-list-item 4)
     (should (eq (point) 3700))
-    (should (equal (markdown-cur-list-item-bounds)
+    (should (equal (butlast (markdown-cur-list-item-bounds))
                    (list 3700 3901 0 4 "-   " nil)))
     (markdown-next-list-item 4)
     (should (eq (point) 3903))
-    (should (equal (markdown-cur-list-item-bounds)
+    (should (equal (butlast (markdown-cur-list-item-bounds))
                    (list 3903 3937 0 4 "*   " nil)))))
 
 (ert-deftest test-markdown-lists/bounds-2 ()
@@ -3890,7 +3890,7 @@ puts 'hello, world'
     (markdown-next-list-item 4)
     (markdown-next-list-item 4)
     (should (eq (point) 3903))
-    (should (equal (markdown-prev-list-item-bounds)
+    (should (equal (butlast (markdown-prev-list-item-bounds))
                    (list 3700 3901 0 4 "-   " nil)))))
 
 (ert-deftest test-markdown-lists/bounds-next ()
@@ -3902,13 +3902,13 @@ puts 'hello, world'
     (markdown-test-goto-heading "Case 9")
     (markdown-next-list-item 4)
     (should (eq (point) 3700))
-    (should (equal (markdown-next-list-item-bounds)
+    (should (equal (butlast (markdown-next-list-item-bounds))
                    (list 3903 3937 0 4 "*   " nil)))))
 
 (ert-deftest test-markdown-lists/bounds-gfm-task-list-item ()
   "Test `markdown-cur-list-item-bounds' with a GFM task list item."
   (markdown-test-string "  - [ ] task name"
-    (should (equal (markdown-cur-list-item-bounds)
+    (should (equal (butlast (markdown-cur-list-item-bounds))
                    '(1 18 2 4 "- " "[ ] ")))))
 
 (ert-deftest test-markdown-lists/gfm-task-list-item-at-point-1 ()
