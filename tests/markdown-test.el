@@ -5368,22 +5368,25 @@ See GH-288."
    (should (= (point) 16))
    (should (string-equal (buffer-string) "one two ~~three~~"))))
 
-(ert-deftest test-markdown-gfm/insert-code-block ()
-  "GFM code block insertion test."
-  ;; Test empty markup insertion
+(ert-deftest test-markdown-gfm/insert-code-block-empty-markup ()
+  "Test GFM code block insertion with empty code section."
   (markdown-test-string-gfm "line 1\nline 2\n"
    (end-of-line)
    (markdown-insert-gfm-code-block "elisp")
    (should (equal (car markdown-gfm-used-languages) "elisp"))
    (should (equal (car (markdown-gfm-get-corpus)) "elisp"))
    (should (string-equal (buffer-string)
-                         "line 1\n\n``` elisp\n\n```\n\nline 2\n")))
-  ;; Test ‘markdown-spaces-after-code-fence’.
+                         "line 1\n\n``` elisp\n\n```\n\nline 2\n"))))
+
+(ert-deftest test-markdown-gfm/markdown-spaces-after-code-fence ()
+  "Test `markdown-spaces-after-code-fence'."
   (markdown-test-string-gfm ""
     (let ((markdown-spaces-after-code-fence 0))
       (markdown-insert-gfm-code-block "elisp")
-      (should (equal (buffer-string) "```elisp\n\n```"))))
-  ;; Test with active region
+      (should (equal (buffer-string) "```elisp\n\n```")))))
+
+(ert-deftest test-markdown-gfm/insert-code-block-active-region ()
+  "Test GFM code block insertion with active region."
   (markdown-test-string-gfm "line 1\nline 2\nline 3\n"
    (forward-line)
    (transient-mark-mode)
@@ -5392,16 +5395,20 @@ See GH-288."
    (should (markdown-use-region-p))
    (markdown-insert-gfm-code-block "elisp")
    (should (string-equal (buffer-string)
-                         "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n")))
-  ;; Test indented list item
+                         "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n"))))
+
+(ert-deftest test-markdown-gfm/insert-code-block-indented-list-item ()
+  "Test GFM code block insertion with an indented list item."
   (markdown-test-string-gfm "1. foo\n   "
     (goto-char (point-max))
     (markdown-insert-gfm-code-block "elisp")
     (should (equal (buffer-substring-no-properties (point-min) (point-max))
                    "1. foo\n\n   ``` elisp\n   \n   ```"))
     (should (equal (buffer-substring-no-properties (point) (point-max))
-                   "\n   ```")))
-  ;; Test indented list item with active region
+                   "\n   ```"))))
+
+(ert-deftest test-markdown-gfm/insert-code-block-indented-list-item-active-region ()
+  "Test GFM code block insertion with an indented list item and active region."
   (markdown-test-string-gfm "1.  foo\n    bar\n"
     (let ((transient-mark-mode t))
       (forward-line)
