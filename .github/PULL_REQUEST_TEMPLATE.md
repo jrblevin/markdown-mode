@@ -29,8 +29,7 @@ If you're unsure about any of these, feel free to ask.
 -->
 
 - [ ] I have read the **CONTRIBUTING.md** document.
-- [ ] I have updated the documentation at the beginning of `markdown-mode.el` if needed.
-- [ ] If documentation was added or changed, I have updated the **README.md** file using `webpage.sh`.
+- [ ] I have updated the documentation in the **README.md** file if necessary.
 - [ ] I have added an entry to **CHANGES.md**.
 - [ ] I have added tests to cover my changes.
 - [ ] All new and existing tests passed (using `make test`).
