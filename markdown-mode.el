@@ -562,6 +562,33 @@ requires Emacs to be built with ImageMagick support."
                         (const :tag "No maximum height" nil)))))
 
 
+;;; Markdown-Specific `rx' Macro
+
+;; Based on python-rx from python.el.
+(eval-and-compile
+  (defconst markdown-rx-constituents
+    `((newline . ,(rx "\n"))
+      (indent . ,(rx (or (repeat 4 " ") "\t")))
+      (block-end . ,(rx (and (or (one-or-more (zero-or-more blank) "\n") line-end))))
+      (numeral . ,(rx (and (one-or-more (any "0-9#")) ".")))
+      (bullet . ,(rx (any "*+:-")))
+      (list-marker . ,(rx (or (and (one-or-more (any "0-9#")) ".")
+                              (any "*+:-"))))
+      (checkbox . ,(rx "[" (any " xX") "]")))
+    "Markdown-specific sexps for `markdown-rx'")
+
+  (defmacro markdown-rx (&rest regexps)
+    "Markdown mode specialized rx macro.
+This variant of `rx' supports common Markdown named REGEXPS."
+    (let ((rx-constituents (append markdown-rx-constituents rx-constituents)))
+      (cond ((null regexps)
+             (error "No regexp"))
+            ((cdr regexps)
+             (rx-to-string `(and ,@regexps) t))
+            (t
+             (rx-to-string (car regexps) t))))))
+
+
 ;;; Regular Expressions =======================================================
 
 (defconst markdown-regex-comment-start
@@ -681,16 +708,15 @@ Group 2 matches any whitespace and the final newline.")
   "Regular expression for matching preformatted text sections.")
 
 (defconst markdown-regex-list
-  (rx line-start
-      ;; 1. Leading whitespace
-      (group (* blank))
-      ;; 2. List marker: a numeral, bullet, or colon
-      (group (or (and (+ (any "0-9#")) ".")
-                 (any "*+:-")))
-      ;; 3. Trailing whitespace
-      (group (+ blank))
-      ;; 4. Optional checkbox for GFM task list items
-      (opt (group (and "[" (any " xX") "]" (* blank)))))
+  (markdown-rx line-start
+               ;; 1. Leading whitespace
+               (group (* blank))
+               ;; 2. List marker: a numeral, bullet, or colon
+               (group list-marker)
+               ;; 3. Trailing whitespace
+               (group (+ blank))
+               ;; 4. Optional checkbox for GFM task list items
+               (opt (group (and checkbox (* blank)))))
   "Regular expression for matching list items.")
 
 (defconst markdown-regex-bold
