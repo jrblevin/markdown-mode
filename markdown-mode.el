@@ -7,6 +7,7 @@
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
 ;; Version: 2.4-dev
+;; Package-Version: 20171031.1725
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
@@ -768,6 +769,14 @@
 ;;   * `markdown-xhtml-header-content' - additional content to include
 ;;     in the XHTML `<head>` block (default: `""`).
 ;;
+;;   * `markdown-xhtml-body-preamble' - additional content to include in the
+;;     XHTML <body> block, before the output. This is useful if you'd like to
+;;     wrap the Markdown output around extra elements (default: `""`')."
+;;
+;;   * `markdown-xhtml-body-epilogue' - additional content to include in the
+;;     XHTML <body> block, after the output. This is useful if you'd like to
+;;     wrap the Markdown output around extra elements (default: `""`').
+;;
 ;;   * `markdown-xhtml-standalone-regexp' - a regular expression which
 ;;     `markdown-mode' uses to determine whether the output of
 ;;     `markdown-command' is a standalone XHTML document or an XHTML
@@ -1386,6 +1395,18 @@ exporting with `markdown-export'."
 
 (defcustom markdown-xhtml-header-content ""
   "Additional content to include in the XHTML <head> block."
+  :group 'markdown
+  :type 'string)
+
+(defcustom markdown-xhtml-body-preamble ""
+  "Additional content to include in the XHTML <body> block, before the output.
+This is useful if you'd like to wrap the Markdown output around extra elements."
+  :group 'markdown
+  :type 'string)
+
+(defcustom markdown-xhtml-body-epilogue ""
+  "Additional content to include in the XHTML <body> block, after the output.
+This is useful if you'd like to wrap the Markdown output around extra elements."
   :group 'markdown
   :type 'string)
 
@@ -8097,7 +8118,13 @@ Standalone XHTML output is identified by an occurrence of
     (insert markdown-xhtml-header-content))
   (insert "\n</head>\n\n"
           "<body>\n\n")
+  (when (> (length markdown-xhtml-body-preamble) 0)
+    (insert markdown-xhtml-body-preamble))
+  (insert "\n")
   (goto-char (point-max))
+  (insert "\n")
+  (when (> (length markdown-xhtml-body-epilogue) 0)
+    (insert markdown-xhtml-body-epilogue))
   (insert "\n"
           "</body>\n"
           "</html>\n"))

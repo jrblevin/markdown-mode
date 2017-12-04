@@ -752,6 +752,14 @@ provides an interface to all of the possible customizations:
   * `markdown-xhtml-header-content` - additional content to include
     in the XHTML `<head>` block (default: `""`).
 
+  * `markdown-xhtml-body-preamble` - additional content to include in the
+    XHTML <body> block, before the output. This is useful if you'd like to
+    wrap the Markdown output around extra elements (default: `""``)."
+
+  * `markdown-xhtml-body-epilogue` - additional content to include in the
+    XHTML <body> block, after the output. This is useful if you'd like to
+    wrap the Markdown output around extra elements (default: `""``).
+
   * `markdown-xhtml-standalone-regexp` - a regular expression which
     `markdown-mode` uses to determine whether the output of
     `markdown-command` is a standalone XHTML document or an XHTML
