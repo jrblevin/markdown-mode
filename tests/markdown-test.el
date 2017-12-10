@@ -2521,7 +2521,7 @@ if (y)
 "
    (markdown-test-range-has-face 1 19 nil)
    (markdown-test-range-has-face 20 22 markdown-markup-face)
-   (markdown-test-range-has-face 24 60 markdown-pre-face)
+   (markdown-test-range-has-face 24 59 markdown-pre-face)
    (markdown-test-range-has-face 61 63 markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-1 ()
@@ -5263,7 +5263,7 @@ This includes preserving whitespace after the pipe."
       (markdown-test-range-has-face 179 179 markdown-markup-face)
       (markdown-test-range-has-face 180 187 markdown-language-keyword-face)
       (markdown-test-range-has-face 188 188 markdown-markup-face)
-      (markdown-test-range-has-face 190 211 markdown-pre-face)
+      (markdown-test-range-has-face 190 210 markdown-pre-face)
       (markdown-test-range-has-face 212 215 markdown-markup-face)
 
       (markdown-test-range-has-face 218 218 markdown-markup-face)
