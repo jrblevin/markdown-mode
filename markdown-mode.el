@@ -2067,11 +2067,11 @@ Depending on your font, some reasonable choices are:
              `(display ,markdown-footnote-display))))
 
 (defvar markdown-mode-font-lock-keywords-basic
-  `((markdown-match-yaml-metadata-begin . ((1 markdown-markup-face)))
-    (markdown-match-yaml-metadata-end . ((1 markdown-markup-face)))
-    (markdown-match-yaml-metadata-key . ((1 markdown-metadata-key-face)
-                                         (2 markdown-markup-face)
-                                         (3 markdown-metadata-value-face)))
+  `((markdown-match-yaml-metadata-begin . ((1 'markdown-markup-face)))
+    (markdown-match-yaml-metadata-end . ((1 'markdown-markup-face)))
+    (markdown-match-yaml-metadata-key . ((1 'markdown-metadata-key-face)
+                                         (2 'markdown-markup-face)
+                                         (3 'markdown-metadata-value-face)))
     (markdown-match-gfm-open-code-blocks . ((1 markdown-markup-properties)
                                             (2 markdown-markup-properties nil t)
                                             (3 markdown-language-keyword-properties nil t)
@@ -2170,6 +2170,10 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-blockquotes)
     (markdown-match-wiki-link . ((0 markdown-link-face prepend))))
   "Syntax highlighting for Markdown files.")
+
+(define-obsolete-variable-alias
+ 'markdown-mode-font-lock-keywords-basic
+ 'markdown-mode-font-lock-keywords "v2.4")
 
 ;; Footnotes
 (defvar markdown-footnote-counter 0
@@ -9137,18 +9141,15 @@ spaces, or alternatively a TAB should be used as the separator."
   (setq-local syntax-propertize-function #'markdown-syntax-propertize)
   (syntax-propertize (point-max)) ;; Propertize before hooks run, etc.
   ;; Font lock.
-  (setq-local font-lock-defaults nil)
-  (setq-local font-lock-multiline t)
-  (setq-local font-lock-extra-managed-props
-              (append font-lock-extra-managed-props
-                      '(composition display invisible)))
+  (setq font-lock-defaults
+        '(markdown-mode-font-lock-keywords
+          nil nil nil nil
+          (font-lock-multiline . t)
+          (font-lock-syntactic-face-function . markdown-syntactic-face)
+          (font-lock-extra-managed-props . '(composition display invisible))))
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
-  (setq font-lock-defaults
-        '(markdown-mode-font-lock-keywords-basic
-          nil nil nil nil
-          (font-lock-syntactic-face-function . markdown-syntactic-face)))
   ;; Wiki links
   (markdown-setup-wiki-link-hooks)
   ;; Math mode
@@ -9269,20 +9270,17 @@ spaces, or alternatively a TAB should be used as the separator."
 (defvar gfm-mode-hook nil
   "Hook run when entering GFM mode.")
 
-(defvar gfm-font-lock-keywords
-  ;; Basic Markdown features (excluding possibly overridden ones)
-  markdown-mode-font-lock-keywords-basic
-  "Default highlighting expressions for GitHub Flavored Markdown mode.")
-
 ;;;###autoload
 (define-derived-mode gfm-mode markdown-mode "GFM"
   "Major mode for editing GitHub Flavored Markdown files."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
-  (setq-local font-lock-defaults '(gfm-font-lock-keywords))
   (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
-  ;; do the initial link fontification
   (markdown-gfm-parse-buffer-for-languages))
+
+(define-obsolete-variable-alias
+ 'gfm-font-lock-keywords
+ 'markdown-mode-font-lock-keywords "v2.4")
 
 
 ;;; Live Preview Mode  ============================================

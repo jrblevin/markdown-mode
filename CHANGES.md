@@ -4,6 +4,12 @@
 
 *   **Breaking changes:**
 
+    -   Internal variables `markdown-font-lock-keywords-basic` and
+        `gfm-font-lock-keywords` are now obsolete.
+        `markdown-font-lock-keywords` is now used instead, but users
+        should use `font-lock-add-keywords` instead of modifying this
+        variable.
+
 *   New features:
 
     -   GFM task list item (checkbox) insertion with `C-c C-s [`, or
