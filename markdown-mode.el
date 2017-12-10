@@ -58,11 +58,6 @@
 (defconst markdown-output-buffer-name "*markdown-output*"
   "Name of temporary buffer for markdown command output.")
 
-(defconst markdown-sub-superscript-display
-  '(((raise -0.3) (height 0.7))         ; subscript
-    ((raise 0.3) (height 0.7)))         ; superscript
-  "Parameters for sub- and superscript formatting.")
-
 
 ;;; Global Variables ==========================================================
 
