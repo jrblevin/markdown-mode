@@ -3247,9 +3247,10 @@ returns nil."
          (props (get-text-property posn prop)))
     (save-match-data
       (set-match-data props)
-      (and (match-beginning num) (match-end num)
-           (= (match-beginning num) begin)
-           (= (match-end num) end)))))
+      (should (match-beginning num))
+      (should (match-end num))
+      (should (= (match-beginning num) begin))
+      (should (= (match-end num) end)))))
 
 (ert-deftest test-markdown-parsing/syntax-with-adjacent-code-blocks ()
   "Test `markdown-syntax-propertize-fenced-code-blocks' with adjacent blocks."
@@ -3285,21 +3286,21 @@ echo \"Hello, world v2!\"
      (set-marker start-bottom-1 43)
      (set-marker end-bottom-1 46)
      ;; check top tildes
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 1 (marker-position start-top-1)
-              (marker-position end-top-1) (marker-position start-top-1)))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 1 (marker-position start-top-1)
+      (marker-position end-top-1) (marker-position start-top-1))
      ;; check top language specifier
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 3 (marker-position start-lang-1)
-              (marker-position end-lang-1) (marker-position start-lang-1)))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 3 (marker-position start-lang-1)
+      (marker-position end-lang-1) (marker-position start-lang-1))
      ;; check text in between
-     (should (markdown-test-check-match-limits
-              'markdown-fenced-code 0 (marker-position start-mid-1)
-              (marker-position end-mid-1) (marker-position start-mid-1)))
+     (markdown-test-check-match-limits
+      'markdown-fenced-code 0 (marker-position start-mid-1)
+      (marker-position end-mid-1) (marker-position start-mid-1))
      ;; check bottom tildes
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-end 1 (marker-position start-bottom-1)
-              (marker-position end-bottom-1) (marker-position start-bottom-1)))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-end 1 (marker-position start-bottom-1)
+      (marker-position end-bottom-1) (marker-position start-bottom-1))
      ;; Point between code blocks
      (set-marker between 47)
      (should (equal (get-text-property between 'markdown-fenced-code)
@@ -3313,18 +3314,18 @@ echo \"Hello, world v2!\"
      (set-marker end-mid-2 93)
      (set-marker start-bottom-2 93)
      (set-marker end-bottom-2 96)
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 1 (marker-position start-top-2)
-              (marker-position end-top-2) (marker-position start-top-2)))
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 3 (marker-position start-lang-2)
-              (marker-position end-lang-2) (marker-position start-lang-2)))
-     (should (markdown-test-check-match-limits
-              'markdown-fenced-code 0 (marker-position start-mid-2)
-              (marker-position end-mid-2) (marker-position start-mid-2)))
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-end 1 (marker-position start-bottom-2)
-              (marker-position end-bottom-2) (marker-position start-bottom-2)))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 1 (marker-position start-top-2)
+      (marker-position end-top-2) (marker-position start-top-2))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 3 (marker-position start-lang-2)
+      (marker-position end-lang-2) (marker-position start-lang-2))
+     (markdown-test-check-match-limits
+      'markdown-fenced-code 0 (marker-position start-mid-2)
+      (marker-position end-mid-2) (marker-position start-mid-2))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-end 1 (marker-position start-bottom-2)
+      (marker-position end-bottom-2) (marker-position start-bottom-2))
      ;; ;; Move point between code blocks and insert a character
      (goto-char between)
      (insert "x")
@@ -3332,35 +3333,35 @@ echo \"Hello, world v2!\"
      (let ((range (markdown-syntax-propertize-extend-region (1- between) (point-max))))
        (markdown-syntax-propertize (car range) (cdr range)))
      ;; Re-check first code block
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 1 (marker-position start-top-1)
-              (marker-position end-top-1) (marker-position start-top-1)))
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 3 (marker-position start-lang-1)
-              (marker-position end-lang-1) (marker-position start-lang-1)))
-     (should (markdown-test-check-match-limits
-              'markdown-fenced-code 0 (marker-position start-mid-1)
-              (marker-position end-mid-1) (marker-position start-mid-1)))
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-end 1 (marker-position start-bottom-1)
-              (marker-position end-bottom-1) (marker-position start-bottom-1)))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 1 (marker-position start-top-1)
+      (marker-position end-top-1) (marker-position start-top-1))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 3 (marker-position start-lang-1)
+      (marker-position end-lang-1) (marker-position start-lang-1))
+     (markdown-test-check-match-limits
+      'markdown-fenced-code 0 (marker-position start-mid-1)
+      (marker-position end-mid-1) (marker-position start-mid-1))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-end 1 (marker-position start-bottom-1)
+      (marker-position end-bottom-1) (marker-position start-bottom-1))
      ;; Re-check point between code blocks
      (should (equal (get-text-property between 'markdown-fenced-code)
                     nil))
      ;; Re-check second code block
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 1 (marker-position start-top-2)
-              (marker-position end-top-2) (marker-position start-top-2)))
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-begin 3 (marker-position start-lang-2)
-              (marker-position end-lang-2) (marker-position start-lang-2)))
-     (should (markdown-test-check-match-limits
-              'markdown-fenced-code 0 (marker-position start-mid-2)
-              (marker-position end-mid-2) (marker-position start-mid-2)))
-     (should (markdown-test-check-match-limits
-              'markdown-tilde-fence-end 1 (marker-position start-bottom-2)
-              (marker-position end-bottom-2)
-              (marker-position start-bottom-2))))))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 1 (marker-position start-top-2)
+      (marker-position end-top-2) (marker-position start-top-2))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-begin 3 (marker-position start-lang-2)
+      (marker-position end-lang-2) (marker-position start-lang-2))
+     (markdown-test-check-match-limits
+      'markdown-fenced-code 0 (marker-position start-mid-2)
+      (marker-position end-mid-2) (marker-position start-mid-2))
+     (markdown-test-check-match-limits
+      'markdown-tilde-fence-end 1 (marker-position start-bottom-2)
+      (marker-position end-bottom-2)
+      (marker-position start-bottom-2)))))
 
 (ert-deftest test-markdown-parsing/propertize-fenced-in-between ()
   "Test whether `markdown-syntax-propertize-fenced-block-constructs' handles the
@@ -3378,11 +3379,9 @@ echo \"Hello, world!\"
     (markdown-syntax-propertize-fenced-block-constructs (point-min) 21)
     ;; ~~~ shell should be propertized, but nothing else
     ;; check tildes
-    (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-begin 1 1 4 1))
+    (markdown-test-check-match-limits 'markdown-tilde-fence-begin 1 1 4 1)
     ;; check language
-    (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-begin 3 5 10 5))
+    (markdown-test-check-match-limits 'markdown-tilde-fence-begin 3 5 10 5)
     ;; middle should not be propertized
     (should-not (get-text-property 11 'markdown-fenced-code))
     ;; neither should end
@@ -3390,15 +3389,12 @@ echo \"Hello, world!\"
     (markdown-syntax-propertize-fenced-block-constructs 21 (point-max))
     ;; everything should be propertized now
     ;; re-check top
-    (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-begin 1 1 4 1))
-    (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-begin 3 5 10 5))
+    (markdown-test-check-match-limits 'markdown-tilde-fence-begin 1 1 4 1)
+    (markdown-test-check-match-limits 'markdown-tilde-fence-begin 3 5 10 5)
     ;; check middle
-    (should (markdown-test-check-match-limits 'markdown-fenced-code 0 10 43 10))
+    (markdown-test-check-match-limits 'markdown-fenced-code 0 10 43 10)
     ;; check ending tildes
-    (should (markdown-test-check-match-limits
-             'markdown-tilde-fence-end 1 43 46 43))))
+    (markdown-test-check-match-limits 'markdown-tilde-fence-end 1 43 46 43)))
 
 (ert-deftest test-markdown-parsing/get-code-block-at-pos ()
   "Test whether `markdown-code-block-at-pos' works in all situations. All
