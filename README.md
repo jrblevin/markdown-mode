@@ -574,6 +574,20 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     correctly when calculating column widths, however, columns
     containing hidden markup may not always be aligned properly.
 
+  * Viewing Modes:
+
+    Read-only viewing modes, `markdown-view-mode` and `gfm-view-mode`
+    are provided for viewing Markdown content.  These modes provide
+    simplified keybindings for navigating the buffer.  Many of these
+    are like `help-mode` and `view-mode`, such as <kbd>SPC</kbd>,
+    <kbd>DEL</kbd>, <kbd><</kbd>, and <kbd>></kbd> for scrolling,
+    <kbd>q</kbd> for quitting, and <kbd>?</kbd> or <kbd>h</kbd> for
+    help.  Other keys are provided that mirror the outline navigation
+    commands when editing: <kbd>n</kbd>, <kbd>p</kbd>, <kbd>f</kbd>,
+    <kbd>b</kbd>, and <kbd>u</kbd>.  Both of these modes enable markup
+    hiding by default, bit this can be customized by setting
+    `markdown-hide-markup-in-view-modes`.
+
   * Miscellaneous Commands:
 
     When the [`edit-indirect`][ei] package is installed, <kbd>C-c '</kbd>

@@ -3001,7 +3001,7 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
 
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
-  (let ((regex (if (eq major-mode 'gfm-mode)
+  (let ((regex (if (memq major-mode '(gfm-mode gfm-view-mode))
                    markdown-regex-gfm-italic markdown-regex-italic)))
     (when (markdown-match-inline-generic regex last)
       (let ((begin (match-beginning 1))
@@ -7658,7 +7658,7 @@ in parent directories if
 `markdown-wiki-link-search-parent-directories' is non-nil."
   (let* ((basename (markdown-replace-regexp-in-string
                     "[[:space:]\n]" markdown-link-space-sub-char name))
-         (basename (if (eq major-mode 'gfm-mode)
+         (basename (if (eq major-mode '(gfm-mode gfm-view-mode))
                        (concat (upcase (substring basename 0 1))
                                (downcase (substring basename 1 nil)))
                      basename))
@@ -7984,7 +7984,8 @@ or span."
 (defun markdown-reload-extensions ()
   "Check settings, update font-lock keywords and hooks, and re-fontify buffer."
   (interactive)
-  (when (member major-mode '(markdown-mode gfm-mode))
+  (when (member major-mode
+                '(markdown-mode markdown-view-mode gfm-mode gfm-view-mode))
     ;; Refontify buffer
     (if (eval-when-compile (fboundp 'font-lock-flush))
         ;; Use font-lock-flush in Emacs >= 25.1
@@ -9316,6 +9317,45 @@ spaces, or alternatively a TAB should be used as the separator."
 (define-obsolete-variable-alias
  'gfm-font-lock-keywords
  'markdown-mode-font-lock-keywords "v2.4")
+
+
+;;; Viewing modes
+
+(defcustom markdown-hide-markup-in-view-modes t
+  "Enable hidden markup mode in `markdown-view-mode' and `gfm-view-mode'."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp)
+
+(defvar markdown-view-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "p") #'markdown-outline-previous)
+    (define-key map (kbd "n") #'markdown-outline-next)
+    (define-key map (kbd "f") #'markdown-outline-next-same-level)
+    (define-key map (kbd "b") #'markdown-outline-previous-same-level)
+    (define-key map (kbd "u") #'markdown-outline-up)
+    (define-key map (kbd "DEL") #'scroll-down-command)
+    (define-key map (kbd "SPC") #'scroll-up-command)
+    (define-key map (kbd ">") #'end-of-buffer)
+    (define-key map (kbd "<") #'beginning-of-buffer)
+    (define-key map (kbd "q") #'kill-this-buffer)
+    (define-key map (kbd "?") #'describe-mode)
+    map)
+  "Keymap for `markdown-view-mode'.")
+
+(define-derived-mode markdown-view-mode markdown-mode "Markdown-View"
+  "Major mode for viewing Markdown content."
+  (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
+  (read-only-mode 1))
+
+(defvar gfm-view-mode-map
+  markdown-view-mode-map
+  "Keymap for `gfm-view-mode'.")
+
+(define-derived-mode gfm-view-mode gfm-mode "GFM-View"
+  "Major mode for viewing GitHub Flavored Markdown content."
+  (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
+  (read-only-mode 1))
 
 
 ;;; Live Preview Mode  ============================================

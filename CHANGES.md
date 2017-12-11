@@ -33,6 +33,9 @@
         `markdown-html-entity-face`.
     -   Scale down large inline images using `markdown-max-image-size`,
         a cons cell of the form `(max-width . max-height)`.
+    -   Added read-only viewing modes `markdown-view-mode` and
+        `gfm-view-mode` with keymaps similar to `view-mode` and
+        `help-mode`.  ([GH-296][])
 
 *   Improvements:
 
@@ -120,6 +123,7 @@
   [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
   [gh-277]: https://github.com/jrblevin/markdown-mode/pull/277
   [gh-284]: https://github.com/jrblevin/markdown-mode/issues/284
+  [gh-296]: https://github.com/jrblevin/markdown-mode/issues/296
 
 # Markdown Mode 2.3
 
