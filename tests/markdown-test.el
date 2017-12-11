@@ -5460,6 +5460,30 @@ See GH-288."
     (markdown-test-range-has-face 24 26 'markdown-pre-face)
     (markdown-test-range-has-face 28 30 'markdown-markup-face)))
 
+;;; Extension: GFM simplified tables
+
+(ert-deftest test-markdown-gfm/false-table-first-line ()
+  "Test beginning of table detection at beginning of buffer.
+Based on GH-298."
+  (markdown-test-string
+   "[|"
+   (should-not (gfm--table-at-point-p))))
+
+(ert-deftest test-markdown-gfm/true-table-first-line ()
+  "Test beginning of table detection at beginning of buffer."
+  (markdown-test-string
+   "[|
+-|-
+x|"
+   (dotimes (x 3)
+     (should (gfm--table-at-point-p))
+     (forward-line))))
+
+(ert-deftest test-markdown-gfm/table-begin-top-of-file ()
+  "Test beginning of table detection at top of file."
+  (markdown-test-string "[|"
+    (should-not (gfm--table-at-point-p))))
+
 ;;; Tests for other extensions:
 
 (ert-deftest test-markdown-ext/pandoc-fancy-lists ()
