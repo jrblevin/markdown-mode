@@ -585,7 +585,7 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     help.  Other keys are provided that mirror the outline navigation
     commands when editing: <kbd>n</kbd>, <kbd>p</kbd>, <kbd>f</kbd>,
     <kbd>b</kbd>, and <kbd>u</kbd>.  Both of these modes enable markup
-    hiding by default, bit this can be customized by setting
+    hiding by default, but this can be customized by setting
     `markdown-hide-markup-in-view-modes`.
 
   * Miscellaneous Commands:
