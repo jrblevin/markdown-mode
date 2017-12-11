@@ -8549,8 +8549,11 @@ tables and gfm tables which are less strict about the markup.")
               ;; go up to find the header
               (catch 'done
                 (while (looking-at-p gfm-table-line-regexp)
-                  (when (looking-at-p gfm-table-hline-regexp)
+                  (cond
+                   ((looking-at-p gfm-table-hline-regexp)
                     (throw 'done t))
+                   ((bobp)
+                    (throw 'done nil)))
                   (forward-line -1))
                 nil))))))
 
