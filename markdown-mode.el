@@ -1784,6 +1784,39 @@ See `markdown-hide-markup' for additional details."
 (defvar markdown-markup-face 'markdown-markup-face
   "Face name to use for markup elements.")
 
+(make-obsolete-variable 'markdown-italic-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-bold-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-strike-through-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-delimiter-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-rule-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face-1 "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face-2 "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face-3 "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face-4 "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face-5 "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-header-face-6 "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-inline-code-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-list-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-blockquote-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-pre-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-language-keyword-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-language-info-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-link-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-missing-link-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-reference-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-footnote-marker-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-url-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-link-title-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-line-break-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-comment-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-math-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-metadata-key-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-metadata-value-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-gfm-checkbox-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-highlight-face "Use face name directly" "v2.4")
+(make-obsolete-variable 'markdown-markup-face "Use face name directly" "v2.4")
+
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
   :group 'markdown
@@ -2087,20 +2120,20 @@ Depending on your font, some reasonable choices are:
                                                (5 markdown-markup-properties nil t)))
     (markdown-match-fenced-end-code-block . ((0 markdown-markup-properties)))
     (markdown-fontify-fenced-code-blocks)
-    (markdown-match-pre-blocks . ((0 markdown-pre-face)))
+    (markdown-match-pre-blocks . ((0 'markdown-pre-face)))
     (markdown-fontify-headings)
-    (markdown-match-declarative-metadata . ((1 markdown-metadata-key-face)
-                                              (2 markdown-markup-face)
-                                              (3 markdown-metadata-value-face)))
-    (markdown-match-pandoc-metadata . ((1 markdown-markup-face)
-                                       (2 markdown-markup-face)
-                                       (3 markdown-metadata-value-face)))
+    (markdown-match-declarative-metadata . ((1 'markdown-metadata-key-face)
+                                              (2 'markdown-markup-face)
+                                              (3 'markdown-metadata-value-face)))
+    (markdown-match-pandoc-metadata . ((1 'markdown-markup-face)
+                                       (2 'markdown-markup-face)
+                                       (3 'markdown-metadata-value-face)))
     (markdown-fontify-hrs)
     (markdown-match-code . ((1 markdown-markup-properties prepend)
-                            (2 markdown-inline-code-face prepend)
+                            (2 'markdown-inline-code-face prepend)
                             (3 markdown-markup-properties prepend)))
     (,markdown-regex-kbd . ((1 markdown-markup-properties)
-                            (2 markdown-inline-code-face)
+                            (2 'markdown-inline-code-face)
                             (3 markdown-markup-properties)))
     (markdown-fontify-angle-uris)
     (,markdown-regex-email . 'markdown-plain-url-face)
@@ -2135,40 +2168,40 @@ Depending on your font, some reasonable choices are:
                                 (7 markdown-markup-properties)))
     (markdown-fontify-inline-links)
     (markdown-fontify-reference-links)
-    (,markdown-regex-reference-definition . ((1 markdown-markup-face) ; [
-                                             (2 markdown-reference-face) ; label
-                                             (3 markdown-markup-face)    ; ]
-                                             (4 markdown-markup-face)    ; :
-                                             (5 markdown-url-face)       ; url
-                                             (6 markdown-link-title-face))) ; "title" (optional)
+    (,markdown-regex-reference-definition . ((1 'markdown-markup-face) ; [
+                                             (2 'markdown-reference-face) ; label
+                                             (3 'markdown-markup-face)    ; ]
+                                             (4 'markdown-markup-face)    ; :
+                                             (5 'markdown-url-face)       ; url
+                                             (6 'markdown-link-title-face))) ; "title" (optional)
     (markdown-fontify-plain-uris)
     ;; Math mode $..$
-    (markdown-match-math-single . ((1 markdown-markup-face prepend)
-                                   (2 markdown-math-face append)
-                                   (3 markdown-markup-face prepend)))
+    (markdown-match-math-single . ((1 'markdown-markup-face prepend)
+                                   (2 'markdown-math-face append)
+                                   (3 'markdown-markup-face prepend)))
     ;; Math mode $$..$$
-    (markdown-match-math-double . ((1 markdown-markup-face prepend)
-                                   (2 markdown-math-face append)
-                                   (3 markdown-markup-face prepend)))
+    (markdown-match-math-double . ((1 'markdown-markup-face prepend)
+                                   (2 'markdown-math-face append)
+                                   (3 'markdown-markup-face prepend)))
     ;; Math mode \[..\] and \\[..\\]
-    (markdown-match-math-display . ((1 markdown-markup-face prepend)
-                                    (3 markdown-math-face append)
-                                    (4 markdown-markup-face prepend)))
+    (markdown-match-math-display . ((1 'markdown-markup-face prepend)
+                                    (3 'markdown-math-face append)
+                                    (4 'markdown-markup-face prepend)))
     (markdown-match-bold . ((1 markdown-markup-properties prepend)
-                            (2 markdown-bold-face append)
+                            (2 'markdown-bold-face append)
                             (3 markdown-markup-properties prepend)))
     (markdown-match-italic . ((1 markdown-markup-properties prepend)
-                              (2 markdown-italic-face append)
+                              (2 'markdown-italic-face append)
                               (3 markdown-markup-properties prepend)))
     (,markdown-regex-strike-through . ((3 markdown-markup-properties)
-                                       (4 markdown-strike-through-face)
+                                       (4 'markdown-strike-through-face)
                                        (5 markdown-markup-properties)))
-    (,markdown-regex-line-break . (1 markdown-line-break-face prepend))
+    (,markdown-regex-line-break . (1 'markdown-line-break-face prepend))
     (markdown-fontify-sub-superscripts)
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
     (markdown-fontify-blockquotes)
-    (markdown-match-wiki-link . ((0 markdown-link-face prepend))))
+    (markdown-match-wiki-link . ((0 'markdown-link-face prepend))))
   "Syntax highlighting for Markdown files.")
 
 (define-obsolete-variable-alias
@@ -3001,8 +3034,8 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
     (let ((begin (match-beginning 1)) (end (match-end 1)))
       (prog1
           (if (or (markdown-range-property-any
-                   begin end 'face (list markdown-inline-code-face
-                                         markdown-bold-face))
+                   begin end 'face
+                   '(markdown-inline-code-face markdown-bold-face))
                   (markdown-range-properties-exist
                    begin end
                    (markdown-get-fenced-block-middle-properties)))
@@ -7469,7 +7502,7 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
-                     'face markdown-link-face
+                     'face 'markdown-link-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (if title (concat title "\n" url) url)))
@@ -7509,7 +7542,7 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
-                     'face markdown-link-face
+                     'face 'markdown-link-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (lambda (_ __ pos)
@@ -7707,9 +7740,9 @@ and highlight accordingly."
                 (markdown-wiki-link-link))))
           (if (condition-case nil (file-exists-p file-name) (error nil))
               (markdown-highlight-wiki-link
-               highlight-beginning highlight-end markdown-link-face)
+               highlight-beginning highlight-end 'markdown-link-face)
             (markdown-highlight-wiki-link
-             highlight-beginning highlight-end markdown-missing-link-face)))))))
+             highlight-beginning highlight-end 'markdown-missing-link-face)))))))
 
 (defun markdown-extend-changed-region (from to)
   "Extend region given by FROM and TO so that we can fontify all links.
@@ -7751,8 +7784,7 @@ newline after."
                 ;; wiki link face or if the wiki link regexp matches.
                 (when (or (markdown-range-property-any
                            new-from new-to 'font-lock-face
-                           (list markdown-link-face
-                                 markdown-missing-link-face))
+                           '(markdown-link-face markdown-missing-link-face))
                           (re-search-forward
                            markdown-regex-wiki-link new-to t))
                   ;; Unfontify existing fontification (start from scratch)

@@ -2025,9 +2025,9 @@ See GH-245."
                       ;; Check face of char before leading asterisk
                       (markdown-test-range-has-face 8 8 nil)
                       ;; Check face of italic range
-                      (markdown-test-range-has-face 9 9 markdown-markup-face)
-                      (markdown-test-range-has-face 10 16 markdown-italic-face)
-                      (markdown-test-range-has-face 17 17 markdown-markup-face)
+                      (markdown-test-range-has-face 9 9 'markdown-markup-face)
+                      (markdown-test-range-has-face 10 16 'markdown-italic-face)
+                      (markdown-test-range-has-face 17 17 'markdown-markup-face)
                       ;; Check face of point past leading asterisk
                       (markdown-test-range-has-face 18 18 nil)))
 
@@ -2048,17 +2048,17 @@ See GH-245."
   (markdown-test-string
    "italic *\\**"
    (markdown-test-range-has-face 1 7 nil)
-   (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 9 10 markdown-italic-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)))
+   (markdown-test-range-has-face 8 8 'markdown-markup-face)
+   (markdown-test-range-has-face 9 10 'markdown-italic-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-5 ()
   "Test italic single letter."
   (markdown-test-string
    "*a*"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 2 markdown-italic-face)
-   (markdown-test-range-has-face 3 3 markdown-markup-face)))
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 2 'markdown-italic-face)
+   (markdown-test-range-has-face 3 3 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-6 ()
   "Test multiline italics across list items."
@@ -2097,92 +2097,92 @@ See GH-245."
   "Underscores in URLs should not trigger italics."
   (markdown-test-string
    "[1]: http://jblevins.org/research/centroid/cd_z_path.m"
-   (markdown-test-range-face-equals 6 54 markdown-url-face)))
+   (markdown-test-range-face-equals 6 54 'markdown-url-face)))
 
 (ert-deftest test-markdown-font-lock/italics-12 ()
   "Underscores in URLs should not trigger italics."
   (markdown-test-string
    "[cd\\_z\\_path.m](http://jblevins.org/research/centroid/cd_z_path.m)"
-   (markdown-test-range-face-equals 17 65 markdown-url-face)))
+   (markdown-test-range-face-equals 17 65 'markdown-url-face)))
 
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n*italic*\n"
                         (markdown-test-range-has-face 1 5 'markdown-hr-face)
-                        (markdown-test-range-has-face 8 8 markdown-markup-face)
-                        (markdown-test-range-has-face 9 14 markdown-italic-face)
-                        (markdown-test-range-has-face 15 15 markdown-markup-face)))
+                        (markdown-test-range-has-face 8 8 'markdown-markup-face)
+                        (markdown-test-range-has-face 9 14 'markdown-italic-face)
+                        (markdown-test-range-has-face 15 15 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-in-heading ()
   "Test italic overlay in a heading."
   (markdown-test-string
    "# *Italics* in a Heading"
-   (markdown-test-range-has-face 3 3 markdown-markup-face)
-   (markdown-test-range-has-face 4 10 markdown-italic-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)))
+   (markdown-test-range-has-face 3 3 'markdown-markup-face)
+   (markdown-test-range-has-face 4 10 'markdown-italic-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-link ()
   "Test italic overlay in an inline link."
   (markdown-test-string
    "*[italic link](http://www.link.com/)*"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 36 markdown-italic-face)
-   (markdown-test-range-has-face 37 37 markdown-markup-face))
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 36 'markdown-italic-face)
+   (markdown-test-range-has-face 37 37 'markdown-markup-face))
   (markdown-test-string
    "[*italic link*](http://www.link.com/)"
-   (markdown-test-range-has-face 2 2 markdown-markup-face)
-   (markdown-test-range-has-face 3 13 markdown-italic-face)
-   (markdown-test-range-has-face 14 14 markdown-markup-face)))
+   (markdown-test-range-has-face 2 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 13 'markdown-italic-face)
+   (markdown-test-range-has-face 14 14 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-in-blockquote ()
   "Test italics overlay in a blockquote."
   (markdown-test-string
    "> *italics* inside a blockquote"
-   (markdown-test-range-has-face 3 3 markdown-markup-face)
-   (markdown-test-range-has-face 4 10 markdown-italic-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)))
+   (markdown-test-range-has-face 3 3 'markdown-markup-face)
+   (markdown-test-range-has-face 4 10 'markdown-italic-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-in-pre ()
   "Test italics overlay in a blockquote."
   (markdown-test-string
    "    *italics* inside a pre block"
    (markdown-test-range-has-face (point-min) (1- (point-max))
-                                 markdown-pre-face)))
+                                 'markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/italics-and-code ()
   "Test seeming italics mixed with code."
   (markdown-test-string
    "define `var_1` and `var_2` inline code"
-   (markdown-test-range-has-face 9 13 markdown-inline-code-face)
-   (markdown-test-range-has-face 21 25 markdown-inline-code-face))
+   (markdown-test-range-has-face 9 13 'markdown-inline-code-face)
+   (markdown-test-range-has-face 21 25 'markdown-inline-code-face))
   (markdown-test-string
    "`var_1` and var_2"
-   (markdown-test-range-has-face 2 6 markdown-inline-code-face)
+   (markdown-test-range-has-face 2 6 'markdown-inline-code-face)
    (markdown-test-range-has-face 8 17 nil))
   (markdown-test-string
    "var_1 and `var_2`"
    (markdown-test-range-has-face 1 10 nil)
-   (markdown-test-range-has-face 12 16 markdown-inline-code-face)))
+   (markdown-test-range-has-face 12 16 'markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/code-in-italics ()
   "Test inline code inside italics.
 See GH-275."
   (markdown-test-string
    "*text `code` text*"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 17 markdown-italic-face)
-   (markdown-test-range-has-face 7 7 markdown-markup-face)
-   (markdown-test-range-has-face 8 11 markdown-inline-code-face)
-   (markdown-test-range-has-face 12 12 markdown-markup-face)
-   (markdown-test-range-has-face 18 18 markdown-markup-face)))
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 17 'markdown-italic-face)
+   (markdown-test-range-has-face 7 7 'markdown-markup-face)
+   (markdown-test-range-has-face 8 11 'markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 'markdown-markup-face)
+   (markdown-test-range-has-face 18 18 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/italics-in-reference-definitions ()
   "Test not matching italics in reference definitions across lines."
   (markdown-test-string
    "[lg]: twilight_sm.png\n[sm]: twilight_lg.png"
-   (markdown-test-range-has-face 7 21 markdown-url-face)
+   (markdown-test-range-has-face 7 21 'markdown-url-face)
    (markdown-test-range-has-face 22 22 nil)
-   (markdown-test-range-has-face 29 43 markdown-url-face)
+   (markdown-test-range-has-face 29 43 'markdown-url-face)
    (markdown-test-range-has-face 28 28 nil)))
 
 (ert-deftest test-markdown-font-lock/italics-in-comment ()
@@ -2214,11 +2214,11 @@ See GH-223."
                       ;; Check face of char before leading asterisk
                       (markdown-test-range-has-face 26 26 nil)
                       ;; Check face of opening asterisks
-                      (markdown-test-range-has-face 27 28 markdown-markup-face)
+                      (markdown-test-range-has-face 27 28 'markdown-markup-face)
                       ;; Check face of bold range
-                      (markdown-test-range-has-face 29 33 markdown-bold-face)
+                      (markdown-test-range-has-face 29 33 'markdown-bold-face)
                       ;; Check face of closing asterisks
-                      (markdown-test-range-has-face 34 35 markdown-markup-face)
+                      (markdown-test-range-has-face 34 35 'markdown-markup-face)
                       ;; Check face of point past leading asterisk
                       (markdown-test-range-has-face 36 36 nil)))
 
@@ -2235,53 +2235,53 @@ See GH-223."
   (markdown-test-string
    "bold **\\***"
    (markdown-test-range-has-face 1 5 nil)
-   (markdown-test-range-has-face 6 7 markdown-markup-face)
-   (markdown-test-range-has-face 8 9 markdown-bold-face)
-   (markdown-test-range-has-face 10 11 markdown-markup-face)))
+   (markdown-test-range-has-face 6 7 'markdown-markup-face)
+   (markdown-test-range-has-face 8 9 'markdown-bold-face)
+   (markdown-test-range-has-face 10 11 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-4 ()
   "Test bold single letter."
   (markdown-test-string
    "**a**"
-   (markdown-test-range-has-face 1 2 markdown-markup-face)
-   (markdown-test-range-has-face 3 3 markdown-bold-face)
-   (markdown-test-range-has-face 4 5 markdown-markup-face)))
+   (markdown-test-range-has-face 1 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 3 'markdown-bold-face)
+   (markdown-test-range-has-face 4 5 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-after-hr ()
   "Test bold after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n**bold**\n"
    (markdown-test-range-has-face 1 5 'markdown-hr-face)
-   (markdown-test-range-has-face 8 9 markdown-markup-face)
-   (markdown-test-range-has-face 10 13 markdown-bold-face)
-   (markdown-test-range-has-face 14 15 markdown-markup-face)))
+   (markdown-test-range-has-face 8 9 'markdown-markup-face)
+   (markdown-test-range-has-face 10 13 'markdown-bold-face)
+   (markdown-test-range-has-face 14 15 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-link ()
   "Test bold overlay in an inline link."
   (markdown-test-string
    "**[bold link](http://www.link.com/)**"
-   (markdown-test-range-has-face 1 2 markdown-markup-face)
-   (markdown-test-range-has-face 3 35 markdown-bold-face)
-   (markdown-test-range-has-face 36 37 markdown-markup-face))
+   (markdown-test-range-has-face 1 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 35 'markdown-bold-face)
+   (markdown-test-range-has-face 36 37 'markdown-markup-face))
   (markdown-test-string
    "[**bold link**](http://www.link.com/)"
-   (markdown-test-range-has-face 2 3 markdown-markup-face)
-   (markdown-test-range-has-face 4 12 markdown-bold-face)
-   (markdown-test-range-has-face 13 14 markdown-markup-face)))
+   (markdown-test-range-has-face 2 3 'markdown-markup-face)
+   (markdown-test-range-has-face 4 12 'markdown-bold-face)
+   (markdown-test-range-has-face 13 14 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-in-blockquote ()
   "Test bold overlay in a blockquote."
   (markdown-test-string
    "> **bold** inside a blockquote"
-   (markdown-test-range-has-face 3 4 markdown-markup-face)
-   (markdown-test-range-has-face 5 8 markdown-bold-face)
-   (markdown-test-range-has-face 9 10 markdown-markup-face)))
+   (markdown-test-range-has-face 3 4 'markdown-markup-face)
+   (markdown-test-range-has-face 5 8 'markdown-bold-face)
+   (markdown-test-range-has-face 9 10 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-in-pre ()
   "Test bold overlay in a blockquote."
   (markdown-test-string
    "    **bold** inside a pre block"
    (markdown-test-range-has-face (point-min) (1- (point-max))
-                                 markdown-pre-face)))
+                                 'markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/no-bold-in-code ()
   "Bold markers in inline code should not trigger bold."
@@ -2302,12 +2302,12 @@ See GH-223."
   "Test inline code inside bold."
   (markdown-test-string
    "**text `code` text**"
-   (markdown-test-range-has-face 1 2 markdown-markup-face)
-   (markdown-test-range-has-face 3 18 markdown-bold-face)
-   (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 9 12 markdown-inline-code-face)
-   (markdown-test-range-has-face 13 13 markdown-markup-face)
-   (markdown-test-range-has-face 19 20 markdown-markup-face)))
+   (markdown-test-range-has-face 1 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 18 'markdown-bold-face)
+   (markdown-test-range-has-face 8 8 'markdown-markup-face)
+   (markdown-test-range-has-face 9 12 'markdown-inline-code-face)
+   (markdown-test-range-has-face 13 13 'markdown-markup-face)
+   (markdown-test-range-has-face 19 20 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/bold-in-comment ()
   "Test not matching bold in comments."
@@ -2329,95 +2329,95 @@ See GH-223."
    (goto-char 45)
    (should (looking-at "`"))
    ;; Regular code span
-   (markdown-test-range-has-face 45 45 markdown-markup-face)
-   (markdown-test-range-has-face 46 49 markdown-inline-code-face)
-   (markdown-test-range-has-face 50 50 markdown-markup-face)
+   (markdown-test-range-has-face 45 45 'markdown-markup-face)
+   (markdown-test-range-has-face 46 49 'markdown-inline-code-face)
+   (markdown-test-range-has-face 50 50 'markdown-markup-face)
    ;; Code containing backticks
-   (markdown-test-range-has-face 61 62 markdown-markup-face)
-   (markdown-test-range-has-face 63 87 markdown-inline-code-face)
-   (markdown-test-range-has-face 88 89 markdown-markup-face)
+   (markdown-test-range-has-face 61 62 'markdown-markup-face)
+   (markdown-test-range-has-face 63 87 'markdown-inline-code-face)
+   (markdown-test-range-has-face 88 89 'markdown-markup-face)
    ;; Seven backquotes in a row
    (markdown-test-range-has-face 119 125 nil)
    ;; Backquotes at beginning or end
-   (markdown-test-range-has-face 228 229 markdown-markup-face)
-   (markdown-test-range-has-face 230 237 markdown-inline-code-face)
-   (markdown-test-range-has-face 238 239 markdown-markup-face)
-   (markdown-test-range-has-face 341 342 markdown-markup-face)
-   (markdown-test-range-has-face 343 349 markdown-inline-code-face)
-   (markdown-test-range-has-face 350 351 markdown-markup-face)
+   (markdown-test-range-has-face 228 229 'markdown-markup-face)
+   (markdown-test-range-has-face 230 237 'markdown-inline-code-face)
+   (markdown-test-range-has-face 238 239 'markdown-markup-face)
+   (markdown-test-range-has-face 341 342 'markdown-markup-face)
+   (markdown-test-range-has-face 343 349 'markdown-inline-code-face)
+   (markdown-test-range-has-face 350 351 'markdown-markup-face)
    ;; Backslash as final character
-   (markdown-test-range-has-face 460 460 markdown-markup-face)
-   (markdown-test-range-has-face 461 467 markdown-inline-code-face)
-   (markdown-test-range-has-face 468 468 markdown-markup-face)
+   (markdown-test-range-has-face 460 460 'markdown-markup-face)
+   (markdown-test-range-has-face 461 467 'markdown-inline-code-face)
+   (markdown-test-range-has-face 468 468 'markdown-markup-face)
    ;; Escaping of leading backquotes
    (markdown-test-range-has-face 586 592 nil)
    (markdown-test-range-has-face 597 603 nil)
    ;; A code span crossing lines
    (markdown-test-range-has-face 652 656 nil)
-   (markdown-test-range-has-face 657 657 markdown-markup-face)
-   (markdown-test-range-has-face 658 665 markdown-inline-code-face)
-   (markdown-test-range-has-face 666 666 markdown-markup-face)
+   (markdown-test-range-has-face 657 657 'markdown-markup-face)
+   (markdown-test-range-has-face 658 665 'markdown-inline-code-face)
+   (markdown-test-range-has-face 666 666 'markdown-markup-face)
    ;; Three backquotes: same line, across lines, not across blocks
    (markdown-test-range-has-face 695 748 nil)
-   (markdown-test-range-has-face 749 750 markdown-markup-face)
-   (markdown-test-range-has-face 751 755 markdown-inline-code-face)
-   (markdown-test-range-has-face 756 757 markdown-markup-face)
+   (markdown-test-range-has-face 749 750 'markdown-markup-face)
+   (markdown-test-range-has-face 751 755 'markdown-inline-code-face)
+   (markdown-test-range-has-face 756 757 'markdown-markup-face)
    (markdown-test-range-has-face 758 805 nil)
-   (markdown-test-range-has-face 806 807 markdown-markup-face)
-   (markdown-test-range-has-face 808 812 markdown-inline-code-face)
-   (markdown-test-range-has-face 813 814 markdown-markup-face)
+   (markdown-test-range-has-face 806 807 'markdown-markup-face)
+   (markdown-test-range-has-face 808 812 'markdown-inline-code-face)
+   (markdown-test-range-has-face 813 814 'markdown-markup-face)
    (markdown-test-range-has-face 815 891 nil)
    ))
 
 (ert-deftest test-markdown-font-lock/code-2 ()
   "Multiple code spans in a row and on different lines."
   (markdown-test-string "`foo` `bar` `baz`"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 4 markdown-inline-code-face)
-   (markdown-test-range-has-face 5 5 markdown-markup-face)
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 4 'markdown-inline-code-face)
+   (markdown-test-range-has-face 5 5 'markdown-markup-face)
    (markdown-test-range-has-face 6 6 nil)
-   (markdown-test-range-has-face 7 7 markdown-markup-face)
-   (markdown-test-range-has-face 8 10 markdown-inline-code-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)
+   (markdown-test-range-has-face 7 7 'markdown-markup-face)
+   (markdown-test-range-has-face 8 10 'markdown-inline-code-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)
    (markdown-test-range-has-face 12 12 nil)
-   (markdown-test-range-has-face 13 13 markdown-markup-face)
-   (markdown-test-range-has-face 14 16 markdown-inline-code-face)
-   (markdown-test-range-has-face 17 17 markdown-markup-face))
+   (markdown-test-range-has-face 13 13 'markdown-markup-face)
+   (markdown-test-range-has-face 14 16 'markdown-inline-code-face)
+   (markdown-test-range-has-face 17 17 'markdown-markup-face))
   (markdown-test-string "`a`\n`b`\n`c`\n"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 2 markdown-inline-code-face)
-   (markdown-test-range-has-face 3 3 markdown-markup-face)
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 2 'markdown-inline-code-face)
+   (markdown-test-range-has-face 3 3 'markdown-markup-face)
    (markdown-test-range-has-face 4 4 nil)
-   (markdown-test-range-has-face 5 5 markdown-markup-face)
-   (markdown-test-range-has-face 6 6 markdown-inline-code-face)
-   (markdown-test-range-has-face 7 7 markdown-markup-face)
+   (markdown-test-range-has-face 5 5 'markdown-markup-face)
+   (markdown-test-range-has-face 6 6 'markdown-inline-code-face)
+   (markdown-test-range-has-face 7 7 'markdown-markup-face)
    (markdown-test-range-has-face 8 8 nil)
-   (markdown-test-range-has-face 9 9 markdown-markup-face)
-   (markdown-test-range-has-face 10 10 markdown-inline-code-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)
+   (markdown-test-range-has-face 9 9 'markdown-markup-face)
+   (markdown-test-range-has-face 10 10 'markdown-inline-code-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)
    (markdown-test-range-has-face 12 12 nil))
   (markdown-test-string "a`foo`b`bar`c`baz`d"
    (markdown-test-range-has-face 1 1 nil)
-   (markdown-test-range-has-face 2 2 markdown-markup-face)
-   (markdown-test-range-has-face 3 5 markdown-inline-code-face)
-   (markdown-test-range-has-face 6 6 markdown-markup-face)
+   (markdown-test-range-has-face 2 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 5 'markdown-inline-code-face)
+   (markdown-test-range-has-face 6 6 'markdown-markup-face)
    (markdown-test-range-has-face 7 7 nil)
-   (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 9 11 markdown-inline-code-face)
-   (markdown-test-range-has-face 12 12 markdown-markup-face)
+   (markdown-test-range-has-face 8 8 'markdown-markup-face)
+   (markdown-test-range-has-face 9 11 'markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 'markdown-markup-face)
    (markdown-test-range-has-face 13 13 nil)
-   (markdown-test-range-has-face 14 14 markdown-markup-face)
-   (markdown-test-range-has-face 15 17 markdown-inline-code-face)
-   (markdown-test-range-has-face 18 18 markdown-markup-face)
+   (markdown-test-range-has-face 14 14 'markdown-markup-face)
+   (markdown-test-range-has-face 15 17 'markdown-inline-code-face)
+   (markdown-test-range-has-face 18 18 'markdown-markup-face)
    (markdown-test-range-has-face 19 19 nil)))
 
 (ert-deftest test-markdown-font-lock/code-3 ()
   "Backslashes don't escape backticks inside of inline code strings."
   (markdown-test-string
    "`foo\\`bar`"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 5 markdown-inline-code-face)
-   (markdown-test-range-has-face 6 6 markdown-markup-face)
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 5 'markdown-inline-code-face)
+   (markdown-test-range-has-face 6 6 'markdown-markup-face)
    (markdown-test-range-has-face 7 10 nil)))
 
 (ert-deftest test-markdown-font-lock/code-link-precedence ()
@@ -2427,9 +2427,9 @@ Test currently fails because this case isn't handled properly."
   (markdown-test-string
    "[not a `link](/foo`)"
    (markdown-test-range-has-face 1 7 nil)
-   (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 9 18 markdown-inline-code-face)
-   (markdown-test-range-has-face 19 19 markdown-markup-face)
+   (markdown-test-range-has-face 8 8 'markdown-markup-face)
+   (markdown-test-range-has-face 9 18 'markdown-inline-code-face)
+   (markdown-test-range-has-face 19 19 'markdown-markup-face)
    (markdown-test-range-has-face 20 20 nil)))
 
 (ert-deftest test-markdown-font-lock/code-in-comment ()
@@ -2442,14 +2442,14 @@ Test currently fails because this case isn't handled properly."
 (ert-deftest test-markdown-font-lock/kbd ()
   "Test font lock for <kbd> tags."
   (markdown-test-string "<kbd>C-c <</kbd>"
-   (markdown-test-range-has-face 1 5 markdown-markup-face)
-   (markdown-test-range-has-face 6 10 markdown-inline-code-face)
-   (markdown-test-range-has-face 11 16 markdown-markup-face))
+   (markdown-test-range-has-face 1 5 'markdown-markup-face)
+   (markdown-test-range-has-face 6 10 'markdown-inline-code-face)
+   (markdown-test-range-has-face 11 16 'markdown-markup-face))
   (markdown-test-string "To quit Emacs, press <kbd>C-x C-c</kbd>."
    (markdown-test-range-has-face 1 21 nil)
-   (markdown-test-range-has-face 22 26 markdown-markup-face)
-   (markdown-test-range-has-face 27 33 markdown-inline-code-face)
-   (markdown-test-range-has-face 34 39 markdown-markup-face)
+   (markdown-test-range-has-face 22 26 'markdown-markup-face)
+   (markdown-test-range-has-face 27 33 'markdown-inline-code-face)
+   (markdown-test-range-has-face 34 39 'markdown-markup-face)
    (markdown-test-range-has-face 40 40 nil)))
 
 (ert-deftest test-markdown-font-lock/lists-1 ()
@@ -2459,7 +2459,7 @@ Test currently fails because this case isn't handled properly."
                       2762 2853 3097 3188 3700 3903 4009))
      (goto-char loc)
      (should (looking-at "[*+-]"))
-     (markdown-test-range-has-face loc loc markdown-list-face))))
+     (markdown-test-range-has-face loc loc 'markdown-list-face))))
 
 (ert-deftest test-markdown-font-lock/definition-list ()
   "A simple definition list marker font lock test."
@@ -2472,23 +2472,23 @@ Test currently fails because this case isn't handled properly."
   "Nested list and pre block font lock test."
   (markdown-test-file "nested-list.text"
     (dolist (loc (list 4 29 194 224 491 525))
-      (markdown-test-range-has-face loc loc markdown-list-face))
+      (markdown-test-range-has-face loc loc 'markdown-list-face))
     (markdown-test-range-has-face 6 25 nil)
     (markdown-test-range-has-face 31 83 nil)
-    (markdown-test-range-has-face 85 154 markdown-pre-face)
+    (markdown-test-range-has-face 85 154 'markdown-pre-face)
     (markdown-test-range-has-face 157 189 nil)
     (markdown-test-range-has-face 196 215 nil)
     (markdown-test-range-has-face 226 403 nil)
-    (markdown-test-range-has-face 405 481 markdown-pre-face)
+    (markdown-test-range-has-face 405 481 'markdown-pre-face)
     (markdown-test-range-has-face 493 512 nil)
     (markdown-test-range-has-face 527 546 nil)
-    (markdown-test-range-has-face 548 580 markdown-pre-face)))
+    (markdown-test-range-has-face 548 580 'markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/pre-2 ()
   (markdown-test-string "* item\n\nreset baseline\n\n    pre block\n"
-   (markdown-test-range-has-face 1 1 markdown-list-face)
+   (markdown-test-range-has-face 1 1 'markdown-list-face)
    (markdown-test-range-has-face 2 23 nil)
-   (markdown-test-range-has-face 29 37 markdown-pre-face)))
+   (markdown-test-range-has-face 29 37 'markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/pre-3 ()
   (markdown-test-string "It is interesting to see what happens when one queries
@@ -2520,9 +2520,9 @@ if (y)
 ~~~
 "
    (markdown-test-range-has-face 1 19 nil)
-   (markdown-test-range-has-face 20 22 markdown-markup-face)
-   (markdown-test-range-has-face 24 59 markdown-pre-face)
-   (markdown-test-range-has-face 61 63 markdown-markup-face)))
+   (markdown-test-range-has-face 20 22 'markdown-markup-face)
+   (markdown-test-range-has-face 24 59 'markdown-pre-face)
+   (markdown-test-range-has-face 61 63 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-1 ()
   "Test GFM-style fenced code blocks (1)."
@@ -2532,8 +2532,8 @@ require 'redcarpet'
 markdown = Redcarpet.new('Hello World!')
 puts markdown.to_html
 ```"
-      (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
-      (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
+      (markdown-test-range-has-face 1 3 'markdown-markup-face) ; ```
+      (markdown-test-range-has-face 4 7 'markdown-language-keyword-face) ; ruby
       (markdown-test-range-has-face 9 90 'markdown-code-face) ; entire code block
       (unless (version< emacs-version "24.4")
         (markdown-test-range-has-face 9 15 'font-lock-builtin-face)) ; require
@@ -2541,18 +2541,18 @@ puts markdown.to_html
       (markdown-test-range-has-face 40 48 'font-lock-type-face) ; Redcarpet
       (unless (version< emacs-version "24.4")
         (markdown-test-range-has-face 70 72 'font-lock-builtin-face)) ; puts
-      (markdown-test-range-has-face 92 94 markdown-markup-face)))) ; ```
+      (markdown-test-range-has-face 92 94 'markdown-markup-face)))) ; ```
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-2 ()
   "Test GFM-style fenced code blocks (2)."
   (markdown-test-string "```{r sum}\n2+2\n```"
-   (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
-   (markdown-test-range-has-face 4 4 markdown-markup-face) ; {
-   (markdown-test-range-has-face 5 5 markdown-language-keyword-face) ; r
-   (markdown-test-range-has-face 7 9 markdown-language-info-face) ; sum
-   (markdown-test-range-has-face 10 10 markdown-markup-face) ; }
-   (markdown-test-range-has-face 12 14 markdown-pre-face) ; 2+2
-   (markdown-test-range-has-face 16 18 markdown-markup-face))) ; ```
+   (markdown-test-range-has-face 1 3 'markdown-markup-face) ; ```
+   (markdown-test-range-has-face 4 4 'markdown-markup-face) ; {
+   (markdown-test-range-has-face 5 5 'markdown-language-keyword-face) ; r
+   (markdown-test-range-has-face 7 9 'markdown-language-info-face) ; sum
+   (markdown-test-range-has-face 10 10 'markdown-markup-face) ; }
+   (markdown-test-range-has-face 12 14 'markdown-pre-face) ; 2+2
+   (markdown-test-range-has-face 16 18 'markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-3 ()
   "GFM-style code blocks need not be preceded by a blank line."
@@ -2563,19 +2563,19 @@ for (var i = 0; i < 10; i++) {
 }
 ```"
     (markdown-test-range-has-face 1 10 nil) ; Paragraph
-    (markdown-test-range-has-face 11 13 markdown-markup-face) ; ```
-    (markdown-test-range-has-face 14 15 markdown-language-keyword-face) ; js
-    (markdown-test-range-has-face 17 68 markdown-pre-face)
-    (markdown-test-range-has-face 70 72 markdown-markup-face)))
+    (markdown-test-range-has-face 11 13 'markdown-markup-face) ; ```
+    (markdown-test-range-has-face 14 15 'markdown-language-keyword-face) ; js
+    (markdown-test-range-has-face 17 68 'markdown-pre-face)
+    (markdown-test-range-has-face 70 72 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/gfm-fenced-4 ()
   "Test GFM-style fenced code blocks (2)."
   (markdown-test-string "```scalaFiddle libraries=\"Java8 Time-0.1.0\"\nimport java.time._\n\nval hour = LocalTime.now().getHour()\n\nprintln(hour)\n```"
-   (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
-   (markdown-test-range-has-face 4 14 markdown-language-keyword-face) ; scalaFiddle
-   (markdown-test-range-has-face 16 43 markdown-language-info-face) ; libraries="Java8 Time-0.1.0"
-   (markdown-test-range-has-face 45 115 markdown-pre-face) ; [code]
-   (markdown-test-range-has-face 117 119 markdown-markup-face))) ; ```
+   (markdown-test-range-has-face 1 3 'markdown-markup-face) ; ```
+   (markdown-test-range-has-face 4 14 'markdown-language-keyword-face) ; scalaFiddle
+   (markdown-test-range-has-face 16 43 'markdown-language-info-face) ; libraries="Java8 Time-0.1.0"
+   (markdown-test-range-has-face 45 115 'markdown-pre-face) ; [code]
+   (markdown-test-range-has-face 117 119 'markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-font-lock/tilde-fenced-1 ()
   "Test native fontification of tilde fenced code blocks."
@@ -2585,8 +2585,8 @@ require 'redcarpet'
 markdown = Redcarpet.new('Hello World!')
 puts markdown.to_html
 ~~~"
-      (markdown-test-range-has-face 1 3 markdown-markup-face) ; ```
-      (markdown-test-range-has-face 4 7 markdown-language-keyword-face) ; ruby
+      (markdown-test-range-has-face 1 3 'markdown-markup-face) ; ```
+      (markdown-test-range-has-face 4 7 'markdown-language-keyword-face) ; ruby
       (markdown-test-range-has-face 9 90 'markdown-code-face) ; entire code block
       (unless (version< emacs-version "24.4")
         (markdown-test-range-has-face 9 15 'font-lock-builtin-face)) ; require
@@ -2594,7 +2594,7 @@ puts markdown.to_html
       (markdown-test-range-has-face 40 48 'font-lock-type-face) ; Redcarpet
       (unless (version< emacs-version "24.4")
         (markdown-test-range-has-face 70 72 'font-lock-builtin-face)) ; puts
-      (markdown-test-range-has-face 92 94 markdown-markup-face)))) ; ```
+      (markdown-test-range-has-face 92 94 'markdown-markup-face)))) ; ```
 
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
@@ -2608,46 +2608,46 @@ puts markdown.to_html
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
   "An edge case for level-one setext headers."
   (markdown-test-string "a\n=\n"
-   (markdown-test-range-has-face 1 1 markdown-header-face-1)
-   (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
+   (markdown-test-range-has-face 1 1 'markdown-header-face-1)
+   (markdown-test-range-has-face 3 3 'markdown-header-rule-face)))
 
 (ert-deftest test-markdown-font-lock/setext-2-letter ()
   "An edge case for level-two setext headers."
   (markdown-test-string "b\n-\n"
-   (markdown-test-range-has-face 1 1 markdown-header-face-2)
-   (markdown-test-range-has-face 3 3 markdown-header-rule-face)))
+   (markdown-test-range-has-face 1 1 'markdown-header-face-2)
+   (markdown-test-range-has-face 3 3 'markdown-header-rule-face)))
 
 (ert-deftest test-markdown-font-lock/inline-links ()
   "Test font lock for inline links."
   (let ((markdown-hide-urls nil))
     (markdown-test-file "inline.text"
-      (markdown-test-range-has-face 925 925 markdown-markup-face)
-      (markdown-test-range-has-face 926 929 markdown-link-face)
-      (markdown-test-range-has-face 930 931 markdown-markup-face)
-      (markdown-test-range-has-face 932 949 markdown-url-face)
-      (markdown-test-range-has-face 951 957 markdown-link-title-face)
-      (markdown-test-range-has-face 958 958 markdown-markup-face))))
+      (markdown-test-range-has-face 925 925 'markdown-markup-face)
+      (markdown-test-range-has-face 926 929 'markdown-link-face)
+      (markdown-test-range-has-face 930 931 'markdown-markup-face)
+      (markdown-test-range-has-face 932 949 'markdown-url-face)
+      (markdown-test-range-has-face 951 957 'markdown-link-title-face)
+      (markdown-test-range-has-face 958 958 'markdown-markup-face))))
 
 (ert-deftest test-markdown-font-lock/inline-links-with-parentheses ()
   "Test font lock for inline links with nested parentheses.
 See <https://github.com/jrblevin/markdown-mode/issues/170>."
   (let ((markdown-hide-urls nil))
     (markdown-test-string "[foo](bar(baz)qux)"
-      (markdown-test-range-has-face 1 1 markdown-markup-face)
-      (markdown-test-range-has-face 2 4 markdown-link-face)
-      (markdown-test-range-has-face 5 6 markdown-markup-face)
-      (markdown-test-range-has-face 7 17 markdown-url-face)
-      (markdown-test-range-has-face 18 18 markdown-markup-face))))
+      (markdown-test-range-has-face 1 1 'markdown-markup-face)
+      (markdown-test-range-has-face 2 4 'markdown-link-face)
+      (markdown-test-range-has-face 5 6 'markdown-markup-face)
+      (markdown-test-range-has-face 7 17 'markdown-url-face)
+      (markdown-test-range-has-face 18 18 'markdown-markup-face))))
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
   (markdown-test-string "    <!-- pre, not comment -->"
-   (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-pre-face)))
+   (markdown-test-range-has-face (point-min) (1- (point-max)) 'markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/inline-code-comment ()
   "Test comments inside of inline code."
   (markdown-test-string "`<h1> <!-- HTML comment inside inline code -->`"
-   (markdown-test-range-has-face (1+ (point-min)) (- (point-max) 2) markdown-inline-code-face)))
+   (markdown-test-range-has-face (1+ (point-min)) (- (point-max) 2) 'markdown-inline-code-face)))
 
 (ert-deftest test-markdown-font-lock/inline-code-link ()
   "Test links inside of inline code."
@@ -2660,16 +2660,16 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
 (ert-deftest test-markdown-font-lock/comment-hanging-indent ()
   "Test comments with hanging indentation."
   (markdown-test-string "<!-- This comment has\n    hanging indentation -->"
-   (markdown-test-range-has-face (point-min) (1- (point-max)) markdown-comment-face)))
+   (markdown-test-range-has-face (point-min) (1- (point-max)) 'markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/comment-multiple ()
   "Test multiple single-line comments in arow."
   (markdown-test-string "<!-- This is a comment -->\n<!-- And so is this -->"
    (markdown-test-range-has-face
-    (point-at-bol) (1- (point-at-eol)) markdown-comment-face)
+    (point-at-bol) (1- (point-at-eol)) 'markdown-comment-face)
    (forward-line)
    (markdown-test-range-has-face
-    (point-at-bol) (1- (point-at-eol)) markdown-comment-face)))
+    (point-at-bol) (1- (point-at-eol)) 'markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/comment-list-items ()
   "Test comment with list inside."
@@ -2679,13 +2679,13 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
   - note 2.
 -->"
    (markdown-test-range-face-equals (point-min) (1- (point-max))
-                                    markdown-comment-face)))
+                                    'markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/comment-angle-bracket ()
   "Regression test for GH-117."
   (markdown-test-string "<!-- > test -->"
    (markdown-test-range-face-equals (point-min) (1- (point-max))
-                                    markdown-comment-face)))
+                                    'markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/comment-link ()
   "Test links inside of comments."
@@ -2699,32 +2699,32 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
   "Test an edge case involving footnote markers and inline reference links."
   (markdown-test-string "Harvard[^1] [tuition][]"
    (markdown-test-range-has-face 1 7 nil)
-   (markdown-test-range-has-face 8 8 markdown-markup-face)
-   (markdown-test-range-has-face 10 10 markdown-footnote-marker-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)
+   (markdown-test-range-has-face 8 8 'markdown-markup-face)
+   (markdown-test-range-has-face 10 10 'markdown-footnote-marker-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)
    (markdown-test-range-has-face 12 12 nil)
-   (markdown-test-range-has-face 13 13 markdown-markup-face)
-   (markdown-test-range-has-face 14 20 markdown-link-face)
-   (markdown-test-range-has-face 21 21 markdown-markup-face)
-   (markdown-test-range-has-face 22 23 markdown-markup-face)))
+   (markdown-test-range-has-face 13 13 'markdown-markup-face)
+   (markdown-test-range-has-face 14 20 'markdown-link-face)
+   (markdown-test-range-has-face 21 21 'markdown-markup-face)
+   (markdown-test-range-has-face 22 23 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata ()
   "Basic MultMarkdown metadata tests."
   (markdown-test-string "Title: peg-multimarkdown User's Guide
 Author: Fletcher T. Penney
 Base Header Level: 2"
-   (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
-   (markdown-test-range-has-face 6 6 markdown-markup-face)
-   (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
-   (markdown-test-range-has-face 39 44 markdown-metadata-key-face)
-   (markdown-test-range-has-face 46 46 markdown-markup-face)
-   (markdown-test-range-has-face 47 64 markdown-metadata-value-face)
-   (markdown-test-range-has-face 66 82 markdown-metadata-key-face)
-   (markdown-test-range-has-face 83 83 markdown-markup-face)
-   (markdown-test-range-has-face 85 85 markdown-metadata-value-face))
+   (markdown-test-range-has-face 1 5 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 6 6 'markdown-markup-face)
+   (markdown-test-range-has-face 8 37 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 39 44 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 46 46 'markdown-markup-face)
+   (markdown-test-range-has-face 47 64 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 66 82 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 83 83 'markdown-markup-face)
+   (markdown-test-range-has-face 85 85 'markdown-metadata-value-face))
   ;; Avoid triggering when a title contains a colon (e.g., Markdown: Syntax)
   (markdown-test-file "syntax.text"
-   (markdown-test-range-has-face 1 16 markdown-header-face-1)))
+   (markdown-test-range-has-face 1 16 'markdown-header-face-1)))
 
 (ert-deftest test-markdown-font-lock/mmd-metadata-after-header ()
   "Ensure that similar lines are not matched after the header."
@@ -2732,9 +2732,9 @@ Base Header Level: 2"
 
 Author: Fletcher T. Penney
 Base Header Level: 2"
-   (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
-   (markdown-test-range-has-face 6 6 markdown-markup-face)
-   (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
+   (markdown-test-range-has-face 1 5 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 6 6 'markdown-markup-face)
+   (markdown-test-range-has-face 8 37 'markdown-metadata-value-face)
    (markdown-test-range-has-face 40 65 nil)
    (markdown-test-range-has-face 67 86 nil)))
 
@@ -2744,9 +2744,9 @@ The blank line here has two spaces, which should not change how
 it is parsed."
   (markdown-test-string
    "Title: peg-multimarkdown User's Guide\n  \nAuthor: Fletcher T. Penney\nBase Header Level: 2\n"
-   (markdown-test-range-has-face 1 5 markdown-metadata-key-face)
-   (markdown-test-range-has-face 6 6 markdown-markup-face)
-   (markdown-test-range-has-face 8 37 markdown-metadata-value-face)
+   (markdown-test-range-has-face 1 5 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 6 6 'markdown-markup-face)
+   (markdown-test-range-has-face 8 37 'markdown-metadata-value-face)
    (markdown-test-range-has-face 42 67 nil)
    (markdown-test-range-has-face 69 88 nil)))
 
@@ -2759,12 +2759,12 @@ it is parsed."
 % date
 
 body"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 3 24 markdown-metadata-value-face)
-   (markdown-test-range-has-face 26 26 markdown-markup-face)
-   (markdown-test-range-has-face 28 56 markdown-metadata-value-face)
-   (markdown-test-range-has-face 58 58 markdown-markup-face)
-   (markdown-test-range-has-face 60 63 markdown-metadata-value-face)
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 3 24 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 26 26 'markdown-markup-face)
+   (markdown-test-range-has-face 28 56 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 58 58 'markdown-markup-face)
+   (markdown-test-range-has-face 60 63 'markdown-metadata-value-face)
    (markdown-test-range-has-face 64 69 nil)))
 
 (ert-deftest test-markdown-font-lock/yaml-metadata ()
@@ -2775,14 +2775,14 @@ layout: post
 date: 2015-08-13 11:35:25 EST
 ---
 "
-   (markdown-test-range-has-face 1 3 markdown-markup-face)
-   (markdown-test-range-has-face 5 10 markdown-metadata-key-face)
-   (markdown-test-range-has-face 11 11 markdown-markup-face)
-   (markdown-test-range-has-face 13 16 markdown-metadata-value-face)
-   (markdown-test-range-has-face 18 21 markdown-metadata-key-face)
-   (markdown-test-range-has-face 22 22 markdown-markup-face)
-   (markdown-test-range-has-face 24 46 markdown-metadata-value-face)
-   (markdown-test-range-has-face 48 50 markdown-markup-face)))
+   (markdown-test-range-has-face 1 3 'markdown-markup-face)
+   (markdown-test-range-has-face 5 10 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 11 11 'markdown-markup-face)
+   (markdown-test-range-has-face 13 16 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 18 21 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 22 22 'markdown-markup-face)
+   (markdown-test-range-has-face 24 46 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 48 50 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/toml-metadata ()
   "Basic TOML metadata tests."
@@ -2792,14 +2792,14 @@ layout = post
 date = 2015-08-13 11:35:25 EST
 ---
 "
-   (markdown-test-range-has-face 1 3 markdown-markup-face)
-   (markdown-test-range-has-face 5 10 markdown-metadata-key-face)
-   (markdown-test-range-has-face 12 12 markdown-markup-face)
-   (markdown-test-range-has-face 14 17 markdown-metadata-value-face)
-   (markdown-test-range-has-face 19 22 markdown-metadata-key-face)
-   (markdown-test-range-has-face 24 24 markdown-markup-face)
-   (markdown-test-range-has-face 26 48 markdown-metadata-value-face)
-   (markdown-test-range-has-face 50 52 markdown-markup-face)))
+   (markdown-test-range-has-face 1 3 'markdown-markup-face)
+   (markdown-test-range-has-face 5 10 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 12 12 'markdown-markup-face)
+   (markdown-test-range-has-face 14 17 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 19 22 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 24 24 'markdown-markup-face)
+   (markdown-test-range-has-face 26 48 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 50 52 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/pandoc-yaml-metadata ()
   "Basic yaml metadata tests, with pandoc syntax."
@@ -2829,47 +2829,47 @@ date: 2015-08-13 11:35:25 EST
 ```
 "
      ;; first section
-     (markdown-test-range-has-face 12 14 markdown-markup-face)
-     (markdown-test-range-has-face 16 21 markdown-metadata-key-face)
-     (markdown-test-range-has-face 22 22 markdown-markup-face)
-     (markdown-test-range-has-face 24 27 markdown-metadata-value-face)
-     (markdown-test-range-has-face 29 32 markdown-metadata-key-face)
-     (markdown-test-range-has-face 33 33 markdown-markup-face)
-     (markdown-test-range-has-face 35 57 markdown-metadata-value-face)
-     (markdown-test-range-has-face 59 61 markdown-markup-face)
+     (markdown-test-range-has-face 12 14 'markdown-markup-face)
+     (markdown-test-range-has-face 16 21 'markdown-metadata-key-face)
+     (markdown-test-range-has-face 22 22 'markdown-markup-face)
+     (markdown-test-range-has-face 24 27 'markdown-metadata-value-face)
+     (markdown-test-range-has-face 29 32 'markdown-metadata-key-face)
+     (markdown-test-range-has-face 33 33 'markdown-markup-face)
+     (markdown-test-range-has-face 35 57 'markdown-metadata-value-face)
+     (markdown-test-range-has-face 59 61 'markdown-markup-face)
      ;; second section
-     (markdown-test-range-has-face 75 77 markdown-markup-face)
-     (markdown-test-range-has-face 79 84 markdown-metadata-key-face)
-     (markdown-test-range-has-face 85 85 markdown-markup-face)
-     (markdown-test-range-has-face 87 90 markdown-metadata-value-face)
-     (markdown-test-range-has-face 92 95 markdown-metadata-key-face)
-     (markdown-test-range-has-face 96 96 markdown-markup-face)
-     (markdown-test-range-has-face 98 120 markdown-metadata-value-face)
-     (markdown-test-range-has-face 122 124 markdown-markup-face)
+     (markdown-test-range-has-face 75 77 'markdown-markup-face)
+     (markdown-test-range-has-face 79 84 'markdown-metadata-key-face)
+     (markdown-test-range-has-face 85 85 'markdown-markup-face)
+     (markdown-test-range-has-face 87 90 'markdown-metadata-value-face)
+     (markdown-test-range-has-face 92 95 'markdown-metadata-key-face)
+     (markdown-test-range-has-face 96 96 'markdown-markup-face)
+     (markdown-test-range-has-face 98 120 'markdown-metadata-value-face)
+     (markdown-test-range-has-face 122 124 'markdown-markup-face)
      ;; third section
-     (markdown-test-range-has-face 160 162 markdown-markup-face)
-     (markdown-test-range-has-face 164 213 markdown-pre-face)
-     (markdown-test-range-has-face 215 217 markdown-markup-face))))
+     (markdown-test-range-has-face 160 162 'markdown-markup-face)
+     (markdown-test-range-has-face 164 213 'markdown-pre-face)
+     (markdown-test-range-has-face 215 217 'markdown-markup-face))))
 
 (ert-deftest test-markdown-font-lock/line-break ()
   "Basic line break tests."
   (markdown-test-string "    \nasdf  \n"
    (markdown-test-range-has-face 1 9 nil)
-   (markdown-test-range-has-face 10 11 markdown-line-break-face)))
+   (markdown-test-range-has-face 10 11 'markdown-line-break-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-bold ()
   "Test font lock for bold inside of a blockquote."
   (markdown-test-string
    "> **bold**"
-   (markdown-test-range-has-face 1 10 markdown-blockquote-face)
-   (markdown-test-range-has-face 5 8 markdown-bold-face)))
+   (markdown-test-range-has-face 1 10 'markdown-blockquote-face)
+   (markdown-test-range-has-face 5 8 'markdown-bold-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-italic ()
   "Test font lock for italic inside of a blockquote."
   (markdown-test-string
    "> *italic*"
-   (markdown-test-range-has-face 1 10 markdown-blockquote-face)
-   (markdown-test-range-has-face 4 9 markdown-italic-face)))
+   (markdown-test-range-has-face 1 10 'markdown-blockquote-face)
+   (markdown-test-range-has-face 4 9 'markdown-italic-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-code ()
   "Test font lock for inline code inside of a blockquote."
@@ -2887,20 +2887,20 @@ blockquotes is implemented (at present, the blockquote face
 takes precedence)."
   (markdown-test-string
    "> [link](url)"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 2 13 markdown-blockquote-face)
-   (markdown-test-range-has-face 3 3 markdown-markup-face)
-   (markdown-test-range-has-face 4 7 markdown-link-face)
-   (markdown-test-range-has-face 8 9 markdown-markup-face)
-   (markdown-test-range-has-face 10 12 markdown-url-face)
-   (markdown-test-range-has-face 13 13 markdown-markup-face)))
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 2 13 'markdown-blockquote-face)
+   (markdown-test-range-has-face 3 3 'markdown-markup-face)
+   (markdown-test-range-has-face 4 7 'markdown-link-face)
+   (markdown-test-range-has-face 8 9 'markdown-markup-face)
+   (markdown-test-range-has-face 10 12 'markdown-url-face)
+   (markdown-test-range-has-face 13 13 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/blockquote-comment ()
   "Test font lock for comments inside of a blockquote."
   (markdown-test-string
    "> <!-- comment -->"
-   (markdown-test-range-has-face 1 1 markdown-markup-face)
-   (markdown-test-range-has-face 3 18 markdown-comment-face)))
+   (markdown-test-range-has-face 1 1 'markdown-markup-face)
+   (markdown-test-range-has-face 3 18 'markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/pre-override ()
   "Test that font lock for pre blocks overrides everything else."
@@ -2910,29 +2910,29 @@ takes precedence)."
     <!-- comment -->
     [link](url)
     * list"
-   (markdown-test-range-has-face 1 73 markdown-pre-face)))
+   (markdown-test-range-has-face 1 73 'markdown-pre-face)))
 
 (ert-deftest test-markdown-font-lock/gfm-code-block-font-lock ()
   "GFM code block font lock test. Now in base markdown-mode as well!"
   (markdown-test-file "gfm.text"
-    (markdown-test-range-has-face 2639 2641 markdown-markup-face) ; ```
-    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
-    (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
-    (markdown-test-range-has-face 2730 2732 markdown-markup-face))) ; ```
+    (markdown-test-range-has-face 2639 2641 'markdown-markup-face) ; ```
+    (markdown-test-range-has-face 2642 2645 'markdown-language-keyword-face) ; lang
+    (markdown-test-range-has-face 2647 2728 'markdown-pre-face) ; code
+    (markdown-test-range-has-face 2730 2732 'markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-font-lock/reference-definition ()
   "Reference definitions should not include ]."
   (let ((markdown-hide-urls nil))
     (markdown-test-string "[1]: http://daringfireball.net/ \"title\""
-      (markdown-test-range-has-face 2 2 markdown-reference-face) ; 1
-      (markdown-test-range-has-face 6 31 markdown-url-face) ; URL
-      (markdown-test-range-has-face 34 38 markdown-link-title-face)) ; title
+      (markdown-test-range-has-face 2 2 'markdown-reference-face) ; 1
+      (markdown-test-range-has-face 6 31 'markdown-url-face) ; URL
+      (markdown-test-range-has-face 34 38 'markdown-link-title-face)) ; title
     (markdown-test-string "[foo][1] and [bar][2]: not a reference definition"
-      (markdown-test-range-has-face 2 4 markdown-link-face) ; foo
-      (markdown-test-range-has-face 7 7 markdown-reference-face) ; 1
+      (markdown-test-range-has-face 2 4 'markdown-link-face) ; foo
+      (markdown-test-range-has-face 7 7 'markdown-reference-face) ; 1
       (markdown-test-range-has-face 9 13 nil) ; [ ]and[ ]
-      (markdown-test-range-has-face 15 17 markdown-link-face) ; bar
-      (markdown-test-range-has-face 20 20 markdown-reference-face) ; 2
+      (markdown-test-range-has-face 15 17 'markdown-link-face) ; bar
+      (markdown-test-range-has-face 20 20 'markdown-reference-face) ; 2
       (markdown-test-range-has-face 22 49 nil)))) ; [ ]and[ ]
 
 (ert-deftest test-markdown-font-lock/subscripts ()
@@ -2954,12 +2954,12 @@ takes precedence)."
   "Test URL hiding and toggling."
   (let ((markdown-hide-urls t))
     (markdown-test-file "inline.text"
-      (markdown-test-range-has-face 925 925 markdown-markup-face)
-      (markdown-test-range-has-face 926 929 markdown-link-face)
-      (markdown-test-range-has-face 930 931 markdown-markup-face)
-      (markdown-test-range-has-face 932 949 markdown-url-face)
-      (markdown-test-range-has-face 951 957 markdown-link-title-face)
-      (markdown-test-range-has-face 958 958 markdown-markup-face)
+      (markdown-test-range-has-face 925 925 'markdown-markup-face)
+      (markdown-test-range-has-face 926 929 'markdown-link-face)
+      (markdown-test-range-has-face 930 931 'markdown-markup-face)
+      (markdown-test-range-has-face 932 949 'markdown-url-face)
+      (markdown-test-range-has-face 951 957 'markdown-link-title-face)
+      (markdown-test-range-has-face 958 958 'markdown-markup-face)
       (should (get-text-property 932 'composition)))))
 
 (ert-deftest test-markdown-font-lock/hidden-urls-reference ()
@@ -2967,19 +2967,19 @@ takes precedence)."
   (let ((markdown-hide-urls t))
     (markdown-test-string "[link][15]"
       ;; Two-character reference labels shouldn't get composed.
-      (markdown-test-range-has-face 1 1 markdown-markup-face)
-      (markdown-test-range-has-face 2 5 markdown-link-face)
-      (markdown-test-range-has-face 6 7 markdown-markup-face)
-      (markdown-test-range-has-face 8 9 markdown-reference-face)
-      (markdown-test-range-has-face 10 10 markdown-markup-face)
+      (markdown-test-range-has-face 1 1 'markdown-markup-face)
+      (markdown-test-range-has-face 2 5 'markdown-link-face)
+      (markdown-test-range-has-face 6 7 'markdown-markup-face)
+      (markdown-test-range-has-face 8 9 'markdown-reference-face)
+      (markdown-test-range-has-face 10 10 'markdown-markup-face)
       (should-not (get-text-property 8 'composition)))
     (markdown-test-string "[link][long-reference-label]"
       ;; Longer reference labels should be composed
-      (markdown-test-range-has-face 1 1 markdown-markup-face)
-      (markdown-test-range-has-face 2 5 markdown-link-face)
-      (markdown-test-range-has-face 6 7 markdown-markup-face)
-      (markdown-test-range-has-face 8 27 markdown-reference-face)
-      (markdown-test-range-has-face 28 28 markdown-markup-face)
+      (markdown-test-range-has-face 1 1 'markdown-markup-face)
+      (markdown-test-range-has-face 2 5 'markdown-link-face)
+      (markdown-test-range-has-face 6 7 'markdown-markup-face)
+      (markdown-test-range-has-face 8 27 'markdown-reference-face)
+      (markdown-test-range-has-face 28 28 'markdown-markup-face)
       (should (get-text-property 8 'composition)))))
 
 (ert-deftest test-markdown-font-lock/snake-case-code-in-heading ()
@@ -3654,11 +3654,10 @@ only partially propertized."
    "inline.text"
    (should (markdown-range-property-any
             (point-min) (point-at-eol)
-            'face (list markdown-markup-face
-                        markdown-italic-face)))
+            'face '(markdown-markup-face markdown-italic-face)))
    (should-not (markdown-range-property-any
             (point-min) (point-at-eol)
-            'face (list markdown-bold-face)))))
+            'face '(markdown-bold-face)))))
 
 (ert-deftest test-markdown-parsing/inline-code ()
   "Don't cause infinite loop for inline code just after metadata block
@@ -4766,16 +4765,16 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
         ;; Confirm location of first wiki link
         (should (eq (markdown-next-link) 8))
         ;; First wiki link doesn't have a corresponding file
-        (markdown-test-range-has-property 8 20 'font-lock-face markdown-missing-link-face)
+        (markdown-test-range-has-property 8 20 'font-lock-face 'markdown-missing-link-face)
         ;; Second wiki link doesn't have a corresponding file
         (should (eq (markdown-next-link) 73))
-        (markdown-test-range-has-property 73 88 'font-lock-face markdown-missing-link-face)
+        (markdown-test-range-has-property 73 88 'font-lock-face 'markdown-missing-link-face)
         ;; Move to third wiki link, and create the missing file
         (should (eq (markdown-next-link) 155))
         (should (string-equal (markdown-wiki-link-link) "inline"))
-        (markdown-test-range-has-property 155 164 'font-lock-face markdown-link-face)
+        (markdown-test-range-has-property 155 164 'font-lock-face 'markdown-link-face)
         ;; Check wiki links in code blocks
-        (markdown-test-range-has-face 360 395 markdown-pre-face)
+        (markdown-test-range-has-face 360 395 'markdown-pre-face)
         ;; Remove temporary files
         (delete-file fn)))
     (delete-directory temporary-file-directory)))
@@ -5238,49 +5237,49 @@ This includes preserving whitespace after the pipe."
   (let ((markdown-enable-math t))
     (markdown-test-file "math.text"
       (markdown-test-range-has-face 1 32 nil)
-      (markdown-test-range-has-face 33 33 markdown-markup-face)
-      (markdown-test-range-has-face 34 45 markdown-math-face)
-      (markdown-test-range-has-face 46 46 markdown-markup-face)
+      (markdown-test-range-has-face 33 33 'markdown-markup-face)
+      (markdown-test-range-has-face 34 45 'markdown-math-face)
+      (markdown-test-range-has-face 46 46 'markdown-markup-face)
       (markdown-test-range-has-face 47 49 nil)
-      (markdown-test-range-has-face 50 51 markdown-markup-face)
-      (markdown-test-range-has-face 52 63 markdown-math-face)
-      (markdown-test-range-has-face 64 65 markdown-markup-face)
+      (markdown-test-range-has-face 50 51 'markdown-markup-face)
+      (markdown-test-range-has-face 52 63 'markdown-math-face)
+      (markdown-test-range-has-face 64 65 'markdown-markup-face)
       (markdown-test-range-has-face 66 98 nil)
-      (markdown-test-range-has-face 99 100 markdown-markup-face)
-      (markdown-test-range-has-face 101 112 markdown-math-face)
-      (markdown-test-range-has-face 113 114 markdown-markup-face)
-      (markdown-test-range-has-face 113 114 markdown-markup-face)
-      (markdown-test-range-has-face 117 117 markdown-header-delimiter-face)
-      (markdown-test-range-has-face 119 152 markdown-header-face-1)
-      (markdown-test-range-has-face 129 129 markdown-markup-face)
-      (markdown-test-range-has-face 136 136 markdown-markup-face)
+      (markdown-test-range-has-face 99 100 'markdown-markup-face)
+      (markdown-test-range-has-face 101 112 'markdown-math-face)
+      (markdown-test-range-has-face 113 114 'markdown-markup-face)
+      (markdown-test-range-has-face 113 114 'markdown-markup-face)
+      (markdown-test-range-has-face 117 117 'markdown-header-delimiter-face)
+      (markdown-test-range-has-face 119 152 'markdown-header-face-1)
+      (markdown-test-range-has-face 129 129 'markdown-markup-face)
+      (markdown-test-range-has-face 136 136 'markdown-markup-face)
 
-      (markdown-test-range-has-face 174 177 markdown-markup-face)
-      (markdown-test-range-has-face 179 179 markdown-markup-face)
-      (markdown-test-range-has-face 180 187 markdown-language-keyword-face)
-      (markdown-test-range-has-face 188 188 markdown-markup-face)
-      (markdown-test-range-has-face 190 210 markdown-pre-face)
-      (markdown-test-range-has-face 212 215 markdown-markup-face)
+      (markdown-test-range-has-face 174 177 'markdown-markup-face)
+      (markdown-test-range-has-face 179 179 'markdown-markup-face)
+      (markdown-test-range-has-face 180 187 'markdown-language-keyword-face)
+      (markdown-test-range-has-face 188 188 'markdown-markup-face)
+      (markdown-test-range-has-face 190 210 'markdown-pre-face)
+      (markdown-test-range-has-face 212 215 'markdown-markup-face)
 
-      (markdown-test-range-has-face 218 218 markdown-markup-face)
-      (markdown-test-range-has-face 219 223 markdown-math-face)
-      (markdown-test-range-has-face 224 224 markdown-markup-face)
-      (markdown-test-range-has-face 350 351 markdown-markup-face)
-      (markdown-test-range-has-face 352 356 markdown-math-face)
-      (markdown-test-range-has-face 357 358 markdown-markup-face)
+      (markdown-test-range-has-face 218 218 'markdown-markup-face)
+      (markdown-test-range-has-face 219 223 'markdown-math-face)
+      (markdown-test-range-has-face 224 224 'markdown-markup-face)
+      (markdown-test-range-has-face 350 351 'markdown-markup-face)
+      (markdown-test-range-has-face 352 356 'markdown-math-face)
+      (markdown-test-range-has-face 357 358 'markdown-markup-face)
       (markdown-test-range-has-face 359 391 nil)
-      (markdown-test-range-has-face 392 393 markdown-markup-face)
-      (markdown-test-range-has-face 394 398 markdown-math-face)
-      (markdown-test-range-has-face 399 400 markdown-markup-face))))
+      (markdown-test-range-has-face 392 393 'markdown-markup-face)
+      (markdown-test-range-has-face 394 398 'markdown-math-face)
+      (markdown-test-range-has-face 399 400 'markdown-markup-face))))
 
 (ert-deftest test-markdown-math/double-slash-display-math ()
   "Test double slash display math font lock."
   (let ((markdown-enable-math t))
     (markdown-test-file "math.text"
       (markdown-test-range-has-face 403 474 nil)
-      (markdown-test-range-has-face 475 477 markdown-markup-face)
-      (markdown-test-range-has-face 478 543 markdown-math-face)
-      (markdown-test-range-has-face 544 546 markdown-markup-face))))
+      (markdown-test-range-has-face 475 477 'markdown-markup-face)
+      (markdown-test-range-has-face 478 543 'markdown-math-face)
+      (markdown-test-range-has-face 544 546 'markdown-markup-face))))
 
 (ert-deftest test-markdown-math/indented-double-slash-display-math ()
   "Test font lock for indented double slash display math.
@@ -5289,29 +5288,29 @@ See GH-288."
     (markdown-test-string "- Einstein's equation:
 
     \\\\[ E = m c^2 \\\\]"
-      (markdown-test-range-has-face 29 31 markdown-markup-face)
-      (markdown-test-range-has-face 32 42 markdown-math-face)
-      (markdown-test-range-has-face 43 45 markdown-markup-face))))
+      (markdown-test-range-has-face 29 31 'markdown-markup-face)
+      (markdown-test-range-has-face 32 42 'markdown-math-face)
+      (markdown-test-range-has-face 43 45 'markdown-markup-face))))
 
 (ert-deftest test-markdown-math/font-lock-italics ()
   "Test markdown math mode with underscores."
   (let ((markdown-enable-math t))
     (markdown-test-file "math.text"
-      (markdown-test-range-has-face 227 227 markdown-markup-face)
-      (markdown-test-range-has-face 228 233 markdown-math-face)
-      (markdown-test-range-has-face 234 234 markdown-markup-face)
+      (markdown-test-range-has-face 227 227 'markdown-markup-face)
+      (markdown-test-range-has-face 228 233 'markdown-math-face)
+      (markdown-test-range-has-face 234 234 'markdown-markup-face)
       (markdown-test-range-has-face 235 270 nil)
-      (markdown-test-range-has-face 271 271 markdown-markup-face)
-      (markdown-test-range-has-face 272 274 markdown-math-face)
-      (markdown-test-range-has-face 275 275 markdown-markup-face))))
+      (markdown-test-range-has-face 271 271 'markdown-markup-face)
+      (markdown-test-range-has-face 272 274 'markdown-math-face)
+      (markdown-test-range-has-face 275 275 'markdown-markup-face))))
 
 (ert-deftest test-markdown-math/font-lock-no-bold ()
   "Bold markers in math should not trigger bold."
   (let ((markdown-enable-math t))
     (markdown-test-file "math.text"
-      (markdown-test-range-has-face 279 299 markdown-math-face)
+      (markdown-test-range-has-face 279 299 'markdown-math-face)
       (markdown-test-range-has-face 301 308 nil)
-      (markdown-test-range-has-face 310 312 markdown-math-face))))
+      (markdown-test-range-has-face 310 312 'markdown-math-face))))
 
 ;;; Extension: pipe table editing
 
@@ -5330,26 +5329,26 @@ See GH-288."
   "GFM pre block font lock test."
   (markdown-test-file-gfm "gfm.text"
     (markdown-test-range-has-face 2626 2637 nil)
-    (markdown-test-range-has-face 2639 2641 markdown-markup-face)
-    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face)
-    (markdown-test-range-has-face 2647 2728 markdown-pre-face)
-    (markdown-test-range-has-face 2730 2732 markdown-markup-face)))
+    (markdown-test-range-has-face 2639 2641 'markdown-markup-face)
+    (markdown-test-range-has-face 2642 2645 'markdown-language-keyword-face)
+    (markdown-test-range-has-face 2647 2728 'markdown-pre-face)
+    (markdown-test-range-has-face 2730 2732 'markdown-markup-face)))
 
 (ert-deftest test-markdown-gfm/italic-1 ()
   "GFM italic font lock test."
   (markdown-test-file-gfm "gfm.text"
-    (markdown-test-range-has-face 1483 1483 markdown-markup-face)
-    (markdown-test-range-has-face 1484 1487 markdown-italic-face)
-    (markdown-test-range-has-face 1488 1488 markdown-markup-face)
+    (markdown-test-range-has-face 1483 1483 'markdown-markup-face)
+    (markdown-test-range-has-face 1484 1487 'markdown-italic-face)
+    (markdown-test-range-has-face 1488 1488 'markdown-markup-face)
     (markdown-test-range-has-face 1729 1790 nil)))
 
 (ert-deftest test-markdown-gfm/strike-through-1 ()
   "GFM strike through font lock test."
   (markdown-test-string-gfm "one ~~two~~ three"
     (markdown-test-range-has-face 1 4 nil)
-    (markdown-test-range-has-face 5 6 markdown-markup-face)
-    (markdown-test-range-has-face 7 9 markdown-strike-through-face)
-    (markdown-test-range-has-face 10 11 markdown-markup-face)
+    (markdown-test-range-has-face 5 6 'markdown-markup-face)
+    (markdown-test-range-has-face 7 9 'markdown-strike-through-face)
+    (markdown-test-range-has-face 10 11 'markdown-markup-face)
     (markdown-test-range-has-face 12 17 nil)))
 
 (ert-deftest test-markdown-gfm/toggle-strike-through ()
@@ -5449,17 +5448,17 @@ See GH-288."
 (ert-deftest test-markdown-gfm/code-block-font-lock ()
   "GFM code block font lock test."
   (markdown-test-file-gfm "gfm.text"
-    (markdown-test-range-has-face 2639 2641 markdown-markup-face) ; ```
-    (markdown-test-range-has-face 2642 2645 markdown-language-keyword-face) ; lang
-    (markdown-test-range-has-face 2647 2728 markdown-pre-face) ; code
-    (markdown-test-range-has-face 2730 2732 markdown-markup-face))) ; ```
+    (markdown-test-range-has-face 2639 2641 'markdown-markup-face) ; ```
+    (markdown-test-range-has-face 2642 2645 'markdown-language-keyword-face) ; lang
+    (markdown-test-range-has-face 2647 2728 'markdown-pre-face) ; code
+    (markdown-test-range-has-face 2730 2732 'markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-gfm/code-block-font-lock-2 ()
   "GFM code block font lock test without language identifier."
   (markdown-test-string-gfm "Plain code block:\n\n```\nfoo\n```\n"
-    (markdown-test-range-has-face 20 22 markdown-markup-face)
-    (markdown-test-range-has-face 24 26 markdown-pre-face)
-    (markdown-test-range-has-face 28 30 markdown-markup-face)))
+    (markdown-test-range-has-face 20 22 'markdown-markup-face)
+    (markdown-test-range-has-face 24 26 'markdown-pre-face)
+    (markdown-test-range-has-face 28 30 'markdown-markup-face)))
 
 ;;; Tests for other extensions:
 
@@ -5468,7 +5467,7 @@ See GH-288."
   (markdown-test-string " #. abc\ndef\n"
     ;; font lock
     (markdown-test-range-has-face 1 1 nil)
-    (markdown-test-range-has-face 2 3 markdown-list-face)
+    (markdown-test-range-has-face 2 3 'markdown-list-face)
     (markdown-test-range-has-face 4 11 nil)
     ;; filling
     (forward-line)
@@ -5496,10 +5495,10 @@ See GH-288."
                      (markdown-convert-wiki-link-to-filename "doesnotexist")
                      "doesnotexist"))
             ;; font lock
-            (markdown-test-range-has-property 1 11 'font-lock-face markdown-link-face)
-            (markdown-test-range-has-property 14 33 'font-lock-face markdown-missing-link-face)
-            (markdown-test-range-has-property 36 42 'font-lock-face markdown-link-face)
-            (markdown-test-range-has-property 45 60 'font-lock-face markdown-missing-link-face))
+            (markdown-test-range-has-property 1 11 'font-lock-face 'markdown-link-face)
+            (markdown-test-range-has-property 14 33 'font-lock-face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 36 42 'font-lock-face 'markdown-link-face)
+            (markdown-test-range-has-property 45 60 'font-lock-face 'markdown-missing-link-face))
         (kill-buffer)))
     (progn
       (find-file "wiki/sub/foo")
@@ -5514,8 +5513,8 @@ See GH-288."
                      (markdown-convert-wiki-link-to-filename "doesnotexist")
                      "doesnotexist"))
             ;; font lock
-            (markdown-test-range-has-property 1 16 'font-lock-face markdown-missing-link-face)
-            (markdown-test-range-has-property 19 26 'font-lock-face markdown-link-face))
+            (markdown-test-range-has-property 1 16 'font-lock-face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 19 26 'font-lock-face 'markdown-link-face))
         (kill-buffer)))))
 
 (defadvice markdown-live-preview-window-eww

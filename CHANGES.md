@@ -4,6 +4,10 @@
 
 *   **Breaking changes:**
 
+    -   Face variables, such as `markdown-italic-face` are now
+        obsolete.  Use face names directly in code and customizations.
+        The face names themselves are unaffected, so this shouldn't
+        affect most users.
     -   Internal variables `markdown-font-lock-keywords-basic` and
         `gfm-font-lock-keywords` are now obsolete.
         `markdown-font-lock-keywords` is now used instead, but users
