@@ -965,6 +965,35 @@ Group 3 matches all attributes and whitespace following the tag name.")
 
 ;;; Syntax ====================================================================
 
+(defvar markdown--syntax-properties
+  (list 'markdown-tilde-fence-begin nil
+        'markdown-tilde-fence-end nil
+        'markdown-fenced-code nil
+        'markdown-yaml-metadata-begin nil
+        'markdown-yaml-metadata-end nil
+        'markdown-yaml-metadata-section nil
+        'markdown-gfm-block-begin nil
+        'markdown-gfm-block-end nil
+        'markdown-gfm-code nil
+        'markdown-list-item nil
+        'markdown-pre nil
+        'markdown-blockquote nil
+        'markdown-hr nil
+        'markdown-comment nil
+        'markdown-heading nil
+        'markdown-heading-1-setext nil
+        'markdown-heading-2-setext nil
+        'markdown-heading-1-atx nil
+        'markdown-heading-2-atx nil
+        'markdown-heading-3-atx nil
+        'markdown-heading-4-atx nil
+        'markdown-heading-5-atx nil
+        'markdown-heading-6-atx nil
+        'markdown-metadata-key nil
+        'markdown-metadata-value nil
+        'markdown-metadata-markup nil)
+  "Property list of all Markdown syntactic properties.")
+
 (defsubst markdown-in-comment-p (&optional pos)
   "Return non-nil if POS is in a comment.
 If POS is not given, use point instead."
@@ -1575,35 +1604,6 @@ region of a YAML metadata block as propertized by
          (min (1+ comment-end) end (point-max)) end)))
      ;; Nothing found
      (t nil))))
-
-(defvar markdown--syntax-properties
-  (list 'markdown-tilde-fence-begin nil
-        'markdown-tilde-fence-end nil
-        'markdown-fenced-code nil
-        'markdown-yaml-metadata-begin nil
-        'markdown-yaml-metadata-end nil
-        'markdown-yaml-metadata-section nil
-        'markdown-gfm-block-begin nil
-        'markdown-gfm-block-end nil
-        'markdown-gfm-code nil
-        'markdown-list-item nil
-        'markdown-pre nil
-        'markdown-blockquote nil
-        'markdown-hr nil
-        'markdown-comment nil
-        'markdown-heading nil
-        'markdown-heading-1-setext nil
-        'markdown-heading-2-setext nil
-        'markdown-heading-1-atx nil
-        'markdown-heading-2-atx nil
-        'markdown-heading-3-atx nil
-        'markdown-heading-4-atx nil
-        'markdown-heading-5-atx nil
-        'markdown-heading-6-atx nil
-        'markdown-metadata-key nil
-        'markdown-metadata-value nil
-        'markdown-metadata-markup nil)
-  "Property list of all Markdown syntactic properties.")
 
 (defun markdown-syntax-propertize (start end)
   "Function used as `syntax-propertize-function'.
