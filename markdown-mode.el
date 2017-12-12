@@ -572,16 +572,22 @@ requires Emacs to be built with ImageMagick support."
       (checkbox . ,(rx "[" (any " xX") "]")))
     "Markdown-specific sexps for `markdown-rx'")
 
+  (defun markdown-rx-to-string (form &optional no-group)
+    "Markdown mode specialized `rx-to-string' function.
+This variant supports named Markdown expressions in FORM.
+NO-GROUP non-nil means don't put shy groups around the result."
+    (let ((rx-constituents (append markdown-rx-constituents rx-constituents)))
+      (rx-to-string form no-group)))
+
   (defmacro markdown-rx (&rest regexps)
     "Markdown mode specialized rx macro.
 This variant of `rx' supports common Markdown named REGEXPS."
-    (let ((rx-constituents (append markdown-rx-constituents rx-constituents)))
-      (cond ((null regexps)
-             (error "No regexp"))
-            ((cdr regexps)
-             (rx-to-string `(and ,@regexps) t))
-            (t
-             (rx-to-string (car regexps) t))))))
+    (cond ((null regexps)
+           (error "No regexp"))
+          ((cdr regexps)
+           (markdown-rx-to-string `(and ,@regexps) t))
+          (t
+           (markdown-rx-to-string (car regexps) t)))))
 
 
 ;;; Regular Expressions =======================================================
