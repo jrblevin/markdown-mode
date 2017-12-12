@@ -2094,7 +2094,7 @@ Depending on your font, some reasonable choices are:
          ,@(when markdown-hide-markup
              `(display ,markdown-footnote-display))))
 
-(defvar markdown-mode-font-lock-keywords-basic
+(defvar markdown-mode-font-lock-keywords
   `((markdown-match-yaml-metadata-begin . ((1 'markdown-markup-face)))
     (markdown-match-yaml-metadata-end . ((1 'markdown-markup-face)))
     (markdown-match-yaml-metadata-key . ((1 'markdown-metadata-key-face)
