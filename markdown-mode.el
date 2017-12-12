@@ -9177,7 +9177,7 @@ spaces, or alternatively a TAB should be used as the separator."
           nil nil nil nil
           (font-lock-multiline . t)
           (font-lock-syntactic-face-function . markdown-syntactic-face)
-          (font-lock-extra-managed-props . '(composition display invisible))))
+          (font-lock-extra-managed-props . (composition display invisible))))
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
