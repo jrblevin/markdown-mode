@@ -2599,10 +2599,12 @@ original point.  If the point is not in a list item, do nothing."
       (setq indent (current-indentation)))
     ;; Don't skip over whitespace for empty list items (marker and
     ;; whitespace only), just move to end of whitespace.
-    (save-match-data
-      (if (looking-back (concat markdown-regex-list "\\s-*") (point-at-bol))
-          (goto-char (match-end 3))
-        (skip-chars-backward " \t\n")))
+    (if (save-excursion
+          (beginning-of-line)
+          (looking-at (concat markdown-regex-list "[ \t]*$")))
+        (goto-char (match-end 3))
+      (skip-chars-backward " \t\n"))
+    (end-of-line)
     (point)))
 
 (defun markdown-cur-list-item-bounds ()
