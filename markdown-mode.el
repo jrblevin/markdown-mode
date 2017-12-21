@@ -1106,7 +1106,7 @@ giving the bounds of the current and parent list items."
       (markdown-search-backward-baseline)
       ;; Search for all list items between baseline and END
       (while (and (< (point) end)
-                  (re-search-forward markdown-regex-list end t))
+                  (re-search-forward markdown-regex-list end 'limit))
         ;; Level of list nesting
         (setq level (length bounds))
         ;; Pre blocks need to be indented one level past the list level
