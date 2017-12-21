@@ -2432,6 +2432,16 @@ Test currently fails because this case isn't handled properly."
    (markdown-test-range-has-face 19 19 'markdown-markup-face)
    (markdown-test-range-has-face 20 20 nil)))
 
+(ert-deftest test-markdown-font-lock/code-italics-precedence ()
+  "Test that inline code takes precedence over italics.
+Test currently fails because this case isn't handled properly."
+  (markdown-test-string
+   "*text `code* text`"
+   (markdown-test-range-has-face 1 6 nil)
+   (markdown-test-range-has-face 7 7 'markdown-markup-face)
+   (markdown-test-range-has-face 8 17 'markdown-inline-code-face)
+   (markdown-test-range-has-face 18 18 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/code-in-comment ()
   "Test that inline code is not matched inside a comment."
   (markdown-test-string
