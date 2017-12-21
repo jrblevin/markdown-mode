@@ -3050,7 +3050,7 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
         (and (or (null (setq bounds (car (get-text-property pos prop))))
                  (< (cl-first bounds) pos))
              (< (point) last)
-             (setq pos (next-single-char-property-change pos prop nil last))
+             (setq pos (next-single-property-change pos prop nil last))
              (goto-char pos)))
     (when bounds
       (set-match-data (cl-seventh bounds))
@@ -3078,7 +3078,7 @@ Restore match data previously stored in PROPERTY."
   (let ((saved (get-text-property (point) property))
         pos)
     (unless saved
-      (setq pos (next-single-char-property-change (point) property nil last))
+      (setq pos (next-single-property-change (point) property nil last))
       (setq saved (get-text-property pos property)))
     (when saved
       (set-match-data saved)
