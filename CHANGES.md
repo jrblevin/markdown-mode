@@ -4,6 +4,8 @@
 
 *   **Breaking changes:**
 
+    -   GNU Emacs 24.4 or later is required.  Support for Emacs 24.3
+        has been dropped.
     -   Face variables, such as `markdown-italic-face` are now
         obsolete.  Use face names directly in code and customizations.
         The face names themselves are unaffected, so this shouldn't
