@@ -89,6 +89,7 @@
         ([GH-275][])
     -   Make code block language detection handle unspecified
         or unknown code block languages.  ([GH-284][])
+    -   Fix precedence of inline code over inline links.
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216

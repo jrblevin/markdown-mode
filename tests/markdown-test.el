@@ -2421,9 +2421,7 @@ See GH-223."
    (markdown-test-range-has-face 7 10 nil)))
 
 (ert-deftest test-markdown-font-lock/code-link-precedence ()
-  "Test that inline code takes precedence over inline links.
-Test currently fails because this case isn't handled properly."
-  :expected-result :failed
+  "Test that inline code takes precedence over inline links."
   (markdown-test-string
    "[not a `link](/foo`)"
    (markdown-test-range-has-face 1 7 nil)
@@ -2431,6 +2429,18 @@ Test currently fails because this case isn't handled properly."
    (markdown-test-range-has-face 9 18 'markdown-inline-code-face)
    (markdown-test-range-has-face 19 19 'markdown-markup-face)
    (markdown-test-range-has-face 20 20 nil)))
+
+(ert-deftest test-markdown-font-lock/code-in-link-text ()
+  "Test that inline code in link text is fontified properly"
+  (markdown-test-string
+   "[`this is a` link](/foo)"
+   (markdown-test-range-has-face 1 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 11 'markdown-inline-code-face)
+   (markdown-test-range-has-face 12 12 'markdown-markup-face)
+   (markdown-test-range-has-face 3 17 'markdown-link-face)
+   (markdown-test-range-has-face 18 19 'markdown-markup-face)
+   (markdown-test-range-has-face 20 23 'markdown-url-face)
+   (markdown-test-range-has-face 24 24 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/code-italics-precedence ()
   "Test that inline code takes precedence over italics.

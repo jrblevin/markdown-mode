@@ -3138,29 +3138,42 @@ analysis."
 (defun markdown-match-generic-links (last ref)
   "Match inline links from point to LAST.
 When REF is non-nil, match reference links instead of standard
-links with URLs."
+links with URLs.
+This function should only be used during font-lock, as it
+determines syntax based on the presence of faces for previously
+processed elements."
   ;; Search for the next potential link (not in a code block).
-  (while (and (progn
-                ;; Clear match data to test for a match after functions returns.
-                (set-match-data nil)
-                ;; Preliminary regular expression search so we can return
-                ;; quickly upon failure.  This doesn't handle malformed links
-                ;; or nested square brackets well, so if it passes we back up
-                ;; continue with a more precise search.
-                (re-search-forward
-                 (if ref
-                     markdown-regex-link-reference
-                   markdown-regex-link-inline)
-                 last 'limit))
-              ;; Keep searching if this is in a code block, inline
-              ;; code, or a comment, or if it is include syntax.
-              (or (markdown-code-block-at-point-p)
-                  (markdown-inline-code-at-pos-p (match-beginning 0))
-                  (markdown-inline-code-at-pos-p (match-end 0))
-                  (markdown-in-comment-p)
-                  (and (char-equal (char-after (point-at-bol)) ?<)
-                       (char-equal (char-after (1+ (point-at-bol))) ?<)))
-              (< (point) last)))
+  (let ((prohibited-faces '(markdown-pre-face
+                            markdown-code-face
+                            markdown-inline-code-face
+                            markdown-comment-face))
+        found)
+    (while
+        (and (not found) (< (point) last)
+             (progn
+               ;; Clear match data to test for a match after functions returns.
+               (set-match-data nil)
+               ;; Preliminary regular expression search so we can return
+               ;; quickly upon failure.  This doesn't handle malformed links
+               ;; or nested square brackets well, so if it passes we back up
+               ;; continue with a more precise search.
+               (re-search-forward
+                (if ref
+                    markdown-regex-link-reference
+                  markdown-regex-link-inline)
+                last 'limit)))
+      ;; Keep searching if this is in a code block, inline code, or a
+      ;; comment, or if it is include syntax. The link text portion
+      ;; (group 3) may contain inline code or comments, but the
+      ;; markup, URL, and title should not be part of such elements.
+      (if (or (markdown-range-property-any
+               (match-beginning 0) (match-end 2) 'face prohibited-faces)
+              (markdown-range-property-any
+               (match-beginning 4) (match-end 0) 'face prohibited-faces)
+              (and (char-equal (char-after (point-at-bol)) ?<)
+                   (char-equal (char-after (1+ (point-at-bol))) ?<)))
+          (set-match-data nil)
+        (setq found t))))
   ;; Match opening exclamation point (optional) and left bracket.
   (when (match-beginning 2)
     (let* ((bang (match-beginning 1))
@@ -3227,14 +3240,6 @@ links with URLs."
         nil)
        ;; Return t if a match occurred
        (t t)))))
-
-(defun markdown-match-inline-links (last)
-  "Match standard inline links from point to LAST."
-  (markdown-match-generic-links last nil))
-
-(defun markdown-match-reference-links (last)
-  "Match inline reference links from point to LAST."
-  (markdown-match-generic-links last t))
 
 (defun markdown-match-angle-uris (last)
   "Match angle bracket URIs from point to LAST."
@@ -7497,9 +7502,8 @@ Translate filenames using `markdown-filename-translate-function'."
                      'invisible 'markdown-markup
                      'rear-nonsticky t
                      'font-lock-multiline t))
-           ;; Link part
+           ;; Link part (without face)
            (lp (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-link-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (if title (concat title "\n" url) url)))
@@ -7518,7 +7522,11 @@ Translate filenames using `markdown-filename-translate-function'."
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)))
-      (when link-start (add-text-properties link-start link-end lp))
+      ;; Preserve existing faces applied to link part (e.g., inline code)
+      (when link-start
+        (add-text-properties link-start link-end lp)
+        (add-face-text-property link-start link-end
+                                'markdown-link-face 'append))
       (when url-start (add-text-properties url-start url-end up))
       (when title-start (add-text-properties url-end title-end tp))
       (when (and markdown-hide-urls url-start)
