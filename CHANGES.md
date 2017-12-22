@@ -38,6 +38,8 @@
     -   Added read-only viewing modes `markdown-view-mode` and
         `gfm-view-mode` with keymaps similar to `view-mode` and
         `help-mode`.  ([GH-296][])
+    -   Optionally add footnote definitions to the end of the imenu
+        index using `markdown-add-footnotes-to-imenu`.  ([GH-235][])
 
 *   Improvements:
 
@@ -99,6 +101,7 @@
   [gh-224]: https://github.com/jrblevin/markdown-mode/issues/224
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
+  [gh-235]: https://github.com/jrblevin/markdown-mode/issues/235
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
   [gh-246]: https://github.com/jrblevin/markdown-mode/issues/246
   [gh-247]: https://github.com/jrblevin/markdown-mode/issues/247

@@ -792,6 +792,9 @@ provides an interface to all of the possible customizations:
     flat list may allow for faster keyboard navigation via tab
     completion.
 
+  * `markdown-add-footnotes-to-imenu` - Add footnote definitions to
+    the end of the imenu index (default: `t`).
+
   * `comment-auto-fill-only-comments` - variable is made
     buffer-local and set to `nil` by default.  In programming
     language modes, when this variable is non-nil, only comments

@@ -5690,6 +5690,38 @@ comments = false
       (should (member "Header2" headers))
       (should-not (member "comments = false" headers)))))
 
+(ert-deftest test-markdown-imenu/include-footnotes ()
+  "Check that footnotes are added to the imenu.
+https://github.com/jrblevin/markdown-mode/issues/235"
+  (markdown-test-string "# H1
+
+[^fn1]: footnote 1
+
+## H2
+
+[^fn2]: footnote 2
+"
+    (let* ((markdown-add-footnotes-to-imenu t)
+           (entries (mapcar #'car (markdown-imenu-create-flat-index))))
+      (should (member "^fn1" entries))
+      (should (member "^fn2" entries)))))
+
+(ert-deftest test-markdown-imenu/no-footnotes ()
+  "Check that footnotes are not added to the imenu.
+https://github.com/jrblevin/markdown-mode/issues/235"
+  (markdown-test-string "# H1
+
+[^fn1]: footnote 1
+
+## H2
+
+[^fn2]: footnote 2
+"
+    (let* ((markdown-add-footnotes-to-imenu nil)
+           (entries (mapcar #'car (markdown-imenu-create-flat-index))))
+      (should-not (member "^fn1" entries))
+      (should-not (member "^fn2" entries)))))
+
 (ert-deftest test-markdown-command/function ()
   "Test ‘markdown’ with ‘markdown-command’ being a function."
   (markdown-test-string "foo"

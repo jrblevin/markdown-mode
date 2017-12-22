@@ -415,6 +415,13 @@ completion."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.2"))
 
+(defcustom markdown-add-footnotes-to-imenu t
+  "Add footnotes to end of imenu heading index."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.4"))
+
 (defcustom markdown-make-gfm-checkboxes-buttons t
   "When non-nil, make GFM checkboxes into buttons."
   :group 'markdown
@@ -4721,6 +4728,33 @@ NIL is returned instead."
         (forward-line)
         (append result (list (point)))))))
 
+(defun markdown-get-defined-footnotes ()
+  "Return a list of all defined footnotes.
+Result is an alist of pairs (MARKER . LINE), where MARKER is the
+footnote marker, a string, and LINE is the line number containing
+the footnote definition.
+
+For example, suppose the following footnotes are defined at positions
+448 and 475:
+
+\[^1]: First footnote here.
+\[^marker]: Second footnote.
+
+Then the returned list is: ((\"^1\" . 478) (\"^marker\" . 475))"
+  (save-excursion
+    (goto-char (point-min))
+    (let (footnotes)
+      (while (markdown-search-until-condition
+              (lambda () (and (not (markdown-code-block-at-point-p))
+                              (not (markdown-inline-code-at-point-p))
+                              (not (markdown-in-comment-p))))
+              markdown-regex-footnote-definition nil t)
+        (let ((marker (match-string-no-properties 1))
+              (pos (match-beginning 0)))
+          (unless (zerop (length marker))
+            (cl-pushnew (cons marker pos) footnotes :test #'equal))))
+      (reverse footnotes))))
+
 
 ;;; Element Removal ===========================================================
 
@@ -5556,6 +5590,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
          (self-heading ".")
          hashes pos level heading)
     (save-excursion
+      ;; Headings
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
         (unless (markdown-code-block-at-point-p)
@@ -5595,13 +5630,19 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
                 (setcdr sibling-alist alist)
                 (setq cur-alist alist))
               (setq cur-level level))))))
-      (cdr root))))
+      ;; Footnotes
+      (let ((fn (markdown-get-defined-footnotes)))
+        (if (or (zerop (length fn))
+                (null markdown-add-footnotes-to-imenu))
+            (cdr root)
+          (nconc (cdr root) (list (cons "Footnotes" fn))))))))
 
 (defun markdown-imenu-create-flat-index ()
   "Create and return a flat imenu index alist for the current buffer.
 See `imenu-create-index-function' and `imenu--index-alist' for details."
   (let* ((empty-heading "-") index heading pos)
     (save-excursion
+      ;; Headings
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
         (when (and (not (markdown-code-block-at-point-p))
@@ -5614,6 +5655,9 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
           (or (> (length heading) 0)
               (setq heading empty-heading))
           (setq index (append index (list (cons heading pos))))))
+      ;; Footnotes
+      (when markdown-add-footnotes-to-imenu
+        (nconc index (markdown-get-defined-footnotes)))
       index)))
 
 
