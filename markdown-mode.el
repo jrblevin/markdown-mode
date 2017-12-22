@@ -5506,6 +5506,20 @@ See also `markdown-mode-map'.")
      ["Mark Block" markdown-mark-block]
      ["Mark Section" mark-defun]
      ["Mark Subtree" markdown-mark-subtree])
+    ("Tables"
+     ["Move Row Up" markdown-move-up :enable (markdown-table-at-point-p) :keys "C-c <up>"]
+     ["Move Row Down" markdown-move-down :enable (markdown-table-at-point-p) :keys "C-c <down>"]
+     ["Move Column Left" markdown-demote :enable (markdown-table-at-point-p) :keys "C-c <left>"]
+     ["Move Column Right" markdown-promote :enable (markdown-table-at-point-p) :keys "C-c <right>"]
+     ["Delete Row" markdown-table-delete-row :enable (markdown-table-at-point-p)]
+     ["Insert Row" markdown-table-insert-row :enable (markdown-table-at-point-p)]
+     ["Delete Column" markdown-table-delete-column :enable (markdown-table-at-point-p)]
+     ["Insert Column" markdown-table-insert-column :enable (markdown-table-at-point-p)]
+     "--"
+     ["Convert Region to Table" markdown-table-convert-region]
+     ["Sort Table Lines" markdown-table-sort-lines :enable (markdown-table-at-point-p)]
+     ["Transpose Table" markdown-table-transpose :enable (markdown-table-at-point-p)]
+)
     ("Lists"
      ["Insert List Item" markdown-insert-list-item]
      ["Move Subtree Up" markdown-move-up :keys "C-c <up>"]
