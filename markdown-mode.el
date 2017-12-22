@@ -7625,7 +7625,7 @@ and disable it otherwise."
   (markdown-reload-extensions))
 
 
-;;; WikiLink Following/Markup =================================================
+;;; Wiki Links ================================================================
 
 (defun markdown-wiki-link-p ()
   "Return non-nil if wiki links are enabled and `point' is at a true wiki link.
@@ -7815,6 +7815,43 @@ Designed to be used with the `after-change-functions' hook."
   "Refontify all wiki links in the buffer."
   (interactive)
   (markdown-check-change-for-wiki-link (point-min) (point-max)))
+
+(defun markdown-toggle-wiki-links (&optional arg)
+  "Toggle support for wiki links.
+With a prefix argument ARG, enable wiki link support if ARG is positive,
+and disable it otherwise."
+  (interactive (list (or current-prefix-arg 'toggle)))
+  (setq markdown-enable-wiki-links
+        (if (eq arg 'toggle)
+            (not markdown-enable-wiki-links)
+          (> (prefix-numeric-value arg) 0)))
+  (if markdown-enable-wiki-links
+      (message "markdown-mode wiki link support enabled")
+    (message "markdown-mode wiki link support disabled"))
+  (markdown-reload-extensions))
+
+(defun markdown-setup-wiki-link-hooks ()
+  "Add or remove hooks for fontifying wiki links.
+These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
+  ;; Anytime text changes make sure it gets fontified correctly
+  (if (and markdown-enable-wiki-links
+           markdown-wiki-link-fontify-missing)
+      (add-hook 'after-change-functions
+                'markdown-check-change-for-wiki-link-after-change t t)
+    (remove-hook 'after-change-functions
+                 'markdown-check-change-for-wiki-link-after-change t))
+  ;; If we left the buffer there is a really good chance we were
+  ;; creating one of the wiki link documents. Make sure we get
+  ;; refontified when we come back.
+  (if (and markdown-enable-wiki-links
+           markdown-wiki-link-fontify-missing)
+      (progn
+        (add-hook 'window-configuration-change-hook
+                  'markdown-fontify-buffer-wiki-links t t)
+        (markdown-fontify-buffer-wiki-links))
+    (remove-hook 'window-configuration-change-hook
+                 'markdown-fontify-buffer-wiki-links t)
+  (markdown-unfontify-region-wiki-links (point-min) (point-max))))
 
 
 ;;; Following & Doing =========================================================
@@ -8017,46 +8054,6 @@ before regenerating font-lock rules for extensions."
     (when (assoc 'markdown-enable-math file-local-variables-alist)
       (markdown-toggle-math markdown-enable-math))
     (markdown-reload-extensions)))
-
-
-;;; Wiki Links ================================================================
-
-(defun markdown-toggle-wiki-links (&optional arg)
-  "Toggle support for wiki links.
-With a prefix argument ARG, enable wiki link support if ARG is positive,
-and disable it otherwise."
-  (interactive (list (or current-prefix-arg 'toggle)))
-  (setq markdown-enable-wiki-links
-        (if (eq arg 'toggle)
-            (not markdown-enable-wiki-links)
-          (> (prefix-numeric-value arg) 0)))
-  (if markdown-enable-wiki-links
-      (message "markdown-mode wiki link support enabled")
-    (message "markdown-mode wiki link support disabled"))
-  (markdown-reload-extensions))
-
-(defun markdown-setup-wiki-link-hooks ()
-  "Add or remove hooks for fontifying wiki links.
-These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
-  ;; Anytime text changes make sure it gets fontified correctly
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (add-hook 'after-change-functions
-                'markdown-check-change-for-wiki-link-after-change t t)
-    (remove-hook 'after-change-functions
-                 'markdown-check-change-for-wiki-link-after-change t))
-  ;; If we left the buffer there is a really good chance we were
-  ;; creating one of the wiki link documents. Make sure we get
-  ;; refontified when we come back.
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (progn
-        (add-hook 'window-configuration-change-hook
-                  'markdown-fontify-buffer-wiki-links t t)
-        (markdown-fontify-buffer-wiki-links))
-    (remove-hook 'window-configuration-change-hook
-                 'markdown-fontify-buffer-wiki-links t)
-  (markdown-unfontify-region-wiki-links (point-min) (point-max))))
 
 
 ;;; Math Support ==============================================================
