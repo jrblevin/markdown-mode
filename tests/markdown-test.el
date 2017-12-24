@@ -963,89 +963,121 @@ Test point position upon removal and insertion."
                         (should (string-equal (buffer-string) "<>"))
                         (should (= (point) 2))))
 
-(ert-deftest test-markdown-insertion/list-item ()
-  "Test `markdown-insert-list-item' on several lists."
-  ;; No existing list
+(ert-deftest test-markdown-insertion/list-item-1 ()
+  "Test `markdown-insert-list-item' when there is no existing list."
   (markdown-test-string "abc"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "abc\n  * "))
-                        (should (= (point) 9)))
-  ;; Following a list item, on the same line
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "abc\n  * "))
+    (should (= (point) 9))))
+
+(ert-deftest test-markdown-insertion/list-item-2 ()
+  "Test `markdown-insert-list-item' following a list item, on the same line."
   (markdown-test-string "  * foo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "  * foo\n  * ")))
-  ;; Following a list item, on the next line
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "  * foo\n  * "))))
+
+(ert-deftest test-markdown-insertion/list-item-3 ()
+  "Test `markdown-insert-list-item' following a list item, on the next line."
   (markdown-test-string "- foo\n"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "- foo\n- ")))
-  ;; Following a list item, after a blank line
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "- foo\n- "))))
+
+(ert-deftest test-markdown-insertion/list-item-4 ()
+  "Test `markdown-insert-list-item' following a list item, after a blank line."
   (markdown-test-string "- foo\n\n"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "- foo\n\n- ")))
-  ;; Preceding a list item
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "- foo\n\n- "))))
+
+(ert-deftest test-markdown-insertion/list-item-5 ()
+  "Test `markdown-insert-list-item' preceding a list item."
   (markdown-test-string "- foo\n"
-                        (goto-char (point-min))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "- \n- foo\n")))
-  ;; Preceding a list item and a blank line
+    (goto-char (point-min))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "- \n- foo\n"))))
+
+(ert-deftest test-markdown-insertion/list-item-6 ()
+  "Test `markdown-insert-list-item' preceding a list item and a blank line."
   (markdown-test-string "\n\n- foo\n"
-                        (goto-char (point-min))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "- \n\n- foo\n")))
-  ;; In the middle of a list item
+    (goto-char (point-min))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "- \n\n- foo\n"))))
+
+(ert-deftest test-markdown-insertion/list-item-7 ()
+  "Test `markdown-insert-list-item' in the middle of a list item."
   (markdown-test-string "- foo bar\n"
-                        (forward-word)
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "- foo\n-  bar\n")))
-  ;; Before a list marker, but not at beginning of line
+    (forward-word)
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "- foo\n-  bar\n"))))
+
+(ert-deftest test-markdown-insertion/list-item-8 ()
+  "Test `markdown-insert-list-item' before marker, not at beginning of line."
   (markdown-test-string "   - foo\n"
-                        (forward-char 2)
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "   - \n   - foo\n")))
-  ;; Following an ordered list item
+    (forward-char 2)
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "   - \n   - foo\n"))))
+
+(ert-deftest test-markdown-insertion/list-item-9 ()
+  "Test `markdown-insert-list-item' following an ordered list item."
   (markdown-test-string "6. foo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "6. foo\n7. ")))
-  ;; Following a fancy list item, on the next line
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "6. foo\n7. "))))
+
+(ert-deftest test-markdown-insertion/list-item-10 ()
+  "Test `markdown-insert-list-item' after fancy list item, on the next line."
   (markdown-test-string "#. foo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "#. foo\n#. ")))
-  ;; Following a nested ordered list item
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "#. foo\n#. "))))
+
+(ert-deftest test-markdown-insertion/list-item-11 ()
+  "Test `markdown-insert-list-item' following a nested ordered list item."
   (markdown-test-string "6. foo\n    1. bar"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. ")))
-  ;; Preceding an ordered list item
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "6. foo\n    1. bar\n    2. "))))
+
+(ert-deftest test-markdown-insertion/list-item-12 ()
+  "Test `markdown-insert-list-item' preceding an ordered list item."
   (markdown-test-string "\n1. foo\n2. bar"
-                        (goto-char (point-min))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string) "1. \n1. foo\n2. bar")))
-  ;; Preserve previous spacing in ordered list
+    (goto-char (point-min))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string) "1. \n1. foo\n2. bar"))))
+
+(ert-deftest test-markdown-insertion/list-item-13 ()
+  "Test `markdown-insert-list-item' preserves previous spacing in ordered list."
   (markdown-test-string "1.        foo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string)  "1.        foo\n2.        ")))
-  ;; Adjust spacing for number width changes (e.g., 9 -> 10)
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string)  "1.        foo\n2.        "))))
+
+(ert-deftest test-markdown-insertion/list-item-14 ()
+  "Test `markdown-insert-list-item' adjusts spacing for number width changes.
+For example, 9 to 10."
   (markdown-test-string "9.  foo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string)  "9.  foo\n10. ")))
-  ;; Don't adjust spacing for number width changes if no extra whitespace
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string)  "9.  foo\n10. "))))
+
+(ert-deftest test-markdown-insertion/list-item-15 ()
+  "Test `markdown-insert-list-item' don't adjust for number width
+changes if no extra whitespace."
   (markdown-test-string "99. foo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string)  "99. foo\n100. ")))
-  ;; Don't adjust spacing if tabs are used as whitespace
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string)  "99. foo\n100. "))))
+
+(ert-deftest test-markdown-insertion/list-item-16 ()
+  "Test that `markdown-insert-list-item' spacing.
+Don't adjust spacing if tabs are used as whitespace."
   (markdown-test-string "9.\tfoo"
-                        (goto-char (point-max))
-                        (call-interactively 'markdown-insert-list-item)
-                        (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
+    (goto-char (point-max))
+    (call-interactively 'markdown-insert-list-item)
+    (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
 
 (ert-deftest test-markdown-insertion/nested-list-marker ()
   "Test marker detection for `markdown-insert-list-item'."
@@ -3031,7 +3063,7 @@ takes precedence)."
     (markdown-test-range-has-face 30 33 'markdown-bold-face)
     (should-not (markdown-range-property-any 30 33 'face '(markdown-italic-face)))))
 
-(ert-deftest test-markdown-font-lock/heading-with-italics-and-bold ()
+(ert-deftest test-markdown-font-lock/hr-vs-level-2-setext ()
   "Test that HRs are distinguished from setext H2 markup."
   (markdown-test-file "outline.text"
     (goto-char 485)
@@ -3426,59 +3458,58 @@ echo \"Hello, world!\"
     ;; check ending tildes
     (markdown-test-check-match-limits 'markdown-tilde-fence-end 1 43 46 43)))
 
-(ert-deftest test-markdown-parsing/get-code-block-at-pos ()
-  "Test whether `markdown-code-block-at-pos' works in all situations. All
-  situations are:
-1. pre block
-2. tilde block
-3. gfm block
-4. yaml metadata block"
+(ert-deftest test-markdown-parsing/code-block-at-pos-pre-indent ()
+  "Ensure `markdown-code-block-at-pos' works in a pre block."
+  (markdown-test-string
+   "    pre code
+    random stuff
+    more preformatted code"
+   (should (equal (markdown-code-block-at-pos 1) '(1 57)))
+   (should (equal (markdown-code-block-at-pos 30) '(1 57)))
+   (should (equal (markdown-code-block-at-pos (point-max)) '(1 57)))))
+
+(ert-deftest test-markdown-parsing/code-block-at-pos-tilde-fenced ()
+  "Ensure `markdown-code-block-at-pos' works in tilde fenced blocks."
+  (markdown-test-string
+   "~~~ ruby
+some_ruby_fun()
+~~~"
+   (should (equal (markdown-code-block-at-pos 1) '(1 29)))
+   (should (equal (markdown-code-block-at-pos 10) '(1 29)))
+   (should (equal (markdown-code-block-at-pos 26) '(1 29)))))
+
+(ert-deftest test-markdown-parsing/code-block-at-pos-gfm-fenced ()
+  "Ensure `markdown-code-block-at-pos' works in GFM fenced blocks."
+  (markdown-test-string
+   "``` {.bash}
+#!/bin/sh
+echo hey
+```"
+   (should (equal (markdown-code-block-at-pos 1) '(1 35)))
+   (should (equal (markdown-code-block-at-pos 13) '(1 35)))
+   (should (equal (markdown-code-block-at-pos 23) '(1 35)))
+   (should (equal (markdown-code-block-at-pos 35) '(1 35)))))
+
+(ert-deftest test-markdown-parsing/code-block-at-pos-yaml-metadata ()
+  "Ensure `markdown-code-block-at-pos' works in YAML metadata blocks."
   (let ((markdown-use-pandoc-style-yaml-metadata t))
     (markdown-test-string
-        "
-~~~ ruby
-some_ruby_fun()
-~~~
-
----
+     "---
 a: b
 ---
 
-``` {.bash}
-#!/bin/sh
-echo hey
-```
-
-    pre code
-    random stuff
-    more preformatted code
-
 ---
 data: pandoc
-...
-"
-      ;; start/mid/end at tilde block
-      (should (equal (markdown-code-block-at-pos 2) (list 2 30)))
-      (should (equal (markdown-code-block-at-pos 11) (list 2 30)))
-      (should (equal (markdown-code-block-at-pos 27) (list 2 30)))
-      ;; yaml metadata block
-      (should (equal (markdown-code-block-at-pos 32) (list 32 44)))
-      (should (equal (markdown-code-block-at-pos 36) (list 32 44)))
-      (should (equal (markdown-code-block-at-pos 41) (list 32 44)))
-      ;; gfm block
-      (should (equal (markdown-code-block-at-pos 46) (list 46 80)))
-      (should (equal (markdown-code-block-at-pos 58) (list 46 80)))
-      (should (equal (markdown-code-block-at-pos 77) (list 46 80)))
-      ;; pre block
-      (should (equal (markdown-code-block-at-pos 82) (list 82 138)))
-      (should (equal (markdown-code-block-at-pos 99) (list 82 138)))
-      (should (equal (markdown-code-block-at-pos 137) (list 82 138)))
-      ;; pandoc yaml metadata block (should work if yaml above works)
-      (should (equal (markdown-code-block-at-pos 140) (list 140 160)))
-      (should (equal (markdown-code-block-at-pos 142) (list 140 160)))
-      (should (equal (markdown-code-block-at-pos 144) (list 140 160)))
-      (should (equal (markdown-code-block-at-pos 157) (list 140 160)))
-      (should (equal (markdown-code-block-at-pos 159) (list 140 160))))))
+..."
+     ;; First YAML block
+     (should (equal (markdown-code-block-at-pos 1) '(1 13)))
+     (should (equal (markdown-code-block-at-pos 5) '(1 13)))
+     (should (equal (markdown-code-block-at-pos 12) '(1 13)))
+     ;; Pandoc YAML block
+     (should (equal (markdown-code-block-at-pos 15) '(15 35)))
+     (should (equal (markdown-code-block-at-pos 19) '(15 35)))
+     (should (equal (markdown-code-block-at-pos 34) '(15 35)))
+     (should (equal (markdown-code-block-at-pos 35) '(15 35))))))
 
 (ert-deftest test-markdown-parsing/syntax-get-fenced-blocks ()
   "Test whether *-get-fenced-block-* functions work in the case where a block is
@@ -3955,18 +3986,10 @@ puts 'hello, world'
     (call-interactively 'markdown-insert-list-item)
     (should (string-equal (buffer-string) "  - [ ] task\n  - [ ] "))))
 
-(ert-deftest test-markdown-lists/promotion-and-demotion ()
+(ert-deftest test-markdown-lists/promotion-and-demotion-1 ()
   "Test function `markdown-promote-list-item'."
   (markdown-test-file "nested-list.text"
     (forward-line)
-    (should (looking-at-p "   - List level 1 item 2
-
-     Second paragraph of item 2
-
-        Nested pre block in item 2
-        Four spaces past the marker
-
-     Another paragraph of item 2"))
     (markdown-demote-list-item)
     (should (looking-at-p "       - List level 1 item 2
 
@@ -3984,8 +4007,11 @@ puts 'hello, world'
         Nested pre block in item 2
         Four spaces past the marker
 
-     Another paragraph of item 2"))
-    (goto-char (point-min))
+     Another paragraph of item 2"))))
+
+(ert-deftest test-markdown-lists/promotion-and-demotion-2 ()
+  "Test function `markdown-promote-list-item'."
+  (markdown-test-file "nested-list.text"
     (forward-line 22)
     (should (looking-at-p "           - List level 3 item 1
 
