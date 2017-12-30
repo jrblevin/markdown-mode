@@ -3234,6 +3234,19 @@ across blocks]"
           markdown-html-attr-name-face
           markdown-html-attr-value-face))))))
 
+(ert-deftest test-markdown-font-lock/html-tag-angle-bracket ()
+  "Test a hard to parse HTML attribute with an angle bracket."
+  (markdown-test-string "<img title=\"displays >\" src=\"big.gif\">"
+    (markdown-test-range-has-face 1 1 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 2 4 'markdown-html-tag-name-face)
+    (markdown-test-range-has-face 6 10 'markdown-html-attr-name-face)
+    (markdown-test-range-has-face 11 11 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 12 23 'markdown-html-attr-value-face)
+    (markdown-test-range-has-face 25 27 'markdown-html-attr-name-face)
+    (markdown-test-range-has-face 28 28 'markdown-html-tag-delimiter-face)
+    (markdown-test-range-has-face 29 37 'markdown-html-attr-value-face)
+    (markdown-test-range-has-face 38 38 'markdown-html-tag-delimiter-face)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
