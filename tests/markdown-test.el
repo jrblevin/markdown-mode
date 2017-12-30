@@ -5633,7 +5633,10 @@ x|"
     (markdown-mode)
 
     ;; Activating `markdown-live-preview-mode' signals error
-    (should-error (markdown-live-preview-mode))
+    (let ((data (should-error (markdown-live-preview-mode) :type 'user-error)))
+      (should (string-match-p
+               (rx bos "Buffer " (+ nonl) " does not visit a file" eos)
+               (error-message-string data))))
 
     ;; After trying to activate live preview mode, mode is not activated
     (should-not markdown-live-preview-mode)
