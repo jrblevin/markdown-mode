@@ -166,6 +166,14 @@ This file is not saved."
     (if (re-search-forward regexp nil t)
         (goto-char (match-end 0)))))
 
+(defun markdown-command-identity (begin end output-buffer)
+  "A placeholder `markdown-command' function for testing.
+Extracts region from BEGIN to END and inserts in OUTPUT-BUFFER."
+  (let ((text (buffer-substring-no-properties begin end)))
+    (with-current-buffer output-buffer
+      (erase-buffer)
+      (insert text))))
+
 (defun markdown-test ()
   "Run all defined test cases for `markdown-mode'."
   (interactive)
@@ -5103,6 +5111,7 @@ This includes preserving whitespace after the pipe."
   "Test `markdown-export-kill-buffer' equal to nil."
   (markdown-test-temp-file "inline.text"
     (let* ((markdown-export-kill-buffer nil)
+           (markdown-command #'markdown-command-identity)
            (export-file (markdown-export))
            (export-buffer (get-file-buffer export-file)))
       ;; Output buffer should remain open.
@@ -5112,6 +5121,7 @@ This includes preserving whitespace after the pipe."
   "Test `markdown-export-kill-buffer' equal to t."
   (markdown-test-temp-file "inline.text"
     (let* ((markdown-export-kill-buffer t)
+           (markdown-command #'markdown-command-identity)
            (export-file (markdown-export))
            (export-buffer (get-file-buffer export-file)))
       ;; Output buffer should be killed.
@@ -5124,6 +5134,7 @@ This includes preserving whitespace after the pipe."
   (markdown-test-temp-file "lists.text"
    (let* ((before-hook-run nil)
           (orig-point (point))
+          (markdown-command #'markdown-command-identity)
           (func (lambda ()
                   ;; Change value of a variable
                   (setq before-hook-run t)
@@ -5157,6 +5168,7 @@ This includes preserving whitespace after the pipe."
   "Test hook run after export XHTML."
   (markdown-test-temp-file "lists.text"
    (let* ((after-hook-run nil)
+          (markdown-command #'markdown-command-identity)
           (markdown-export-kill-buffer nil)
           (func (lambda ()
                   ;; Change variable value
@@ -5590,36 +5602,40 @@ x|"
     (should-not (markdown-live-preview-remove))))
 
 (ert-deftest test-markdown-ext/live-preview-exports ()
-  (markdown-test-temp-file "inline.text"
-    (unless (and (fboundp 'libxml-parse-html-region) (require 'eww nil t))
-      (should-error (markdown-live-preview-mode)))
-    (markdown-test-fake-eww
-     (markdown-live-preview-mode)
-     (should (buffer-live-p markdown-live-preview-buffer))
-     (should (eq (current-buffer)
-                 (with-current-buffer markdown-live-preview-buffer
-                   markdown-live-preview-source-buffer)))
-     (kill-buffer markdown-live-preview-buffer)
-     (should (null markdown-live-preview-buffer))
-     (set-buffer-modified-p t)
-     (save-buffer)                      ; should create new export
-     (should (buffer-live-p markdown-live-preview-buffer)))))
+  (let ((markdown-command #'markdown-command-identity))
+    (markdown-test-temp-file "inline.text"
+      (unless (and (fboundp 'libxml-parse-html-region) (require 'eww nil t))
+        (should-error (markdown-live-preview-mode)))
+      (markdown-test-fake-eww
+       (markdown-live-preview-mode)
+       (should (buffer-live-p markdown-live-preview-buffer))
+       (should (eq (current-buffer)
+                   (with-current-buffer markdown-live-preview-buffer
+                     markdown-live-preview-source-buffer)))
+       (kill-buffer markdown-live-preview-buffer)
+       (should (null markdown-live-preview-buffer))
+       (set-buffer-modified-p t)
+       (save-buffer) ;; should create new export
+       (should (buffer-live-p markdown-live-preview-buffer))))))
 
 (ert-deftest test-markdown-ext/live-preview-delete-exports ()
   (markdown-test-fake-eww
    (let ((markdown-live-preview-delete-export 'delete-on-destroy)
+         (markdown-command #'markdown-command-identity)
          file-output)
      (markdown-test-temp-file "inline.text"
        (markdown-live-preview-mode)
        (setq file-output (markdown-export-file-name)))
      (should-not (file-exists-p file-output)))
    (let ((markdown-live-preview-delete-export 'delete-on-export)
+         (markdown-command #'markdown-command-identity)
          file-output)
      (markdown-test-temp-file "inline.text"
        (markdown-live-preview-mode)
        (setq file-output (markdown-export-file-name))
        (should-not (file-exists-p file-output))))
    (let ((markdown-live-preview-delete-export nil)
+         (markdown-command #'markdown-command-identity)
          file-output)
      (unwind-protect
          (markdown-test-temp-file "inline.text"
