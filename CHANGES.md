@@ -40,6 +40,9 @@
         `help-mode`.  ([GH-296][])
     -   Optionally add footnote definitions to the end of the imenu
         index using `markdown-add-footnotes-to-imenu`.  ([GH-235][])
+    -   Add custom variables `markdown-xhtml-body-preamble` and
+        `markdown-xhtml-body-epilogue` for wrapping additional XHTML
+        tags around the output.  ([GH-280][], [GH-281][])
 
 *   Improvements:
 
@@ -130,6 +133,8 @@
   [gh-275]: https://github.com/jrblevin/markdown-mode/issues/275
   [gh-276]: https://github.com/jrblevin/markdown-mode/issues/276
   [gh-277]: https://github.com/jrblevin/markdown-mode/pull/277
+  [gh-280]: https://github.com/jrblevin/markdown-mode/issues/280
+  [gh-281]: https://github.com/jrblevin/markdown-mode/pull/281
   [gh-284]: https://github.com/jrblevin/markdown-mode/issues/284
   [gh-291]: https://github.com/jrblevin/markdown-mode/issues/291
   [gh-296]: https://github.com/jrblevin/markdown-mode/issues/296

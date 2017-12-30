@@ -353,6 +353,20 @@ exporting with `markdown-export'."
   :group 'markdown
   :type 'string)
 
+(defcustom markdown-xhtml-body-preamble ""
+  "Content to include in the XHTML <body> block, before the output."
+  :group 'markdown
+  :type 'string
+  :safe 'stringp
+  :package-version '(markdown-mode . "2.4"))
+
+(defcustom markdown-xhtml-body-epilogue ""
+  "Content to include in the XHTML <body> block, after the output."
+  :group 'markdown
+  :type 'string
+  :safe 'stringp
+  :package-version '(markdown-mode . "2.4"))
+
 (defcustom markdown-xhtml-standalone-regexp
   "^\\(<\\?xml\\|<!DOCTYPE\\|<html\\)"
   "Regexp indicating whether `markdown-command' output is standalone XHTML."
@@ -7251,7 +7265,11 @@ Standalone XHTML output is identified by an occurrence of
     (insert markdown-xhtml-header-content))
   (insert "\n</head>\n\n"
           "<body>\n\n")
+  (when (> (length markdown-xhtml-body-preamble) 0)
+    (insert markdown-xhtml-body-preamble "\n"))
   (goto-char (point-max))
+  (when (> (length markdown-xhtml-body-epilogue) 0)
+    (insert "\n" markdown-xhtml-body-epilogue))
   (insert "\n"
           "</body>\n"
           "</html>\n"))

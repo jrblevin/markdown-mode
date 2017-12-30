@@ -5140,6 +5140,36 @@ This includes preserving whitespace after the pipe."
       ;; Output buffer should be killed.
       (should-not export-buffer))))
 
+(ert-deftest test-markdown-export/body-preamble ()
+  "Test `markdown-xhtml-body-preamble'."
+  (markdown-test-temp-file "inline.text"
+    (let* ((str "<!-- body preamble test -->")
+           (markdown-xhtml-body-preamble str)
+           (markdown-command #'markdown-command-identity)
+           (markdown-export-kill-buffer nil)
+           (ofile (markdown-export))
+           (obuffer (get-file-buffer ofile)))
+      (with-current-buffer obuffer
+        (goto-char (point-min))
+        (should (search-forward str)))
+      (kill-buffer obuffer)
+      (delete-file ofile))))
+
+(ert-deftest test-markdown-export/body-epilogue ()
+  "Test `markdown-xhtml-body-epilogue'."
+  (markdown-test-temp-file "inline.text"
+    (let* ((str "<!-- body epilogue test -->")
+           (markdown-xhtml-body-epilogue str)
+           (markdown-command #'markdown-command-identity)
+           (markdown-export-kill-buffer nil)
+           (ofile (markdown-export))
+           (obuffer (get-file-buffer ofile)))
+      (with-current-buffer obuffer
+        (goto-char (point-min))
+        (should (search-forward str)))
+      (kill-buffer obuffer)
+      (delete-file ofile))))
+
 ;;; Hook tests:
 
 (ert-deftest test-markdown-hook/before-export ()
