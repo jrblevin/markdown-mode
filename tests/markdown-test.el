@@ -5733,6 +5733,24 @@ https://github.com/jrblevin/markdown-mode/issues/235"
       (should (buffer-live-p buffer))
       (should (equal calls `((1 4 ,buffer)))))))
 
+(ert-deftest test-markdown-command/does-not-exist ()
+  "Test ‘markdown’ with a non-existing ‘markdown-command’."
+  (skip-unless (not (file-executable-p "/does/not/exist")))
+  (markdown-test-string "foo"
+    (let* ((markdown-command "/does/not/exist")
+           (data (should-error (markdown) :type 'user-error)))
+      (should (string-prefix-p "/does/not/exist failed with exit code "
+                               (error-message-string data))))))
+
+(ert-deftest test-markdown-command/fails ()
+  "Test ‘markdown’ with a failing ‘markdown-command’."
+  (skip-unless (executable-find "false"))
+  (markdown-test-string "foo"
+    (let* ((markdown-command "false")
+           (data (should-error (markdown) :type 'user-error)))
+      (should (string-prefix-p "false failed with exit code "
+                               (error-message-string data))))))
+
 (ert-deftest test-markdown-open-command/function ()
   "Test ‘markdown-open’ with ‘markdown-open-command’ being a function."
   (markdown-test-string ""
@@ -5740,6 +5758,26 @@ https://github.com/jrblevin/markdown-mode/issues/235"
            (markdown-open-command (lambda () (cl-incf calls))))
       (markdown-open)
       (should (equal calls 1)))))
+
+(ert-deftest test-markdown-open-command/does-not-exist ()
+  "Test ‘markdown-open’ with a non-existing ‘markdown-open-command’."
+  (skip-unless (not (file-executable-p "/does/not/exist")))
+  (markdown-test-string "foo"
+    (let ((buffer-file-name
+           (expand-file-name "bar.md" temporary-file-directory))
+          (markdown-open-command "/does/not/exist"))
+      (should-error (markdown-open) :type 'file-error))))
+
+(ert-deftest test-markdown-open-command/fails ()
+  "Test ‘markdown-open’ with a failing ‘markdown-open-command’."
+  (skip-unless (executable-find "false"))
+  (markdown-test-string "foo"
+    (let* ((buffer-file-name
+            (expand-file-name "bar.md" temporary-file-directory))
+           (markdown-open-command "false")
+           (data (should-error (markdown-open) :type 'user-error)))
+      (should (string-prefix-p "false failed with exit code "
+                               (error-message-string data))))))
 
 (provide 'markdown-test)
 

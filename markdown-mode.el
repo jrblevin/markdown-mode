@@ -7148,25 +7148,39 @@ Return the name of the output buffer used."
 
       (unless output-buffer-name
         (setq output-buffer-name markdown-output-buffer-name))
-      (cond
-       ;; Handle case when `markdown-command' does not read from stdin
-       ((and (stringp markdown-command) markdown-command-needs-filename)
-        (if (not buffer-file-name)
-            (user-error "Must be visiting a file")
-          (shell-command (concat markdown-command " "
-                                 (shell-quote-argument buffer-file-name))
-                         output-buffer-name)))
-       ;; Pass region to `markdown-command' via stdin
-       (t
-        (let ((buf (get-buffer-create output-buffer-name)))
-          (with-current-buffer buf
-            (setq buffer-read-only nil)
-            (erase-buffer))
-          (if (stringp markdown-command)
-              (call-process-region begin-region end-region
-                                   shell-file-name nil buf nil
-                                   shell-command-switch markdown-command)
-            (funcall markdown-command begin-region end-region buf))))))
+      (let ((exit-code
+             (cond
+              ;; Handle case when `markdown-command' does not read from stdin
+              ((and (stringp markdown-command) markdown-command-needs-filename)
+               (if (not buffer-file-name)
+                   (user-error "Must be visiting a file")
+                 ;; Don’t use ‘shell-command’ because it’s not guaranteed to
+                 ;; return the exit code of the process.
+                 (shell-command-on-region
+                  ;; Pass an empty region so that stdin is empty.
+                  (point) (point)
+                  (concat markdown-command " "
+                          (shell-quote-argument buffer-file-name))
+                  output-buffer-name)))
+              ;; Pass region to `markdown-command' via stdin
+              (t
+               (let ((buf (get-buffer-create output-buffer-name)))
+                 (with-current-buffer buf
+                   (setq buffer-read-only nil)
+                   (erase-buffer))
+                 (if (stringp markdown-command)
+                     (call-process-region begin-region end-region
+                                          shell-file-name nil buf nil
+                                          shell-command-switch markdown-command)
+                   (funcall markdown-command begin-region end-region buf)
+                   ;; If the ‘markdown-command’ function didn’t signal an
+                   ;; error, assume it succeeded by binding ‘exit-code’ to 0.
+                   0))))))
+        ;; The exit code can be a signal description string, so don’t use ‘=’
+        ;; or ‘zerop’.
+        (unless (eq exit-code 0)
+          (user-error "%s failed with exit code %s"
+                      markdown-command exit-code))))
     output-buffer-name))
 
 (defun markdown-standalone (&optional output-buffer-name)
@@ -7488,7 +7502,13 @@ update this buffer's contents."
       (if (not buffer-file-name)
           (user-error "Must be visiting a file")
         (save-buffer)
-        (call-process markdown-open-command nil 0 nil buffer-file-name))
+        (let ((exit-code (call-process markdown-open-command nil 0 nil
+                                       buffer-file-name)))
+          ;; The exit code can be a signal description string, so don’t use ‘=’
+          ;; or ‘zerop’.
+          (unless (eq exit-code 0)
+            (user-error "%s failed with exit code %s"
+                        markdown-open-command exit-code))))
     (funcall markdown-open-command))
   nil)
 
