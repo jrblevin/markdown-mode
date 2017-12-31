@@ -43,6 +43,8 @@
     -   Add custom variables `markdown-xhtml-body-preamble` and
         `markdown-xhtml-body-epilogue` for wrapping additional XHTML
         tags around the output.  ([GH-280][], [GH-281][])
+    -   Add custom variable `markdown-fontify-code-block-default` to
+        fontify code block with a default mode
 
 *   Improvements:
 

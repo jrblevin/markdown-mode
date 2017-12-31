@@ -8459,6 +8459,11 @@ LANG is a string, and the returned major mode is a symbol."
          (intern (concat lang "-mode"))
          (intern (concat (downcase lang) "-mode")))))
 
+(defvar markdown-fontify-code-block-default nil
+  "Default mode to use to fontify code blocks.
+This mode is used when automatic detection fails, such as for GFM
+code blocks with no language specified.")
+
 (defun markdown-fontify-code-blocks-generic (matcher last)
   "Add text properties to next code block from point to LAST.
 Use matching function MATCHER."
@@ -8474,7 +8479,8 @@ Use matching function MATCHER."
                                 (if (bolp) (point-at-bol 2) (point-at-bol 3))))
                lang)
           (if (and markdown-fontify-code-blocks-natively
-                   (setq lang (markdown-code-block-lang)))
+                   (or (setq lang (markdown-code-block-lang))
+                       markdown-fontify-code-block-default))
               (markdown-fontify-code-block-natively lang start end)
             (add-text-properties start end '(face markdown-pre-face)))
           ;; Set background for block as well as opening and closing lines.
@@ -8500,7 +8506,8 @@ This function is called by Emacs for automatic fontification when
 `markdown-fontify-code-blocks-natively' is non-nil.  LANG is the
 language used in the block. START and END specify the block
 position."
-  (let ((lang-mode (markdown-get-lang-mode lang)))
+  (let ((lang-mode (if lang (markdown-get-lang-mode lang)
+                     markdown-fontify-code-block-default)))
     (when (fboundp lang-mode)
       (let ((string (buffer-substring-no-properties start end))
             (modified (buffer-modified-p))
