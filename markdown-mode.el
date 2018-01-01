@@ -520,7 +520,7 @@ This applies to insertions done with
 This mode is used when automatic detection fails, such as for GFM
 code blocks with no language specified."
   :group 'markdown
-  :type 'symbol
+  :type '(choice function (const :tag "None" nil))
   :package-version '(markdown-mode . "2.4"))
 
 (defcustom markdown-gfm-uppercase-checkbox nil
