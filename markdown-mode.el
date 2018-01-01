@@ -8415,6 +8415,14 @@ setting the variable `markdown-code-lang-modes'."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.3"))
 
+(defcustom markdown-fontify-code-block-default-mode nil
+  "Default mode to use to fontify code blocks.
+This mode is used when automatic detection fails, such as for GFM
+code blocks with no language specified."
+  :group 'markdown
+  :type '(choice function (const :tag "None" nil))
+  :package-version '(markdown-mode . "2.4"))
+
 (defun markdown-toggle-fontify-code-blocks-natively (&optional arg)
   "Toggle the native fontification of code blocks.
 With a prefix argument ARG, enable if ARG is positive,
@@ -8459,11 +8467,6 @@ LANG is a string, and the returned major mode is a symbol."
          (intern (concat lang "-mode"))
          (intern (concat (downcase lang) "-mode")))))
 
-(defvar markdown-fontify-code-block-default nil
-  "Default mode to use to fontify code blocks.
-This mode is used when automatic detection fails, such as for GFM
-code blocks with no language specified.")
-
 (defun markdown-fontify-code-blocks-generic (matcher last)
   "Add text properties to next code block from point to LAST.
 Use matching function MATCHER."
@@ -8480,7 +8483,7 @@ Use matching function MATCHER."
                lang)
           (if (and markdown-fontify-code-blocks-natively
                    (or (setq lang (markdown-code-block-lang))
-                       markdown-fontify-code-block-default))
+                       markdown-fontify-code-block-default-mode))
               (markdown-fontify-code-block-natively lang start end)
             (add-text-properties start end '(face markdown-pre-face)))
           ;; Set background for block as well as opening and closing lines.
@@ -8507,7 +8510,7 @@ This function is called by Emacs for automatic fontification when
 language used in the block. START and END specify the block
 position."
   (let ((lang-mode (if lang (markdown-get-lang-mode lang)
-                     markdown-fontify-code-block-default)))
+                     markdown-fontify-code-block-default-mode)))
     (when (fboundp lang-mode)
       (let ((string (buffer-substring-no-properties start end))
             (modified (buffer-modified-p))

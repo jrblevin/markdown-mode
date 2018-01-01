@@ -43,8 +43,6 @@
     -   Add custom variables `markdown-xhtml-body-preamble` and
         `markdown-xhtml-body-epilogue` for wrapping additional XHTML
         tags around the output.  ([GH-280][], [GH-281][])
-    -   Add custom variable `markdown-fontify-code-block-default` to
-        fontify code block with a default mode
 
 *   Improvements:
 
@@ -60,8 +58,10 @@
     -   Support double-backslash math delimiters.  ([GH-270][])
     -   New user option `markdown-export-kill-buffer` to kill or preserve
         HTML export output buffer.  ([GH-224][])
-    -   Add `markdown-edit-code-block-default-mode` to specify default
-        mode for indirect editing of code blocks.  ([GH-251][])
+    -   Add custom variables `markdown-edit-code-block-default-mode`
+        and `markdown-fontify-code-block-default-mode` to specify default
+        modes for indirect editing and fontification of code blocks.
+        ([GH-251][], [GH-303][])
     -   Insert-and-indirect-edit GFM code blocks simultaneously by
         giving a prefix argument to `C-c C-s C`.  ([GH-251][])
     -   Improve package load time by deferring calls to
@@ -140,6 +140,7 @@
   [gh-284]: https://github.com/jrblevin/markdown-mode/issues/284
   [gh-291]: https://github.com/jrblevin/markdown-mode/issues/291
   [gh-296]: https://github.com/jrblevin/markdown-mode/issues/296
+  [gh-303]: https://github.com/jrblevin/markdown-mode/pull/303
 
 # Markdown Mode 2.3
 
