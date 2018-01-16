@@ -9501,6 +9501,7 @@ spaces, or alternatively a TAB should be used as the separator."
     map)
   "Keymap for `markdown-view-mode'.")
 
+;;;###autoload
 (define-derived-mode markdown-view-mode markdown-mode "Markdown-View"
   "Major mode for viewing Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
@@ -9510,6 +9511,7 @@ spaces, or alternatively a TAB should be used as the separator."
   markdown-view-mode-map
   "Keymap for `gfm-view-mode'.")
 
+;;;###autoload
 (define-derived-mode gfm-view-mode gfm-mode "GFM-View"
   "Major mode for viewing GitHub Flavored Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
@@ -9517,6 +9519,7 @@ spaces, or alternatively a TAB should be used as the separator."
 
 
 ;;; Live Preview Mode  ============================================
+;;;###autoload
 (define-minor-mode markdown-live-preview-mode
   "Toggle native previewing on save for a specific markdown file."
   :lighter " MD-Preview"
