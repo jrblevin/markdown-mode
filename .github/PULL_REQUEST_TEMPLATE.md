@@ -10,7 +10,7 @@
 For more involved changes, it's probably best to open an issue first
 for discussion.  If you are fixing a known bug, please reference the
 issue number here or give a link to the issue.
-<!--
+-->
 
 ## Type of Change
 
