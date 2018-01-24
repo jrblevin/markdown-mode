@@ -7520,7 +7520,7 @@ update this buffer's contents."
       (if (not buffer-file-name)
           (user-error "Must be visiting a file")
         (save-buffer)
-        (let ((exit-code (call-process markdown-open-command nil 0 nil
+        (let ((exit-code (call-process markdown-open-command nil nil nil
                                        buffer-file-name)))
           ;; The exit code can be a signal description string, so don’t use ‘=’
           ;; or ‘zerop’.

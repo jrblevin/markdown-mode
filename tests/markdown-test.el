@@ -5864,7 +5864,7 @@ https://github.com/jrblevin/markdown-mode/issues/235"
             (expand-file-name "bar.md" temporary-file-directory))
            (markdown-open-command "false")
            (data (should-error (markdown-open) :type 'user-error)))
-      (should (string-prefix-p "false failed with exit code "
+      (should (string-prefix-p "false failed with exit code 1"
                                (error-message-string data))))))
 
 (provide 'markdown-test)
