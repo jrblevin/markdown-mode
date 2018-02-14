@@ -101,6 +101,7 @@
     -   Fix precedence of inline code over inline links.
     -   Improve error reporting for `markdown` and `markdown-open`.
         ([GH-291][])
+    -   Fix M-RET binding for terminals ([GH-317][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -141,6 +142,7 @@
   [gh-291]: https://github.com/jrblevin/markdown-mode/issues/291
   [gh-296]: https://github.com/jrblevin/markdown-mode/issues/296
   [gh-303]: https://github.com/jrblevin/markdown-mode/pull/303
+  [gh-317]: https://github.com/jrblevin/markdown-mode/pull/317
 
 # Markdown Mode 2.3
 
