@@ -1079,6 +1079,16 @@ Don't adjust spacing if tabs are used as whitespace."
     (call-interactively 'markdown-insert-list-item)
     (should (string-equal (buffer-string)  "9.\tfoo\n10.\t"))))
 
+(ert-deftest test-markdown-insertion/list-item-bound-keys ()
+  "Test that `markdown-insert-list-item' is bound to M-RET and equivalents."
+  (markdown-test-string "- foo"
+                        (goto-char (point-max))
+                        (execute-kbd-macro (read-kbd-macro "M-RET bar C-M-m baz"))
+                        (should (string-equal (buffer-string) "- foo\n- bar\n- baz"))
+                        (when (display-graphic-p)
+                          (execute-kbd-macro (read-kbd-macro "M-<return> quux"))
+                          (should (string-equal (buffer-string) "- foo\n- bar\n- baz\n- quux")))))
+
 (ert-deftest test-markdown-insertion/nested-list-marker ()
   "Test marker detection for `markdown-insert-list-item'."
   (markdown-test-string
