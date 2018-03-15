@@ -101,6 +101,7 @@
     -   Fix precedence of inline code over inline links.
     -   Improve error reporting for `markdown` and `markdown-open`.
         ([GH-291][])
+    -   Do not fail displaying inline images on empty links
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
