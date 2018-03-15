@@ -8376,7 +8376,8 @@ or \\[markdown-toggle-inline-images]."
         (let ((start (match-beginning 0))
               (end (match-end 0))
               (file (match-string-no-properties 6)))
-          (when (file-exists-p file)
+          (when (and (not (zerop (length file)))
+		     (file-exists-p file))
             (let* ((abspath (if (file-name-absolute-p file)
                                 file
                               (concat default-directory file)))
