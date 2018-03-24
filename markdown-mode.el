@@ -409,9 +409,9 @@ nil to disable this."
 The car is used for subscript, the cdr is used for superscripts."
   :group 'markdown
   :type '(cons (choice (sexp :tag "Subscript form")
-		       (const :tag "No lowering" nil))
-	       (choice (sexp :tag "Superscript form")
-		       (const :tag "No raising" nil)))
+                       (const :tag "No lowering" nil))
+               (choice (sexp :tag "Superscript form")
+                       (const :tag "No raising" nil)))
   :package-version '(markdown-mode . "2.4"))
 
 (defcustom markdown-unordered-list-item-prefix "  * "
