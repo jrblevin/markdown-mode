@@ -5938,6 +5938,7 @@ REFERENCE must be a pair of (ref . line-number)."
     ;; Create a reference button
     (insert-button label
                    :type 'markdown-goto-line-button
+                   'face 'bold
                    'target-buffer oldbuf
                    'target-line (cdr reference))
     (insert (format " (%d)\n" (cdr reference)))))
