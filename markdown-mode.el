@@ -5889,7 +5889,6 @@ The string %buffer% will be replaced by the corresponding buffer name.")
   'follow-link t
   'face 'italic
   'action (lambda (b)
-            (message (button-get b 'buffer))
             (switch-to-buffer-other-window (button-get b 'target-buffer))
             ;; use call-interactively to silence compiler
             (let ((current-prefix-arg (button-get b 'target-line)))
