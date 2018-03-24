@@ -5291,6 +5291,7 @@ Assumes match data is available for `markdown-regex-italic'."
      (propertize "e" 'face 'markdown-bold-face) "xport, "
      "export & pre" (propertize "v" 'face 'markdown-bold-face) "iew, "
      (propertize "c" 'face 'markdown-bold-face) "heck refs, "
+     (propertize "u" 'face 'markdown-bold-face) "nused refs, "
      "C-h = more")))
 
 (defvar markdown-mode-style-map
@@ -5335,6 +5336,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "l") 'markdown-live-preview-mode)
     (define-key map (kbd "w") 'markdown-kill-ring-save)
     (define-key map (kbd "c") 'markdown-check-refs)
+    (define-key map (kbd "u") 'markdown-unused-refs)
     (define-key map (kbd "n") 'markdown-cleanup-list-numbers)
     (define-key map (kbd "]") 'markdown-complete-buffer)
     (define-key map (kbd "^") 'markdown-table-sort-lines)
@@ -5591,6 +5593,7 @@ See also `markdown-mode-map'.")
       :keys "C-c C-s w"]
      "---"
      ["Check References" markdown-check-refs]
+     ["Find Unused References" markdown-unused-refs]
      ["Toggle URL Hiding" markdown-toggle-url-hiding
       :style radio
       :selected markdown-hide-urls]
@@ -5807,6 +5810,31 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
 \((\"emacs\" (\"Nice editor\" . 12) (\"GNU Emacs\" . 45)) (\"elisp\" (\"manual\" . 127)))."
   (markdown-for-all-refs markdown-collect-undefined))
 
+(defun markdown-get-unused-refs ()
+  (cl-set-difference
+   (markdown-get-defined-references) (markdown-get-all-refs)
+   :test (lambda (e1 e2) (equal (car e1) e2))))
+
+(defconst markdown-unused-references-buffer
+  "*Unused references for %buffer%*"
+  "Pattern for name of buffer for listing unused references.
+The string %buffer% will be replaced by the corresponding
+`markdown-mode' buffer name.")
+
+(defun markdown-unused-references-buffer (&optional buffer-name)
+  "Name and return buffer for unused reference checking.
+BUFFER-NAME is the name of the main buffer being visited."
+  (or buffer-name (setq buffer-name (buffer-name)))
+  (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
+                                    "%buffer%" buffer-name
+                                    markdown-unused-references-buffer))))
+    (with-current-buffer refbuf
+      (when view-mode
+        (View-exit-and-edit))
+      (use-local-map button-buffer-map)
+      (erase-buffer))
+    refbuf))
+
 (defconst markdown-reference-check-buffer
   "*Undefined references for %buffer%*"
   "Pattern for name of buffer for listing undefined references.
@@ -5912,6 +5940,17 @@ as by `markdown-get-undefined-refs'."
     (insert ")")
     (newline)))
 
+(defun markdown-insert-unused-reference-button (reference oldbuf)
+  "Insert a button for creating REFERENCE in buffer OLDBUF.
+REFERENCE must be a pair of (ref . line-number)."
+  (let ((label (car reference)))
+    ;; Create a reference button
+    (insert-button label
+                   :type 'markdown-goto-line-button
+                   'target-buffer oldbuf
+                   'target-line (cdr reference))
+    (insert (format " (%d)\n" (cdr reference)))))
+
 (defun markdown-insert-link-button (link oldbuf)
   "Insert a button for jumping to LINK in buffer OLDBUF.
 LINK should be a list of the form (text char line) containing
@@ -5970,6 +6009,29 @@ defined."
         (insert "The following references are undefined:\n\n")
         (dolist (ref refs)
           (markdown-insert-undefined-reference-button ref oldbuf))
+        (view-buffer-other-window refbuf)
+        (goto-char (point-min))
+        (forward-line 2)))))
+
+(defun markdown-unused-refs (&optional silent)
+  "Show all unused Markdown references in current `markdown-mode' buffer.
+If SILENT is non-nil, do not message anything when no unused
+references found."
+  (interactive "P")
+  (when (not (memq major-mode '(markdown-mode gfm-mode)))
+    (user-error "Not available in current mode"))
+  (let ((oldbuf (current-buffer))
+        (refs (markdown-get-unused-refs))
+        (refbuf (markdown-unused-references-buffer)))
+    (if (null refs)
+        (progn
+          (when (not silent)
+            (message "No unused references found"))
+          (kill-buffer refbuf))
+      (with-current-buffer refbuf
+        (insert "The following references are not used:\n\n")
+        (dolist (ref refs)
+          (markdown-insert-unused-reference-button ref oldbuf))
         (view-buffer-other-window refbuf)
         (goto-char (point-min))
         (forward-line 2)))))

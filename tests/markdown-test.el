@@ -3833,6 +3833,13 @@ puts 'hello, world'
 
 ;;; Reference Checking:
 
+(ert-deftest test-markdown-references/get-unused-refs ()
+  "Test `markdown-get-unused-refs'."
+  (markdown-test-file "refs.text"
+   (should (equal (markdown-get-unused-refs)
+                  '(("logorrhea" . 8)
+                    ("orphan" . 11))))))
+
 (ert-deftest test-markdown-references/goto-line-button ()
   "Create and test a goto line button."
   (markdown-test-string "line 1\nline 2\n"
@@ -3864,6 +3871,25 @@ puts 'hello, world'
    (with-current-buffer (get-buffer check)
      (should (equal (local-key-binding (kbd "TAB")) 'forward-button))
      (should (equal (local-key-binding (kbd "<backtab>")) 'backward-button))))))
+
+(ert-deftest test-markdown-references/undefined-refs-killing ()
+  "Test that buttons in unused references buffer delete lines when pushed."
+  (markdown-test-file "refs.text"
+   (let* ((target (buffer-name))
+          (check (markdown-replace-regexp-in-string
+                  "%buffer%" target
+                  markdown-unused-references-buffer))
+          (original-unused-refs (markdown-get-unused-refs)))
+   (markdown-unused-refs)
+   ;; Push X
+   (with-current-buffer (get-buffer check)
+     (forward-button 1)
+     (call-interactively 'push-button))
+   ;; The first orphan should now be gone with the rest of orphans
+   ;; moved up by one line
+   (should (equal (markdown-get-unused-refs)
+                  (mapcar (lambda (o) (cons (car o) (1- (cdr o))))
+                          (cdr original-unused-refs)))))))
 
 ;;; Lists:
 
