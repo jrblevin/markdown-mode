@@ -2781,13 +2781,16 @@ intact additional processing."
                          (match-beginning 5) (match-end 5)))))))))
 
 (defun markdown-get-defined-references ()
-  "Return a list of all defined reference labels (not including square brackets)."
+  "Return all defined reference labels and their line numbers (not including square brackets)."
   (save-excursion
     (goto-char (point-min))
     (let (refs)
       (while (re-search-forward markdown-regex-reference-definition nil t)
         (let ((target (match-string-no-properties 2)))
-          (cl-pushnew target refs :test #'equal)))
+          (cl-pushnew
+           (cons target
+                 (markdown-line-number-at-pos (match-beginning 2)))
+           refs :test #'equal :key #'car)))
       (reverse refs))))
 
 (defun markdown-get-used-uris ()
@@ -3938,7 +3941,7 @@ This is an internal function called by
     (let* ((ref (when ref (concat "[" ref "]")))
            (defined-refs (append
                           (mapcar (lambda (ref) (concat "[" ref "]"))
-                                  (markdown-get-defined-references))))
+                                  (mapcar #'car (markdown-get-defined-references)))))
            (used-uris (markdown-get-used-uris))
            (uri-or-ref (completing-read
                         "URL or [reference]: "
