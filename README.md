@@ -355,6 +355,11 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     end of the buffer.  Similarly, selecting the line number will
     jump to the corresponding line.
 
+    <kbd>C-c C-c u</kbd> will check for unused references.  This will
+    also open a small buffer if any are found, similar to undefined
+    reference checking.  The buffer for unused references will contain
+    `X` buttons that remove unused references when selected.
+
     <kbd>C-c C-c n</kbd> renumbers any ordered lists in the buffer that are
     out of sequence.
 
