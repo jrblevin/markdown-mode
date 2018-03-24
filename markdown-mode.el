@@ -5815,25 +5815,26 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
    (markdown-get-defined-references) (markdown-get-all-refs)
    :test (lambda (e1 e2) (equal (car e1) e2))))
 
-(defconst markdown-unused-references-buffer
-  "*Unused references for %buffer%*"
-  "Pattern for name of buffer for listing unused references.
-The string %buffer% will be replaced by the corresponding
-`markdown-mode' buffer name.")
+(defmacro defun-markdown-buffer (name docstring)
+  "Define a function to name and return a buffer.
 
-(defun markdown-unused-references-buffer (&optional buffer-name)
-  "Name and return buffer for unused reference checking.
-BUFFER-NAME is the name of the main buffer being visited."
-  (or buffer-name (setq buffer-name (buffer-name)))
-  (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
-                                    "%buffer%" buffer-name
-                                    markdown-unused-references-buffer))))
-    (with-current-buffer refbuf
-      (when view-mode
-        (View-exit-and-edit))
-      (use-local-map button-buffer-map)
-      (erase-buffer))
-    refbuf))
+By convention, NAME must be a name of a string constant with
+%buffer% placeholder used to name the buffer, and will also be
+used as a name of the function defined.
+
+DOCSTRING will be used as the first part of the docstring."
+  `(defun ,name (&optional buffer-name)
+     ,(concat docstring "\n\nBUFFER-NAME is the name of the main buffer being visited.")
+     (or buffer-name (setq buffer-name (buffer-name)))
+     (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
+                                       "%buffer%" buffer-name
+                                       ,name))))
+       (with-current-buffer refbuf
+         (when view-mode
+           (View-exit-and-edit))
+         (use-local-map button-buffer-map)
+         (erase-buffer))
+       refbuf)))
 
 (defconst markdown-reference-check-buffer
   "*Undefined references for %buffer%*"
@@ -5841,38 +5842,28 @@ BUFFER-NAME is the name of the main buffer being visited."
 The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
-(defun markdown-reference-check-buffer (&optional buffer-name)
-  "Name and return buffer for reference checking.
-BUFFER-NAME is the name of the main buffer being visited."
-  (or buffer-name (setq buffer-name (buffer-name)))
-  (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
-                                    "%buffer%" buffer-name
-                                    markdown-reference-check-buffer))))
-    (with-current-buffer refbuf
-      (when view-mode
-        (View-exit-and-edit))
-      (use-local-map button-buffer-map)
-      (erase-buffer))
-    refbuf))
+(defun-markdown-buffer
+  markdown-reference-check-buffer
+  "Name and return buffer for reference checking.")
+
+(defconst markdown-unused-references-buffer
+  "*Unused references for %buffer%*"
+  "Pattern for name of buffer for listing unused references.
+The string %buffer% will be replaced by the corresponding
+`markdown-mode' buffer name.")
+
+(defun-markdown-buffer
+  markdown-unused-references-buffer
+  "Name and return buffer for unused reference checking.")
 
 (defconst markdown-reference-links-buffer
   "*Reference links for %buffer%*"
   "Pattern for name of buffer for listing references.
 The string %buffer% will be replaced by the corresponding buffer name.")
 
-(defun markdown-reference-links-buffer (&optional buffer-name)
-  "Name, setup, and return a buffer for listing links.
-BUFFER-NAME is the name of the main buffer being visited."
-  (or buffer-name (setq buffer-name (buffer-name)))
-  (let ((linkbuf (get-buffer-create (markdown-replace-regexp-in-string
-                                     "%buffer%" buffer-name
-                                     markdown-reference-links-buffer))))
-    (with-current-buffer linkbuf
-      (when view-mode
-        (View-exit-and-edit))
-      (use-local-map button-buffer-map)
-      (erase-buffer))
-    linkbuf))
+(defun-markdown-buffer
+  markdown-reference-links-buffer
+  "Name, setup, and return a buffer for listing links.")
 
 ;; Add an empty Markdown reference definition to buffer
 ;; specified in the 'target-buffer property.  The reference name is
