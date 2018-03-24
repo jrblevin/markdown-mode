@@ -5766,6 +5766,35 @@ the link, and line is the line number on which the link appears."
           (cl-pushnew (list text start line) links :test #'equal))))
     links))
 
+(defmacro markdown-for-all-refs (f)
+  `(let ((result))
+     (save-excursion
+       (goto-char (point-min))
+       (while
+           (re-search-forward markdown-regex-link-reference nil t)
+         (let* ((text (match-string-no-properties 3))
+                (reference (match-string-no-properties 6))
+                (target (downcase (if (string= reference "") text reference))))
+          (,f text target result))))
+     (reverse result)))
+
+(defmacro markdown-collect-always (_ target result)
+  `(cl-pushnew ,target ,result :test #'equal))
+
+(defmacro markdown-collect-undefined (text target result)
+  `(unless (markdown-reference-definition target)
+     (let ((entry (assoc ,target ,result)))
+       (if (not entry)
+           (cl-pushnew
+            (cons ,target (list (cons ,text (markdown-line-number-at-pos))))
+            ,result :test #'equal)
+         (setcdr entry
+                 (append (cdr entry) (list (cons ,text (markdown-line-number-at-pos)))))))))
+
+(defun markdown-get-all-refs ()
+  "Return a list of all Markdown references."
+  (markdown-for-all-refs markdown-collect-always))
+
 (defun markdown-get-undefined-refs ()
   "Return a list of undefined Markdown references.
 Result is an alist of pairs (reference . occurrences), where
@@ -5773,23 +5802,7 @@ occurrences is itself another alist of pairs (label . line-number).
 For example, an alist corresponding to [Nice editor][Emacs] at line 12,
 \[GNU Emacs][Emacs] at line 45 and [manual][elisp] at line 127 is
 \((\"emacs\" (\"Nice editor\" . 12) (\"GNU Emacs\" . 45)) (\"elisp\" (\"manual\" . 127)))."
-  (let ((missing))
-    (save-excursion
-      (goto-char (point-min))
-      (while
-          (re-search-forward markdown-regex-link-reference nil t)
-        (let* ((text (match-string-no-properties 3))
-               (reference (match-string-no-properties 6))
-               (target (downcase (if (string= reference "") text reference))))
-          (unless (markdown-reference-definition target)
-            (let ((entry (assoc target missing)))
-              (if (not entry)
-                  (cl-pushnew
-                   (cons target (list (cons text (markdown-line-number-at-pos))))
-                   missing :test #'equal)
-                (setcdr entry
-                        (append (cdr entry) (list (cons text (markdown-line-number-at-pos))))))))))
-      (reverse missing))))
+  (markdown-for-all-refs markdown-collect-undefined))
 
 (defconst markdown-reference-check-buffer
   "*Undefined references for %buffer%*"
