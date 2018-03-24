@@ -3615,7 +3615,15 @@ only partially propertized."
   "Test `markdown-get-defined-references'."
   (markdown-test-file "syntax.text"
    (should (equal (markdown-get-defined-references)
-                  '("src" "1" "2" "3" "4" "5" "6" "bq" "l"))))
+                  '(("src" . 37)
+                    ("1" . 55)
+                    ("2" . 56)
+                    ("3" . 57)
+                    ("4" . 58)
+                    ("5" . 59)
+                    ("6" . 60)
+                    ("bq" . 205)
+                    ("l" . 206)))))
   (markdown-test-file "outline.text"
    (should (equal (markdown-get-defined-references) nil)))
   (markdown-test-file "wiki-links.text"
