@@ -5883,7 +5883,7 @@ The string %buffer% will be replaced by the corresponding buffer name.")
               (markdown-check-refs t))))
 
 ;; Jump to line in buffer specified by 'target-buffer property.
-;; Line number is button's 'line property.
+;; Line number is button's 'target-line property.
 (define-button-type 'markdown-goto-line-button
   'help-echo "mouse-1, RET: go to line"
   'follow-link t
@@ -5911,7 +5911,7 @@ The string %buffer% will be replaced by the corresponding buffer name.")
 (defun markdown-insert-undefined-reference-button (reference oldbuf)
   "Insert a button for creating REFERENCE in buffer OLDBUF.
 REFERENCE should be a list of the form (reference . occurrences),
-as by `markdown-get-undefined-refs'."
+as returned by `markdown-get-undefined-refs'."
   (let ((label (car reference)))
     ;; Create a reference button
     (insert-button label
