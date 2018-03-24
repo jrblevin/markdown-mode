@@ -3850,6 +3850,12 @@ puts 'hello, world'
                   '(("logorrhea" . 8)
                     ("orphan" . 11))))))
 
+(ert-deftest test-markdown-references/get-undefined-refs ()
+  "Test `markdown-get-undefined-refs'."
+  (markdown-test-file "refs.text"
+   (should (equal (markdown-get-undefined-refs)
+                  '(("problems" ("problems" . 3) ("controversy" . 5)))))))
+
 (ert-deftest test-markdown-references/goto-line-button ()
   "Create and test a goto line button."
   (markdown-test-string "line 1\nline 2\n"
