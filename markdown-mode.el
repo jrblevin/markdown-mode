@@ -2788,7 +2788,7 @@ intact additional processing."
       (while (re-search-forward markdown-regex-reference-definition nil t)
         (let ((target (match-string-no-properties 2)))
           (cl-pushnew
-           (cons target
+           (cons (downcase target)
                  (markdown-line-number-at-pos (match-beginning 2)))
            refs :test #'equal :key #'car)))
       (reverse refs))))
