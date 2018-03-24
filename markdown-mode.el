@@ -5894,6 +5894,20 @@ The string %buffer% will be replaced by the corresponding buffer name.")
             (let ((current-prefix-arg (button-get b 'target-line)))
               (call-interactively 'goto-line))))
 
+;; Kill a line in buffer specified by 'target-buffer property.
+;; Line number is button's 'target-line property.
+(define-button-type 'markdown-kill-line-button
+  'help-echo "mouse-1, RET: kill line"
+  'follow-link t
+  'face 'italic
+  'action (lambda (b)
+            (switch-to-buffer-other-window (button-get b 'target-buffer))
+            ;; use call-interactively to silence compiler
+            (let ((current-prefix-arg (button-get b 'target-line)))
+              (call-interactively 'goto-line))
+            (kill-line 1)
+            (markdown-unused-refs t)))
+
 ;; Jumps to a particular link at location given by 'target-char
 ;; property in buffer given by 'target-buffer property.
 (define-button-type 'markdown-location-button
@@ -5933,14 +5947,22 @@ as returned by `markdown-get-undefined-refs'."
 (defun markdown-insert-unused-reference-button (reference oldbuf)
   "Insert a button for creating REFERENCE in buffer OLDBUF.
 REFERENCE must be a pair of (ref . line-number)."
-  (let ((label (car reference)))
+  (let ((label (car reference))
+        (line (cdr reference)))
     ;; Create a reference button
     (insert-button label
                    :type 'markdown-goto-line-button
                    'face 'bold
                    'target-buffer oldbuf
-                   'target-line (cdr reference))
-    (insert (format " (%d)\n" (cdr reference)))))
+                   'target-line line)
+    (insert (format " (%d) [" line))
+    (insert-button "X"
+                   :type 'markdown-kill-line-button
+                   'face 'bold
+                   'target-buffer oldbuf
+                   'target-line line)
+    (insert "]")
+    (newline)))
 
 (defun markdown-insert-link-button (link oldbuf)
   "Insert a button for jumping to LINK in buffer OLDBUF.
