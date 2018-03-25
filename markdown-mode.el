@@ -5811,9 +5811,11 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
   (markdown-for-all-refs markdown-collect-undefined))
 
 (defun markdown-get-unused-refs ()
-  (cl-set-difference
-   (markdown-get-defined-references) (markdown-get-all-refs)
-   :test (lambda (e1 e2) (equal (car e1) e2))))
+  (cl-sort
+   (cl-set-difference
+    (markdown-get-defined-references) (markdown-get-all-refs)
+    :test (lambda (e1 e2) (equal (car e1) e2)))
+   #'< :key #'cdr))
 
 (defmacro defun-markdown-buffer (name docstring)
   "Define a function to name and return a buffer.
