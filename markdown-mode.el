@@ -5979,53 +5979,66 @@ the link text, location, and line number."
           (t
            (error "No links for reference %s" reference)))))
 
-(defun markdown-check-refs (&optional silent)
+(defmacro defun-markdown-ref-checker
+    (name docstring checker-function buffer-function none-message buffer-header insert-reference)
+  "Define a function NAME acting on result of CHECKER-FUNCTION.
+
+DOCSTRING is used as a docstring for the defined function.
+
+BUFFER-FUNCTION should name and return an auxiliary buffer to put
+results in.
+
+NONE-MESSAGE is used when CHECKER-FUNCTION returns no results.
+
+BUFFER-HEADER is put into the auxiliary buffer first, followed by
+calling INSERT-REFERENCE for each element in the list returned by
+CHECKER-FUNCTION."
+  `(defun ,name (&optional silent)
+     ,(concat
+       docstring
+       "\n\nIf SILENT is non-nil, do not message anything when no
+such references found.")
+     (interactive "P")
+     (when (not (memq major-mode '(markdown-mode gfm-mode)))
+       (user-error "Not available in current mode"))
+     (let ((oldbuf (current-buffer))
+           (refs (,checker-function))
+           (refbuf (,buffer-function)))
+       (if (null refs)
+           (progn
+             (when (not silent)
+               (message ,none-message))
+             (kill-buffer refbuf))
+         (with-current-buffer refbuf
+           (insert ,buffer-header)
+           (dolist (ref refs)
+             (,insert-reference ref oldbuf))
+           (view-buffer-other-window refbuf)
+           (goto-char (point-min))
+           (forward-line 2))))))
+
+(defun-markdown-ref-checker
+  markdown-check-refs
   "Show all undefined Markdown references in current `markdown-mode' buffer.
-If SILENT is non-nil, do not message anything when no undefined
-references found.
+
 Links which have empty reference definitions are considered to be
 defined."
-  (interactive "P")
-  (when (not (memq major-mode '(markdown-mode gfm-mode)))
-    (user-error "Not available in current mode"))
-  (let ((oldbuf (current-buffer))
-        (refs (markdown-get-undefined-refs))
-        (refbuf (markdown-reference-check-buffer)))
-    (if (null refs)
-        (progn
-          (when (not silent)
-            (message "No undefined references found"))
-          (kill-buffer refbuf))
-      (with-current-buffer refbuf
-        (insert "The following references are undefined:\n\n")
-        (dolist (ref refs)
-          (markdown-insert-undefined-reference-button ref oldbuf))
-        (view-buffer-other-window refbuf)
-        (goto-char (point-min))
-        (forward-line 2)))))
+  markdown-get-undefined-refs
+  markdown-reference-check-buffer
+  "No undefined references found"
+  "The following references are undefined:\n\n"
+  markdown-insert-undefined-reference-button)
 
-(defun markdown-unused-refs (&optional silent)
-  "Show all unused Markdown references in current `markdown-mode' buffer.
-If SILENT is non-nil, do not message anything when no unused
-references found."
-  (interactive "P")
-  (when (not (memq major-mode '(markdown-mode gfm-mode)))
-    (user-error "Not available in current mode"))
-  (let ((oldbuf (current-buffer))
-        (refs (markdown-get-unused-refs))
-        (refbuf (markdown-unused-references-buffer)))
-    (if (null refs)
-        (progn
-          (when (not silent)
-            (message "No unused references found"))
-          (kill-buffer refbuf))
-      (with-current-buffer refbuf
-        (insert "The following references are not used:\n\n")
-        (dolist (ref refs)
-          (markdown-insert-unused-reference-button ref oldbuf))
-        (view-buffer-other-window refbuf)
-        (goto-char (point-min))
-        (forward-line 2)))))
+
+(defun-markdown-ref-checker
+  markdown-unused-refs
+  "Show all unused Markdown references in current `markdown-mode' buffer."
+  markdown-get-unused-refs
+  markdown-unused-references-buffer
+  "No unused references found"
+  "The following references are unused:\n\n"
+  markdown-insert-unused-reference-button)
+
 
 
 ;;; Lists =====================================================================
