@@ -9525,9 +9525,9 @@ spaces, or alternatively a TAB should be used as the separator."
   (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode) t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode) t)
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 
 ;;; GitHub Flavored Markdown Mode  ============================================
