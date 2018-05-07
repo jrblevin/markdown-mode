@@ -15,6 +15,12 @@
         `markdown-font-lock-keywords` is now used instead, but users
         should use `font-lock-add-keywords` instead of modifying this
         variable.
+    -   `markdown-mode` now adds entries to the beginning of
+        `auto-mode-alist` rather than the end. If you were relying on
+        the previous behavior in order to override these entries, you
+        should fix the problem by following best practice and ensuring
+        that your user configuration is loaded after the autoloads for
+        `markdown-mode` are evaluated.
 
 *   New features:
 
