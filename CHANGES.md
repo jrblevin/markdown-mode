@@ -43,6 +43,8 @@
     -   Add custom variables `markdown-xhtml-body-preamble` and
         `markdown-xhtml-body-epilogue` for wrapping additional XHTML
         tags around the output.  ([GH-280][], [GH-281][])
+    -   Add `markdown-unused-refs` command to list and clean up unused
+        references (available via `C-c C-c u`)
 
 *   Improvements:
 

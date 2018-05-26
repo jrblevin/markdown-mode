@@ -409,9 +409,9 @@ nil to disable this."
 The car is used for subscript, the cdr is used for superscripts."
   :group 'markdown
   :type '(cons (choice (sexp :tag "Subscript form")
-		       (const :tag "No lowering" nil))
-	       (choice (sexp :tag "Superscript form")
-		       (const :tag "No raising" nil)))
+                       (const :tag "No lowering" nil))
+               (choice (sexp :tag "Superscript form")
+                       (const :tag "No raising" nil)))
   :package-version '(markdown-mode . "2.4"))
 
 (defcustom markdown-unordered-list-item-prefix "  * "
@@ -2781,13 +2781,16 @@ intact additional processing."
                          (match-beginning 5) (match-end 5)))))))))
 
 (defun markdown-get-defined-references ()
-  "Return a list of all defined reference labels (not including square brackets)."
+  "Return all defined reference labels and their line numbers (not including square brackets)."
   (save-excursion
     (goto-char (point-min))
     (let (refs)
       (while (re-search-forward markdown-regex-reference-definition nil t)
         (let ((target (match-string-no-properties 2)))
-          (cl-pushnew target refs :test #'equal)))
+          (cl-pushnew
+           (cons (downcase target)
+                 (markdown-line-number-at-pos (match-beginning 2)))
+           refs :test #'equal :key #'car)))
       (reverse refs))))
 
 (defun markdown-get-used-uris ()
@@ -3938,7 +3941,7 @@ This is an internal function called by
     (let* ((ref (when ref (concat "[" ref "]")))
            (defined-refs (append
                           (mapcar (lambda (ref) (concat "[" ref "]"))
-                                  (markdown-get-defined-references))))
+                                  (mapcar #'car (markdown-get-defined-references)))))
            (used-uris (markdown-get-used-uris))
            (uri-or-ref (completing-read
                         "URL or [reference]: "
@@ -5288,6 +5291,7 @@ Assumes match data is available for `markdown-regex-italic'."
      (propertize "e" 'face 'markdown-bold-face) "xport, "
      "export & pre" (propertize "v" 'face 'markdown-bold-face) "iew, "
      (propertize "c" 'face 'markdown-bold-face) "heck refs, "
+     (propertize "u" 'face 'markdown-bold-face) "nused refs, "
      "C-h = more")))
 
 (defvar markdown-mode-style-map
@@ -5332,6 +5336,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "l") 'markdown-live-preview-mode)
     (define-key map (kbd "w") 'markdown-kill-ring-save)
     (define-key map (kbd "c") 'markdown-check-refs)
+    (define-key map (kbd "u") 'markdown-unused-refs)
     (define-key map (kbd "n") 'markdown-cleanup-list-numbers)
     (define-key map (kbd "]") 'markdown-complete-buffer)
     (define-key map (kbd "^") 'markdown-table-sort-lines)
@@ -5588,6 +5593,7 @@ See also `markdown-mode-map'.")
       :keys "C-c C-s w"]
      "---"
      ["Check References" markdown-check-refs]
+     ["Find Unused References" markdown-unused-refs]
      ["Toggle URL Hiding" markdown-toggle-url-hiding
       :style radio
       :selected markdown-hide-urls]
@@ -5766,6 +5772,35 @@ the link, and line is the line number on which the link appears."
           (cl-pushnew (list text start line) links :test #'equal))))
     links))
 
+(defmacro markdown-for-all-refs (f)
+  `(let ((result))
+     (save-excursion
+       (goto-char (point-min))
+       (while
+           (re-search-forward markdown-regex-link-reference nil t)
+         (let* ((text (match-string-no-properties 3))
+                (reference (match-string-no-properties 6))
+                (target (downcase (if (string= reference "") text reference))))
+          (,f text target result))))
+     (reverse result)))
+
+(defmacro markdown-collect-always (_ target result)
+  `(cl-pushnew ,target ,result :test #'equal))
+
+(defmacro markdown-collect-undefined (text target result)
+  `(unless (markdown-reference-definition target)
+     (let ((entry (assoc ,target ,result)))
+       (if (not entry)
+           (cl-pushnew
+            (cons ,target (list (cons ,text (markdown-line-number-at-pos))))
+            ,result :test #'equal)
+         (setcdr entry
+                 (append (cdr entry) (list (cons ,text (markdown-line-number-at-pos)))))))))
+
+(defun markdown-get-all-refs ()
+  "Return a list of all Markdown references."
+  (markdown-for-all-refs markdown-collect-always))
+
 (defun markdown-get-undefined-refs ()
   "Return a list of undefined Markdown references.
 Result is an alist of pairs (reference . occurrences), where
@@ -5773,23 +5808,35 @@ occurrences is itself another alist of pairs (label . line-number).
 For example, an alist corresponding to [Nice editor][Emacs] at line 12,
 \[GNU Emacs][Emacs] at line 45 and [manual][elisp] at line 127 is
 \((\"emacs\" (\"Nice editor\" . 12) (\"GNU Emacs\" . 45)) (\"elisp\" (\"manual\" . 127)))."
-  (let ((missing))
-    (save-excursion
-      (goto-char (point-min))
-      (while
-          (re-search-forward markdown-regex-link-reference nil t)
-        (let* ((text (match-string-no-properties 3))
-               (reference (match-string-no-properties 6))
-               (target (downcase (if (string= reference "") text reference))))
-          (unless (markdown-reference-definition target)
-            (let ((entry (assoc target missing)))
-              (if (not entry)
-                  (cl-pushnew
-                   (cons target (list (cons text (markdown-line-number-at-pos))))
-                   missing :test #'equal)
-                (setcdr entry
-                        (append (cdr entry) (list (cons text (markdown-line-number-at-pos))))))))))
-      (reverse missing))))
+  (markdown-for-all-refs markdown-collect-undefined))
+
+(defun markdown-get-unused-refs ()
+  (cl-sort
+   (cl-set-difference
+    (markdown-get-defined-references) (markdown-get-all-refs)
+    :test (lambda (e1 e2) (equal (car e1) e2)))
+   #'< :key #'cdr))
+
+(defmacro defun-markdown-buffer (name docstring)
+  "Define a function to name and return a buffer.
+
+By convention, NAME must be a name of a string constant with
+%buffer% placeholder used to name the buffer, and will also be
+used as a name of the function defined.
+
+DOCSTRING will be used as the first part of the docstring."
+  `(defun ,name (&optional buffer-name)
+     ,(concat docstring "\n\nBUFFER-NAME is the name of the main buffer being visited.")
+     (or buffer-name (setq buffer-name (buffer-name)))
+     (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
+                                       "%buffer%" buffer-name
+                                       ,name))))
+       (with-current-buffer refbuf
+         (when view-mode
+           (View-exit-and-edit))
+         (use-local-map button-buffer-map)
+         (erase-buffer))
+       refbuf)))
 
 (defconst markdown-reference-check-buffer
   "*Undefined references for %buffer%*"
@@ -5797,38 +5844,28 @@ For example, an alist corresponding to [Nice editor][Emacs] at line 12,
 The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
-(defun markdown-reference-check-buffer (&optional buffer-name)
-  "Name and return buffer for reference checking.
-BUFFER-NAME is the name of the main buffer being visited."
-  (or buffer-name (setq buffer-name (buffer-name)))
-  (let ((refbuf (get-buffer-create (markdown-replace-regexp-in-string
-                                    "%buffer%" buffer-name
-                                    markdown-reference-check-buffer))))
-    (with-current-buffer refbuf
-      (when view-mode
-        (View-exit-and-edit))
-      (use-local-map button-buffer-map)
-      (erase-buffer))
-    refbuf))
+(defun-markdown-buffer
+  markdown-reference-check-buffer
+  "Name and return buffer for reference checking.")
+
+(defconst markdown-unused-references-buffer
+  "*Unused references for %buffer%*"
+  "Pattern for name of buffer for listing unused references.
+The string %buffer% will be replaced by the corresponding
+`markdown-mode' buffer name.")
+
+(defun-markdown-buffer
+  markdown-unused-references-buffer
+  "Name and return buffer for unused reference checking.")
 
 (defconst markdown-reference-links-buffer
   "*Reference links for %buffer%*"
   "Pattern for name of buffer for listing references.
 The string %buffer% will be replaced by the corresponding buffer name.")
 
-(defun markdown-reference-links-buffer (&optional buffer-name)
-  "Name, setup, and return a buffer for listing links.
-BUFFER-NAME is the name of the main buffer being visited."
-  (or buffer-name (setq buffer-name (buffer-name)))
-  (let ((linkbuf (get-buffer-create (markdown-replace-regexp-in-string
-                                     "%buffer%" buffer-name
-                                     markdown-reference-links-buffer))))
-    (with-current-buffer linkbuf
-      (when view-mode
-        (View-exit-and-edit))
-      (use-local-map button-buffer-map)
-      (erase-buffer))
-    linkbuf))
+(defun-markdown-buffer
+  markdown-reference-links-buffer
+  "Name, setup, and return a buffer for listing links.")
 
 ;; Add an empty Markdown reference definition to buffer
 ;; specified in the 'target-buffer property.  The reference name is
@@ -5848,17 +5885,30 @@ BUFFER-NAME is the name of the main buffer being visited."
               (markdown-check-refs t))))
 
 ;; Jump to line in buffer specified by 'target-buffer property.
-;; Line number is button's 'line property.
+;; Line number is button's 'target-line property.
 (define-button-type 'markdown-goto-line-button
   'help-echo "mouse-1, RET: go to line"
   'follow-link t
   'face 'italic
   'action (lambda (b)
-            (message (button-get b 'buffer))
             (switch-to-buffer-other-window (button-get b 'target-buffer))
             ;; use call-interactively to silence compiler
             (let ((current-prefix-arg (button-get b 'target-line)))
               (call-interactively 'goto-line))))
+
+;; Kill a line in buffer specified by 'target-buffer property.
+;; Line number is button's 'target-line property.
+(define-button-type 'markdown-kill-line-button
+  'help-echo "mouse-1, RET: kill line"
+  'follow-link t
+  'face 'italic
+  'action (lambda (b)
+            (switch-to-buffer-other-window (button-get b 'target-buffer))
+            ;; use call-interactively to silence compiler
+            (let ((current-prefix-arg (button-get b 'target-line)))
+              (call-interactively 'goto-line))
+            (kill-line 1)
+            (markdown-unused-refs t)))
 
 ;; Jumps to a particular link at location given by 'target-char
 ;; property in buffer given by 'target-buffer property.
@@ -5876,7 +5926,7 @@ BUFFER-NAME is the name of the main buffer being visited."
 (defun markdown-insert-undefined-reference-button (reference oldbuf)
   "Insert a button for creating REFERENCE in buffer OLDBUF.
 REFERENCE should be a list of the form (reference . occurrences),
-as by `markdown-get-undefined-refs'."
+as returned by `markdown-get-undefined-refs'."
   (let ((label (car reference)))
     ;; Create a reference button
     (insert-button label
@@ -5894,6 +5944,26 @@ as by `markdown-get-undefined-refs'."
         (insert " ")))
     (delete-char -1)
     (insert ")")
+    (newline)))
+
+(defun markdown-insert-unused-reference-button (reference oldbuf)
+  "Insert a button for creating REFERENCE in buffer OLDBUF.
+REFERENCE must be a pair of (ref . line-number)."
+  (let ((label (car reference))
+        (line (cdr reference)))
+    ;; Create a reference button
+    (insert-button label
+                   :type 'markdown-goto-line-button
+                   'face 'bold
+                   'target-buffer oldbuf
+                   'target-line line)
+    (insert (format " (%d) [" line))
+    (insert-button "X"
+                   :type 'markdown-kill-line-button
+                   'face 'bold
+                   'target-buffer oldbuf
+                   'target-line line)
+    (insert "]")
     (newline)))
 
 (defun markdown-insert-link-button (link oldbuf)
@@ -5933,30 +6003,66 @@ the link text, location, and line number."
           (t
            (error "No links for reference %s" reference)))))
 
-(defun markdown-check-refs (&optional silent)
+(defmacro defun-markdown-ref-checker
+    (name docstring checker-function buffer-function none-message buffer-header insert-reference)
+  "Define a function NAME acting on result of CHECKER-FUNCTION.
+
+DOCSTRING is used as a docstring for the defined function.
+
+BUFFER-FUNCTION should name and return an auxiliary buffer to put
+results in.
+
+NONE-MESSAGE is used when CHECKER-FUNCTION returns no results.
+
+BUFFER-HEADER is put into the auxiliary buffer first, followed by
+calling INSERT-REFERENCE for each element in the list returned by
+CHECKER-FUNCTION."
+  `(defun ,name (&optional silent)
+     ,(concat
+       docstring
+       "\n\nIf SILENT is non-nil, do not message anything when no
+such references found.")
+     (interactive "P")
+     (when (not (memq major-mode '(markdown-mode gfm-mode)))
+       (user-error "Not available in current mode"))
+     (let ((oldbuf (current-buffer))
+           (refs (,checker-function))
+           (refbuf (,buffer-function)))
+       (if (null refs)
+           (progn
+             (when (not silent)
+               (message ,none-message))
+             (kill-buffer refbuf))
+         (with-current-buffer refbuf
+           (insert ,buffer-header)
+           (dolist (ref refs)
+             (,insert-reference ref oldbuf))
+           (view-buffer-other-window refbuf)
+           (goto-char (point-min))
+           (forward-line 2))))))
+
+(defun-markdown-ref-checker
+  markdown-check-refs
   "Show all undefined Markdown references in current `markdown-mode' buffer.
-If SILENT is non-nil, do not message anything when no undefined
-references found.
+
 Links which have empty reference definitions are considered to be
 defined."
-  (interactive "P")
-  (when (not (memq major-mode '(markdown-mode gfm-mode)))
-    (user-error "Not available in current mode"))
-  (let ((oldbuf (current-buffer))
-        (refs (markdown-get-undefined-refs))
-        (refbuf (markdown-reference-check-buffer)))
-    (if (null refs)
-        (progn
-          (when (not silent)
-            (message "No undefined references found"))
-          (kill-buffer refbuf))
-      (with-current-buffer refbuf
-        (insert "The following references are undefined:\n\n")
-        (dolist (ref refs)
-          (markdown-insert-undefined-reference-button ref oldbuf))
-        (view-buffer-other-window refbuf)
-        (goto-char (point-min))
-        (forward-line 2)))))
+  markdown-get-undefined-refs
+  markdown-reference-check-buffer
+  "No undefined references found"
+  "The following references are undefined:\n\n"
+  markdown-insert-undefined-reference-button)
+
+
+(defun-markdown-ref-checker
+  markdown-unused-refs
+  "Show all unused Markdown references in current `markdown-mode' buffer."
+  markdown-get-unused-refs
+  markdown-unused-references-buffer
+  "No unused references found"
+  "The following references are unused:\n\n"
+  markdown-insert-unused-reference-button)
+
 
 
 ;;; Lists =====================================================================
