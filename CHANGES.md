@@ -102,6 +102,7 @@
     -   Improve error reporting for `markdown` and `markdown-open`.
         ([GH-291][])
     -   Fix M-RET binding for terminals ([GH-317][])
+    -   Do not fail displaying inline images on empty links ([GH-320][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -143,6 +144,7 @@
   [gh-296]: https://github.com/jrblevin/markdown-mode/issues/296
   [gh-303]: https://github.com/jrblevin/markdown-mode/pull/303
   [gh-317]: https://github.com/jrblevin/markdown-mode/pull/317
+  [gh-320]: https://github.com/jrblevin/markdown-mode/pull/320
 
 # Markdown Mode 2.3
 
