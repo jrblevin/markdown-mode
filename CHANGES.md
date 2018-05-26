@@ -44,7 +44,7 @@
         `markdown-xhtml-body-epilogue` for wrapping additional XHTML
         tags around the output.  ([GH-280][], [GH-281][])
     -   Add `markdown-unused-refs` command to list and clean up unused
-        references (available via `C-c C-c u`)
+        references (available via `C-c C-c u`).  ([GH-322][])
 
 *   Improvements:
 
@@ -147,6 +147,7 @@
   [gh-303]: https://github.com/jrblevin/markdown-mode/pull/303
   [gh-317]: https://github.com/jrblevin/markdown-mode/pull/317
   [gh-320]: https://github.com/jrblevin/markdown-mode/pull/320
+  [gh-322]: https://github.com/jrblevin/markdown-mode/pull/322
 
 # Markdown Mode 2.3
 
