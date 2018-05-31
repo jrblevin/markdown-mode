@@ -88,7 +88,7 @@ Any changes to the output buffer made by this hook will be saved.")
 (defgroup markdown nil
   "Major mode for editing text files in Markdown format."
   :prefix "markdown-"
-  :group 'wp
+  :group 'text
   :link '(url-link "https://jblevins.org/projects/markdown-mode/"))
 
 (defcustom markdown-command "markdown"
