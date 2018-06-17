@@ -8480,9 +8480,11 @@ or \\[markdown-toggle-inline-images]."
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-link-inline nil t)
         (let ((start (match-beginning 0))
+              (imagep (match-beginning 1))
               (end (match-end 0))
               (file (match-string-no-properties 6)))
-          (when (and (not (zerop (length file)))
+          (when (and imagep
+                     (not (zerop (length file)))
 		     (file-exists-p file))
             (let* ((abspath (if (file-name-absolute-p file)
                                 file
