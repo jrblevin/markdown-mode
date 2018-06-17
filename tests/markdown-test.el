@@ -5809,7 +5809,7 @@ x|"
                      (window-start) (window-point))
                     final-win-st-diff)))))))
 
-;; Tests for imenu
+;;; Tests for imenu
 
 (ert-deftest test-markdown-imenu/metadata ()
   "Don't correct header like statement in metadata.
