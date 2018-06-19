@@ -2838,7 +2838,7 @@ Group 3 matches the closing backquotes."
                   (< (match-end 0) old-point)))
       (and found                              ; matched something
            (<= (match-beginning 0) old-point) ; match contains old-point
-           (>= (match-end 0) old-point)))))
+           (> (match-end 0) old-point)))))
 
 (defun markdown-inline-code-at-pos-p (pos)
   "Return non-nil if there is an inline code fragment at POS.

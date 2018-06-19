@@ -1498,6 +1498,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
       ;; thing at point, and then verify that the kill ring contains cdr.
       (markdown-test-string (car test)
                             (end-of-line)
+                            (forward-char -1)
                             (call-interactively 'markdown-kill-thing-at-point)
                             (should (string-equal (current-kill 0) (cdr test)))))))
 
@@ -3647,25 +3648,25 @@ only partially propertized."
     (goto-char loc)
     (should (markdown-inline-code-at-point))
     (should (equal (match-beginning 0) beg))
-    (should (equal (match-end 0) end))))
+    (should (equal (match-end 0) (1+ end)))))
 
 (ert-deftest test-markdown-parsing/inline-code-at-point ()
   "Test `markdown-inline-code-at-point'."
   (markdown-test-file "inline.text"
-    (markdown-test-test-region 45 51) ; Regular code span
-    (markdown-test-test-region 61 90) ; Code containing backticks
-    (markdown-test-test-region 228 240) ; Backquotes at beginning
-    (markdown-test-test-region 341 352) ; Backquotes at end
-    (markdown-test-test-region 460 469) ; Backslash as final character
-    (markdown-test-test-region 657 667) ; A code span crossing lines
-    (markdown-test-test-region 749 758) ; Three backquotes on same line
-    (markdown-test-test-region 806 815) ; Three backquotes across lines
+    (markdown-test-test-region 45 50) ; Regular code span
+    (markdown-test-test-region 61 89) ; Code containing backticks
+    (markdown-test-test-region 228 239) ; Backquotes at beginning
+    (markdown-test-test-region 341 351) ; Backquotes at end
+    (markdown-test-test-region 460 468) ; Backslash as final character
+    (markdown-test-test-region 657 666) ; A code span crossing lines
+    (markdown-test-test-region 749 757) ; Three backquotes on same line
+    (markdown-test-test-region 806 814) ; Three backquotes across lines
     ))
 
 (ert-deftest test-markdown-parsing/inline-code-at-point-one-space ()
   "Test `markdown-inline-code-at-point' with multiple code spans in a row."
   (markdown-test-string "`foo` `bar` `baz`"
-    (dolist (loc (number-sequence 1 6))
+    (dolist (loc (number-sequence 1 5)) ; `foo`
       (goto-char loc)
       ;; markdown-inline-code-at-point should set match data
       (should (markdown-inline-code-at-point))
@@ -3674,11 +3675,11 @@ only partially propertized."
       (set-match-data (list 1 2 3 4))
       (should (markdown-inline-code-at-point-p))
       (should (equal (match-data) (list 1 2 3 4))))
-    (dolist (loc (number-sequence 7 12))
+    (dolist (loc (number-sequence 7 11)) ; `bar`
       (goto-char loc)
       (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 7 12 7 8 8 11 11 12))))
-    (dolist (loc (number-sequence 13 18))
+    (dolist (loc (number-sequence 13 17)) ; `baz`
       (goto-char loc)
       (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 13 18 13 14 14 17 17 18))))))
@@ -3688,15 +3689,15 @@ only partially propertized."
   (markdown-test-string "a`foo`b`bar`c`baz`d"
     (goto-char 1)                       ; "a"
     (should-not (markdown-inline-code-at-point-p))
-    (dolist (loc (number-sequence 2 7)) ; "`foo`b"
+    (dolist (loc (number-sequence 2 6)) ; "`foo`"
       (goto-char loc)
       (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 2 7 2 3 3 6 6 7))))
-    (dolist (loc (number-sequence 8 13)) ; "`bar`c"
+    (dolist (loc (number-sequence 8 12)) ; "`bar`"
       (goto-char loc)
       (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 8 13 8 9 9 12 12 13))))
-    (dolist (loc (number-sequence 14 19)) ; "`baz`d"
+    (dolist (loc (number-sequence 14 18)) ; "`baz`"
       (goto-char loc)
       (should (markdown-inline-code-at-point))
       (should (equal (match-data) (list 14 19 14 15 15 18 18 19))))))
