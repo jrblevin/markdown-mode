@@ -20,7 +20,7 @@
         the previous behavior in order to override these entries, you
         should fix the problem by following best practice and ensuring
         that your user configuration is loaded after the autoloads for
-        `markdown-mode` are evaluated.
+        `markdown-mode` are evaluated. ([GH-331][], [GH-335][])
 
 *   New features:
 
@@ -157,6 +157,8 @@
   [gh-317]: https://github.com/jrblevin/markdown-mode/pull/317
   [gh-320]: https://github.com/jrblevin/markdown-mode/pull/320
   [gh-322]: https://github.com/jrblevin/markdown-mode/pull/322
+  [gh-331]: https://github.com/jrblevin/markdown-mode/issues/331
+  [gh-335]: https://github.com/jrblevin/markdown-mode/pull/335
 
 # Markdown Mode 2.3
 
