@@ -81,6 +81,8 @@
         via `markdown-sub-superscript-display`.
     -   Several font-lock performance improvements.
     -   Support horizontal rules consisting of underscores.
+    -   Change default character encoding to UTF-8.
+        ([GH-340][], [GH-350][])
 
 *   Bug fixes:
 
@@ -159,6 +161,8 @@
   [gh-322]: https://github.com/jrblevin/markdown-mode/pull/322
   [gh-331]: https://github.com/jrblevin/markdown-mode/issues/331
   [gh-335]: https://github.com/jrblevin/markdown-mode/pull/335
+  [gh-340]: https://github.com/jrblevin/markdown-mode/issues/340
+  [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
 
 # Markdown Mode 2.3
 
