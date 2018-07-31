@@ -749,19 +749,19 @@ provides an interface to all of the possible customizations:
   * `markdown-css-paths` - CSS files to link to in XHTML output
     (default: `nil`).
 
-  * `markdown-content-type` - when set to a nonempty string, an
-    `http-equiv` attribute will be included in the XHTML `<head>`
-    block (default: `""`).  If needed, the suggested values are
-    `application/xhtml+xml` or `text/html`.  See also:
-    `markdown-coding-system`.
+  * `markdown-content-type` - used to set to the `http-equiv`
+    attribute to be included in the XHTML `<head>` block (default:
+    `"text/html"`).  Set to an alternate value `application/xhtml+xml`
+    if needed, or set to an empty string to remove the attribute.  See
+    also: `markdown-coding-system`.
 
   * `markdown-coding-system` - used for specifying the character
     set identifier in the `http-equiv` attribute when included
     (default: `nil`).  See `markdown-content-type`, which must
-    be set before this variable has any effect.  When set to `nil`,
+    be set for this variable to have any effect.  When set to `nil`,
     `buffer-file-coding-system` will be used to automatically
     determine the coding system string (falling back to
-    `iso-8859-1` when unavailable).  Common settings are `utf-8`
+    `utf-8` when unavailable).  Common settings are `iso-8859-1`
     and `iso-latin-1`.
 
   * `markdown-xhtml-header-content` - additional content to include
