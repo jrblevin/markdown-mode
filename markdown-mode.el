@@ -3076,7 +3076,8 @@ Restore match data previously stored in PROPERTY."
         pos)
     (unless saved
       (setq pos (next-single-property-change (point) property nil last))
-      (setq saved (get-text-property pos property)))
+      (unless (= pos last)
+        (setq saved (get-text-property pos property))))
     (when saved
       (set-match-data saved)
       ;; Step at least one character beyond point. Otherwise
