@@ -3499,13 +3499,14 @@ echo hey
    (should (equal (markdown-code-block-at-pos 1) '(1 35)))
    (should (equal (markdown-code-block-at-pos 13) '(1 35)))
    (should (equal (markdown-code-block-at-pos 23) '(1 35)))
-   (should (equal (markdown-code-block-at-pos 35) '(1 35)))))
+   (should (equal (markdown-code-block-at-pos 34) '(1 35)))
+   (should (equal (markdown-code-block-at-pos 35) nil))))
 
 (ert-deftest test-markdown-parsing/code-block-at-pos-yaml-metadata ()
   "Ensure `markdown-code-block-at-pos' works in YAML metadata blocks."
   (let ((markdown-use-pandoc-style-yaml-metadata t))
     (markdown-test-string
-     "---
+      "---
 a: b
 ---
 
@@ -3520,7 +3521,7 @@ data: pandoc
      (should (equal (markdown-code-block-at-pos 15) '(15 35)))
      (should (equal (markdown-code-block-at-pos 19) '(15 35)))
      (should (equal (markdown-code-block-at-pos 34) '(15 35)))
-     (should (equal (markdown-code-block-at-pos 35) '(15 35))))))
+     (should (equal (markdown-code-block-at-pos 35) nil)))))
 
 (ert-deftest test-markdown-parsing/syntax-get-fenced-blocks ()
   "Test whether *-get-fenced-block-* functions work in the case where a block is
