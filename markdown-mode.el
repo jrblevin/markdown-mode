@@ -1559,11 +1559,13 @@ start which was previously propertized."
   (save-excursion
     (goto-char start)
     (while (re-search-forward markdown-regex-hr end t)
-      (unless (or (markdown-on-heading-p)
-                  (markdown-code-block-at-point-p))
-        (put-text-property (match-beginning 0) (match-end 0)
-                           'markdown-hr
-                           (match-data t))))))
+      (let ((beg (match-beginning 0))
+            (end (match-end 0)))
+        (goto-char beg)
+        (unless (or (markdown-on-heading-p)
+                    (markdown-code-block-at-point-p))
+          (put-text-property beg end 'markdown-hr (match-data t)))
+        (goto-char end)))))
 
 (defun markdown-syntax-propertize-yaml-metadata (start end)
   "Propertize elements inside YAML metadata blocks from START to END.
@@ -2849,12 +2851,12 @@ Like `markdown-inline-code-at-pos`, but preserves match data."
 See `markdown-inline-code-at-pos' for details."
   (markdown-inline-code-at-pos (point)))
 
-(defun markdown-inline-code-at-point-p ()
-  "Return non-nil if there is inline code at the point.
+(defun markdown-inline-code-at-point-p (&optional pos)
+  "Return non-nil if there is inline code at the POS.
 This is a predicate function counterpart to
 `markdown-inline-code-at-point' which does not modify the match
 data.  See `markdown-code-block-at-point-p' for code blocks."
-  (save-match-data (markdown-inline-code-at-pos (point))))
+  (save-match-data (markdown-inline-code-at-pos (or pos (point)))))
 
 (make-obsolete 'markdown-code-at-point-p 'markdown-inline-code-at-point-p "v2.2")
 
@@ -2863,29 +2865,32 @@ data.  See `markdown-code-block-at-point-p' for code blocks."
 Uses text properties at the beginning of the line position.
 This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  Return nil otherwise."
-  (setq pos (save-excursion (goto-char pos) (point-at-bol)))
-  (or (get-text-property pos 'markdown-pre)
-      (markdown-get-enclosing-fenced-block-construct pos)
-      ;; polymode removes text properties set by markdown-mode, so
-      ;; check if `poly-markdown-mode' is active and whether the
-      ;; `chunkmode' property is non-nil at POS.
-      (and (bound-and-true-p poly-markdown-mode)
-           (get-text-property pos 'chunkmode))))
+  (let ((bol (save-excursion (goto-char pos) (point-at-bol))))
+    (or (get-text-property bol 'markdown-pre)
+        (let ((bounds (markdown-get-enclosing-fenced-block-construct pos)))
+          (and bounds
+               (< pos (cl-second bounds))
+               bounds))
+        ;; polymode removes text properties set by markdown-mode, so
+        ;; check if `poly-markdown-mode' is active and whether the
+        ;; `chunkmode' property is non-nil at POS.
+        (and (bound-and-true-p poly-markdown-mode)
+             (get-text-property pos 'chunkmode)))))
 
 ;; Function was renamed to emphasize that it does not modify match-data.
 (defalias 'markdown-code-block-at-point 'markdown-code-block-at-point-p)
 
-(defun markdown-code-block-at-point-p ()
-  "Return non-nil if there is a code block at the point.
+(defun markdown-code-block-at-point-p (&optional pos)
+  "Return non-nil if there is a code block at the POS.
 This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  This function does not modify the match
 data.  See `markdown-inline-code-at-point-p' for inline code."
-  (save-match-data (markdown-code-block-at-pos (point))))
+  (save-match-data (markdown-code-block-at-pos (or pos (point)))))
 
-(defun markdown-heading-at-point ()
-  "Return non-nil if there is a heading at the point.
+(defun markdown-heading-at-point (&optional pos)
+  "Return non-nil if there is a heading at the POS.
 Set match data for `markdown-regex-header'."
-  (let ((match-data (get-text-property (point) 'markdown-heading)))
+  (let ((match-data (get-text-property (or (point) pos) 'markdown-heading)))
     (when match-data
       (set-match-data match-data)
       t)))
@@ -5683,7 +5688,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
       ;; Headings
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (when (and (not (markdown-code-block-at-point-p))
+        (when (and (not (markdown-code-block-at-point-p (point-at-bol)))
                    (not (markdown-text-property-at-point 'markdown-yaml-metadata-begin)))
           (cond
            ((setq heading (match-string-no-properties 1))

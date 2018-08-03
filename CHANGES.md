@@ -21,6 +21,8 @@
         should fix the problem by following best practice and ensuring
         that your user configuration is loaded after the autoloads for
         `markdown-mode` are evaluated. ([GH-331][], [GH-335][])
+    -   Point at the end of fenced code blocks is no-longer considered
+        part of the code block ([GH-#349][]).
 
 *   New features:
 
@@ -86,6 +88,8 @@
 
 *   Bug fixes:
 
+    -   Fix infloop caused by incorrect detection of end of code
+        blocks ([GH-349][]).
     -   Remove GFM checkbox overlays when switching major modes.
         ([GH-238][], [GH-257][])
     -   Don't test the value of the `composition` property to avoid
@@ -115,7 +119,7 @@
     -   Do not fail displaying inline images on empty links. ([GH-320][])
     -   Fix off-by-one error in `markdown-inline-code-at-pos`.
         ([GH-313][])
-
+  [gh-349]: https://github.com/jrblevin/markdown-mode/issues/349]
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
   [gh-222]: https://github.com/jrblevin/markdown-mode/issues/222
