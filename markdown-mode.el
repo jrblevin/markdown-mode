@@ -1603,7 +1603,8 @@ region of a YAML metadata block as propertized by
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
-  (let* ((in-comment (nth 4 (syntax-ppss))))
+  (let* ((in-comment (nth 4 (syntax-ppss)))
+         (comment-begin (nth 8 (syntax-ppss))))
     (goto-char start)
     (cond
      ;; Comment start
@@ -1617,10 +1618,9 @@ region of a YAML metadata block as propertized by
         (markdown-syntax-propertize-comments
          (min (1+ (match-end 0)) end (point-max)) end)))
      ;; Comment end
-     ((and in-comment
+     ((and in-comment comment-begin
            (re-search-forward markdown-regex-comment-end end t))
-      (let ((comment-end (match-end 0))
-            (comment-begin (nth 8 (syntax-ppss))))
+      (let ((comment-end (match-end 0)))
         (put-text-property (1- comment-end) comment-end
                            'syntax-table (string-to-syntax ">"))
         ;; Remove any other text properties inside the comment
