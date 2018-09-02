@@ -2870,12 +2870,7 @@ quoted code blocks.  Return nil otherwise."
         (let ((bounds (markdown-get-enclosing-fenced-block-construct pos)))
           (and bounds
                (< pos (cl-second bounds))
-               bounds))
-        ;; polymode removes text properties set by markdown-mode, so
-        ;; check if `poly-markdown-mode' is active and whether the
-        ;; `chunkmode' property is non-nil at POS.
-        (and (bound-and-true-p poly-markdown-mode)
-             (get-text-property pos 'chunkmode)))))
+               bounds)))))
 
 ;; Function was renamed to emphasize that it does not modify match-data.
 (defalias 'markdown-code-block-at-point 'markdown-code-block-at-point-p)
