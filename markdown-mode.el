@@ -2867,10 +2867,13 @@ This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  Return nil otherwise."
   (let ((bol (save-excursion (goto-char pos) (point-at-bol))))
     (or (get-text-property bol 'markdown-pre)
-        (let ((bounds (markdown-get-enclosing-fenced-block-construct pos)))
-          (and bounds
-               (< pos (cl-second bounds))
-               bounds)))))
+        (let* ((bounds (markdown-get-enclosing-fenced-block-construct pos))
+               (second (cl-second bounds)))
+          (if second
+              ;; chunks are right open
+              (when (< pos second)
+                bounds)
+            bounds)))))
 
 ;; Function was renamed to emphasize that it does not modify match-data.
 (defalias 'markdown-code-block-at-point 'markdown-code-block-at-point-p)
@@ -2885,7 +2888,7 @@ data.  See `markdown-inline-code-at-point-p' for inline code."
 (defun markdown-heading-at-point (&optional pos)
   "Return non-nil if there is a heading at the POS.
 Set match data for `markdown-regex-header'."
-  (let ((match-data (get-text-property (or (point) pos) 'markdown-heading)))
+  (let ((match-data (get-text-property (or pos (point)) 'markdown-heading)))
     (when match-data
       (set-match-data match-data)
       t)))
