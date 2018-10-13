@@ -55,6 +55,8 @@
         references (available via `C-c C-c u`).  ([GH-322][])
     -   Add `markdown-insert-table` (`C-c C-s t`) for interactive
         table insertion.  ([GH-369][])
+    -   Add `markdown-kill-outline` and `markdown-kill-block`
+        functions.
 
 *   Improvements:
 

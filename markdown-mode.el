@@ -4817,6 +4817,20 @@ text to kill ring), and list items."
      (t
       (user-error "Nothing found at point to kill")))))
 
+(defun markdown-kill-outline ()
+  "Kill visible heading and add it to `kill-ring'."
+  (interactive)
+  (save-excursion
+    (markdown-outline-previous)
+    (kill-region (point) (progn (markdown-outline-next) (point)))))
+
+(defun markdown-kill-block ()
+  "Kill visible code block, list item, or blockquote and add it to `kill-ring'."
+  (interactive)
+  (save-excursion
+    (markdown-backward-block)
+    (kill-region (point) (progn (markdown-forward-block) (point)))))
+
 
 ;;; Indentation ====================================================================
 
