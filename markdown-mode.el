@@ -1886,7 +1886,7 @@ See `markdown-hide-markup' for additional details."
   :group 'markdown-faces)
 
 (defface markdown-code-face
-  '((t (:inherit fixed-pitch)))
+  '()
   "Face for inline code, pre blocks, and fenced code blocks.
 This may be used, for example, to add a contrasting background to
 inline code fragments and code blocks."
