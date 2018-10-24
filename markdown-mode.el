@@ -5404,6 +5404,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-t s") 'markdown-insert-header-setext-2)
     (define-key map (kbd "C-c C-t t") 'markdown-insert-header-setext-1)
     (define-key map (kbd "C-c C-i") 'markdown-insert-image)
+    (define-key map (kbd "C-c C-t") 'markdown-insert-table)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item) ;; C-c C-j
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox) ;; C-c C-d
     (define-key map (kbd "C-c -") 'markdown-insert-hr)
@@ -5527,6 +5528,8 @@ See also `markdown-mode-map'.")
      ["Delete Column" markdown-table-delete-column
       :enable (markdown-table-at-point-p)]
      ["Insert Column" markdown-table-insert-column
+      :enable (markdown-table-at-point-p)]
+     ["Insert Table" markdown-insert-table
       :enable (markdown-table-at-point-p)]
      "--"
      ["Convert Region to Table" markdown-table-convert-region]
@@ -9334,6 +9337,49 @@ spaces, or alternatively a TAB should be used as the separator."
       (while (re-search-forward re end t) (replace-match "| " t t)))
     (goto-char begin)
     (markdown-table-align)))
+
+(defun markdown-insert-table ()
+  "Insert a new table."
+  (interactive)
+  (let ((table-column (string-to-number (read-string "column size: ")))
+        (table-row (string-to-number (read-string "row size: ")))
+        (align-type (read-string "align type: "))
+        (content "")
+        (align-counter 1)
+        (align "|")
+        (header-counter 1)
+        (header "|")
+        (row-counter 1)
+        (column-counter 1))
+
+    (cond ((equal align-type "left") (setq content ":---"))
+          ((equal align-type "right") (setq content "---:"))
+          ((equal align-type "center") (setq content "---"))
+          (t (user-error "Speficy align-type: left, right or center")))
+
+    (while (<= align-counter table-column)
+      (setq align (concat align content "|"))
+      (setq align-counter (1+ align-counter)))
+    (setq align (concat align "\n"))
+
+    (while (<= header-counter table-column)
+      (setq header (concat header (read-string (concat "header " (number-to-string header-counter) ": ")) "|"))
+      (setq header-counter (1+ header-counter)))
+    (setq header (concat header "\n"))
+
+    (insert header)
+    (insert align)
+
+    (while (<= row-counter table-row)
+      (setq column-counter 1)
+      (while (<= column-counter (1+ table-column))
+        (insert "|")
+        (setq column-counter (1+ column-counter)))
+      (if (< row-counter table-row)
+          (insert "\n"))
+      (setq row-counter (1+ row-counter)))
+  (markdown-table-align)
+  ))
 
 
 ;;; ElDoc Support
