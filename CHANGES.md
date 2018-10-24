@@ -53,6 +53,8 @@
         tags around the output.  ([GH-280][], [GH-281][])
     -   Add `markdown-unused-refs` command to list and clean up unused
         references (available via `C-c C-c u`).  ([GH-322][])
+    -   Add `markdown-insert-table` (`C-c C-s t`) for interactive
+        table insertion.  ([GH-369][])
 
 *   Improvements:
 
@@ -170,6 +172,7 @@
   [gh-335]: https://github.com/jrblevin/markdown-mode/pull/335
   [gh-340]: https://github.com/jrblevin/markdown-mode/issues/340
   [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
+  [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
 
 # Markdown Mode 2.3
 
