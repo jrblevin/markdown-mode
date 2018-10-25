@@ -5505,7 +5505,12 @@ See GH-288."
 (ert-deftest test-markdown-insertion/cannot-create-table ()
   "Cannot create table."
   (markdown-test-string ""
-                        (should-error (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 2 RET other RET id RET name RET")) :type 'user-error)))
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 2 RET other RET id RET name RET"))
+                        (should (string-equal (buffer-string) "|id|name|
+|---|---|
+|   |   |
+|   |   |
+"))))
 
 ;;; gfm-mode tests:
 

@@ -5289,6 +5289,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "[") 'markdown-insert-gfm-checkbox)
     ;; Deprecated keys that may be removed in a future version
     (define-key map (kbd "e") 'markdown-insert-italic)
+    (define-key map (kbd "t") 'markdown-insert-table)
     map)
   "Keymap for Markdown text styling commands.")
 
@@ -5404,7 +5405,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-t s") 'markdown-insert-header-setext-2)
     (define-key map (kbd "C-c C-t t") 'markdown-insert-header-setext-1)
     (define-key map (kbd "C-c C-i") 'markdown-insert-image)
-    (define-key map (kbd "C-c C-t") 'markdown-insert-table)
+    (define-key map (kbd "C-c C-s t") 'markdown-insert-table)
     (define-key map (kbd "C-c C-x m") 'markdown-insert-list-item) ;; C-c C-j
     (define-key map (kbd "C-c C-x C-x") 'markdown-toggle-gfm-checkbox) ;; C-c C-d
     (define-key map (kbd "C-c -") 'markdown-insert-hr)
@@ -5529,8 +5530,7 @@ See also `markdown-mode-map'.")
       :enable (markdown-table-at-point-p)]
      ["Insert Column" markdown-table-insert-column
       :enable (markdown-table-at-point-p)]
-     ["Insert Table" markdown-insert-table
-      :enable (markdown-table-at-point-p)]
+     ["Insert Table" markdown-insert-table]
      "--"
      ["Convert Region to Table" markdown-table-convert-region]
      ["Sort Table Lines" markdown-table-sort-lines
@@ -9343,7 +9343,7 @@ spaces, or alternatively a TAB should be used as the separator."
   (interactive)
   (let ((table-column (string-to-number (read-string "column size: ")))
         (table-row (string-to-number (read-string "row size: ")))
-        (align-type (read-string "align type: "))
+        (align-type (read-string "align type (left, right, center(default)): "))
         (content "")
         (align-counter 1)
         (align "|")
@@ -9355,7 +9355,7 @@ spaces, or alternatively a TAB should be used as the separator."
     (cond ((equal align-type "left") (setq content ":---"))
           ((equal align-type "right") (setq content "---:"))
           ((equal align-type "center") (setq content "---"))
-          (t (user-error "Speficy align-type: left, right or center")))
+          (t (setq content "---")))
 
     (while (<= align-counter table-column)
       (setq align (concat align content "|"))
