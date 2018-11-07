@@ -9351,48 +9351,36 @@ spaces, or alternatively a TAB should be used as the separator."
     (goto-char begin)
     (markdown-table-align)))
 
-(defun markdown-insert-table ()
-  "Insert a new table."
+(defun markdown-insert-table (&optional rows columns align)
+  "Insert an empty pipe table.
+Optional arguments ROWS, COLUMNS, and ALIGN specify number of
+rows and columns and the column alignment."
   (interactive)
-  (let ((table-column (string-to-number (read-string "column size: ")))
-        (table-row (string-to-number (read-string "row size: ")))
-        (align-type (read-string "align type (left, right, center (default)): "))
-        (content "")
-        (align-counter 1)
-        (align "|")
-        (header-counter 1)
-        (header "|")
-        (row-counter 1)
-        (column-counter 1))
-
-    (cond ((equal align-type "left") (setq content ":---"))
-          ((equal align-type "right") (setq content "---:"))
-          ((equal align-type "center") (setq content "---"))
-          (t (setq content "---")))
-
-    (while (<= align-counter table-column)
-      (setq align (concat align content "|"))
-      (setq align-counter (1+ align-counter)))
-    (setq align (concat align "\n"))
-
-    (while (<= header-counter table-column)
-      (setq header (concat header (read-string (concat "header " (number-to-string header-counter) ": ")) "|"))
-      (setq header-counter (1+ header-counter)))
-    (setq header (concat header "\n"))
-
-    (insert header)
-    (insert align)
-
-    (while (<= row-counter table-row)
-      (setq column-counter 1)
-      (while (<= column-counter (1+ table-column))
-        (insert "|")
-        (setq column-counter (1+ column-counter)))
-      (if (< row-counter table-row)
-          (insert "\n"))
-      (setq row-counter (1+ row-counter)))
-  (markdown-table-align)
-  ))
+  (let* ((rows (or rows (string-to-number (read-string "Row size: "))))
+         (columns (or columns (string-to-number (read-string "Column size: "))))
+         (align (or align (read-string "Alignment ([l]eft, [r]ight, [c]enter): ")))
+         (align (cond ((equal align "l") ":--")
+                      ((equal align "r") "--:")
+                      ((equal align "c") ":-:")
+                      (t "---")))
+         (pos (point))
+         (indent (make-string (current-column) ?\ ))
+         (line (concat
+                (apply 'concat indent "|"
+                       (make-list columns "  |")) "\n"))
+         (hline (apply 'concat indent "|"
+                       (make-list columns (concat align "|")))))
+    (if (string-match
+         "^[ \t]*$" (buffer-substring-no-properties
+                     (point-at-bol) (point)))
+        (beginning-of-line 1)
+      (newline))
+    (dotimes (_ rows) (insert line))
+    (goto-char pos)
+    (if (> rows 1)
+        (progn
+          (end-of-line 1) (insert (concat "\n" hline)) (goto-char pos)))
+    (markdown-table-align)))
 
 
 ;;; ElDoc Support

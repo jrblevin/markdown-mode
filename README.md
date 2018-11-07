@@ -579,13 +579,8 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     correctly when calculating column widths, however, columns
     containing hidden markup may not always be aligned properly.
 
-    <kbd>C-c C-s t</kbd> (`markdown-insert-table`) is a general command for
-    inserting new table. Specify table size, table align and table header in
-    minibuffer when executing `markdown-insert-table`.
-      - Specify row size.
-      - Specify column size.
-      - Specify table align: right, left or center (center is default).
-      - Specify header contents.
+    <kbd>C-c C-s t</kbd> (`markdown-insert-table`) is a general command for inserting new table.
+    The command prompts for table size and column alignment and inserts an empty pipe table at point.
 
   * Viewing Modes:
 
