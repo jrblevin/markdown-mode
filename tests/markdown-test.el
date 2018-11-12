@@ -5464,53 +5464,64 @@ See GH-288."
     (should (markdown-table-at-point-p))
     (should (= (markdown-table-begin) 2))))
 
-;;; Create table with left align
+;;; Extension: pipe table insertion
 
 (ert-deftest test-markdown-insertion/create-table-with-left-align ()
-  "Insert table with left align."
-  (markdown-test-string ""
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 2 RET left RET id RET name RET"))
-                        (should (string-equal (buffer-string) "|id|name|
+  "Insert table with left column alignment."
+  (markdown-test-string
+   ""
+   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 3 RET 2 RET l RET"))
+   (should (string-equal (buffer-string) "|   |   |
 |:--|:--|
 |   |   |
 |   |   |
 "))))
 
-;;; Create table with right align
-
 (ert-deftest test-markdown-insertion/create-table-with-right-align ()
-  "Insert table with right align."
-  (markdown-test-string ""
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 2 RET right RET id RET name RET"))
-                        (should (string-equal (buffer-string) "|id|name|
+  "Insert table with right column alignment."
+  (markdown-test-string
+   ""
+   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 3 RET 2 RET r RET"))
+   (should (string-equal (buffer-string) "|   |   |
 |--:|--:|
 |   |   |
 |   |   |
 "))))
 
-;;; Create table with center align
+(ert-deftest test-markdown-insertion/create-table-with-center-align ()
+  "Insert table with center column alignment."
+  (markdown-test-string
+   ""
+   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 3 RET 2 RET c RET"))
+   (should (string-equal (buffer-string) "|   |   |
+|:-:|:-:|
+|   |   |
+|   |   |
+"))))
+
+(ert-deftest test-markdown-insertion/create-table-with-default-align ()
+  "Insert table with default column alignment."
+  (markdown-test-string
+   ""
+   (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 3 RET 2 RET RET"))
+   (should (string-equal (buffer-string) "|   |   |
+|---|---|
+|   |   |
+|   |   |
+"))))
+
+;;; Create table with center column alignment
 
 (ert-deftest test-markdown-insertion/create-table-with-center-align ()
   "Insert table with center align."
   (markdown-test-string ""
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 2 RET center RET id RET name RET"))
-                        (should (string-equal (buffer-string) "|id|name|
+                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 3 RET c RET"))
+                        (should (string-equal (buffer-string) "|   |   |
 |---|---|
 |   |   |
 |   |   |
 "))))
 
-;;; Cannot create table
-
-(ert-deftest test-markdown-insertion/cannot-create-table ()
-  "Cannot create table."
-  (markdown-test-string ""
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 2 RET other RET id RET name RET"))
-                        (should (string-equal (buffer-string) "|id|name|
-|---|---|
-|   |   |
-|   |   |
-"))))
 
 ;;; gfm-mode tests:
 
