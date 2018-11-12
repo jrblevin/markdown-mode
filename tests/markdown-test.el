@@ -5475,7 +5475,8 @@ See GH-288."
 |:--|:--|
 |   |   |
 |   |   |
-"))))
+"))
+   (should (= (point) 3))))
 
 (ert-deftest test-markdown-insertion/create-table-with-right-align ()
   "Insert table with right column alignment."
@@ -5486,7 +5487,8 @@ See GH-288."
 |--:|--:|
 |   |   |
 |   |   |
-"))))
+"))
+   (should (= (point) 3))))
 
 (ert-deftest test-markdown-insertion/create-table-with-center-align ()
   "Insert table with center column alignment."
@@ -5497,7 +5499,8 @@ See GH-288."
 |:-:|:-:|
 |   |   |
 |   |   |
-"))))
+"))
+   (should (= (point) 3))))
 
 (ert-deftest test-markdown-insertion/create-table-with-default-align ()
   "Insert table with default column alignment."
@@ -5508,20 +5511,8 @@ See GH-288."
 |---|---|
 |   |   |
 |   |   |
-"))))
-
-;;; Create table with center column alignment
-
-(ert-deftest test-markdown-insertion/create-table-with-center-align ()
-  "Insert table with center align."
-  (markdown-test-string ""
-                        (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-table RET 2 RET 3 RET c RET"))
-                        (should (string-equal (buffer-string) "|   |   |
-|---|---|
-|   |   |
-|   |   |
-"))))
-
+"))
+   (should (= (point) 3))))
 
 ;;; gfm-mode tests:
 

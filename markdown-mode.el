@@ -9358,7 +9358,7 @@ rows and columns and the column alignment."
   (interactive)
   (let* ((rows (or rows (string-to-number (read-string "Row size: "))))
          (columns (or columns (string-to-number (read-string "Column size: "))))
-         (align (or align (read-string "Alignment ([l]eft, [r]ight, [c]enter): ")))
+         (align (or align (read-string "Alignment ([l]eft, [r]ight, [c]enter, or RET for default): ")))
          (align (cond ((equal align "l") ":--")
                       ((equal align "r") "--:")
                       ((equal align "c") ":-:")
@@ -9367,7 +9367,7 @@ rows and columns and the column alignment."
          (indent (make-string (current-column) ?\ ))
          (line (concat
                 (apply 'concat indent "|"
-                       (make-list columns "  |")) "\n"))
+                       (make-list columns "   |")) "\n"))
          (hline (apply 'concat indent "|"
                        (make-list columns (concat align "|")))))
     (if (string-match
@@ -9380,7 +9380,7 @@ rows and columns and the column alignment."
     (if (> rows 1)
         (progn
           (end-of-line 1) (insert (concat "\n" hline)) (goto-char pos)))
-    (markdown-table-align)))
+    (markdown-table-forward-cell)))
 
 
 ;;; ElDoc Support
