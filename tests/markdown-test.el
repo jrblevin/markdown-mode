@@ -5458,11 +5458,11 @@ See GH-288."
 
 (ert-deftest test-markdown-table/table-begin-top-of-file ()
   "Test beginning of table detection at top of file."
-  (markdown-test-string "\n| 1 | 2 |\n"
-    (should-not (markdown-table-at-point-p))
+  (markdown-test-string "| 1 | 2 |\n| 3 | 4 |\n"
+    (should (markdown-table-at-point-p))
     (forward-line)
     (should (markdown-table-at-point-p))
-    (should (= (markdown-table-begin) 2))))
+    (should (= (markdown-table-begin) 1))))
 
 ;;; Extension: pipe table insertion
 
