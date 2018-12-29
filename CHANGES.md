@@ -57,6 +57,7 @@
         table insertion.  ([GH-369][])
     -   Add `markdown-kill-outline` and `markdown-kill-block`
         functions.
+    -   Added options for viewing remote images.  ([GH-378][])
 
 *   Improvements:
 
