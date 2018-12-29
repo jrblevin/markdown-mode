@@ -226,14 +226,18 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     added to the end of the reference definition and will be used
     to populate the title attribute when converted to HTML.
 
-    Local images associated with image links may be displayed
+    Images associated with image links may be displayed
     inline in the buffer by pressing <kbd>C-c C-x C-i</kbd>
     (`markdown-toggle-inline-images`).  This is a toggle command, so
-    pressing this once again will remove inline images.  Large
-    images may be scaled down to fit in the buffer using
-    `markdown-max-image-size`, a cons cell of the form
-    `(max-width . max-height)`.  Resizing requires Emacs to be
-    built with ImageMagick support.
+    pressing this once again will remove inline images.
+    By default, only local images are displayed.  However, remote
+    images will also be downloaded and displayed if
+    `markdown-display-remote-images` is non-nil.
+
+    Large images may be scaled down to fit in the buffer using
+    `markdown-max-image-size`, a cons cell of the form `(max-width
+    . max-height)`.  Resizing requires Emacs to be built with
+    ImageMagick support.
 
   * Text Styles: <kbd>C-c C-s</kbd>
 

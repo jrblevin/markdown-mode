@@ -57,7 +57,8 @@
         table insertion.  ([GH-369][])
     -   Add `markdown-kill-outline` and `markdown-kill-block`
         functions.
-    -   Added options for viewing remote images.  ([GH-378][])
+    -   Added `markdown-display-remote-images` for viewing remote
+        images.  Thanks to Sean Allread for the patch.  ([GH-378][])
 
 *   Improvements:
 
@@ -176,6 +177,7 @@
   [gh-340]: https://github.com/jrblevin/markdown-mode/issues/340
   [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
   [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
+  [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
 
 # Markdown Mode 2.3
 
