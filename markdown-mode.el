@@ -578,7 +578,7 @@ requires Emacs to be built with ImageMagick support."
                         (const :tag "No maximum height" nil)))))
 
 
-;;; Markdown-Specific `rx' Macro
+;;; Markdown-Specific `rx' Macro ==============================================
 
 ;; Based on python-rx from python.el.
 (eval-and-compile
@@ -1648,7 +1648,7 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-comments start end))))
 
 
-;;; Markup Hiding
+;;; Markup Hiding =============================================================
 
 (defconst markdown-markup-properties
   '(face markdown-markup-face invisible markdown-markup)
@@ -4516,7 +4516,7 @@ at the beginning of the block."
                  (goto-char (next-single-property-change (point) prop)))))))
 
 
-;;; Footnotes ==================================================================
+;;; Footnotes =================================================================
 
 (defun markdown-footnote-counter-inc ()
   "Increment `markdown-footnote-counter' and return the new value."
@@ -4832,7 +4832,7 @@ text to kill ring), and list items."
     (kill-region (point) (progn (markdown-forward-block) (point)))))
 
 
-;;; Indentation ====================================================================
+;;; Indentation ===============================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
   "Return the position after the index of CUR-POS in POSITIONS.
@@ -5442,7 +5442,7 @@ Assumes match data is available for `markdown-regex-italic'."
 See also `markdown-mode-map'.")
 
 
-;;; Menu ==================================================================
+;;; Menu ======================================================================
 
 (easy-menu-define markdown-mode-menu markdown-mode-map
   "Menu for Markdown mode"
@@ -8436,7 +8436,7 @@ BEG and END are the limits of scanned region."
       (remove-overlays nil nil 'face 'markdown-gfm-checkbox-face))))
 
 
-;;; Display inline image =================================================
+;;; Display inline image ======================================================
 
 (defvar markdown-inline-image-overlays nil)
 (make-variable-buffer-local 'markdown-inline-image-overlays)
@@ -8696,7 +8696,7 @@ position."
                (markdown-edit-code-block))))))
 
 
-;;; Table Editing
+;;; Table Editing =============================================================
 
 ;; These functions were originally adapted from `org-table.el'.
 
@@ -9416,7 +9416,7 @@ rows and columns and the column alignment."
     (markdown-table-forward-cell)))
 
 
-;;; ElDoc Support
+;;; ElDoc Support =============================================================
 
 (defun markdown-eldoc-function ()
   "Return a helpful string when appropriate based on context.
@@ -9632,7 +9632,7 @@ rows and columns and the column alignment."
  'markdown-mode-font-lock-keywords "v2.4")
 
 
-;;; Viewing modes
+;;; Viewing modes =============================================================
 
 (defcustom markdown-hide-markup-in-view-modes t
   "Enable hidden markup mode in `markdown-view-mode' and `gfm-view-mode'."
@@ -9673,7 +9673,7 @@ rows and columns and the column alignment."
   (read-only-mode 1))
 
 
-;;; Live Preview Mode  ============================================
+;;; Live Preview Mode  ========================================================
 ;;;###autoload
 (define-minor-mode markdown-live-preview-mode
   "Toggle native previewing on save for a specific markdown file."
