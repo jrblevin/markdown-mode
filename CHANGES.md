@@ -91,6 +91,7 @@
     -   Support horizontal rules consisting of underscores.
     -   Change default character encoding to UTF-8.
         ([GH-340][], [GH-350][])
+    -   Allow relative CSS stylesheets paths.
 
 *   Bug fixes:
 

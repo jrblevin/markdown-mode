@@ -754,7 +754,8 @@ provides an interface to all of the possible customizations:
     (default: `t`).
 
   * `markdown-css-paths` - CSS files to link to in XHTML output
-    (default: `nil`).
+    (default: `nil`). These can be either local files (relative or
+    absolute) or URLs.
 
   * `markdown-content-type` - used to set to the `http-equiv`
     attribute to be included in the XHTML `<head>` block (default:
