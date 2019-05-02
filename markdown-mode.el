@@ -2075,8 +2075,7 @@ variable-height variable `markdown-header-scaling'." ,num1)
             :group 'markdown-faces))))))
 
 (defun markdown-update-header-faces (&optional _scaling _scaling-values)
-  "Update header faces using current values of markdown-header-scaling and
-markdown-header-scaling-values.  Arguments are ignored but retained to avoid breakage."
+  "Update header faces using current values of markdown-header-scaling and markdown-header-scaling-values.  Arguments are ignored but retained to avoid breakage."
   (markdown-make-header-faces)
   (dotimes (num 6)
     (let* ((face-name (intern (format "markdown-header-face-%s" (1+ num))))
