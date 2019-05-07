@@ -126,6 +126,8 @@
     -   Fix off-by-one error in `markdown-inline-code-at-pos`.
         ([GH-313][])
     -   Fix bounds during inline comment syntax propertization. ([GH-327][])
+    -   Fix inverted meaning of 'vertical and 'horizontal for
+        markdown-split-window-direction
 
   [gh-349]: https://github.com/jrblevin/markdown-mode/issues/349]
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171

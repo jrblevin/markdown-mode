@@ -7549,9 +7549,9 @@ displaying the rendered output."
 (defun markdown-get-other-window ()
   "Find another window to display preview or output content."
   (cond
-   ((memq markdown-split-window-direction '(vertical below))
+   ((memq markdown-split-window-direction '(vertical right))
     (or (window-in-direction 'below) (split-window-vertically)))
-   ((memq markdown-split-window-direction '(horizontal right))
+   ((memq markdown-split-window-direction '(horizontal below))
     (or (window-in-direction 'right) (split-window-horizontally)))
    (t (split-window-sensibly (get-buffer-window)))))
 
