@@ -2122,6 +2122,14 @@ Depending on your font, some reasonable choices are:
          ,@(when markdown-hide-markup
              `(display ,markdown-footnote-display))))
 
+(define-obsolete-variable-alias
+ 'gfm-font-lock-keywords
+ 'markdown-mode-font-lock-keywords "v2.4")
+
+(define-obsolete-variable-alias
+ 'markdown-mode-font-lock-keywords-basic
+ 'markdown-mode-font-lock-keywords "v2.4")
+
 (defvar markdown-mode-font-lock-keywords
   `((markdown-match-yaml-metadata-begin . ((1 'markdown-markup-face)))
     (markdown-match-yaml-metadata-end . ((1 'markdown-markup-face)))
@@ -2226,10 +2234,6 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-blockquotes)
     (markdown-match-wiki-link . ((0 'markdown-link-face prepend))))
   "Syntax highlighting for Markdown files.")
-
-(define-obsolete-variable-alias
- 'markdown-mode-font-lock-keywords-basic
- 'markdown-mode-font-lock-keywords "v2.4")
 
 ;; Footnotes
 (defvar markdown-footnote-counter 0
@@ -9626,10 +9630,6 @@ rows and columns and the column alignment."
   (setq markdown-wiki-link-search-subdirectories t)
   (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
   (markdown-gfm-parse-buffer-for-languages))
-
-(define-obsolete-variable-alias
- 'gfm-font-lock-keywords
- 'markdown-mode-font-lock-keywords "v2.4")
 
 
 ;;; Viewing modes =============================================================
