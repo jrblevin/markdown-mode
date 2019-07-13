@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'markdown-mode)
+(require 'markdown-changelog)
 (require 'ert)
 (require 'cl-lib)
 
