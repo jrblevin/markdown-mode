@@ -5968,6 +5968,11 @@ https://github.com/jrblevin/markdown-mode/issues/235"
       (should (string-prefix-p "false failed with exit code 1"
                                (error-message-string data))))))
 
+(ert-deftest test-load ()
+  "Test successful evaluation of markdown-changelog."
+  (should (equal (format-time-string "%Y-%m-%d")
+		 (markdown-changelog-date-string))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
