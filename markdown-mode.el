@@ -7449,7 +7449,8 @@ To be used with `markdown-live-preview-window-function'."
   (if (require 'eww nil t)
       (progn
         (eww-open-file file)
-        (get-buffer "*eww*"))
+	      (or (get-buffer "*eww*")
+	          (current-buffer)))
     (error "EWW is not present or not loaded on this version of Emacs")))
 
 (defun markdown-visual-lines-between-points (beg end)
