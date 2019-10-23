@@ -7448,9 +7448,11 @@ This is the inverse of `markdown-live-preview-buffer'.")
 To be used with `markdown-live-preview-window-function'."
   (if (require 'eww nil t)
       (progn
-        (eww-open-file file)
-	(or (get-buffer "*eww*")
-	    (current-buffer)))
+	(eww-open-file file)
+	(car (cl-member-if (lambda (b)
+			     (with-current-buffer b
+			       (eq major-mode 'eww-mode)))
+			   (buffer-list))))
     (error "EWW is not present or not loaded on this version of Emacs")))
 
 (defun markdown-visual-lines-between-points (beg end)
