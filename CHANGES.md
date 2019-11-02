@@ -62,6 +62,7 @@
 
 *   Improvements:
 
+    -   Make `markdown-back-to-heading` interactive for keybinding.
     -   Insert references before local variables.  Thanks to Philipp
         Stephani for a patch.  ([GH-216][], [GH-262][])
     -   Allow `markdown-command` and `markdown-open-command` to be
