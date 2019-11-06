@@ -2558,7 +2558,7 @@ Test currently fails because this case isn't handled properly."
   (markdown-test-string "It is interesting to see what happens when one queries
 `social upheaval` and `protopalatial era`.
 
-* `social upheaval`: the follwing queries have been tried:
+* `social upheaval`: the following queries have been tried:
 
     social upheaval subClassOf"
    (markdown-test-range-has-face 160 190 nil)))

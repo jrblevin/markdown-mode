@@ -346,7 +346,7 @@ Here's another `valid` one.
 It is interesting to see what happens when one queries
 `social upheaval` and `protopalatial era`.
 
-* `social upheaval`: the follwing queries have been tried:
+* `social upheaval`: the following queries have been tried:
 
     social upheaval subClassOf
 
@@ -368,7 +368,7 @@ This is a footnote marker,[^1] but this is not.[^]
 
 This is a valid markdown link: [^][]
 
-[^]: http://jblevins.org/ "And this is a valid reference defintion!"
+[^]: http://jblevins.org/ "And this is a valid reference definition!"
 
 
 33. Email Address Inside Bold and Italic Spans
