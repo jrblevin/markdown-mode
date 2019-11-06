@@ -469,7 +469,7 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     Press <kbd>C-c C-k</kbd> to kill the thing at point and add important
     text, without markup, to the kill ring.  Possible things to
     kill include (roughly in order of precedece): inline code,
-    headings, horizonal rules, links (add link text to kill ring),
+    headings, horizontal rules, links (add link text to kill ring),
     images (add alt text to kill ring), angle URIs, email
     addresses, bold, italics, reference definitions (add URI to
     kill ring), footnote markers and text (kill both marker and

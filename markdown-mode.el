@@ -2252,7 +2252,7 @@ Depending on your font, some reasonable choices are:
 ;;; Compatibility =============================================================
 
 (defun markdown-replace-regexp-in-string (regexp rep string)
-  "Replace ocurrences of REGEXP with REP in STRING.
+  "Replace occurrences of REGEXP with REP in STRING.
 This is a compatibility wrapper to provide `replace-regexp-in-string'
 in XEmacs 21."
   (if (featurep 'xemacs)
@@ -3685,7 +3685,7 @@ Return a cons cell containing updated bounds for the region."
       (cons beg (- end removed)))))
 
 (defun markdown-insert-hr (arg)
-  "Insert or replace a horizonal rule.
+  "Insert or replace a horizontal rule.
 By default, use the first element of `markdown-hr-strings'.  When
 ARG is non-nil, as when given a prefix, select a different
 element as follows.  When prefixed with \\[universal-argument],
@@ -4748,7 +4748,7 @@ Then the returned list is: ((\"^1\" . 478) (\"^marker\" . 475))"
 (defun markdown-kill-thing-at-point ()
   "Kill thing at point and add important text, without markup, to kill ring.
 Possible things to kill include (roughly in order of precedence):
-inline code, headers, horizonal rules, links (add link text to
+inline code, headers, horizontal rules, links (add link text to
 kill ring), images (add alt text to kill ring), angle uri, email
 addresses, bold, italics, reference definition (add URI to kill
 ring), footnote markers and text (kill both marker and text, add
@@ -4768,7 +4768,7 @@ text to kill ring), and list items."
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (kill-new (match-string 1))
       (delete-region (match-beginning 0) (match-end 0)))
-     ;; Horizonal rule
+     ;; Horizontal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (kill-new (match-string 0))
       (delete-region (match-beginning 0) (match-end 0)))
@@ -4911,7 +4911,7 @@ duplicate positions, which are handled up by calling functions."
     (if (and prev-line-pos (> prev-line-pos tab-width))
         (setq positions (cons (- prev-line-pos tab-width) positions)))
 
-    ;; Indentation of all preceeding list markers (when in a list)
+    ;; Indentation of all preceding list markers (when in a list)
     (when (setq pos (markdown-calculate-list-levels))
       (setq positions (append pos positions)))
 
@@ -7185,7 +7185,7 @@ markup."
      ;; Promote setext heading
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (markdown-cycle-setext -1))
-     ;; Promote horizonal rule
+     ;; Promote horizontal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (markdown-cycle-hr -1))
      ;; Promote list item
@@ -7217,7 +7217,7 @@ or remove markup."
      ;; Demote setext heading
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (markdown-cycle-setext 1))
-     ;; Demote horizonal rule
+     ;; Demote horizontal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (markdown-cycle-hr 1))
      ;; Demote list item
@@ -8168,7 +8168,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     (thing-at-point-looking-at (markdown-make-regex-link-generic))))
 
 (defun markdown-line-is-reference-definition-p ()
-  "Return whether the current line is a (non-footnote) reference defition."
+  "Return whether the current line is a (non-footnote) reference definition."
   (save-excursion
     (move-beginning-of-line 1)
     (and (looking-at-p markdown-regex-reference-definition)

@@ -22,7 +22,7 @@ Ensure that the issue is reproducible using `emacs -Q`.
 See this page by Sebastian Wiesner for background:
 https://www.lunaryorn.com/posts/reproduce-bugs-in-emacs-q#section-how-do-you-reproduce-a-bug-in-emacs--q
 
-For example, you might try runing Emacs like so:
+For example, you might try running Emacs like so:
 
     emacs -Q --load path/to/markdown-mode.el test-case.md
 -->
