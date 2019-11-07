@@ -9616,6 +9616,8 @@ rows and columns and the column alignment."
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.mdwn\\'" . markdown-mode))
 
 
 ;;; GitHub Flavored Markdown Mode  ============================================
