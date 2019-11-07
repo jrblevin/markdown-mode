@@ -9613,11 +9613,11 @@ rows and columns and the column alignment."
   (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t t))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.mdwn\\'" . markdown-mode))
+(setq auto-mode-alist
+      (append auto-mode-alist
+              '(("\\.markdown\\'" . markdown-mode)
+                ("\\.md\\'" . markdown-mode)
+                ("\\.mdwn\\'" . markdown-mode))))
 
 
 ;;; GitHub Flavored Markdown Mode  ============================================
