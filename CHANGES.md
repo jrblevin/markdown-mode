@@ -91,6 +91,8 @@
     -   Support horizontal rules consisting of underscores.
     -   Change default character encoding to UTF-8.
         ([GH-340][], [GH-350][])
+    -   Also load markdown-mode for *.mdwn files.
+    -   Optimise the autoloaded add-to-alist 'auto-mode-alist section.
 
 *   Bug fixes:
 
