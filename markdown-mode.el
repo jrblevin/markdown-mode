@@ -30,7 +30,6 @@
 
 ;; See the README.md file for details.
 
-
 ;;; Code:
 
 (require 'easymenu)
@@ -49,7 +48,6 @@
 (declare-function eww-open-file "eww")
 (declare-function url-path-and-query "url-parse")
 
-
 ;;; Constants =================================================================
 
 (defconst markdown-mode-version "2.4-dev"
@@ -58,7 +56,6 @@
 (defconst markdown-output-buffer-name "*markdown-output*"
   "Name of temporary buffer for markdown command output.")
 
-
 ;;; Global Variables ==========================================================
 
 (defvar markdown-reference-label-history nil
@@ -70,7 +67,6 @@
 (defvar markdown-gfm-language-history nil
   "History list of languages used in the current buffer in GFM code blocks.")
 
-
 ;;; Customizable Variables ====================================================
 
 (defvar markdown-mode-hook nil
@@ -577,7 +573,6 @@ requires Emacs to be built with ImageMagick support."
                 (choice (sexp :tag "Maximum height in pixels")
                         (const :tag "No maximum height" nil)))))
 
-
 ;;; Markdown-Specific `rx' Macro ==============================================
 
 ;; Based on python-rx from python.el.
@@ -610,7 +605,6 @@ This variant of `rx' supports common Markdown named REGEXPS."
           (t
            (markdown-rx-to-string (car regexps) t)))))
 
-
 ;;; Regular Expressions =======================================================
 
 (defconst markdown-regex-comment-start
@@ -989,7 +983,6 @@ Group 3 matches all attributes and whitespace following the tag name.")
   "\\(&#?[[:alnum:]]+;\\)"
   "Regular expression for matching HTML entities.")
 
-
 ;;; Syntax ====================================================================
 
 (defvar markdown--syntax-properties
@@ -1647,7 +1640,6 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-hrs start end)
       (markdown-syntax-propertize-comments start end))))
 
-
 ;;; Markup Hiding =============================================================
 
 (defconst markdown-markup-properties
@@ -1706,7 +1698,6 @@ See `markdown-hide-markup' for additional details."
            (message "markdown-mode markup hiding disabled")))
   (markdown-reload-extensions))
 
-
 ;;; Font Lock =================================================================
 
 (require 'font-lock)
@@ -2248,7 +2239,6 @@ Depending on your font, some reasonable choices are:
   (concat "^ \\{0,3\\}\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
   "Regular expression matching a footnote definition, capturing the label.")
 
-
 ;;; Compatibility =============================================================
 
 (defun markdown-replace-regexp-in-string (regexp rep string)
@@ -2369,7 +2359,6 @@ Used for `flyspell-generic-check-word-predicate'."
       ;; `font-lock-fontify-buffer' in Emacs 25.
       (font-lock-fontify-buffer))))
 
-
 ;;; Markdown Parsing Functions ================================================
 
 (define-obsolete-function-alias
@@ -2902,7 +2891,6 @@ Set match data for `markdown-regex-header'."
 This may be useful for tables and Pandoc's line_blocks extension."
   (char-equal (char-after (point-at-bol)) ?|))
 
-
 ;;; Markdown Font Lock Matching Functions =====================================
 
 (defun markdown-range-property-any (begin end prop prop-values)
@@ -3415,7 +3403,6 @@ Group 7: closing filename delimiter"
                           (match-beginning 9) (match-end 9)))
     t))
 
-
 ;;; Markdown Font Fontification Functions =====================================
 
 (defun markdown--first-displayable (seq)
@@ -3570,7 +3557,6 @@ SEQ may be an atom or a sequence."
       (add-text-properties (match-beginning 4) (match-end 4) mp)
       t)))
 
-
 ;;; Syntax Table ==============================================================
 
 (defvar markdown-mode-syntax-table
@@ -3579,7 +3565,6 @@ SEQ may be an atom or a sequence."
     tab)
   "Syntax table for `markdown-mode'.")
 
-
 ;;; Element Insertion =========================================================
 
 (defun markdown-ensure-blank-line-before ()
@@ -4519,7 +4504,6 @@ at the beginning of the block."
        do (progn (when lang (markdown-gfm-add-used-language lang))
                  (goto-char (next-single-property-change (point) prop)))))))
 
-
 ;;; Footnotes =================================================================
 
 (defun markdown-footnote-counter-inc ()
@@ -4742,7 +4726,6 @@ Then the returned list is: ((\"^1\" . 478) (\"^marker\" . 475))"
             (cl-pushnew (cons marker pos) footnotes :test #'equal))))
       (reverse footnotes))))
 
-
 ;;; Element Removal ===========================================================
 
 (defun markdown-kill-thing-at-point ()
@@ -4835,7 +4818,6 @@ text to kill ring), and list items."
     (markdown-backward-block)
     (kill-region (point) (progn (markdown-forward-block) (point)))))
 
-
 ;;; Indentation ===============================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
@@ -5013,7 +4995,6 @@ See `markdown-indent-line' and `markdown-indent-line'."
   (interactive "*r")
   (markdown-indent-region beg end t))
 
-
 ;;; Markup Completion =========================================================
 
 (defconst markdown-complete-alist
@@ -5161,7 +5142,6 @@ match."
   (interactive "*")
   (markdown-complete-region (point-min) (point-max)))
 
-
 ;;; Markup Cycling ============================================================
 
 (defun markdown-cycle-atx (arg &optional remove)
@@ -5245,7 +5225,6 @@ Assumes match data is available for `markdown-regex-italic'."
       (replace-match new-delim t t nil 2)
       (replace-match new-delim t t nil 4))))
 
-
 ;;; Keymap ====================================================================
 
 (defun markdown--style-map-prompt ()
@@ -5445,7 +5424,6 @@ Assumes match data is available for `markdown-regex-italic'."
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
 
-
 ;;; Menu ======================================================================
 
 (easy-menu-define markdown-mode-menu markdown-mode-map
@@ -5639,7 +5617,6 @@ See also `markdown-mode-map'.")
      ["Describe Mode" (describe-function 'markdown-mode)]
      ["Guide" (browse-url "https://leanpub.com/markdown-mode")])))
 
-
 ;;; imenu =====================================================================
 
 (defun markdown-imenu-create-nested-index ()
@@ -5722,7 +5699,6 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
         (nconc index (markdown-get-defined-footnotes)))
       index)))
 
-
 ;;; References ================================================================
 
 (defun markdown-reference-goto-definition ()
@@ -6050,7 +6026,6 @@ defined."
   markdown-insert-unused-reference-button)
 
 
-
 ;;; Lists =====================================================================
 
 (defun markdown-insert-list-item (&optional arg)
@@ -6296,7 +6271,6 @@ a list."
     (goto-char (point-min))
     (markdown-cleanup-list-numbers-level "")))
 
-
 ;;; Movement ==================================================================
 
 (defun markdown-beginning-of-defun (&optional arg)
@@ -6653,7 +6627,6 @@ See `markdown-wiki-link-p' and `markdown-next-wiki-link'."
       (goto-char opoint)
       nil)))
 
-
 ;;; Outline ===================================================================
 
 (defun markdown-move-heading-common (move-fn &optional arg adjust)
@@ -7018,7 +6991,6 @@ demote."
   (unless (markdown-up-list)
     (markdown-up-heading 1)))
 
-
 ;;; Marking and Narrowing =====================================================
 
 (defun markdown-mark-paragraph ()
@@ -7139,7 +7111,6 @@ This puts point at the start of the current subtree, and mark at the end."
           (backward-char 1))
           (point))))))
 
-
 ;;; Generic Structure Editing, Completion, and Cycling Commands ===============
 
 (defun markdown-move-up ()
@@ -7235,7 +7206,6 @@ or remove markup."
      (t
       (user-error "Nothing to demote at point")))))
 
-
 ;;; Commands ==================================================================
 
 (defun markdown (&optional output-buffer-name)
@@ -7630,7 +7600,6 @@ update this buffer's contents."
     (with-current-buffer markdown-output-buffer-name
       (kill-ring-save (point-min) (point-max)))))
 
-
 ;;; Links =====================================================================
 
 (defun markdown-link-p ()
@@ -7854,7 +7823,6 @@ and disable it otherwise."
     (message "markdown-mode URL hiding disabled"))
   (markdown-reload-extensions))
 
-
 ;;; Wiki Links ================================================================
 
 (defun markdown-wiki-link-p ()
@@ -8083,7 +8051,6 @@ These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
                  'markdown-fontify-buffer-wiki-links t)
   (markdown-unfontify-region-wiki-links (point-min) (point-max))))
 
-
 ;;; Following & Doing =========================================================
 
 (defun markdown-follow-thing-at-point (arg)
@@ -8131,7 +8098,6 @@ markers and footnote text."
    (t
     (markdown-insert-gfm-checkbox))))
 
-
 ;;; Miscellaneous =============================================================
 
 (defun markdown-compress-whitespace-string (str)
@@ -8256,7 +8222,6 @@ or span."
     (or (markdown-inline-code-at-pos pos)
         (markdown-code-block-at-pos pos))))
 
-
 ;;; Extension Framework =======================================================
 
 (defun markdown-reload-extensions ()
@@ -8285,7 +8250,6 @@ before regenerating font-lock rules for extensions."
       (markdown-toggle-math markdown-enable-math))
     (markdown-reload-extensions)))
 
-
 ;;; Math Support ==============================================================
 
 (make-obsolete 'markdown-enable-math 'markdown-toggle-math "v2.1")
@@ -8322,7 +8286,6 @@ if ARG is omitted or nil."
     (message "markdown-mode math support disabled"))
   (markdown-reload-extensions))
 
-
 ;;; GFM Checkboxes ============================================================
 
 (define-button-type 'markdown-gfm-checkbox-button
@@ -8439,7 +8402,6 @@ BEG and END are the limits of scanned region."
       (widen)
       (remove-overlays nil nil 'face 'markdown-gfm-checkbox-face))))
 
-
 ;;; Display inline image ======================================================
 
 (defvar markdown-inline-image-overlays nil)
@@ -8528,7 +8490,6 @@ or \\[markdown-toggle-inline-images]."
       (markdown-remove-inline-images)
     (markdown-display-inline-images)))
 
-
 ;;; GFM Code Block Fontification ==============================================
 
 (defcustom markdown-fontify-code-blocks-natively nil
@@ -8699,7 +8660,6 @@ position."
                (package-install 'edit-indirect)
                (markdown-edit-code-block))))))
 
-
 ;;; Table Editing =============================================================
 
 ;; These functions were originally adapted from `org-table.el'.
@@ -9419,7 +9379,6 @@ rows and columns and the column alignment."
           (end-of-line 1) (insert (concat "\n" hline)) (goto-char pos)))
     (markdown-table-forward-cell)))
 
-
 ;;; ElDoc Support =============================================================
 
 (defun markdown-eldoc-function ()
@@ -9459,7 +9418,6 @@ rows and columns and the column alignment."
               (markdown--substitute-command-keys
                "\\[markdown-toggle-markup-hiding]"))))))
 
-
 ;;; Mode Definition  ==========================================================
 
 (defun markdown-show-version ()
@@ -9619,7 +9577,6 @@ rows and columns and the column alignment."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.mdwn\\'" . markdown-mode))
 
-
 ;;; GitHub Flavored Markdown Mode  ============================================
 
 (defvar gfm-mode-hook nil
@@ -9633,7 +9590,6 @@ rows and columns and the column alignment."
   (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
   (markdown-gfm-parse-buffer-for-languages))
 
-
 ;;; Viewing modes =============================================================
 
 (defcustom markdown-hide-markup-in-view-modes t
@@ -9674,7 +9630,6 @@ rows and columns and the column alignment."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (read-only-mode 1))
 
-
 ;;; Live Preview Mode  ========================================================
 ;;;###autoload
 (define-minor-mode markdown-live-preview-mode
@@ -9687,7 +9642,6 @@ rows and columns and the column alignment."
         (user-error "Buffer %s does not visit a file" (current-buffer)))
     (markdown-live-preview-remove)))
 
-
 (provide 'markdown-mode)
 
 ;; Local Variables:
