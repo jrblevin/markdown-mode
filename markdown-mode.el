@@ -3546,7 +3546,7 @@ SEQ may be an atom or a sequence."
               font-lock-multiline t
               ,@(when (and markdown-hide-markup hr-char)
                   `(display ,(make-string
-                              (window-body-width) hr-char)))))
+                              (1- (window-body-width)) hr-char)))))
       t)))
 
 (defun markdown-fontify-sub-superscripts (last)
