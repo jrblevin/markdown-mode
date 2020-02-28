@@ -109,6 +109,9 @@
 
 *   Bug fixes:
 
+    -   No longer treat code fragments that are delimited with three
+        backquotes on each side as the beginning of a code block.
+        ([GH-403][])
     -   Fix infloop caused by incorrect detection of end of code
         blocks ([GH-349][]).
     -   Remove GFM checkbox overlays when switching major modes.
