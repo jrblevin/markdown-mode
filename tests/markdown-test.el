@@ -2810,6 +2810,14 @@ it is parsed."
    (markdown-test-range-has-face 42 67 nil)
    (markdown-test-range-has-face 69 88 nil)))
 
+(ert-deftest test-markdown-font-lock/mmd-not-metadata ()
+  "Don't treat as metadata if its line is not in header
+https://github.com/jrblevin/markdown-mode/issues/437"
+  (markdown-test-string "hello world
+foo bar baz: one two three
+"
+   (markdown-test-range-has-face 13 39 nil)))
+
 (ert-deftest test-markdown-font-lock/pandoc-metadata ()
   "Basic Pandoc metadata tests."
   (markdown-test-string "% title
