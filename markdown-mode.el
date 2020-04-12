@@ -1026,6 +1026,14 @@ Group 3 matches all attributes and whitespace following the tag name.")
 If POS is not given, use point instead."
   (get-text-property (or pos (point)) 'markdown-comment))
 
+(defun markdown-in-html-attr-p (pos)
+  "Return non-nil if POS is in a html attribute name or value."
+  (let ((face-prop (get-text-property pos 'face)))
+    (if (listp face-prop)
+        (cl-loop for face in face-prop
+                 thereis (memq face '(markdown-html-attr-name-face markdown-html-attr-value-face)))
+      (memq face-prop '(markdown-html-attr-name-face markdown-html-attr-value-face)))))
+
 (defun markdown-syntax-propertize-extend-region (start end)
   "Extend START to END region to include an entire block of text.
 This helps improve syntax analysis for block constructs.
@@ -2999,7 +3007,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
   "Match inline italics from the point to LAST."
   (let ((regex (if (memq major-mode '(gfm-mode gfm-view-mode))
                    markdown-regex-gfm-italic markdown-regex-italic)))
-    (when (markdown-match-inline-generic regex last)
+    (when (and (markdown-match-inline-generic regex last)
+               (not (markdown-in-html-attr-p (match-beginning 1))))
       (let ((begin (match-beginning 1))
             (end (match-end 1)))
         (if (or (markdown-inline-code-at-pos-p begin)
