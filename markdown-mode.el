@@ -9231,7 +9231,7 @@ Horizontal separator lines will be eliminated."
     (user-error "Not at a table"))
   (let* ((table (buffer-substring-no-properties
                  (markdown-table-begin) (markdown-table-end)))
-         ;; Convert table to a Lisp structure
+         ;; Convert table to Lisp structure
          (table (delq nil
                       (mapcar
                        (lambda (x)
@@ -9251,12 +9251,13 @@ Horizontal separator lines will be eliminated."
                                 table)))
                            (car table))))
     (goto-char (markdown-table-begin))
-    (re-search-forward "|") (backward-char)
-    (delete-region (point) (markdown-table-end))
-    (insert (mapconcat
-             (lambda(x)
-               (concat "| " (mapconcat 'identity x " | " ) "  |\n"))
-             contents ""))
+    (save-excursion
+      (re-search-forward "|") (backward-char)
+      (delete-region (point) (markdown-table-end))
+      (insert (mapconcat
+               (lambda(x)
+                 (concat "| " (mapconcat 'identity x " | " ) " |\n"))
+               contents "")))
     (markdown-table-goto-dline col_old)
     (markdown-table-goto-column dline_old))
   (markdown-table-align))
