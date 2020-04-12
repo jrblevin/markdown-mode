@@ -127,6 +127,7 @@
         ([GH-313][])
     -   Fix bounds during inline comment syntax propertization. ([GH-327][])
     -   Fix wrong metadata highlighting. ([GH-437][])
+    -   Fix wrong italic highlighting in HTML attributes. ([GH-410][])
 
   [gh-349]: https://github.com/jrblevin/markdown-mode/issues/349]
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
@@ -179,6 +180,7 @@
   [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
   [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
+  [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
 
 # Markdown Mode 2.3

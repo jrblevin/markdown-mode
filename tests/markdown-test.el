@@ -2236,6 +2236,12 @@ See GH-275."
    (markdown-test-range-has-face 1 30 'markdown-comment-face)
    (should-not (markdown-range-property-any 1 30 'face '(markdown-italic-face)))))
 
+(ert-deftest test-markdown-font-lock/italics-in-html-attribute ()
+  "Test not matching italics in HTML attributes."
+  (markdown-test-string
+   "<meta a=\"b_c\" d=\"e_f\">"
+   (should-not (markdown-range-property-any 12 18 'face '(markdown-italic-face)))))
+
 (ert-deftest test-markdown-font-lock/italics-after-bold ()
   "Test bold and italics on the same line.
 See GH-223."
