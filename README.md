@@ -1,11 +1,11 @@
-# Emacs Markdown Mode [![MELPA badge][melpa-badge]][melpa-link] [![MELPA stable badge][melpa-stable-badge]][melpa-stable-link] [![Travis CI Build Status][travis-badge]][travis-link] [![Guide to Markdown Mode for Emacs][leanpub-badge]][leanpub-link]
+# Emacs Markdown Mode [![MELPA badge][melpa-badge]][melpa-link] [![MELPA stable badge][melpa-stable-badge]][melpa-stable-link] [![Github Actions Status][github-actions-badge]][github-actions-link] [![Guide to Markdown Mode for Emacs][leanpub-badge]][leanpub-link]
 
   [melpa-link]: https://melpa.org/#/markdown-mode
   [melpa-stable-link]: https://stable.melpa.org/#/markdown-mode
   [melpa-badge]: https://melpa.org/packages/markdown-mode-badge.svg
   [melpa-stable-badge]: https://stable.melpa.org/packages/markdown-mode-badge.svg
-  [travis-link]: https://travis-ci.org/jrblevin/markdown-mode
-  [travis-badge]: https://travis-ci.org/jrblevin/markdown-mode.svg?branch=master
+  [github-actions-link]: https://github.com/jrblevin/markdown-mode/actions
+  [github-actions-badge]: https://github.com/jrblevin/markdown-mode/workflows/CI/badge.svg
   [leanpub-link]: https://leanpub.com/markdown-mode
   [leanpub-badge]: https://img.shields.io/badge/leanpub-guide-orange.svg
 
