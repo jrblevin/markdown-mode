@@ -3261,6 +3261,17 @@ Made into a variable to allow for dynamic let-binding.")
       (setq ret (funcall condition)))
     ret))
 
+(defun markdown-metadata-line-p (pos regexp)
+  (save-excursion
+    (or (= (line-number-at-pos pos) 1)
+        (progn
+          (forward-line -1)
+          ;; skip multi-line metadata
+          (while (and (looking-at-p "^\\s-+[[:alpha:]]")
+                      (> (line-number-at-pos (point)) 1))
+            (forward-line -1))
+          (looking-at-p regexp)))))
+
 (defun markdown-match-generic-metadata (regexp last)
   "Match metadata declarations specified by REGEXP from point to LAST.
 These declarations must appear inside a metadata block that begins at
@@ -3281,7 +3292,8 @@ the buffer)."
       ;; before the beginning of the block, start there. Otherwise,
       ;; move back to FIRST.
       (goto-char (if (< first block-begin) block-begin first))
-      (if (re-search-forward regexp (min last block-end) t)
+      (if (and (re-search-forward regexp (min last block-end) t)
+               (markdown-metadata-line-p (point) regexp))
           ;; If a metadata declaration is found, set match-data and return t.
           (let ((key-beginning (match-beginning 1))
                 (key-end (match-end 1))
