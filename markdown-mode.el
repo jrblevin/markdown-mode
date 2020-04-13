@@ -7654,16 +7654,24 @@ update this buffer's contents."
 
 ;;; Links =====================================================================
 
+(defun markdown-backward-to-link-start ()
+  "Backward link start position if current position is in link title."
+  ;; Issue #305
+  (when (eq (get-text-property (point) 'face) 'markdown-link-face)
+    (skip-chars-backward "^[")
+    (forward-char -1)))
+
 (defun markdown-link-p ()
   "Return non-nil when `point' is at a non-wiki link.
 See `markdown-wiki-link-p' for more information."
-  (let ((case-fold-search nil))
-    (and (not (markdown-wiki-link-p))
-         (not (markdown-code-block-at-point-p))
-         (or (thing-at-point-looking-at markdown-regex-link-inline)
-             (thing-at-point-looking-at markdown-regex-link-reference)
-             (thing-at-point-looking-at markdown-regex-uri)
-             (thing-at-point-looking-at markdown-regex-angle-uri)))))
+  (save-excursion
+    (let ((case-fold-search nil))
+      (when (and (not (markdown-wiki-link-p)) (not (markdown-code-block-at-point-p)))
+        (markdown-backward-to-link-start)
+        (or (thing-at-point-looking-at markdown-regex-link-inline)
+            (thing-at-point-looking-at markdown-regex-link-reference)
+            (thing-at-point-looking-at markdown-regex-uri)
+            (thing-at-point-looking-at markdown-regex-angle-uri))))))
 
 (make-obsolete 'markdown-link-link 'markdown-link-url "v2.3")
 
@@ -7679,6 +7687,7 @@ Value is a list of elements describing the link:
  6. bang (nil or \"!\")"
   (save-excursion
     (goto-char pos)
+    (markdown-backward-to-link-start)
     (let (begin end text url reference title bang)
       (cond
        ;; Inline or reference image or link at point.

@@ -4818,6 +4818,17 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
       (should (equal translated-files '("/foo/bar/baz")))
       (should (equal visited-files '("/root/foo/bar/baz.md"))))))
 
+(ert-deftest test-markdown-link/link-p ()
+  "Test that `markdown-link-p' returns t if cursor is on link."
+  (markdown-test-string "[one][two] [three][four]"
+    (should (markdown-link-p))
+    (goto-char 2)
+    (should (markdown-link-p))
+    (goto-char 12)
+    (should (markdown-link-p))
+    (goto-char 13)
+    (should (markdown-link-p))))
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/file-local-variables ()
