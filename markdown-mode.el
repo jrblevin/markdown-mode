@@ -2996,7 +2996,7 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                                  markdown-math-face)))
           (progn (goto-char (min (1+ begin) last))
                  (when (< (point) last)
-                   (markdown-match-italic last)))
+                   (markdown-match-bold last)))
         (set-match-data (list (match-beginning 2) (match-end 2)
                               (match-beginning 3) (match-end 3)
                               (match-beginning 4) (match-end 4)
