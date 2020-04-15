@@ -130,6 +130,7 @@
     -   Fix wrong metadata highlighting. ([GH-437][])
     -   Fix wrong italic highlighting in HTML attributes. ([GH-410][])
     -   Fix markdown-follow-thing-at-point issue for continuous links. ([GH-305][])
+    -   Fix wrong setting major-mode issue at following wiki link([GH-427][])
 
   [gh-349]: https://github.com/jrblevin/markdown-mode/issues/349]
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
@@ -184,6 +185,7 @@
   [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
   [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
+  [gh-410]: https://github.com/jrblevin/markdown-mode/issues/427
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
 
 # Markdown Mode 2.3

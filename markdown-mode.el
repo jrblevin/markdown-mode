@@ -7970,7 +7970,7 @@ window when OTHER is non-nil."
       (when other (other-window 1))
       (let ((default-directory wp))
         (find-file filename)))
-    (when (not (eq major-mode 'markdown-mode))
+    (unless (memq major-mode '(markdown-mode gfm-mode))
       (markdown-mode))))
 
 (defun markdown-follow-wiki-link-at-point (&optional arg)

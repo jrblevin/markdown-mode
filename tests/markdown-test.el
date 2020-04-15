@@ -5768,6 +5768,19 @@ x|"
             (markdown-test-range-has-property 19 26 'font-lock-face 'markdown-link-face))
         (kill-buffer)))))
 
+(ert-deftest test-markdown-ext/wiki-link-major-mode ()
+  "Test major-mode of linked page."
+  (let ((markdown-enable-wiki-links t)
+        (auto-mode-alist (cons '("bar\\.md" . gfm-mode) auto-mode-alist)))
+    (find-file "wiki/root")
+    (unwind-protect
+        (progn
+          (markdown-mode)
+          (search-forward "sub/bar.md")
+          (markdown-follow-wiki-link-at-point)
+          (should (eq major-mode 'gfm-mode)))
+      (kill-buffer))))
+
 (defadvice markdown-live-preview-window-eww
     (around markdown-test-create-fake-eww disable)
   (setq ad-return-value (get-buffer-create "*eww*")))
