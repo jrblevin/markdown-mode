@@ -5,3 +5,5 @@
 [[foo]]
 
 [[doesnotexist]]
+
+[[sub/bar.md]]
