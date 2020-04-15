@@ -179,6 +179,17 @@ Extracts region from BEGIN to END and inserts in OUTPUT-BUFFER."
   (interactive)
   (ert "markdown"))
 
+;;; major-mode tests:
+
+(ert-deftest test-markdown-major-mode ()
+  "Test auto-mode-alist setting."
+  (dolist (extension '(".md" ".markdown" ".mkd" ".mdown" ".mkdn" ".mdwn"))
+    (let ((file (make-temp-file "a" nil extension)))
+      (unwind-protect
+          (with-current-buffer (find-file-noselect file)
+            (should (eq major-mode 'markdown-mode)))
+        (delete-file file)))))
+
 ;;; Example tests:
 
 (ert-deftest test-markdown-example/string ()

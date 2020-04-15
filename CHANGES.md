@@ -91,6 +91,7 @@
     -   Support horizontal rules consisting of underscores.
     -   Change default character encoding to UTF-8.
         ([GH-340][], [GH-350][])
+    -   Support more markdown extensions same as Vim
 
 *   Bug fixes:
 
