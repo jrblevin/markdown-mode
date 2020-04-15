@@ -69,7 +69,7 @@ Then, after restarting Emacs or evaluating the above statements, issue
 the following command: <kbd>M-x package-install RET markdown-mode RET</kbd>.
 When installed this way, the major modes `markdown-mode` and `gfm-mode`
 will be autoloaded and `markdown-mode` will be used for file names
-ending in either `.md` or `.markdown`.
+ending in `.md`, `.markdown`, `.mkd`, `.mdown`, `.mkdn`, `.mdwn`.
 
 Alternatively, if you manage loading packages with [use-package][]
 then you can automatically install and configure `markdown-mode` by
@@ -99,8 +99,8 @@ to load automatically by adding the following to your init file:
 ```lisp
 (autoload 'markdown-mode "markdown-mode"
    "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist
+             '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'" . markdown-mode))
 
 (autoload 'gfm-mode "markdown-mode"
    "Major mode for editing GitHub Flavored Markdown files" t)
