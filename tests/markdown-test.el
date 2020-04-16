@@ -2542,6 +2542,27 @@ Test currently fails because this case isn't handled properly."
      (should (looking-at "[*+-]"))
      (markdown-test-range-has-face loc loc 'markdown-list-face))))
 
+(ert-deftest test-markdown-font-lock/lists-2 ()
+  "Test markdown-list-face with markdown-list-indent-width.
+See https://github.com/jrblevin/markdown-mode/issues/405 ."
+  (let ((markdown-list-indent-width 2))
+    (markdown-test-string "
+* level 1
+  * level 2
+    * level 3
+      * level 4
+        * level 5"
+      (markdown-test-range-has-face 62 62 'markdown-list-face)))
+
+  (let ((markdown-list-indent-width 4))
+    (markdown-test-string "
+* level 1
+  * level 2
+    * level 3
+      * level 4
+        * level 5"
+      (markdown-test-range-has-face 62 62 nil))))
+
 (ert-deftest test-markdown-font-lock/definition-list ()
   "A simple definition list marker font lock test."
   (markdown-test-file "definition-list.text"
