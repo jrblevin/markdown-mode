@@ -92,6 +92,7 @@
     -   Change default character encoding to UTF-8.
         ([GH-340][], [GH-350][])
     -   Support more markdown extensions same as Vim
+    -   Complete link text from link labels at inserting link. ([GH-421][])
 
 *   Bug fixes:
 
@@ -187,6 +188,7 @@
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
+  [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
 
