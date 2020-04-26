@@ -3940,7 +3940,7 @@ puts 'hello, world'
   "Test that buttons in unused references buffer delete lines when pushed."
   (markdown-test-file "refs.text"
    (let* ((target (buffer-name))
-          (check (markdown-replace-regexp-in-string
+          (check (replace-regexp-in-string
                   "%buffer%" target
                   markdown-unused-references-buffer))
           (original-unused-refs (markdown-get-unused-refs)))
@@ -5635,7 +5635,7 @@ See GH-288."
    (transient-mark-mode)
    (push-mark (point) t t)
    (end-of-line)
-   (should (markdown-use-region-p))
+   (should (use-region-p))
    (markdown-insert-gfm-code-block "elisp")
    (should (string-equal (buffer-string)
                          "line 1\n\n``` elisp\nline 2\n```\n\nline 3\n"))))
@@ -5657,7 +5657,7 @@ See GH-288."
       (forward-line)
       (push-mark nil :nomsg :activate)
       (end-of-line)
-      (should (markdown-use-region-p))
+      (should (use-region-p))
       (markdown-insert-gfm-code-block "elisp"))
     (should (equal (buffer-substring-no-properties (point-min) (point-max))
                    "1.  foo\n\n    ``` elisp\n    bar\n    ```\n\n"))
