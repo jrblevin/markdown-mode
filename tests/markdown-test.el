@@ -4833,6 +4833,14 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
   (markdown-test-string "http://jblevins.org/projects/markdown-mode/"
     (should (equal (markdown-link-at-pos (point)) '(1 44 nil "http://jblevins.org/projects/markdown-mode/" nil nil nil)))))
 
+(ert-deftest test-markdown-link/link-contains-parenthesis ()
+  "Test URL which contains close parenthesis.
+Detail: https://github.com/jrblevin/markdown-mode/issues/408"
+  (let ((url "https://commons.wikimedia.org/wiki/Category:SVG_locator_maps_of_continents_(location_map_scheme)_(Winkel_3_projection)"))
+    (markdown-test-string (format "[foo](%s)" url)
+      (let ((link (markdown-link-at-pos (point))))
+        (should (string= (nth 3 link) url))))))
+
 (ert-deftest test-markdown-link/follow-filename ()
   "Test that `markdown-follow-thing-at-pos' uses
 `markdown-translate-filename-function' to translate filenames."
