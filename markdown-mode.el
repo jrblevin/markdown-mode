@@ -7426,20 +7426,29 @@ Value is a list of elements describing the link:
     (markdown-backward-to-link-start)
     (let (begin end text url reference title bang)
       (cond
-       ;; Inline or reference image or link at point.
+       ;; Inline image or link at point.
+       ((thing-at-point-looking-at markdown-regex-link-inline)
+        (setq bang (match-string-no-properties 1)
+              begin (match-beginning 0)
+              end (match-end 0)
+              text (match-string-no-properties 3)
+              url (match-string-no-properties 6))
+        (if (match-end 7)
+            (setq title (substring (match-string-no-properties 7) 1 -1))
+          ;; #408 URL contains close parenthesis case
+          (goto-char (match-beginning 5))
+          (let ((paren-end (scan-sexps (point) 1)))
+            (when (and paren-end (< end paren-end))
+              (setq url (buffer-substring (match-beginning 6) (1- paren-end)))))))
+       ;; Reference link at point.
        ((or (thing-at-point-looking-at markdown-regex-link-inline)
             (thing-at-point-looking-at markdown-regex-link-reference))
         (setq bang (match-string-no-properties 1)
               begin (match-beginning 0)
               end (match-end 0)
               text (match-string-no-properties 3))
-        (if (char-equal (char-after (match-beginning 5)) ?\[)
-            ;; Reference link
-            (setq reference (match-string-no-properties 6))
-          ;; Inline link
-          (setq url (match-string-no-properties 6))
-          (when (match-end 7)
-            (setq title (substring (match-string-no-properties 7) 1 -1)))))
+        (when (char-equal (char-after (match-beginning 5)) ?\[)
+          (setq reference (match-string-no-properties 6))))
        ;; Angle bracket URI at point.
        ((thing-at-point-looking-at markdown-regex-angle-uri)
         (setq begin (match-beginning 0)

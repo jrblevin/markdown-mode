@@ -135,6 +135,7 @@
     -   Fix markdown-follow-thing-at-point issue for continuous links. ([GH-305][])
     -   Fix wrong setting major-mode issue at following wiki link([GH-427][])
     -   Fix not consider `markdown-list-indent-width` issue([GH-405][])
+    -   Fix URL open issue which contains end parentheses ([GH-408][])
 
   [gh-349]: https://github.com/jrblevin/markdown-mode/issues/349]
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
@@ -190,6 +191,7 @@
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
+  [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408
   [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
   [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427
