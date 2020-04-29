@@ -22,6 +22,7 @@
         `markdown-mode` are evaluated. ([GH-331][], [GH-335][])
     -   Point at the end of fenced code blocks is no-longer considered
         part of the code block ([GH-#349][]).
+    -   Enable `markdown-fontify-code-blocks-natively` in `gfm-view-mode`. ([GH-#451][])
 
 *   New features:
 
@@ -192,6 +193,7 @@
   [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
+  [gh-451]: https://github.com/jrblevin/markdown-mode/issues/451
 
 # Markdown Mode 2.3
 
