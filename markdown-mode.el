@@ -1720,135 +1720,6 @@ See `markdown-hide-markup' for additional details."
 
 (require 'font-lock)
 
-(defvar markdown-italic-face 'markdown-italic-face
-  "Face name to use for italic text.")
-
-(defvar markdown-bold-face 'markdown-bold-face
-  "Face name to use for bold text.")
-
-(defvar markdown-strike-through-face 'markdown-strike-through-face
-  "Face name to use for strike-through text.")
-
-(defvar markdown-header-delimiter-face 'markdown-header-delimiter-face
-  "Face name to use as a base for header delimiters.")
-
-(defvar markdown-header-rule-face 'markdown-header-rule-face
-  "Face name to use as a base for header rules.")
-
-(defvar markdown-header-face 'markdown-header-face
-  "Face name to use as a base for headers.")
-
-(defvar markdown-header-face-1 'markdown-header-face-1
-  "Face name to use for level-1 headers.")
-
-(defvar markdown-header-face-2 'markdown-header-face-2
-  "Face name to use for level-2 headers.")
-
-(defvar markdown-header-face-3 'markdown-header-face-3
-  "Face name to use for level-3 headers.")
-
-(defvar markdown-header-face-4 'markdown-header-face-4
-  "Face name to use for level-4 headers.")
-
-(defvar markdown-header-face-5 'markdown-header-face-5
-  "Face name to use for level-5 headers.")
-
-(defvar markdown-header-face-6 'markdown-header-face-6
-  "Face name to use for level-6 headers.")
-
-(defvar markdown-inline-code-face 'markdown-inline-code-face
-  "Face name to use for inline code.")
-
-(defvar markdown-list-face 'markdown-list-face
-  "Face name to use for list markers.")
-
-(defvar markdown-blockquote-face 'markdown-blockquote-face
-  "Face name to use for blockquote.")
-
-(defvar markdown-pre-face 'markdown-pre-face
-  "Face name to use for preformatted text.")
-
-(defvar markdown-language-keyword-face 'markdown-language-keyword-face
-  "Face name to use for programming language identifiers.")
-
-(defvar markdown-language-info-face 'markdown-language-info-face
-  "Face name to use for programming info strings.")
-
-(defvar markdown-link-face 'markdown-link-face
-  "Face name to use for links.")
-
-(defvar markdown-missing-link-face 'markdown-missing-link-face
-  "Face name to use for links where the linked file does not exist.")
-
-(defvar markdown-reference-face 'markdown-reference-face
-  "Face name to use for reference.")
-
-(defvar markdown-footnote-marker-face 'markdown-footnote-marker-face
-  "Face name to use for footnote markers.")
-
-(defvar markdown-url-face 'markdown-url-face
-  "Face name to use for URLs.")
-
-(defvar markdown-link-title-face 'markdown-link-title-face
-  "Face name to use for reference link titles.")
-
-(defvar markdown-line-break-face 'markdown-line-break-face
-  "Face name to use for hard line breaks.")
-
-(defvar markdown-comment-face 'markdown-comment-face
-  "Face name to use for HTML comments.")
-
-(defvar markdown-math-face 'markdown-math-face
-  "Face name to use for LaTeX expressions.")
-
-(defvar markdown-metadata-key-face 'markdown-metadata-key-face
-  "Face name to use for metadata keys.")
-
-(defvar markdown-metadata-value-face 'markdown-metadata-value-face
-  "Face name to use for metadata values.")
-
-(defvar markdown-gfm-checkbox-face 'markdown-gfm-checkbox-face
-  "Face name to use for GFM checkboxes.")
-
-(defvar markdown-highlight-face 'markdown-highlight-face
-  "Face name to use for mouse highlighting.")
-
-(defvar markdown-markup-face 'markdown-markup-face
-  "Face name to use for markup elements.")
-
-(make-obsolete-variable 'markdown-italic-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-bold-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-strike-through-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-delimiter-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-rule-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face-1 "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face-2 "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face-3 "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face-4 "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face-5 "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-header-face-6 "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-inline-code-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-list-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-blockquote-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-pre-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-language-keyword-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-language-info-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-link-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-missing-link-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-reference-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-footnote-marker-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-url-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-link-title-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-line-break-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-comment-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-math-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-metadata-key-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-metadata-value-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-gfm-checkbox-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-highlight-face "Use face name directly" "v2.4")
-(make-obsolete-variable 'markdown-markup-face "Use face name directly" "v2.4")
-
 (defgroup markdown-faces nil
   "Faces used in Markdown Mode"
   :group 'markdown
@@ -1940,9 +1811,6 @@ inline code fragments and code blocks."
   '((t (:inherit markdown-markup-face)))
   "Face for link references."
   :group 'markdown-faces)
-
-(define-obsolete-face-alias 'markdown-footnote-face
-  'markdown-footnote-marker-face "v2.3")
 
 (defface markdown-footnote-marker-face
   '((t (:inherit markdown-markup-face)))
@@ -2131,14 +1999,6 @@ Depending on your font, some reasonable choices are:
          ,@(when markdown-hide-markup
              `(display ,markdown-footnote-display))))
 
-(define-obsolete-variable-alias
- 'gfm-font-lock-keywords
- 'markdown-mode-font-lock-keywords "v2.4")
-
-(define-obsolete-variable-alias
- 'markdown-mode-font-lock-keywords-basic
- 'markdown-mode-font-lock-keywords "v2.4")
-
 (defvar markdown-mode-font-lock-keywords
   `((markdown-match-yaml-metadata-begin . ((1 'markdown-markup-face)))
     (markdown-match-yaml-metadata-end . ((1 'markdown-markup-face)))
@@ -2283,11 +2143,6 @@ Used for `flyspell-generic-check-word-predicate'."
 
 
 ;;; Markdown Parsing Functions ================================================
-
-(define-obsolete-function-alias
-  'markdown-cur-line-blank 'markdown-cur-line-blank-p "v2.4")
-(define-obsolete-function-alias
-  'markdown-next-line-blank 'markdown-next-line-blank-p "v2.4")
 
 (defun markdown-cur-line-blank-p ()
   "Return t if the current line is blank and nil otherwise."
@@ -2773,8 +2628,6 @@ This is a predicate function counterpart to
 `markdown-inline-code-at-point' which does not modify the match
 data.  See `markdown-code-block-at-point-p' for code blocks."
   (save-match-data (markdown-inline-code-at-pos (or pos (point)))))
-
-(make-obsolete 'markdown-code-at-point-p 'markdown-inline-code-at-point-p "v2.2")
 
 (defun markdown-code-block-at-pos (pos)
   "Return match data list if there is a code block at POS.
@@ -3809,11 +3662,6 @@ be used to populate the title attribute when converted to XHTML."
         "Reference [%s] was defined, press \\[markdown-do] to jump there")
        label))))
 
-(define-obsolete-function-alias
-  'markdown-insert-inline-link-dwim 'markdown-insert-link "v2.3")
-(define-obsolete-function-alias
-  'markdown-insert-reference-link-dwim 'markdown-insert-link "v2.3")
-
 (defun markdown--insert-link-or-image (image)
   "Interactively insert new or update an existing link or image.
 When IMAGE is non-nil, insert an image.  Otherwise, insert a link.
@@ -4770,9 +4618,6 @@ Positions are calculated by `markdown-calc-indents'."
     (setq positions (cdr positions)))
   (or (cadr positions) 0))
 
-(define-obsolete-function-alias 'markdown-exdent-find-next-position
-  'markdown-outdent-find-next-position "v2.3")
-
 (defun markdown-outdent-find-next-position (cur-pos positions)
   "Return the maximal element that precedes CUR-POS from POSITIONS.
 Positions are calculated by `markdown-calc-indents'."
@@ -4882,9 +4727,6 @@ list simply adds a blank line)."
    ;; Insert a raw newline
    (t (newline))))
 
-(define-obsolete-function-alias 'markdown-exdent-or-delete
-  'markdown-outdent-or-delete "v2.3")
-
 (defun markdown-outdent-or-delete (arg)
   "Handle BACKSPACE by cycling through indentation points.
 When BACKSPACE is pressed, if there is only whitespace
@@ -4928,9 +4770,6 @@ See `markdown-indent-line' and `markdown-indent-line'."
                      (markdown-indent-find-next-position leftmostcol positions))))
     (indent-rigidly beg end (- next-pos leftmostcol))
     (setq deactivate-mark nil)))
-
-(define-obsolete-function-alias 'markdown-exdent-region
-  'markdown-outdent-region "v2.3")
 
 (defun markdown-outdent-region (beg end)
   "Call `markdown-indent-region' on region from BEG to END with prefix."
@@ -6278,8 +6117,6 @@ It should move point to the first position after the defun."
       (goto-char found)
       (skip-syntax-backward "-"))))
 
-(make-obsolete 'markdown-beginning-of-block 'markdown-beginning-of-text-block "v2.2")
-
 (defun markdown-beginning-of-text-block ()
   "Move backward to previous beginning of a plain text block.
 This function simply looks for blank lines without considering
@@ -6295,8 +6132,6 @@ the surrounding context in light of Markdown syntax.  For that, see
       (if (re-search-backward markdown-regex-block-separator nil t)
           (goto-char (match-end 0))
         (goto-char (point-min))))))
-
-(make-obsolete 'markdown-end-of-block 'markdown-end-of-text-block "v2.2")
 
 (defun markdown-end-of-text-block ()
   "Move forward to next beginning of a plain text block.
@@ -7576,8 +7411,6 @@ See `markdown-wiki-link-p' for more information."
             (thing-at-point-looking-at markdown-regex-uri)
             (thing-at-point-looking-at markdown-regex-angle-uri))))))
 
-(make-obsolete 'markdown-link-link 'markdown-link-url "v2.3")
-
 (defun markdown-link-at-pos (pos)
   "Return properties of link or image at position POS.
 Value is a list of elements describing the link:
@@ -8034,8 +7867,6 @@ See `markdown-follow-link-at-point' and
         (t
          (user-error "Nothing to follow at point"))))
 
-(make-obsolete 'markdown-jump 'markdown-do "v2.3")
-
 (defun markdown-do ()
   "Do something sensible based on context at point.
 Jumps between reference links and definitions; between footnote
@@ -8143,9 +7974,6 @@ handles filling itself, it always returns t so that
     (fill-paragraph justify))
   t)
 
-(make-obsolete 'markdown-fill-forward-paragraph-function
-               'markdown-fill-forward-paragraph "v2.3")
-
 (defun markdown-fill-forward-paragraph (&optional arg)
   "Function used by `fill-paragraph' to move over ARG paragraphs.
 This is a `fill-forward-paragraph-function' for `markdown-mode'.
@@ -8215,8 +8043,6 @@ before regenerating font-lock rules for extensions."
 
 
 ;;; Math Support ==============================================================
-
-(make-obsolete 'markdown-enable-math 'markdown-toggle-math "v2.1")
 
 (defconst markdown-mode-font-lock-keywords-math
   (list
