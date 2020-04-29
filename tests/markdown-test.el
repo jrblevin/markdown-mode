@@ -4220,6 +4220,23 @@ puts 'hello, world'
     (should (string-equal (markdown-toggle-gfm-checkbox) "[x]"))
     (should (string-equal (buffer-string) "   -   [x] GFM task list item"))))
 
+(ert-deftest test-markdown-lists/clean-list-numbers ()
+  "Test for `markdown-cleanup-list-numbers'.
+Detail: https://github.com/jrblevin/markdown-mode/issues/392"
+  (markdown-test-string "Shortcuts
+---------
+  2. Horizontal rule: `C-c C-s -`
+  3. Underlined header `C-c C-s !`
+ 10. Convert to HTML: `C-c C-c m`
+"
+    (call-interactively #'markdown-cleanup-list-numbers)
+    (forward-line 2)
+    (should (looking-at-p "\\s-+1\\. Horizontal rule"))
+    (forward-line 1)
+    (should (looking-at-p "\\s-+2\\. Underlined header"))
+    (forward-line 1)
+    (should (looking-at-p "\\s-+3\\. Convert to HTML"))))
+
 (ert-deftest test-markdown-lists/beginning-of-list ()
   "Test `markdown-beginning-of-list'."
   (markdown-test-file "lists.text"

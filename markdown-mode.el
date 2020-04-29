@@ -6007,12 +6007,14 @@ In nested lists, demote child items as well."
               (forward-line))
             (markdown-syntax-propertize-list-items list-start list-end)))))))
 
-(defun markdown-cleanup-list-numbers-level (&optional pfx)
-  "Update the numbering for level PFX (as a string of spaces).
+(defun markdown-cleanup-list-numbers-level (&optional pfx prev-item)
+  "Update the numbering for level PFX (as a string of spaces) and PREV-ITEM.
+PREV-ITEM is width of previous-indentation and list number
 
 Assume that the previously found match was for a numbered item in
 a list."
   (let ((cpfx pfx)
+        (cur-item nil)
         (idx 0)
         (continue t)
         (step t)
@@ -6020,17 +6022,19 @@ a list."
     (while (and continue (not (eobp)))
       (setq step t)
       (cond
-       ((looking-at "^\\([\s-]*\\)[0-9]+\\. ")
-        (setq cpfx (match-string-no-properties 1))
+       ((looking-at "^\\(\\([\s-]*\\)[0-9]+\\)\\. ")
+        (setq cpfx (match-string-no-properties 2))
+        (setq cur-item (match-string-no-properties 1)) ;; indentation and list marker
         (cond
-         ((string= cpfx pfx)
+         ((or (= (length cpfx) (length pfx))
+              (= (length cur-item) (length prev-item)))
           (save-excursion
             (replace-match
              (concat pfx (number-to-string (setq idx (1+ idx))) ". ")))
           (setq sep nil))
          ;; indented a level
-         ((string< pfx cpfx)
-          (setq sep (markdown-cleanup-list-numbers-level cpfx))
+         ((< (length pfx) (length cpfx))
+          (setq sep (markdown-cleanup-list-numbers-level cpfx cur-item))
           (setq step nil))
          ;; exit the loop
          (t

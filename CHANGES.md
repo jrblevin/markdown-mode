@@ -138,6 +138,7 @@
     -   Fix not consider `markdown-list-indent-width` issue([GH-405][])
     -   Fix URL open issue which contains end parentheses ([GH-408][])
     -   Follow link even if it is in header([GH-430][])
+    -   Fix clean up list number issue([GH-392][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -191,6 +192,7 @@
   [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
   [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
+  [gh-392]: https://github.com/jrblevin/markdown-mode/pull/392
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
   [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408
