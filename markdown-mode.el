@@ -923,7 +923,7 @@ or
     markdown-regex-yaml-metadata-border))
 
 (defconst markdown-regex-inline-attributes
-  "[ \t]*\\({:?\\)[ \t]*\\(\\(#[[:alpha:]_.:-]+\\|\\.[[:alpha:]_.:-]+\\|\\w+=['\"]?[^\n'\"]*['\"]?\\),?[ \t]*\\)+\\(}\\)[ \t]*$"
+  "[ \t]*\\({:?\\)[ \t]*\\(\\(#[[:alpha:]_.:-]+\\|\\.[[:alpha:]_.:-]+\\|\\w+=['\"]?[^\n'\"}]*['\"]?\\),?[ \t]*\\)+\\(}\\)[ \t]*$"
   "Regular expression for matching inline identifiers or attribute lists.
 Compatible with Pandoc, Python Markdown, PHP Markdown Extra, and Leanpub.")
 
