@@ -7473,6 +7473,22 @@ returns nil."
     (or url (and ref (car (markdown-reference-definition
                            (downcase (if (string= ref "") text ref))))))))
 
+(defun markdown--browse-url (url)
+  (let* ((struct (url-generic-parse-url url))
+         (full (url-fullness struct))
+         (file url))
+    ;; Parse URL, determine fullness, strip query string
+    (if (fboundp 'url-path-and-query)
+        (setq file (car (url-path-and-query struct)))
+      (when (and (setq file (url-filename struct))
+                 (string-match "\\?" file))
+        (setq file (substring file 0 (match-beginning 0)))))
+    ;; Open full URLs in browser, files in Emacs
+    (if full
+        (browse-url url)
+      (when (and file (> (length file) 0))
+        (find-file (funcall markdown-translate-filename-function file))))))
+
 (defun markdown-follow-link-at-point ()
   "Open the current non-wiki link.
 If the link is a complete URL, open in browser with `browse-url'.
@@ -7480,21 +7496,7 @@ Otherwise, open with `find-file' after stripping anchor and/or query string.
 Translate filenames using `markdown-filename-translate-function'."
   (interactive)
   (if (markdown-link-p)
-      (let* ((url (markdown-link-url))
-             (struct (url-generic-parse-url url))
-             (full (url-fullness struct))
-             (file url))
-        ;; Parse URL, determine fullness, strip query string
-        (if (fboundp 'url-path-and-query)
-            (setq file (car (url-path-and-query struct)))
-          (when (and (setq file (url-filename struct))
-                     (string-match "\\?" file))
-            (setq file (substring file 0 (match-beginning 0)))))
-        ;; Open full URLs in browser, files in Emacs
-        (if full
-            (browse-url url)
-          (when (and file (> (length file) 0))
-            (find-file (funcall markdown-translate-filename-function file)))))
+      (markdown--browse-url (markdown-link-url))
     (user-error "Point is not at a Markdown link or URL")))
 
 (defun markdown-fontify-inline-links (last)
@@ -7870,11 +7872,15 @@ See `markdown-follow-link-at-point' and
 `markdown-follow-wiki-link-at-point'."
   (interactive "P")
   (cond ((markdown-link-p)
-         (markdown-follow-link-at-point))
+         (markdown--browse-url (markdown-link-url)))
         ((markdown-wiki-link-p)
          (markdown-follow-wiki-link-at-point arg))
         (t
-         (user-error "Nothing to follow at point"))))
+         (let* ((values (markdown-link-at-pos (point)))
+                (url (nth 3 values)))
+           (unless url
+             (user-error "Nothing to follow at point"))
+           (markdown--browse-url url)))))
 
 (defun markdown-do ()
   "Do something sensible based on context at point.
