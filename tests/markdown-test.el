@@ -4803,6 +4803,19 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
       (should (equal (file-name-nondirectory (buffer-file-name)) "path"))
       (kill-buffer))))
 
+(ert-deftest test-markdown-link/link-in-header ()
+  "Test link following even if it is in header.
+Detail: https://github.com/jrblevin/markdown-mode/issues/430"
+  (markdown-test-string "---
+[link](https://link-in-header.com)
+---"
+    (forward-line +1)
+    (let* ((opened-url nil)
+           (browse-url-browser-function
+            (lambda (url &rest args) (setq opened-url url))))
+      (markdown-follow-thing-at-point nil)
+      (should (equal opened-url "https://link-in-header.com")))))
+
 (ert-deftest test-markdown-link/inline-link-at-pos ()
   "Test `markdown-link-at-pos' return values with an inline link."
   (markdown-test-string "[text](url \"title\")"
