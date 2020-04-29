@@ -60,6 +60,7 @@
         functions.
     -   Added `markdown-display-remote-images` for viewing remote
         images.  Thanks to Sean Allread for the patch.  ([GH-378][])
+    -   `markdown-back-to-heading` can be used as command ([GH-415][])
 
 *   Improvements:
 
@@ -194,6 +195,7 @@
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
   [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408
   [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
+  [gh-415]: https://github.com/jrblevin/markdown-mode/issues/415
   [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427
   [gh-430]: https://github.com/jrblevin/markdown-mode/issues/430
