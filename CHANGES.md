@@ -96,6 +96,7 @@
     -   Support more markdown extensions same as Vim
     -   Complete link text from link labels at inserting link. ([GH-421][])
     -   Improve regular expression for inline attributes. ([GH-406][])
+    -   Allow relative CSS stylesheets paths. ([GH-389][])
 
 *   Bug fixes:
 
@@ -192,6 +193,7 @@
   [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
   [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
+  [gh-389]: https://github.com/jrblevin/markdown-mode/pull/389
   [gh-392]: https://github.com/jrblevin/markdown-mode/pull/392
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
