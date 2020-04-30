@@ -3107,11 +3107,16 @@ the buffer)."
 
 (defun markdown-match-inline-attributes (last)
   "Match inline attributes from point to LAST."
-  (when (markdown-match-inline-generic markdown-regex-inline-attributes last)
-    (unless (or (markdown-inline-code-at-pos-p (match-beginning 0))
-                (markdown-inline-code-at-pos-p (match-end 0))
-                (markdown-in-comment-p))
-      t)))
+  ;; #428 re-search-forward markdown-regex-inline-attributes is very slow.
+  ;; So use simple regex for re-search-forward and use markdown-regex-inline-attributes
+  ;; against matched string.
+  (when (markdown-match-inline-generic "[ \t]*\\({\\)\\([^\n]*\\)}[ \t]*$" last)
+    (if (not (string-match-p markdown-regex-inline-attributes (match-string 0)))
+        (markdown-match-inline-attributes last)
+      (unless (or (markdown-inline-code-at-pos-p (match-beginning 0))
+                  (markdown-inline-code-at-pos-p (match-end 0))
+                  (markdown-in-comment-p))
+        t))))
 
 (defun markdown-match-leanpub-sections (last)
   "Match Leanpub section markers from point to LAST."

@@ -97,6 +97,7 @@
     -   Complete link text from link labels at inserting link. ([GH-421][])
     -   Improve regular expression for inline attributes. ([GH-406][])
     -   Allow relative CSS stylesheets paths. ([GH-389][])
+    -   Improve regular expression matching for inline attributes. ([GH-389][])
 
 *   Bug fixes:
 
@@ -202,6 +203,7 @@
   [gh-415]: https://github.com/jrblevin/markdown-mode/issues/415
   [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427
+  [gh-428]: https://github.com/jrblevin/markdown-mode/issues/428
   [gh-430]: https://github.com/jrblevin/markdown-mode/issues/430
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
   [gh-451]: https://github.com/jrblevin/markdown-mode/issues/451
