@@ -98,6 +98,7 @@
     -   Improve regular expression for inline attributes. ([GH-406][])
     -   Allow relative CSS stylesheets paths. ([GH-389][])
     -   Improve regular expression matching for inline attributes. ([GH-389][])
+    -   If user set `display-buffer-alist` then use `display-buffer`. ([GH-413][])
 
 *   Bug fixes:
 
@@ -200,6 +201,7 @@
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
   [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408
   [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
+  [gh-413]: https://github.com/jrblevin/markdown-mode/issues/413
   [gh-415]: https://github.com/jrblevin/markdown-mode/issues/415
   [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427

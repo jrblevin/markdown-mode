@@ -451,7 +451,10 @@ windows based on the values of `split-width-threshold' and
 `split-height-threshold' and the available windows.  To force
 vertically split (left and right) windows, set this to 'vertical
 or 'right.  To force horizontally split (top and bottom) windows,
-set this to 'horizontal or 'below."
+set this to 'horizontal or 'below.
+
+If this value is 'any and `display-buffer-alist' is set then
+`display-buffer' is used for open buffer function"
   :group 'markdown
   :type '(choice (const :tag "Automatic" any)
                  (const :tag "Right (vertical)" right)
@@ -7319,10 +7322,12 @@ displaying the rendered output."
 
 (defun markdown-display-buffer-other-window (buf)
   "Display preview or output buffer BUF in another window."
-  (let ((cur-buf (current-buffer))
-        (window (markdown-get-other-window)))
-    (set-window-buffer window buf)
-    (set-buffer cur-buf)))
+  (if (and display-buffer-alist (eq markdown-split-window-direction 'any))
+      (display-buffer buf)
+    (let ((cur-buf (current-buffer))
+          (window (markdown-get-other-window)))
+      (set-window-buffer window buf)
+      (set-buffer cur-buf))))
 
 (defun markdown-live-preview-if-markdown ()
   (when (and (derived-mode-p 'markdown-mode)
