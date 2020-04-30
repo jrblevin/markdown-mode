@@ -5189,7 +5189,7 @@ Assumes match data is available for `markdown-regex-italic'."
 (defvar markdown-mode-mouse-map
   (let ((map (make-sparse-keymap)))
     (define-key map [follow-link] 'mouse-face)
-    (define-key map [mouse-2] 'markdown-follow-link-at-point)
+    (define-key map [mouse-2] #'markdown-follow-thing-at-point)
     map)
   "Keymap for following links with mouse.")
 
