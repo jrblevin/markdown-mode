@@ -2102,9 +2102,8 @@ Depending on your font, some reasonable choices are:
   "Syntax highlighting for Markdown files.")
 
 ;; Footnotes
-(defvar markdown-footnote-counter 0
+(defvar-local markdown-footnote-counter 0
   "Counter for footnote numbers.")
-(make-variable-buffer-local 'markdown-footnote-counter)
 
 (defconst markdown-footnote-chars
   "[[:alnum:]-]"
@@ -4147,9 +4146,8 @@ if three backquotes inserted at the beginning of line."
     "mupad" "nesC" "ooc" "reStructuredText" "wisp" "xBase")
   "Language specifiers recognized by GitHub's syntax highlighting features.")
 
-(defvar markdown-gfm-used-languages nil
+(defvar-local markdown-gfm-used-languages nil
   "Language names used in GFM code blocks.")
-(make-variable-buffer-local 'markdown-gfm-used-languages)
 
 (defun markdown-trim-whitespace (str)
   (replace-regexp-in-string
@@ -7188,14 +7186,12 @@ current filename, but with the extension removed and replaced with .html."
   (interactive)
   (browse-url-of-file (markdown-export)))
 
-(defvar markdown-live-preview-buffer nil
+(defvar-local markdown-live-preview-buffer nil
   "Buffer used to preview markdown output in `markdown-live-preview-export'.")
-(make-variable-buffer-local 'markdown-live-preview-buffer)
 
-(defvar markdown-live-preview-source-buffer nil
+(defvar-local markdown-live-preview-source-buffer nil
   "Source buffer from which current buffer was generated.
 This is the inverse of `markdown-live-preview-buffer'.")
-(make-variable-buffer-local 'markdown-live-preview-source-buffer)
 
 (defvar markdown-live-preview-currently-exporting nil)
 
@@ -8204,8 +8200,7 @@ BEG and END are the limits of scanned region."
 
 ;;; Display inline image ======================================================
 
-(defvar markdown-inline-image-overlays nil)
-(make-variable-buffer-local 'markdown-inline-image-overlays)
+(defvar-local markdown-inline-image-overlays nil)
 
 (defun markdown-remove-inline-images ()
   "Remove inline image overlays from image links in the buffer.
@@ -9277,8 +9272,7 @@ rows and columns and the column alignment."
         (if markdown-nested-imenu-heading-index
             #'markdown-imenu-create-nested-index
           #'markdown-imenu-create-flat-index))
-  ;; For menu support in XEmacs
-  (easy-menu-add markdown-mode-menu markdown-mode-map)
+
   ;; Defun movement
   (setq-local beginning-of-defun-function #'markdown-beginning-of-defun)
   (setq-local end-of-defun-function #'markdown-end-of-defun)
