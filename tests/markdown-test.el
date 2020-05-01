@@ -402,26 +402,42 @@ Extracts region from BEGIN to END and inserts in OUTPUT-BUFFER."
 (ert-deftest test-markdown-insertion/toggle-bold ()
   "Test toggling functionality of `markdown-insert-bold'."
   (markdown-test-string "one **two** three"
-                        (forward-word 2)
-                        (markdown-insert-bold)
-                        (should (string-equal (buffer-string) "one two three"))
-                        (should (= (point) 8))
-                        (forward-word)
-                        (markdown-insert-bold)
-                        (should (= (point) 16))
-                        (should (string-equal (buffer-string) "one two **three**"))))
+    (forward-word 2)
+    (markdown-insert-bold)
+    (should (string-equal (buffer-string) "one two three"))
+    (should (= (point) 8))
+    (forward-word)
+    (markdown-insert-bold)
+    (should (= (point) 16))
+    (should (string-equal (buffer-string) "one two **three**"))))
+
+(ert-deftest test-markdown-insertion/toggle-bold-consective ()
+  "Test toggling functionality of consective bolds.
+Detail: https://github.com/jrblevin/markdown-mode/issues/283"
+  (markdown-test-string "one **two** **three**"
+    (search-forward "w")
+    (markdown-insert-bold)
+    (should (string-equal (buffer-string) "one two **three**"))))
 
 (ert-deftest test-markdown-insertion/toggle-italic ()
   "Test toggling functionality of `markdown-insert-italic'."
   (markdown-test-string "one *two* three"
-                        (forward-word 2)
-                        (markdown-insert-italic)
-                        (should (string-equal (buffer-string) "one two three"))
-                        (should (= (point) 8))
-                        (forward-word)
-                        (markdown-insert-italic)
-                        (should (string-equal (buffer-string) "one two *three*"))
-                        (should (= (point) 15))))
+    (forward-word 2)
+    (markdown-insert-italic)
+    (should (string-equal (buffer-string) "one two three"))
+    (should (= (point) 8))
+    (forward-word)
+    (markdown-insert-italic)
+    (should (string-equal (buffer-string) "one two *three*"))
+    (should (= (point) 15))))
+
+(ert-deftest test-markdown-insertion/toggle-italic-consective ()
+  "Test toggling functionality of consective italics.
+Detail: https://github.com/jrblevin/markdown-mode/issues/283"
+  (markdown-test-string "one *two* *three*"
+    (search-forward "w")
+    (markdown-insert-italic)
+    (should (string-equal (buffer-string) "one two *three*"))))
 
 (ert-deftest test-markdown-insertion/toggle-code ()
   "Test toggling functionality of `markdown-insert-code'."
@@ -5648,6 +5664,13 @@ See GH-288."
    (markdown-insert-strike-through)
    (should (= (point) 16))
    (should (string-equal (buffer-string) "one two ~~three~~"))))
+
+(ert-deftest test-markdown-gfm/toggle-strike-through-consective ()
+  "Test toggling functionality of consective strike-throughs."
+  (markdown-test-string-gfm "one ~~two~~ ~~three~~"
+    (search-forward "w")
+    (markdown-insert-strike-through)
+    (should (string-equal (buffer-string) "one two ~~three~~"))))
 
 (ert-deftest test-markdown-gfm/insert-code-block-empty-markup ()
   "Test GFM code block insertion with empty code section."
