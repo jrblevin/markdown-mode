@@ -110,6 +110,11 @@ arguments."
   :group 'markdown
   :type '(choice file function (const :tag "None" nil)))
 
+(defcustom markdown-open-image-command nil
+  "Command used for opening image files directly at `markdown-follow-link-at-point'."
+  :group 'markdown
+  :type '(choice file function (const :tag "None" nil)))
+
 (defcustom markdown-hr-strings
   '("-------------------------------------------------------------------------------"
     "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
@@ -7482,7 +7487,12 @@ returns nil."
     (if full
         (browse-url url)
       (when (and file (> (length file) 0))
-        (find-file (funcall markdown-translate-filename-function file))))))
+        (let ((link-file (funcall markdown-translate-filename-function file)))
+          (if (and markdown-open-image-command (string-match-p (image-file-name-regexp) link-file))
+              (if (functionp markdown-open-image-command)
+                  (funcall markdown-open-image-command link-file)
+                (process-file markdown-open-image-command nil nil nil link-file))
+            (find-file link-file)))))))
 
 (defun markdown-follow-link-at-point ()
   "Open the current non-wiki link.
