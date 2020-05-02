@@ -6099,6 +6099,15 @@ https://github.com/jrblevin/markdown-mode/issues/235"
       (should (string-prefix-p "false failed with exit code 1"
                                (error-message-string data))))))
 
+(ert-deftest test-markdown-open-image-command ()
+  "Test ‘markdown-open’ with ‘markdown-open-command’ being a function."
+  (markdown-test-string "![foo](./bar.jpg)"
+    (let* ((calls 0)
+           (markdown-open-image-command
+            (lambda (file) (should (string= file "./bar.jpg")))))
+      (forward-char 3)
+      (markdown-follow-link-at-point))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here

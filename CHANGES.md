@@ -99,6 +99,7 @@
     -   Allow relative CSS stylesheets paths. ([GH-389][])
     -   Improve regular expression matching for inline attributes. ([GH-389][])
     -   If user set `display-buffer-alist` then use `display-buffer`. ([GH-413][])
+    -   Add custom variable for opening image. ([GH-383][])
 
 *   Bug fixes:
 
@@ -197,6 +198,7 @@
   [gh-350]: https://github.com/jrblevin/markdown-mode/pull/350
   [gh-369]: https://github.com/jrblevin/markdown-mode/pull/369
   [gh-378]: https://github.com/jrblevin/markdown-mode/pull/378
+  [gh-383]: https://github.com/jrblevin/markdown-mode/issues/383
   [gh-389]: https://github.com/jrblevin/markdown-mode/pull/389
   [gh-392]: https://github.com/jrblevin/markdown-mode/pull/392
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
