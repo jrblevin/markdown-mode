@@ -144,6 +144,7 @@
     -   Follow link even if it is in header([GH-430][])
     -   Fix clean up list number issue([GH-392][])
     -   Fix insert markup functions in consective case([GH-283][])
+    -   Fix hide markup issue in markdown/gfm-view-mode([GH-468][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -213,6 +214,7 @@
   [gh-430]: https://github.com/jrblevin/markdown-mode/issues/430
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
   [gh-451]: https://github.com/jrblevin/markdown-mode/issues/451
+  [gh-468]: https://github.com/jrblevin/markdown-mode/issues/468
 
 # Markdown Mode 2.3
 

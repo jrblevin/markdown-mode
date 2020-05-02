@@ -9418,6 +9418,7 @@ rows and columns and the column alignment."
 (define-derived-mode markdown-view-mode markdown-mode "Markdown-View"
   "Major mode for viewing Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
+  (add-to-invisibility-spec 'markdown-markup)
   (read-only-mode 1))
 
 (defvar gfm-view-mode-map
@@ -9429,6 +9430,7 @@ rows and columns and the column alignment."
   "Major mode for viewing GitHub Flavored Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
+  (add-to-invisibility-spec 'markdown-markup)
   (read-only-mode 1))
 
 
