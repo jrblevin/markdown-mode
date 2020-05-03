@@ -100,6 +100,7 @@
     -   Improve regular expression matching for inline attributes. ([GH-389][])
     -   If user set `display-buffer-alist` then use `display-buffer`. ([GH-413][])
     -   Add custom variable for opening image. ([GH-383][])
+    -   Improve default `markdown-command` setting
 
 *   Bug fixes:
 

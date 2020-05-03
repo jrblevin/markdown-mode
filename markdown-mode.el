@@ -88,7 +88,10 @@ Any changes to the output buffer made by this hook will be saved.")
   :group 'text
   :link '(url-link "https://jblevins.org/projects/markdown-mode/"))
 
-(defcustom markdown-command "markdown"
+(defcustom markdown-command (let ((command (cl-loop for cmd in '("markdown" "pandoc")
+                                                    when (executable-find cmd)
+                                                    return (file-name-nondirectory it))))
+                              (or command "markdown"))
   "Command to run markdown."
   :group 'markdown
   :type '(choice (string :tag "Shell command") function))
