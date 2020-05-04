@@ -7023,6 +7023,8 @@ Return the name of the output buffer used."
 
       (unless output-buffer-name
         (setq output-buffer-name markdown-output-buffer-name))
+      (when (and (stringp markdown-command) (not (executable-find markdown-command)))
+        (user-error "Markdown command %s is not found" markdown-command))
       (let ((exit-code
              (cond
               ;; Handle case when `markdown-command' does not read from stdin
@@ -7045,8 +7047,7 @@ Return the name of the output buffer used."
                    (erase-buffer))
                  (if (stringp markdown-command)
                      (call-process-region begin-region end-region
-                                          shell-file-name nil buf nil
-                                          shell-command-switch markdown-command)
+                                          markdown-command nil buf)
                    (funcall markdown-command begin-region end-region buf)
                    ;; If the ‘markdown-command’ function didn’t signal an
                    ;; error, assume it succeeded by binding ‘exit-code’ to 0.
