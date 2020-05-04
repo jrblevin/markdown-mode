@@ -6059,7 +6059,7 @@ https://github.com/jrblevin/markdown-mode/issues/235"
   (markdown-test-string "foo"
     (let* ((markdown-command "/does/not/exist")
            (data (should-error (markdown) :type 'user-error)))
-      (should (string-prefix-p "/does/not/exist failed with exit code "
+      (should (string-prefix-p "Markdown command /does/not/exist is not found"
                                (error-message-string data))))))
 
 (ert-deftest test-markdown-command/fails ()

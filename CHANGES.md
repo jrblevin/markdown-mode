@@ -101,6 +101,7 @@
     -   If user set `display-buffer-alist` then use `display-buffer`. ([GH-413][])
     -   Add custom variable for opening image. ([GH-383][])
     -   Improve default `markdown-command` setting
+    -   Use markdown-command directly instead of 'sh -c' ([GH-319][])
 
 *   Bug fixes:
 
@@ -190,6 +191,7 @@
   [gh-305]: https://github.com/jrblevin/markdown-mode/issues/305
   [gh-313]: https://github.com/jrblevin/markdown-mode/issues/313
   [gh-317]: https://github.com/jrblevin/markdown-mode/pull/317
+  [gh-319]: https://github.com/jrblevin/markdown-mode/issues/319
   [gh-320]: https://github.com/jrblevin/markdown-mode/pull/320
   [gh-322]: https://github.com/jrblevin/markdown-mode/pull/322
   [gh-327]: https://github.com/jrblevin/markdown-mode/issues/327
