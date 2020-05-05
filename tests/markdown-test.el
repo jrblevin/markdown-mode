@@ -2283,6 +2283,21 @@ See GH-223."
    (markdown-test-range-has-face 15 17 'markdown-italic-face)
    (markdown-test-range-has-face 18 18 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/italics-and-bold-and-punctual ()
+  "Test bold and italics and punctual character.
+Detail: https://github.com/jrblevin/markdown-mode/issues/359"
+  (markdown-test-string
+   "**Fat**, normal *italic*, normal **fat**"
+   (markdown-test-range-has-face 1 2 'markdown-markup-face)
+   (markdown-test-range-has-face 3 5 'markdown-bold-face)
+   (markdown-test-range-has-face 6 7 'markdown-markup-face)
+   (should-not
+    (markdown-range-property-any 10 15 'face '(markdown-italic-face)))
+   (markdown-test-range-has-face 18 23 'markdown-italic-face)
+   (should-not
+    (markdown-range-property-any 27 32 'face '(markdown-italic-face)))
+   (markdown-range-property-any 36 38 'face '(markdown-bold-face))))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"

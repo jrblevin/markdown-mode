@@ -2777,7 +2777,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                      '(markdown-html-attr-name-face markdown-html-attr-value-face))))
       (let ((begin (match-beginning 1))
             (end (match-end 1)))
-        (if (or (markdown-inline-code-at-pos-p begin)
+        (if (or (eql (char-before begin) (char-after begin))
+                (markdown-inline-code-at-pos-p begin)
                 (markdown-inline-code-at-pos-p end)
                 (markdown-in-comment-p)
                 (markdown-range-property-any
