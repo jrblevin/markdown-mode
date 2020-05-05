@@ -2375,6 +2375,14 @@ See GH-223."
    (should-not (markdown-range-property-any
                 (point-min) (point-max) 'face '(markdown-bold-face)))))
 
+(ert-deftest test-markdown-font-lock/no-bold-asterisk-and-underscore ()
+  "string wrap with single asterisk and single underscore is not bold.
+Detail: https://github.com/jrblevin/markdown-mode/issues/325"
+  (markdown-test-string
+   "_*bold_* *_bold*_"
+   (should-not (markdown-range-property-any 3 6 'face '(markdown-bold-face)))
+   (should-not (markdown-range-property-any 11 14 'face '(markdown-bold-face)))))
+
 (ert-deftest test-markdown-font-lock/code-in-bold ()
   "Test inline code inside bold."
   (markdown-test-string

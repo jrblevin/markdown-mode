@@ -147,6 +147,7 @@
     -   Fix clean up list number issue([GH-392][])
     -   Fix insert markup functions in consective case([GH-283][])
     -   Fix hide markup issue in markdown/gfm-view-mode([GH-468][])
+    -   Fix bold regexp issue([GH-325][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -194,6 +195,7 @@
   [gh-319]: https://github.com/jrblevin/markdown-mode/issues/319
   [gh-320]: https://github.com/jrblevin/markdown-mode/pull/320
   [gh-322]: https://github.com/jrblevin/markdown-mode/pull/322
+  [gh-325]: https://github.com/jrblevin/markdown-mode/issues/325
   [gh-327]: https://github.com/jrblevin/markdown-mode/issues/327
   [gh-331]: https://github.com/jrblevin/markdown-mode/issues/331
   [gh-335]: https://github.com/jrblevin/markdown-mode/pull/335
