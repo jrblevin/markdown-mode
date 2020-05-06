@@ -5648,6 +5648,27 @@ See GH-288."
 "))
    (should (= (point) 3))))
 
+(ert-deftest test-markdown-table/align-with-escaped-separator ()
+  "Test table align if column has escaped spearator.
+Details: https://github.com/jrblevin/markdown-mode/issues/308"
+  (markdown-test-string "| Col1  | Col2  |
+| :-: | :-: |
+|  AAA  |  A\\|B |"
+    (search-forward "Col2")
+    (markdown-table-align)
+    (should (string= (buffer-string) "| Col1 | Col2 |
+| :-:  | :-:  |
+| AAA  | A\\|B |\n")))) ;; markdown-table-align insert new-line
+
+(ert-deftest test-markdown-table/table-line-to-columns ()
+  "Test for spliting table line to columns"
+  (should (equal (markdown--table-line-to-columns "|foo|") '("foo")))
+  (should (equal (markdown--table-line-to-columns "foo") '("foo")))
+  (should (equal (markdown--table-line-to-columns "|foo|bar|") '("foo" "bar")))
+  (should (equal (markdown--table-line-to-columns "  |  foo  |  bar  |  ") '("foo" "bar")))
+  (should (equal (markdown--table-line-to-columns "foo|bar") '("foo" "bar")))
+  (should (equal (markdown--table-line-to-columns "foo | bar | baz") '("foo" "bar" "baz"))))
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()

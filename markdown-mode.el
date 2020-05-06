@@ -8742,6 +8742,29 @@ This function assumes point is on a table."
                     (t 'd)))
             (markdown--split-string fmtspec "\\s-*|\\s-*"))))
 
+(defun markdown--first-or-last-column-p (bar-pos)
+  (save-excursion
+    (save-match-data
+      (goto-char bar-pos)
+      (or (looking-back "^\\s-*" (line-beginning-position))
+          (looking-at-p "\\s-*$")))))
+
+(defun markdown--table-line-to-columns (line)
+  (with-temp-buffer
+    (insert line)
+    (goto-char (point-min))
+    (let ((cur (point))
+          ret)
+      (while (re-search-forward "\\s-*\\(|\\)\\s-*" nil t)
+        (if (markdown--first-or-last-column-p (match-beginning 1))
+            (setq cur (match-end 0))
+          (unless (eql (char-before (match-beginning 1)) ?\\)
+            (push (buffer-substring-no-properties cur (match-beginning 0)) ret)
+            (setq cur (match-end 0)))))
+      (when (< cur (length line))
+        (push (buffer-substring-no-properties cur (point-max)) ret))
+      (nreverse ret))))
+
 (defun markdown-table-align ()
   "Align table at point.
 This function assumes point is on a table."
@@ -8759,7 +8782,7 @@ This function assumes point is on a table."
                                  (progn (setq fmtspec (or fmtspec l)) nil) l))
                            (markdown--split-string (buffer-substring begin end) "\n")))
             ;; Split lines in cells
-            (cells (mapcar (lambda (l) (markdown--split-string l "\\s-*|\\s-*"))
+            (cells (mapcar (lambda (l) (markdown--table-line-to-columns l))
                            (remq nil lines)))
             ;; Calculate maximum number of cells in a line
             (maxcells (if cells

@@ -150,6 +150,7 @@
     -   Fix hide markup issue in markdown/gfm-view-mode([GH-468][])
     -   Fix bold regexp issue([GH-325][])
     -   Fix italic and punctual character issue([GH-359][])
+    -   Fix table align issue when column contains escaped bar([GH-308][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -192,6 +193,7 @@
   [gh-296]: https://github.com/jrblevin/markdown-mode/issues/296
   [gh-303]: https://github.com/jrblevin/markdown-mode/pull/303
   [gh-305]: https://github.com/jrblevin/markdown-mode/issues/305
+  [gh-308]: https://github.com/jrblevin/markdown-mode/issues/308
   [gh-313]: https://github.com/jrblevin/markdown-mode/issues/313
   [gh-317]: https://github.com/jrblevin/markdown-mode/pull/317
   [gh-319]: https://github.com/jrblevin/markdown-mode/issues/319
