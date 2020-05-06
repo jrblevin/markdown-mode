@@ -41,6 +41,7 @@
 (require 'button)
 (require 'color)
 (require 'rx)
+(require 'subr-x)
 
 (defvar jit-lock-start)
 (defvar jit-lock-end)
@@ -8658,13 +8659,22 @@ This function assumes point is on a table."
                   (< (point-at-eol) pos))))
     cnt))
 
+(defun markdown--thing-at-wiki-link (pos)
+  (when markdown-enable-wiki-links
+    (save-excursion
+      (save-match-data
+        (goto-char pos)
+        (thing-at-point-looking-at markdown-regex-wiki-link)))))
+
 (defun markdown-table-get-column ()
   "Return table column at point.
 This function assumes point is on a table."
   (let ((pos (point)) (cnt 0))
     (save-excursion
       (beginning-of-line)
-      (while (search-forward "|" pos t) (setq cnt (1+ cnt))))
+      (while (search-forward "|" pos t)
+        (unless (markdown--thing-at-wiki-link (match-beginning 0))
+          (setq cnt (1+ cnt)))))
     cnt))
 
 (defun markdown-table-get-cell (&optional n)
@@ -8701,8 +8711,9 @@ beyond the last delimiter. This function assumes point is on a
 table."
   (beginning-of-line 1)
   (when (> n 0)
-    (while (and (> (setq n (1- n)) -1)
-                (search-forward "|" (point-at-eol) t)))
+    (while (and (> n 0) (search-forward "|" (point-at-eol) t))
+      (unless (markdown--thing-at-wiki-link (match-beginning 0))
+        (cl-decf n)))
     (if on-delim
         (backward-char 1)
       (when (looking-at " ") (forward-char 1)))))
@@ -8726,11 +8737,18 @@ This function assumes point is on a table."
       (setq s (mapconcat
                (lambda (x) (if (member x '(?| ?+)) "|" " "))
                s ""))
-    (while (string-match "|\\([ \t]*?[^ \t\r\n|][^\r\n|]*\\)|" s)
-      (setq s (replace-match
-               (concat "|" (make-string (length (match-string 1 s)) ?\ ) "|")
-               t t s)))
-    s))
+    (with-temp-buffer
+      (insert s)
+      (goto-char (point-min))
+      (when (re-search-forward "|" nil t)
+        (let ((cur (point))
+              ret)
+          (while (re-search-forward "|" nil t)
+            (when (and (not (eql (char-before (match-beginning 0)) ?\\))
+                       (not (markdown--thing-at-wiki-link (match-beginning 0))))
+              (push (make-string (- (match-beginning 0) cur) ? ) ret)
+              (setq cur (match-end 0))))
+          (format "|%s|" (string-join (nreverse ret) "|")))))))
 
 (defun markdown-table-colfmt (fmtspec)
   "Process column alignment specifier FMTSPEC for tables."
@@ -8741,6 +8759,30 @@ This function assumes point is on a table."
                     ((string-match-p ":$"     x) 'r)
                     (t 'd)))
             (markdown--split-string fmtspec "\\s-*|\\s-*"))))
+
+(defun markdown--first-or-last-column-p (bar-pos)
+  (save-excursion
+    (save-match-data
+      (goto-char bar-pos)
+      (or (looking-back "^\\s-*" (line-beginning-position))
+          (looking-at-p "\\s-*$")))))
+
+(defun markdown--table-line-to-columns (line)
+  (with-temp-buffer
+    (insert line)
+    (goto-char (point-min))
+    (let ((cur (point))
+          ret)
+      (while (re-search-forward "\\s-*\\(|\\)\\s-*" nil t)
+        (if (markdown--first-or-last-column-p (match-beginning 1))
+            (setq cur (match-end 0))
+          (when (and (not (eql (char-before (match-beginning 1)) ?\\))
+                     (not (markdown--thing-at-wiki-link (match-beginning 1))))
+            (push (buffer-substring-no-properties cur (match-beginning 0)) ret)
+            (setq cur (match-end 0)))))
+      (when (< cur (length line))
+        (push (buffer-substring-no-properties cur (point-max)) ret))
+      (nreverse ret))))
 
 (defun markdown-table-align ()
   "Align table at point.
@@ -8759,7 +8801,7 @@ This function assumes point is on a table."
                                  (progn (setq fmtspec (or fmtspec l)) nil) l))
                            (markdown--split-string (buffer-substring begin end) "\n")))
             ;; Split lines in cells
-            (cells (mapcar (lambda (l) (markdown--split-string l "\\s-*|\\s-*"))
+            (cells (mapcar (lambda (l) (markdown--table-line-to-columns l))
                            (remq nil lines)))
             ;; Calculate maximum number of cells in a line
             (maxcells (if cells

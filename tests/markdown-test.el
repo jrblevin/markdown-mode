@@ -5648,6 +5648,86 @@ See GH-288."
 "))
    (should (= (point) 3))))
 
+(ert-deftest test-markdown-table/align-with-escaped-separator ()
+  "Test table align if column has escaped spearator.
+Details: https://github.com/jrblevin/markdown-mode/issues/308"
+  (markdown-test-string "| Col1  | Col2  |
+| :-: | :-: |
+|  AAA  |  A\\|B |"
+    (search-forward "Col2")
+    (markdown-table-align)
+    (should (string= (buffer-substring-no-properties (point-min) (point-max))
+                     "| Col1 | Col2 |
+| :-:  | :-:  |
+| AAA  | A\\|B |\n"))))
+
+(ert-deftest test-markdown-table/align-with-wiki-link ()
+  "Test table align if column has wiki link.
+Details: https://github.com/jrblevin/markdown-mode/issues/308"
+  (let ((markdown-enable-wiki-links t))
+   (markdown-test-string "| A | B |
+|-------------|---------|
+| [[Page|Address]] | Content |"
+     (search-forward "B")
+     (markdown-table-align)
+     (should (string= (buffer-substring-no-properties (point-min) (point-max))
+                      "| A                | B       |
+|------------------|---------|
+| [[Page|Address]] | Content |")))))
+
+(ert-deftest test-markdown-table/table-line-to-columns ()
+  "Test for spliting table line to columns."
+  (should (equal (markdown--table-line-to-columns "|foo|") '("foo")))
+  (should (equal (markdown--table-line-to-columns "foo") '("foo")))
+  (should (equal (markdown--table-line-to-columns "|foo|bar|") '("foo" "bar")))
+  (should (equal (markdown--table-line-to-columns "  |  foo  |  bar  |  ") '("foo" "bar")))
+  (should (equal (markdown--table-line-to-columns "foo|bar") '("foo" "bar")))
+  (should (equal (markdown--table-line-to-columns "foo | bar | baz") '("foo" "bar" "baz"))))
+
+(ert-deftest test-markdown-table/blank-line ()
+  "Test for creating new blank line."
+  (should (string= (markdown-table-blank-line "|foo|")  "|   |"))
+  (should (string= (markdown-table-blank-line "|foo|barbaz|")  "|   |      |"))
+  (should (string= (markdown-table-blank-line "|a|bb|ccc|") "| |  |   |"))
+
+  (let ((markdown-enable-wiki-links t))
+    (should (string= (markdown-table-blank-line "| [[Page|Address]] | Content |")
+                     "|                  |         |"))))
+
+(ert-deftest test-markdown-table/get-column ()
+  "Test for getting column number"
+  (markdown-test-string "| Col1 | Col2 |"
+    (search-forward "Col1")
+    (should (= (markdown-table-get-column) 1))
+    (search-forward "Col2")
+    (should (= (markdown-table-get-column) 2)))
+
+  (markdown-test-string "| [[Page|Address]] | Content |"
+    (search-forward "Content")
+    (should (= (markdown-table-get-column) 3)))
+
+  (let ((markdown-enable-wiki-links t))
+    (markdown-test-string "| [[Page|Address]] | Content |"
+      (search-forward "Content")
+      (should (= (markdown-table-get-column) 2)))))
+
+(ert-deftest test-markdown-table/goto-column ()
+  "Test for goto specified column."
+  (markdown-test-string "| Col1 | Col2 |"
+    (markdown-table-goto-column 1)
+    (should (string= (thing-at-point 'word) "Col1"))
+    (markdown-table-goto-column 2)
+    (should (string= (thing-at-point 'word) "Col2")))
+
+  (markdown-test-string "| [[Page|Address]] | Content |"
+    (markdown-table-goto-column 2)
+    (should (string= (thing-at-point 'word) "Address")))
+
+  (let ((markdown-enable-wiki-links t))
+    (markdown-test-string "| [[Page|Address]] | Content |"
+      (markdown-table-goto-column 2)
+      (should (string= (thing-at-point 'word) "Content")))))
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()
