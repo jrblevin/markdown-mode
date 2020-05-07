@@ -5046,16 +5046,41 @@ See `adaptive-fill-first-line-regexp'."
 
 (ert-deftest test-markdown-filling/blockquote-paragraphs ()
   "Test filling of blockquotes containing multiple paragraphs."
-  (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n>\n> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n"
+  (markdown-test-string "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+>
+> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+"
    (forward-paragraph)
    (fill-paragraph)
-   (should (string-equal (buffer-string) "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n>\n> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris\n> nisi ut aliquip ex ea commodo consequat.\n"))))
+   (should (string-equal
+            (buffer-substring-no-properties (point-min) (point-max))
+            "> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+>
+> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+> nisi ut aliquip ex ea commodo consequat.
+"))))
+
+(ert-deftest test-markdown-filling/nested-blockquote-paragraphs ()
+  "Test filling of nested blockquotes.
+Detail: https://github.com/jrblevin/markdown-mode/issues/366"
+  (markdown-test-string "> > pursuit of Happiness.--That to secure these rights, Governments are
+> > instituted among Men, deriving their just powers from the consent of
+"
+   (fill-paragraph)
+   (should (string-equal
+            (buffer-substring-no-properties (point-min) (point-max))
+            "> > pursuit of Happiness.--That to secure these rights, Governments
+> > are instituted among Men, deriving their just powers from the
+> > consent of
+"))))
 
 (ert-deftest test-markdown-filling/leanpub-block ()
   "Test adaptive filling of Leanpub blocks."
   (markdown-test-string "A> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
    (fill-paragraph)
-   (should (string-equal (buffer-string) "A> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\nA> eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
+   (should (string-equal
+            (buffer-substring-no-properties (point-min) (point-max))
+            "A> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do\nA> eiusmod tempor incididunt ut labore et dolore magna aliqua."))))
 
 (ert-deftest test-markdown-filling/space-after-list-marker ()
   "`fill-paragraph' should preserve more than one space after a list marker,
