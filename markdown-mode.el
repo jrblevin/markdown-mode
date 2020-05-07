@@ -7997,7 +7997,11 @@ handles filling itself, it always returns t so that
                 (back-to-indentation)
                 (skip-syntax-forward "-")
                 (markdown-code-block-at-point-p)))
-    (fill-paragraph justify))
+    (let ((fill-prefix (save-excursion
+                         (goto-char (line-beginning-position))
+                         (when (looking-at "\\([ \t]*>[ \t]*\\(?:>[ \t]*\\)+\\)")
+                           (match-string-no-properties 1)))))
+      (fill-paragraph justify)))
   t)
 
 (defun markdown-fill-forward-paragraph (&optional arg)
