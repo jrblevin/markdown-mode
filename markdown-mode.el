@@ -9048,7 +9048,7 @@ Horizontal separator lines will be eliminated."
                        (lambda (x)
                          (unless (string-match-p
                                   markdown-table-hline-regexp x)
-                           (markdown--split-string x "\\s-*|\\s-*")))
+                           (markdown--table-line-to-columns x)))
                        (markdown--split-string table "[ \t]*\n[ \t]*"))))
          (dline_old (markdown-table-get-dline))
          (col_old (markdown-table-get-column))

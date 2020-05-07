@@ -152,6 +152,7 @@
     -   Fix italic and punctual character issue([GH-359][])
     -   Fix table align issue when column contains escaped bar([GH-308][])
     -   Fix nested block fill-paragraph issue([GH-366][])
+    -   Fix table transpose issue with wiki link
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216

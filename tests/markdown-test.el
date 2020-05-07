@@ -5753,6 +5753,20 @@ Details: https://github.com/jrblevin/markdown-mode/issues/308"
       (markdown-table-goto-column 2)
       (should (string= (thing-at-point 'word) "Content")))))
 
+(ert-deftest test-markdown-table/transpose-with-wiki-link ()
+  "Test for table transpose with link.
+Detail: https://github.com/jrblevin/markdown-mode/commit/44a1c5bbc5d9514e97c7cc0a90a0c578130cd1dc"
+  (let ((markdown-enable-wiki-links t))
+    (markdown-test-string "| A           | B       |
+| [[Page|Address]] | Content |
+"
+      (markdown-table-transpose)
+      (should (string=
+               (buffer-substring-no-properties (point-min) (point-max))
+               "| A | [[Page|Address]] |
+| B | Content          |
+")))))
+
 ;;; gfm-mode tests:
 
 (ert-deftest test-markdown-gfm/pre-1 ()
