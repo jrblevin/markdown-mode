@@ -4783,6 +4783,20 @@ See `markdown-indent-line' and `markdown-indent-line'."
   (interactive "*r")
   (markdown-indent-region beg end t))
 
+(defun markdown--indent-region (start end)
+  (let ((deactivate-mark nil))
+    (save-excursion
+      (goto-char end)
+      (setq end (point-marker))
+      (goto-char start)
+      (when (bolp)
+        (forward-line 1))
+      (while (< (point) end)
+        (unless (or (markdown-code-block-at-point-p) (and (bolp) (eolp)))
+          (indent-according-to-mode))
+        (forward-line 1))
+      (move-marker end nil))))
+
 
 ;;; Markup Completion =========================================================
 
@@ -9396,6 +9410,7 @@ rows and columns and the column alignment."
 
   ;; Indentation
   (setq-local indent-line-function markdown-indent-function)
+  (setq-local indent-region-function #'markdown--indent-region)
 
   ;; Flyspell
   (setq-local flyspell-generic-check-word-predicate

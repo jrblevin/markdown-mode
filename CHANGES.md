@@ -153,12 +153,14 @@
     -   Fix table align issue when column contains escaped bar([GH-308][])
     -   Fix nested block fill-paragraph issue([GH-366][])
     -   Fix table transpose issue with wiki link
+    -   Fix indent-region for pre block([GH-228][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
   [gh-222]: https://github.com/jrblevin/markdown-mode/issues/222
   [gh-224]: https://github.com/jrblevin/markdown-mode/issues/224
   [gh-227]: https://github.com/jrblevin/markdown-mode/issues/227
+  [gh-228]: https://github.com/jrblevin/markdown-mode/issues/228
   [gh-229]: https://github.com/jrblevin/markdown-mode/pull/229
   [gh-235]: https://github.com/jrblevin/markdown-mode/issues/235
   [gh-238]: https://github.com/jrblevin/markdown-mode/issues/238
