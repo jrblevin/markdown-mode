@@ -1941,6 +1941,22 @@ Should not cause an infinite loop."
    (should (eq (point) 62))
    (should (looking-back "^    "))))
 
+(ert-deftest test-markdown-indentation/indent-region-function ()
+  "Test `indent-region'. Code block should not be indented.
+Detail: https://github.com/jrblevin/markdown-mode/issues/228"
+  (markdown-test-string
+   "Here follows a code sample:
+
+    #!/bin/bash
+    echo foobar
+
+Nice sample, isn't it ?"
+   (indent-region (point-min) (point-max))
+   (goto-char (point-min))
+   (forward-line 2)
+   (should (looking-at-p "    #!/bin/bash"))
+   (markdown-test-range-has-face (point) (line-end-position) 'markdown-pre-face)))
+
 (ert-deftest test-markdown-indentation/indent-hanging-line ()
   "Test `markdown-indent-line' with hanging indentation.
 See GH-245."
