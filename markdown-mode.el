@@ -95,7 +95,7 @@ Any changes to the output buffer made by this hook will be saved.")
                               (or command "markdown"))
   "Command to run markdown."
   :group 'markdown
-  :type '(choice (string :tag "Shell command") function))
+  :type '(choice (string :tag "Shell command") (repeat (string)) function))
 
 (defcustom markdown-command-needs-filename nil
   "Set to non-nil if `markdown-command' does not accept input from stdin.
@@ -7029,7 +7029,8 @@ The output buffer name defaults to `markdown-output-buffer-name'.
 Return the name of the output buffer used."
   (interactive)
   (save-window-excursion
-    (let* ((commands (and (stringp markdown-command) (split-string markdown-command)))
+    (let* ((commands (cond ((stringp markdown-command) (split-string markdown-command))
+                           ((listp markdown-command) markdown-command)))
            (command (car-safe commands))
            (command-args (cdr-safe commands))
            begin-region end-region)
@@ -7041,29 +7042,32 @@ Return the name of the output buffer used."
 
       (unless output-buffer-name
         (setq output-buffer-name markdown-output-buffer-name))
-      (when (and (stringp markdown-command) (not (executable-find command)))
+      (when (and (stringp command) (not (executable-find command)))
         (user-error "Markdown command %s is not found" command))
       (let ((exit-code
              (cond
               ;; Handle case when `markdown-command' does not read from stdin
-              ((and (stringp markdown-command) markdown-command-needs-filename)
+              ((and (stringp command) markdown-command-needs-filename)
                (if (not buffer-file-name)
                    (user-error "Must be visiting a file")
                  ;; Don’t use ‘shell-command’ because it’s not guaranteed to
                  ;; return the exit code of the process.
-                 (shell-command-on-region
-                  ;; Pass an empty region so that stdin is empty.
-                  (point) (point)
-                  (concat markdown-command " "
-                          (shell-quote-argument buffer-file-name))
-                  output-buffer-name)))
+                 (let ((command (if (listp markdown-command)
+                                    (string-join markdown-command " ")
+                                  markdown-command)))
+                   (shell-command-on-region
+                    ;; Pass an empty region so that stdin is empty.
+                    (point) (point)
+                    (concat command " "
+                            (shell-quote-argument buffer-file-name))
+                    output-buffer-name))))
               ;; Pass region to `markdown-command' via stdin
               (t
                (let ((buf (get-buffer-create output-buffer-name)))
                  (with-current-buffer buf
                    (setq buffer-read-only nil)
                    (erase-buffer))
-                 (if (stringp markdown-command)
+                 (if (stringp command)
                      (if (not (null command-args))
                          (apply #'call-process-region begin-region end-region command nil buf nil command-args)
                        (call-process-region begin-region end-region command nil buf))

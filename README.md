@@ -660,8 +660,10 @@ provides an interface to all of the possible customizations:
 
   * `markdown-command` - the command used to run Markdown (default:
     `markdown`).  This variable may be customized to pass
-    command-line options to your Markdown processor of choice.  It can
-    also be a function; in this case `markdown` will call it with three
+    command-line options to your Markdown processor of choice. We recommend
+    you to use list of strings if you want to set command line options like.
+    `'("pandoc" "--from=markdown" "--to=html5")`.  It can also be a
+    function; in this case `markdown` will call it with three
     arguments: the beginning and end of the region to process, and
     a buffer to write the output to.
 
