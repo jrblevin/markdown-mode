@@ -7015,8 +7015,10 @@ The output buffer name defaults to `markdown-output-buffer-name'.
 Return the name of the output buffer used."
   (interactive)
   (save-window-excursion
-    (let ((begin-region)
-          (end-region))
+    (let* ((commands (and (stringp markdown-command) (split-string markdown-command)))
+           (command (car-safe commands))
+           (command-args (cdr-safe commands))
+           begin-region end-region)
       (if (use-region-p)
           (setq begin-region (region-beginning)
                 end-region (region-end))
@@ -7025,8 +7027,8 @@ Return the name of the output buffer used."
 
       (unless output-buffer-name
         (setq output-buffer-name markdown-output-buffer-name))
-      (when (and (stringp markdown-command) (not (executable-find markdown-command)))
-        (user-error "Markdown command %s is not found" markdown-command))
+      (when (and (stringp markdown-command) (not (executable-find command)))
+        (user-error "Markdown command %s is not found" command))
       (let ((exit-code
              (cond
               ;; Handle case when `markdown-command' does not read from stdin
@@ -7048,8 +7050,9 @@ Return the name of the output buffer used."
                    (setq buffer-read-only nil)
                    (erase-buffer))
                  (if (stringp markdown-command)
-                     (call-process-region begin-region end-region
-                                          markdown-command nil buf)
+                     (if (not (null command-args))
+                         (apply #'call-process-region begin-region end-region command nil buf nil command-args)
+                       (call-process-region begin-region end-region command nil buf))
                    (funcall markdown-command begin-region end-region buf)
                    ;; If the ‘markdown-command’ function didn’t signal an
                    ;; error, assume it succeeded by binding ‘exit-code’ to 0.
