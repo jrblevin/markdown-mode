@@ -103,6 +103,7 @@
     -   Improve default `markdown-command` setting
     -   Use markdown-command directly instead of 'sh -c' ([GH-319][])
     -   Use explicitly numbered group as possible for easy reading regexp
+    -   Support list of strings of `markdown-command`
 
 *   Bug fixes:
 
