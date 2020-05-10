@@ -6211,6 +6211,25 @@ https://github.com/jrblevin/markdown-mode/issues/235"
       (should (buffer-live-p buffer))
       (should (equal calls `((1 4 ,buffer)))))))
 
+(ert-deftest test-markdown-command/string-command ()
+  "Test `markdown-command' for string which has only command."
+  (markdown-test-string "foo"
+    (let ((markdown-command "pandoc"))
+      ;; check exception is not thrown
+      (should (markdown)))))
+
+(ert-deftest test-markdown-command/string-command-with-options ()
+  "Test `markdown-command' for string which has command and options."
+  (markdown-test-string "foo"
+    (let ((markdown-command "pandoc --from=markdown --to=html5"))
+      (should (markdown)))))
+
+(ert-deftest test-markdown-command/list-of-strings ()
+  "Test `markdown-command' for list of strings."
+  (markdown-test-string "foo"
+    (let ((markdown-command '("pandoc" "--from=markdown" "--to=html5")))
+      (should (markdown)))))
+
 (ert-deftest test-markdown-command/does-not-exist ()
   "Test ‘markdown’ with a non-existing ‘markdown-command’."
   (skip-unless (not (file-executable-p "/does/not/exist")))
