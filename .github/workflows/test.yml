@@ -23,6 +23,8 @@ jobs:
         version: ${{ matrix.emacs_version }}
 
     - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: sudo apt install pandoc
     - name: Run tests
       run: |
         make clean
