@@ -149,7 +149,7 @@
     -   Fix URL open issue which contains end parentheses ([GH-408][])
     -   Follow link even if it is in header([GH-430][])
     -   Fix clean up list number issue([GH-392][])
-    -   Fix insert markup functions in consective case([GH-283][])
+    -   Fix insert markup functions in consecutive case([GH-283][])
     -   Fix hide markup issue in markdown/gfm-view-mode([GH-468][])
     -   Fix bold regexp issue([GH-325][])
     -   Fix italic and punctual character issue([GH-359][])

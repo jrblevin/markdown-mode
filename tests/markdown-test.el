@@ -411,8 +411,8 @@ Extracts region from BEGIN to END and inserts in OUTPUT-BUFFER."
     (should (= (point) 16))
     (should (string-equal (buffer-string) "one two **three**"))))
 
-(ert-deftest test-markdown-insertion/toggle-bold-consective ()
-  "Test toggling functionality of consective bolds.
+(ert-deftest test-markdown-insertion/toggle-bold-consecutive ()
+  "Test toggling functionality of consecutive bolds.
 Detail: https://github.com/jrblevin/markdown-mode/issues/283"
   (markdown-test-string "one **two** **three**"
     (search-forward "w")
@@ -431,8 +431,8 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/283"
     (should (string-equal (buffer-string) "one two *three*"))
     (should (= (point) 15))))
 
-(ert-deftest test-markdown-insertion/toggle-italic-consective ()
-  "Test toggling functionality of consective italics.
+(ert-deftest test-markdown-insertion/toggle-italic-consecutive ()
+  "Test toggling functionality of consecutive italics.
 Detail: https://github.com/jrblevin/markdown-mode/issues/283"
   (markdown-test-string "one *two* *three*"
     (search-forward "w")
@@ -1743,7 +1743,7 @@ Should not cause an infinite loop."
   ;; the buffer due to Emacs bug #19102:
   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=19102
   ;; https://github.com/emacs-mirror/emacs/commit/b3910f
-  ;; That also corrects the type of the "Cannot move pase superior level" error
+  ;; That also corrects the type of the "Cannot move past superior level" error
   ;; from 'error to 'user-error.
   (markdown-test-string "# 1 #\n\n## 1.1 ##\n\n### 1.1.1 ###\n\n## 1.2 ##\n\n### 1.2.1 ###\n\n# 2 #\n# Extra\n"
                         (re-search-forward "^# 2")
@@ -5700,7 +5700,7 @@ See GH-288."
    (should (= (point) 3))))
 
 (ert-deftest test-markdown-table/align-with-escaped-separator ()
-  "Test table align if column has escaped spearator.
+  "Test table align if column has escaped separator.
 Details: https://github.com/jrblevin/markdown-mode/issues/308"
   (markdown-test-string "| Col1  | Col2  |
 | :-: | :-: |
@@ -5727,7 +5727,7 @@ Details: https://github.com/jrblevin/markdown-mode/issues/308"
 | [[Page|Address]] | Content |")))))
 
 (ert-deftest test-markdown-table/table-line-to-columns ()
-  "Test for spliting table line to columns."
+  "Test for splitting table line to columns."
   (should (equal (markdown--table-line-to-columns "|foo|") '("foo")))
   (should (equal (markdown--table-line-to-columns "foo") '("foo")))
   (should (equal (markdown--table-line-to-columns "|foo|bar|") '("foo" "bar")))
@@ -5833,8 +5833,8 @@ Detail: https://github.com/jrblevin/markdown-mode/commit/44a1c5bbc5d9514e97c7cc0
    (should (= (point) 16))
    (should (string-equal (buffer-string) "one two ~~three~~"))))
 
-(ert-deftest test-markdown-gfm/toggle-strike-through-consective ()
-  "Test toggling functionality of consective strike-throughs."
+(ert-deftest test-markdown-gfm/toggle-strike-through-consecutive ()
+  "Test toggling functionality of consecutive strike-throughs."
   (markdown-test-string-gfm "one ~~two~~ ~~three~~"
     (search-forward "w")
     (markdown-insert-strike-through)
