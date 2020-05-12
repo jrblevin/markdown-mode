@@ -688,6 +688,12 @@ provides an interface to all of the possible customizations:
     This variable can also be a function; in this case `markdown-open`
     will call it without arguments to preview the current buffer.
 
+  * `markdown-open-image-command` - the command used for opening image
+    link (default: `nil`) via `markdown-follow-*` commands. This variable
+    can also be a function, in this case it is called with a single argument,
+    image-link. If this value is `nil`, `markdown-mode` opens image links
+    by `find-file`.
+
   * `markdown-hr-strings` - list of strings to use when inserting
     horizontal rules.  Different strings will not be distinguished
     when converted to HTML--they will all be converted to
