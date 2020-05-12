@@ -2792,6 +2792,16 @@ See <https://github.com/jrblevin/markdown-mode/issues/170>."
       (markdown-test-range-has-face 7 17 'markdown-url-face)
       (markdown-test-range-has-face 18 18 'markdown-markup-face))))
 
+(ert-deftest test-markdown-font-lock/inline-links-with-escaped-bracket ()
+  "Test font lock for inline links with escaped bracket.
+Detail: https://github.com/jrblevin/markdown-mode/issues/409"
+  (markdown-test-string "[run(Class, String \\[\\])](http://foo.com)"
+    (markdown-test-range-has-face 1 1 'markdown-markup-face)
+    (markdown-test-range-has-face 2 24 'markdown-link-face)
+    (markdown-test-range-has-face 25 26 'markdown-markup-face)
+    (markdown-test-range-has-face 27 40 'markdown-url-face)
+    (markdown-test-range-has-face 41 41 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
   (markdown-test-string "    <!-- pre, not comment -->"
