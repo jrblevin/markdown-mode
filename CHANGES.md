@@ -155,6 +155,7 @@
     -   Fix nested block fill-paragraph issue([GH-366][])
     -   Fix table transpose issue with wiki link
     -   Fix indent-region for pre block([GH-228][])
+    -   Fix link highlight issue which contains escaped right bracket([GH-409][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -221,6 +222,7 @@
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
   [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408
+  [gh-409]: https://github.com/jrblevin/markdown-mode/issues/409
   [gh-410]: https://github.com/jrblevin/markdown-mode/issues/410
   [gh-413]: https://github.com/jrblevin/markdown-mode/issues/413
   [gh-415]: https://github.com/jrblevin/markdown-mode/issues/415
