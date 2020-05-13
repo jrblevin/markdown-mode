@@ -5639,6 +5639,19 @@ See GH-288."
       (markdown-test-range-has-face 301 308 nil)
       (markdown-test-range-has-face 310 312 'markdown-math-face))))
 
+(ert-deftest test-markdown-math/math-inline-single ()
+  "Test for math inline single.
+Detail: https://github.com/jrblevin/markdown-mode/issues/352"
+  (let ((markdown-enable-math t))
+    (markdown-test-string "$a$b$c$"
+      (markdown-test-range-has-face 1 1 'markdown-markup-face)
+      (markdown-test-range-has-face 2 2 'markdown-math-face)
+      (markdown-test-range-has-face 3 3 'markdown-markup-face)
+
+      (markdown-test-range-has-face 5 5 'markdown-markup-face)
+      (markdown-test-range-has-face 6 6 'markdown-math-face)
+      (markdown-test-range-has-face 7 7 'markdown-markup-face))))
+
 ;;; Extension: pipe table editing
 
 (ert-deftest test-markdown-table/table-begin-top-of-file ()
