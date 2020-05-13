@@ -2838,6 +2838,11 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
 
 (defun markdown-match-math-single (last)
   "Match single quoted $..$ math from point to LAST."
+  (when (and markdown-enable-math
+             (not (bolp)) (char-equal (char-after) ?$)
+             (not (char-equal (char-before) ?\\))
+             (not (char-equal (char-before) ?$)))
+    (forward-char -1))
   (markdown-match-math-generic markdown-regex-math-inline-single last))
 
 (defun markdown-match-math-double (last)
