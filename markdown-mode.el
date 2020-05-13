@@ -8302,10 +8302,12 @@ or \\[markdown-toggle-inline-images]."
           (when (and imagep
                      (not (zerop (length file))))
             (unless (file-exists-p file)
-              (when (and markdown-display-remote-images
-                         (member (downcase (url-type (url-generic-parse-url file)))
-                                 markdown-remote-image-protocols))
-                (setq file (markdown--get-remote-image file))))
+              (let* ((download-file (funcall markdown-translate-filename-function file))
+                     (valid-url (ignore-errors
+                                  (member (downcase (url-type (url-generic-parse-url download-file)))
+                                          markdown-remote-image-protocols))))
+                (when (and markdown-display-remote-images valid-url)
+                  (setq file (markdown--get-remote-image download-file)))))
             (when (file-exists-p file)
               (let* ((abspath (if (file-name-absolute-p file)
                                   file

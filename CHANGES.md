@@ -104,6 +104,8 @@
     -   Use markdown-command directly instead of 'sh -c' ([GH-319][])
     -   Use explicitly numbered group as possible for easy reading regexp
     -   Support list of strings of `markdown-command`
+    -   Apply `markdown-translate-filename-function` for `markdown-display-inline-images`
+        ([GH-422][])
 
 *   Bug fixes:
 
@@ -227,6 +229,7 @@
   [gh-413]: https://github.com/jrblevin/markdown-mode/issues/413
   [gh-415]: https://github.com/jrblevin/markdown-mode/issues/415
   [gh-421]: https://github.com/jrblevin/markdown-mode/issues/421
+  [gh-422]: https://github.com/jrblevin/markdown-mode/issues/422
   [gh-427]: https://github.com/jrblevin/markdown-mode/issues/427
   [gh-428]: https://github.com/jrblevin/markdown-mode/issues/428
   [gh-430]: https://github.com/jrblevin/markdown-mode/issues/430
