@@ -158,7 +158,7 @@
     -   Fix table transpose issue with wiki link
     -   Fix indent-region for pre block([GH-228][])
     -   Fix link highlight issue which contains escaped right bracket([GH-409][])
-    -   Fix math inline single highlight issue([GH-352][])
+    -   Fix math inline single/double highlight issue([GH-352][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216

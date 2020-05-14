@@ -2803,7 +2803,7 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
   "Match REGEX from point to LAST.
 REGEX is either `markdown-regex-math-inline-single' for matching
 $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
-  (when (and markdown-enable-math (markdown-match-inline-generic regex last))
+  (when (markdown-match-inline-generic regex last)
     (let ((begin (match-beginning 1)) (end (match-end 1)))
       (prog1
           (if (or (markdown-range-property-any
@@ -2838,20 +2838,29 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
 
 (defun markdown-match-math-single (last)
   "Match single quoted $..$ math from point to LAST."
-  (when (and markdown-enable-math
-             (not (bolp)) (char-equal (char-after) ?$)
-             (not (char-equal (char-before) ?\\))
-             (not (char-equal (char-before) ?$)))
-    (forward-char -1))
-  (markdown-match-math-generic markdown-regex-math-inline-single last))
+  (when markdown-enable-math
+    (when (and (char-equal (char-after) ?$)
+               (not (bolp))
+               (not (char-equal (char-before) ?\\))
+               (not (char-equal (char-before) ?$)))
+      (forward-char -1))
+    (markdown-match-math-generic markdown-regex-math-inline-single last)))
 
 (defun markdown-match-math-double (last)
   "Match double quoted $$..$$ math from point to LAST."
-  (markdown-match-math-generic markdown-regex-math-inline-double last))
+  (when markdown-enable-math
+    (when (and (char-equal (char-after) ?$)
+               (char-equal (char-after (1+ (point))) ?$)
+               (not (bolp))
+               (not (char-equal (char-before) ?\\))
+               (not (char-equal (char-before) ?$)))
+      (forward-char -1))
+    (markdown-match-math-generic markdown-regex-math-inline-double last)))
 
 (defun markdown-match-math-display (last)
   "Match bracketed display math \[..\] and \\[..\\] from point to LAST."
-  (markdown-match-math-generic markdown-regex-math-display last))
+  (when markdown-enable-math
+    (markdown-match-math-generic markdown-regex-math-display last)))
 
 (defun markdown-match-propertized-text (property last)
   "Match text with PROPERTY from point to LAST.
