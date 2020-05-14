@@ -5652,6 +5652,18 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/352"
       (markdown-test-range-has-face 6 6 'markdown-math-face)
       (markdown-test-range-has-face 7 7 'markdown-markup-face))))
 
+(ert-deftest test-markdown-math/math-inline-double ()
+  "Test for math inline double. This is similar to #352 issue."
+  (let ((markdown-enable-math t))
+    (markdown-test-string "$$a$$b$$c$$"
+      (markdown-test-range-has-face 1 2 'markdown-markup-face)
+      (markdown-test-range-has-face 3 3 'markdown-math-face)
+      (markdown-test-range-has-face 4 5 'markdown-markup-face)
+
+      (markdown-test-range-has-face 7 8 'markdown-markup-face)
+      (markdown-test-range-has-face 9 9 'markdown-math-face)
+      (markdown-test-range-has-face 10 11 'markdown-markup-face))))
+
 ;;; Extension: pipe table editing
 
 (ert-deftest test-markdown-table/table-begin-top-of-file ()
