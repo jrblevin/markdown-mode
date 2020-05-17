@@ -5758,7 +5758,8 @@ Details: https://github.com/jrblevin/markdown-mode/issues/308"
   (should (equal (markdown--table-line-to-columns "|foo|bar|") '("foo" "bar")))
   (should (equal (markdown--table-line-to-columns "  |  foo  |  bar  |  ") '("foo" "bar")))
   (should (equal (markdown--table-line-to-columns "foo|bar") '("foo" "bar")))
-  (should (equal (markdown--table-line-to-columns "foo | bar | baz") '("foo" "bar" "baz"))))
+  (should (equal (markdown--table-line-to-columns "foo | bar | baz") '("foo" "bar" "baz")))
+  (should (equal (markdown--table-line-to-columns "| x \\| |") '("x \\|"))))
 
 (ert-deftest test-markdown-table/blank-line ()
   "Test for creating new blank line."
@@ -5816,6 +5817,20 @@ Detail: https://github.com/jrblevin/markdown-mode/commit/44a1c5bbc5d9514e97c7cc0
                (buffer-substring-no-properties (point-min) (point-max))
                "| A | [[Page|Address]] |
 | B | Content          |
+")))))
+
+(ert-deftest test-markdown-table/forward-cell-with-escaped-vertical-bar ()
+  "Test for table forward-cell with escaped vertical bar.
+Detail: https://github.com/jrblevin/markdown-mode/issues/489"
+  (let ((markdown-enable-wiki-links t))
+    (markdown-test-string "| x \\| |
+"
+      (forward-char 1)
+      (markdown-table-forward-cell)
+      (should (string=
+               (buffer-substring-no-properties (point-min) (point-max))
+               "| x \\| |
+|      |
 ")))))
 
 ;;; gfm-mode tests:
