@@ -159,6 +159,7 @@
     -   Fix indent-region for pre block([GH-228][])
     -   Fix link highlight issue which contains escaped right bracket([GH-409][])
     -   Fix math inline single/double highlight issue([GH-352][])
+    -   Fix markdown-table-forward-cell escaped vertical bar issue([GH-489][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -238,6 +239,7 @@
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
   [gh-451]: https://github.com/jrblevin/markdown-mode/issues/451
   [gh-468]: https://github.com/jrblevin/markdown-mode/issues/468
+  [gh-489]: https://github.com/jrblevin/markdown-mode/issues/489
 
 # Markdown Mode 2.3
 

@@ -8801,12 +8801,11 @@ This function assumes point is on a table."
                     (t 'd)))
             (markdown--split-string fmtspec "\\s-*|\\s-*"))))
 
-(defun markdown--first-or-last-column-p (bar-pos)
+(defun markdown--first-column-p (bar-pos)
   (save-excursion
     (save-match-data
       (goto-char bar-pos)
-      (or (looking-back "^\\s-*" (line-beginning-position))
-          (looking-at-p "\\s-*$")))))
+      (looking-back "^\\s-*" (line-beginning-position)))))
 
 (defun markdown--table-line-to-columns (line)
   (with-temp-buffer
@@ -8815,12 +8814,15 @@ This function assumes point is on a table."
     (let ((cur (point))
           ret)
       (while (re-search-forward "\\s-*\\(|\\)\\s-*" nil t)
-        (if (markdown--first-or-last-column-p (match-beginning 1))
+        (if (markdown--first-column-p (match-beginning 1))
             (setq cur (match-end 0))
-          (when (and (not (eql (char-before (match-beginning 1)) ?\\))
-                     (not (markdown--thing-at-wiki-link (match-beginning 1))))
-            (push (buffer-substring-no-properties cur (match-beginning 0)) ret)
-            (setq cur (match-end 0)))))
+          (cond ((eql (char-before (match-beginning 1)) ?\\)
+                 ;; keep spaces
+                 (goto-char (match-end 1)))
+                ((markdown--thing-at-wiki-link (match-beginning 1))) ;; do nothing
+                (t
+                 (push (buffer-substring-no-properties cur (match-beginning 0)) ret)
+                 (setq cur (match-end 0))))))
       (when (< cur (length line))
         (push (buffer-substring-no-properties cur (point-max)) ret))
       (nreverse ret))))
@@ -8849,7 +8851,8 @@ This function assumes point is on a table."
                           (apply #'max (mapcar #'length cells))
                         (user-error "Empty table")))
             ;; Empty cells to fill short lines
-            (emptycells (make-list maxcells "")) maxwidths)
+            (emptycells (make-list maxcells ""))
+            maxwidths)
        ;; Calculate maximum width for each column
        (dotimes (i maxcells)
          (let ((column (mapcar (lambda (x) (or (nth i x) "")) cells)))
@@ -9042,12 +9045,12 @@ Create new table lines if required."
     (when (markdown-table-hline-at-point-p) (end-of-line 1))
     (condition-case nil
         (progn
-          (re-search-forward "|" end)
-          (if (looking-at "[ \t]*$")
-              (re-search-forward "|" end))
-          (if (and (looking-at "[-:]")
-                   (re-search-forward "^[ \t]*|\\([^-:]\\)" end t))
-              (goto-char (match-beginning 1)))
+          (re-search-forward "\\(?:^\\|[^\\]\\)|" end)
+          (when (looking-at "[ \t]*$")
+            (re-search-forward "\\(?^|[^\\]:\\)|" end))
+          (when (and (looking-at "[-:]")
+                     (re-search-forward "^\\(?:[ \t]*\\|[^\\]\\)|\\([^-:]\\)" end t))
+            (goto-char (match-beginning 1)))
           (if (looking-at "[-:]")
               (progn
                 (beginning-of-line 0)
