@@ -160,6 +160,7 @@
     -   Fix link highlight issue which contains escaped right bracket([GH-409][])
     -   Fix math inline single/double highlight issue([GH-352][])
     -   Fix markdown-table-forward-cell escaped vertical bar issue([GH-489][])
+    -   Fix markdown-table-backward-cell escaped vertical bar issue
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
