@@ -5822,16 +5822,23 @@ Detail: https://github.com/jrblevin/markdown-mode/commit/44a1c5bbc5d9514e97c7cc0
 (ert-deftest test-markdown-table/forward-cell-with-escaped-vertical-bar ()
   "Test for table forward-cell with escaped vertical bar.
 Detail: https://github.com/jrblevin/markdown-mode/issues/489"
-  (let ((markdown-enable-wiki-links t))
-    (markdown-test-string "| x \\| |
+  (markdown-test-string "| x \\| |
 "
-      (forward-char 1)
-      (markdown-table-forward-cell)
-      (should (string=
-               (buffer-substring-no-properties (point-min) (point-max))
-               "| x \\| |
+    (forward-char 1)
+    (markdown-table-forward-cell)
+    (should (string=
+             (buffer-substring-no-properties (point-min) (point-max))
+             "| x \\| |
 |      |
-")))))
+"))))
+
+(ert-deftest test-markdown-table/backward-cell-with-escaped-vertical-bar ()
+  "Test for table backward-cell with escaped vertical bar."
+  (markdown-test-string "| x \\| |   |"
+    (goto-char (point-max))
+    (backward-char 1)
+    (markdown-table-backward-cell)
+    (should (char-equal (char-after) ?x))))
 
 ;;; gfm-mode tests:
 

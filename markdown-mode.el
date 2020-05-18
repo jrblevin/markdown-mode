@@ -9067,11 +9067,11 @@ Create new table lines if required."
   (when (markdown-table-hline-at-point-p) (end-of-line 1))
   (condition-case nil
       (progn
-        (re-search-backward "|" (markdown-table-begin))
-        (re-search-backward "|" (markdown-table-begin)))
+        (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin))
+        (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin)))
     (error (user-error "Cannot move to previous table cell")))
   (while (looking-at "|\\([-:]\\|[ \t]*$\\)")
-    (re-search-backward "|" (markdown-table-begin)))
+    (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin)))
   (when (looking-at "| ?") (goto-char (match-end 0))))
 
 (defun markdown-table-transpose ()
