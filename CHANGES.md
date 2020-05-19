@@ -109,6 +109,9 @@
 
 *   Bug fixes:
 
+    -   No longer treat code fragments that are delimited with three
+        backquotes on each side as the beginning of a code block.
+        ([GH-403][])
     -   Fix infloop caused by incorrect detection of end of code
         blocks ([GH-349][]).
     -   Remove GFM checkbox overlays when switching major modes.
@@ -225,6 +228,7 @@
   [gh-383]: https://github.com/jrblevin/markdown-mode/issues/383
   [gh-389]: https://github.com/jrblevin/markdown-mode/pull/389
   [gh-392]: https://github.com/jrblevin/markdown-mode/pull/392
+  [gh-403]: https://github.com/jrblevin/markdown-mode/issues/403
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
   [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408
