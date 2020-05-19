@@ -228,6 +228,7 @@
   [gh-383]: https://github.com/jrblevin/markdown-mode/issues/383
   [gh-389]: https://github.com/jrblevin/markdown-mode/pull/389
   [gh-392]: https://github.com/jrblevin/markdown-mode/pull/392
+  [gh-403]: https://github.com/jrblevin/markdown-mode/issues/403
   [gh-405]: https://github.com/jrblevin/markdown-mode/issues/405
   [gh-406]: https://github.com/jrblevin/markdown-mode/issues/406
   [gh-408]: https://github.com/jrblevin/markdown-mode/issues/408

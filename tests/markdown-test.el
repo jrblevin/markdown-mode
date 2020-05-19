@@ -5984,6 +5984,14 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/489"
     (markdown-test-range-has-face 24 26 'markdown-pre-face)
     (markdown-test-range-has-face 28 30 'markdown-markup-face)))
 
+(ert-deftest test-markdown-gfm/one-line-code-block ()
+  "Don't handle backtick as code block language.
+Details: https://github.com/jrblevin/markdown-mode/issues/403"
+  (markdown-test-string-gfm "```three```"
+    (let ((face-props (get-text-property 4 'face)))
+      (should (memq 'markdown-inline-code-face face-props))
+      (should-not (memq 'markdown-language-keyword-face face-props)))))
+
 ;;; Extension: GFM simplified tables
 
 (ert-deftest test-markdown-gfm/false-table-first-line ()
