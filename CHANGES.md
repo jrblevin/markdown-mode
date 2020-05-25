@@ -106,6 +106,8 @@
     -   Support list of strings of `markdown-command`
     -   Apply `markdown-translate-filename-function` for `markdown-display-inline-images`
         ([GH-422][])
+    -   Buffer substring filter function which filter out codeblock markers
+        is provided by the `gfm-view-mode`
 
 *   Bug fixes:
 
