@@ -9517,11 +9517,22 @@ rows and columns and the column alignment."
   markdown-view-mode-map
   "Keymap for `gfm-view-mode'.")
 
+(defun gfm-view-mode-filter-function (start end &optional delete)
+  "Remove code block markers from buffer substring between START and END.
+If DELETE is non-nil, delete the text between START and END from the buffer.
+This function is used as value of the `filter-buffer-substring-function'."
+  (prog1 (replace-regexp-in-string "^[[:blank:]]*```.*\n*" ""
+                                   (buffer-substring start end))
+    (when delete
+      (let ((inhibit-read-only t))
+        (delete-region start end)))))
+
 ;;;###autoload
 (define-derived-mode gfm-view-mode gfm-mode "GFM-View"
   "Major mode for viewing GitHub Flavored Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
+  (setq-local filter-buffer-substring-function #'gfm-view-mode-filter-function)
   (add-to-invisibility-spec 'markdown-markup)
   (read-only-mode 1))
 

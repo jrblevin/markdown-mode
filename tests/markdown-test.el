@@ -91,6 +91,12 @@
   `(markdown-test-file-mode 'gfm-mode ,file ,@body))
 (def-edebug-spec markdown-test-file-gfm (form body))
 
+(defmacro markdown-test-file-gfm-view (file &rest body)
+  "Open FILE from `markdown-test-dir' in `gfm-view-mode' and execute BODY."
+  (declare (indent 1))
+  `(markdown-test-file-mode 'gfm-view-mode ,file ,@body))
+(def-edebug-spec markdown-test-file-gfm-view (form body))
+
 (defmacro markdown-test-temp-file (file &rest body)
   "Open FILE from `markdown-test-dir' visiting temp file and execute BODY.
 This file is not saved."
@@ -2101,6 +2107,13 @@ See GH-245."
       (markdown-test-range-has-property 154 156 'invisible 'markdown-markup)
       (should (invisible-p 154))
       (should (invisible-p 156)))))
+
+(ert-deftest test-markdown-markup-hiding/gfm-filter-buffer-string ()
+  "Test code block markers filtered out when using `filter-buffer-substring'."
+  (let ((markdown-hide-markuo t))
+    (markdown-test-file-gfm-view "GFM.md"
+      (should (not (string-match markdown-regex-gfm-code-block-open
+                                 (filter-buffer-substring (point-min) (point-max))))))))
 
 ;;; Font lock tests:
 
