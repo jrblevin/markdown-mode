@@ -9506,11 +9506,29 @@ rows and columns and the column alignment."
     map)
   "Keymap for `markdown-view-mode'.")
 
+(defun markdown--filter-visible (beg end &optional delete)
+  (let ((result "")
+        (invisible-faces '(markdown-header-delimiter-face markdown-header-rule-face)))
+    (while (< beg end)
+      (when (markdown--face-p beg invisible-faces)
+        (cl-incf beg)
+        (while (and (markdown--face-p beg invisible-faces) (< beg end))
+          (cl-incf beg)))
+      (let ((next (next-single-char-property-change beg 'invisible)))
+        (unless (get-char-property beg 'invisible)
+          (setq result (concat result (buffer-substring beg (min end next)))))
+        (setq beg next)))
+    (prog1 result
+      (when delete
+        (let ((inhibit-read-only t))
+          (delete-region beg end))))))
+
 ;;;###autoload
 (define-derived-mode markdown-view-mode markdown-mode "Markdown-View"
   "Major mode for viewing Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (add-to-invisibility-spec 'markdown-markup)
+  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
   (read-only-mode 1))
 
 (defvar gfm-view-mode-map
@@ -9522,6 +9540,7 @@ rows and columns and the column alignment."
   "Major mode for viewing GitHub Flavored Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
+  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
   (add-to-invisibility-spec 'markdown-markup)
   (read-only-mode 1))
 
