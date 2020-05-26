@@ -48,9 +48,9 @@
          (with-temp-buffer
            (set-window-buffer win (current-buffer) t)
            (erase-buffer)
+           (insert ,string)
            (funcall ,mode)
            (setq-default indent-tabs-mode nil)
-           (insert ,string)
            (goto-char (point-min))
            (funcall markdown-test-font-lock-function)
            (prog1 ,@body (kill-buffer))))))
@@ -73,6 +73,12 @@
   `(markdown-test-string-mode 'markdown-mode ,string ,@body))
 (def-edebug-spec markdown-test-string (form body))
 
+(defmacro markdown-test-string-view (string &rest body)
+  "Run BODY in a temporary buffer containing STRING in `markdown-view-mode'."
+  (declare (indent 1))
+  `(markdown-test-string-mode 'markdown-view-mode ,string ,@body))
+(def-edebug-spec markdown-test-string-view (form body))
+
 (defmacro markdown-test-file (file &rest body)
   "Open FILE from `markdown-test-dir' in `markdown-mode' and execute BODY."
   (declare (indent 1))
@@ -84,6 +90,12 @@
   (declare (indent 1))
   `(markdown-test-string-mode 'gfm-mode ,string ,@body))
 (def-edebug-spec markdown-test-string-gfm (form body))
+
+(defmacro markdown-test-string-gfm-view (string &rest body)
+  "Run BODY in a temporary buffer containing STRING in `gfm-view-mode'."
+  (declare (indent 1))
+  `(markdown-test-string-mode 'gfm-view-mode ,string ,@body))
+(def-edebug-spec markdown-test-string-gfm-view (form body))
 
 (defmacro markdown-test-file-gfm (file &rest body)
   "Open FILE from `markdown-test-dir' in `gfm-mode' and execute BODY."
@@ -6349,6 +6361,33 @@ https://github.com/jrblevin/markdown-mode/issues/235"
             (lambda (file) (should (string= file "./bar.jpg")))))
       (forward-char 3)
       (markdown-follow-link-at-point))))
+
+;;; Tests for view mode
+
+(ert-deftest test-markdown-view-mode/filter-buffer-substring ()
+  "Test `filter-buffer-substring' of `markdown-view-mode'.
+Detail: https://github.com/jrblevin/markdown-mode/pull/493"
+  (let ((test-string "# foo
+~~This is a dog~~
+
+```python
+foo(bar=None)
+```
+")
+        (test-func
+         (lambda ()
+           (should (string= (filter-buffer-substring (point-min) (line-end-position)) "foo"))
+           (forward-line +1)
+           (should (string= (filter-buffer-substring (point) (line-end-position)) "This is a dog"))
+           (forward-line +2)
+           (let ((code-beg (point)))
+             (forward-line +3)
+             (should (string= (filter-buffer-substring code-beg (point)) "foo(bar=None)\n"))))))
+    (markdown-test-string-view test-string
+      (funcall test-func))
+
+    (markdown-test-string-gfm-view test-string
+      (funcall test-func))))
 
 (provide 'markdown-test)
 

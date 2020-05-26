@@ -106,6 +106,8 @@
     -   Support list of strings of `markdown-command`
     -   Apply `markdown-translate-filename-function` for `markdown-display-inline-images`
         ([GH-422][])
+    -   Implement own `filter-buffer-substring-function` for `markdown-view-mode` and
+        `gfm-view-mode` ([GH-493][])
 
 *   Bug fixes:
 
@@ -245,6 +247,7 @@
   [gh-451]: https://github.com/jrblevin/markdown-mode/issues/451
   [gh-468]: https://github.com/jrblevin/markdown-mode/issues/468
   [gh-489]: https://github.com/jrblevin/markdown-mode/issues/489
+  [gh-493]: https://github.com/jrblevin/markdown-mode/pull/493
 
 # Markdown Mode 2.3
 
