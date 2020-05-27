@@ -166,6 +166,7 @@
     -   Fix math inline single/double highlight issue([GH-352][])
     -   Fix markdown-table-forward-cell escaped vertical bar issue([GH-489][])
     -   Fix markdown-table-backward-cell escaped vertical bar issue
+    -   Fix GFM italic markup issue([GH-448][])
 
   [gh-171]: https://github.com/jrblevin/markdown-mode/issues/171
   [gh-216]: https://github.com/jrblevin/markdown-mode/issues/216
@@ -244,6 +245,7 @@
   [gh-428]: https://github.com/jrblevin/markdown-mode/issues/428
   [gh-430]: https://github.com/jrblevin/markdown-mode/issues/430
   [gh-437]: https://github.com/jrblevin/markdown-mode/issues/437
+  [gh-448]: https://github.com/jrblevin/markdown-mode/issues/448
   [gh-451]: https://github.com/jrblevin/markdown-mode/issues/451
   [gh-468]: https://github.com/jrblevin/markdown-mode/issues/468
   [gh-489]: https://github.com/jrblevin/markdown-mode/issues/489

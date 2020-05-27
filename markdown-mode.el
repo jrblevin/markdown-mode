@@ -780,7 +780,7 @@ Groups 3 and 5 matches the opening and closing delimiters.
 Group 4 matches the text inside the delimiters.")
 
 (defconst markdown-regex-gfm-italic
-  "\\(?:^\\|\\s-\\)\\(?1:\\(?2:[*_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(?4:\\2\\)\\)"
+  "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[*_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(?4:\\2\\)\\)"
   "Regular expression for matching italic text in GitHub Flavored Markdown.
 Underscores in words are not treated as special.
 Group 1 matches the entire expression, including delimiters.
@@ -2768,16 +2768,31 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                               (match-beginning 5) (match-end 5)))
         t))))
 
+(defun markdown--gfm-italic-p (begin end)
+  (let ((is-underscore (eql (char-after begin) ?_)))
+    (if (not is-underscore)
+        t
+      (save-excursion
+        (save-match-data
+          (goto-char begin)
+          (and (looking-back "\\(?:^\\|[[:blank:]]\\)" (1- begin))
+               (progn
+                 (goto-char end)
+                 (looking-at-p "\\(?:[[:blank:]]\\|$\\)"))))))))
+
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
-  (let ((regex (if (memq major-mode '(gfm-mode gfm-view-mode))
-                   markdown-regex-gfm-italic markdown-regex-italic)))
+  (let* ((is-gfm (memq major-mode '(gfm-mode gfm-view-mode)))
+         (regex (if is-gfm
+                    markdown-regex-gfm-italic
+                  markdown-regex-italic)))
     (when (and (markdown-match-inline-generic regex last)
                (not (markdown--face-p
                      (match-beginning 1)
                      '(markdown-html-attr-name-face markdown-html-attr-value-face))))
       (let ((begin (match-beginning 1))
-            (end (match-end 1)))
+            (end (match-end 1))
+            (close-end (match-end 4)))
         (if (or (eql (char-before begin) (char-after begin))
                 (markdown-inline-code-at-pos-p begin)
                 (markdown-inline-code-at-pos-p end)
@@ -2789,7 +2804,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                  begin end 'face '(markdown-bold-face
                                    markdown-list-face
                                    markdown-hr-face
-                                   markdown-math-face)))
+                                   markdown-math-face))
+                (and is-gfm (not (markdown--gfm-italic-p begin close-end))))
             (progn (goto-char (min (1+ begin) last))
                    (when (< (point) last)
                      (markdown-match-italic last)))
