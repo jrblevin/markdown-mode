@@ -5871,6 +5871,31 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/489"
     (markdown-test-range-has-face 1488 1488 'markdown-markup-face)
     (markdown-test-range-has-face 1729 1790 nil)))
 
+(ert-deftest test-markdown-gfm/italic-underscore ()
+  "Test for GFM italic font lock test based on CommonMark specification.
+Details: https://github.com/jrblevin/markdown-mode/issues/448"
+  (markdown-test-string-gfm "_no_emphasis
+*emphasis*
+em*pha*sis
+*emph*asis
+emph*asis*
+em*ph as*is
+_emphasis_
+no_emph_asis
+no_emphasis_
+no_em ph_asis
+"
+    (markdown-test-range-has-face 2 3 nil)
+    (markdown-test-range-has-face 15 22 'markdown-italic-face)
+    (markdown-test-range-has-face 28 30 'markdown-italic-face)
+    (markdown-test-range-has-face 37 40 'markdown-italic-face)
+    (markdown-test-range-has-face 52 55 'markdown-italic-face)
+    (markdown-test-range-has-face 61 65 'markdown-italic-face)
+    (markdown-test-range-has-face 71 78 'markdown-italic-face)
+    (markdown-test-range-has-face 84 87 nil)
+    (markdown-test-range-has-face 97 104 nil)
+    (markdown-test-range-has-face 110 114 nil)))
+
 (ert-deftest test-markdown-gfm/strike-through-1 ()
   "GFM strike through font lock test."
   (markdown-test-string-gfm "one ~~two~~ three"
