@@ -32,6 +32,8 @@
 (require 'ert)
 (require 'cl-lib)
 
+(defvar electric-pair-pairs)
+
 (defconst markdown-test-dir
   (expand-file-name (file-name-directory
                      (or load-file-name buffer-file-name))))
@@ -6413,6 +6415,21 @@ foo(bar=None)
 
     (markdown-test-string-gfm-view test-string
       (funcall test-func))))
+
+;;; Tests for electric pair
+
+(ert-deftest test-markdown-electric-pair-mode ()
+  "Test ‘markdown-open’ with ‘markdown-open-command’ being a function."
+  (markdown-test-string-gfm ""
+    (let ((markdown-gfm-use-electric-backquote nil))
+      (electric-pair-local-mode +1)
+      (make-local-variable 'electric-pair-pairs)
+      (add-to-list 'electric-pair-pairs '(?` . ?`))
+      (dotimes (_ 3)
+        (let ((last-command-event ?`))
+          (call-interactively (key-binding `[,last-command-event]))))
+      (should (looking-back "```" (line-beginning-position)))
+      (should (looking-at-p "```")))))
 
 (provide 'markdown-test)
 

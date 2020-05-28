@@ -46,6 +46,7 @@
 (defvar jit-lock-start)
 (defvar jit-lock-end)
 (defvar flyspell-generic-check-word-predicate)
+(defvar electric-pair-pairs)
 
 
 ;;; Constants =================================================================
@@ -9486,6 +9487,17 @@ rows and columns and the column alignment."
 
 ;;; GitHub Flavored Markdown Mode  ============================================
 
+(defun gfm--electric-pair-fence-code-block ()
+  (when (and electric-pair-mode
+             (not markdown-gfm-use-electric-backquote)
+             (eql last-command-event ?`)
+             (let ((count 0))
+               (while (eql (char-before (- (point) count)) ?`)
+                 (cl-incf count))
+               (= count 3))
+             (eql (char-after) ?`))
+    (save-excursion (insert (make-string 2 ?`)))))
+
 (defvar gfm-mode-hook nil
   "Hook run when entering GFM mode.")
 
@@ -9495,6 +9507,7 @@ rows and columns and the column alignment."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
   (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
+  (add-hook 'post-self-insert-hook #'gfm--electric-pair-fence-code-block 'append t)
   (markdown-gfm-parse-buffer-for-languages))
 
 
