@@ -108,6 +108,7 @@
         ([GH-422][])
     -   Implement own `filter-buffer-substring-function` for `markdown-view-mode` and
         `gfm-view-mode` ([GH-493][])
+    -   Improve triple backtick behavior with `electric-pair-mode`
 
 *   Bug fixes:
 
