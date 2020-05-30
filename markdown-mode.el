@@ -1,12 +1,12 @@
 ;;; markdown-mode.el --- Major mode for Markdown-formatted text -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2007-2017 Jason R. Blevins and markdown-mode
+;; Copyright (C) 2007-2020 Jason R. Blevins and markdown-mode
 ;; contributors (see the commit log for details).
 
 ;; Author: Jason R. Blevins <jblevins@xbeta.org>
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
-;; Version: 2.4-dev
+;; Version: 2.4
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
@@ -51,7 +51,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.4-dev"
+(defconst markdown-mode-version "2.4"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
