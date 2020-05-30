@@ -1,6 +1,6 @@
 # Markdown Mode 2.4
 
-*Under development*
+*May 30, 2020*
 
 *   **Breaking changes:**
 
