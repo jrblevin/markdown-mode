@@ -5,11 +5,14 @@
 *   **Breaking changes:**
 
 *   New features:
+    -   Introduce `markdown-mouse-follow-link` variable [GH-290][]
 
 *   Improvements:
     -   Cleanup test code
 
 *   Bug fixes:
+
+  [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
 
 # Markdown Mode 2.4
 

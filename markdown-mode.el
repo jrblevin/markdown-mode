@@ -587,6 +587,14 @@ requires Emacs to be built with ImageMagick support."
                 (choice (sexp :tag "Maximum height in pixels")
                         (const :tag "No maximum height" nil)))))
 
+(defcustom markdown-mouse-follow-link t
+  "Non-nil means mouse on a link will follow the link.
+This variable must be set before loading markdown-mode."
+  :group 'markdown
+  :type 'bool
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.5"))
+
 
 ;;; Markdown-Specific `rx' Macro ==============================================
 
@@ -5257,10 +5265,11 @@ Assumes match data is available for `markdown-regex-italic'."
   "Keymap for Markdown major mode.")
 
 (defvar markdown-mode-mouse-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [follow-link] 'mouse-face)
-    (define-key map [mouse-2] #'markdown-follow-thing-at-point)
-    map)
+  (when markdown-mouse-follow-link
+    (let ((map (make-sparse-keymap)))
+      (define-key map [follow-link] 'mouse-face)
+      (define-key map [mouse-2] #'markdown-follow-thing-at-point)
+      map))
   "Keymap for following links with mouse.")
 
 (defvar gfm-mode-map
