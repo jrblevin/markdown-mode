@@ -7,6 +7,7 @@
 *   New features:
 
 *   Improvements:
+    -   Cleanup test code
 
 *   Bug fixes:
 
