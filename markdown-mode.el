@@ -6,7 +6,7 @@
 ;; Author: Jason R. Blevins <jblevins@xbeta.org>
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
-;; Version: 2.4
+;; Version: 2.5-dev
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
@@ -51,7 +51,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.4"
+(defconst markdown-mode-version "2.5-dev"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"

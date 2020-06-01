@@ -1,3 +1,16 @@
+# Markdown Mode 2.5
+
+*Under development*
+
+*   **Breaking changes:**
+
+*   New features:
+
+*   Improvements:
+    -   Cleanup test code
+
+*   Bug fixes:
+
 # Markdown Mode 2.4
 
 *May 30, 2020*
