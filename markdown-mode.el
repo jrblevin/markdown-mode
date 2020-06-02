@@ -2142,21 +2142,23 @@ Depending on your font, some reasonable choices are:
 Used for `flyspell-generic-check-word-predicate'."
   (save-excursion
     (goto-char (1- (point)))
-    (not (or (markdown-code-block-at-point-p)
-             (markdown-inline-code-at-point-p)
-             (markdown-in-comment-p)
-             (let ((faces (get-text-property (point) 'face)))
-               (if (listp faces)
-                   (or (memq 'markdown-reference-face faces)
-                       (memq 'markdown-markup-face faces)
-                       (memq 'markdown-plain-url-face faces)
-                       (memq 'markdown-inline-code-face faces)
-                       (memq 'markdown-url-face faces))
-                 (memq faces '(markdown-reference-face
-                               markdown-markup-face
-                               markdown-plain-url-face
-                               markdown-inline-code-face
-                               markdown-url-face))))))))
+    (if (or (markdown-code-block-at-point-p)
+            (markdown-inline-code-at-point-p)
+            (markdown-in-comment-p)
+            (markdown--face-p (point) '(markdown-reference-face
+                                        markdown-markup-face
+                                        markdown-plain-url-face
+                                        markdown-inline-code-face
+                                        markdown-url-face)))
+        (prog1 nil
+          ;; If flyspell overlay is put, then remove it
+          (let ((bounds (bounds-of-thing-at-point 'word)))
+            (when bounds
+              (cl-loop for ov in (overlays-in (car bounds) (cdr bounds))
+                       when (overlay-get ov 'flyspell-overlay)
+                       do
+                       (delete-overlay ov)))))
+      t)))
 
 
 ;;; Markdown Parsing Functions ================================================

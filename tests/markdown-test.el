@@ -6419,7 +6419,7 @@ foo(bar=None)
 ;;; Tests for electric pair
 
 (ert-deftest test-markdown-electric-pair-mode ()
-  "Test ‘markdown-open’ with ‘markdown-open-command’ being a function."
+  "Test insert triple backtick with `electric-pair-mode'."
   (markdown-test-string-gfm ""
     (let ((markdown-gfm-use-electric-backquote nil))
       (electric-pair-local-mode +1)
@@ -6430,6 +6430,31 @@ foo(bar=None)
           (call-interactively (key-binding `[,last-command-event]))))
       (should (looking-back "```" (line-beginning-position)))
       (should (looking-at-p "```")))))
+
+;;; Tests for flyspell mode
+
+(ert-deftest test-markdown-flyspell/remove-overlay ()
+  "Test non-dictionary word in code block with `flyspell-mode'.
+Details: https://github.com/jrblevin/markdown-mode/issues/311"
+  (markdown-test-string "bbb
+```
+bbb
+"
+    (flyspell-mode +1)
+    (flyspell-buffer)
+    (goto-char (point-max))
+    (insert "```\n")
+    (forward-line -2)
+    (flyspell-buffer)
+
+    ;; check 'bbb' in code block
+    (let ((ovs (overlays-in (line-beginning-position) (line-end-position))))
+      (should-not ovs))
+
+    ;; check 'bbb' outside block
+    (goto-char (point-min))
+    (let ((ovs (overlays-in (line-beginning-position) (line-end-position))))
+      (should ovs))))
 
 (provide 'markdown-test)
 
