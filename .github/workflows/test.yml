@@ -24,7 +24,7 @@ jobs:
 
     - uses: actions/checkout@v1
     - name: Install dependencies
-      run: sudo apt install pandoc
+      run: sudo apt install pandoc aspell
     - name: Run tests
       run: |
         make clean

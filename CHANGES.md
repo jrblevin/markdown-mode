@@ -11,8 +11,10 @@
     -   Cleanup test code
 
 *   Bug fixes:
+    -   Fix remaining flyspell overlay in code block or comment issue[GH-311][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
+  [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
 
 # Markdown Mode 2.4
 
