@@ -6433,6 +6433,41 @@ foo(bar=None)
 
 ;;; Tests for flyspell mode
 
+(defun markdown-test-flyspell-incorrect-word-p ()
+  (let ((bounds (bounds-of-thing-at-point 'word)))
+    (cl-loop for ov in (overlays-in (car bounds) (cdr bounds))
+             thereis (overlay-get ov 'flyspell-overlay))))
+
+(ert-deftest test-markdown-flyspell/check-word-p ()
+  "Test for `flyspell'."
+  (markdown-test-string "aaa
+
+```
+bbb
+```
+
+ccc
+
+`ddd`
+
+eee
+
+<!-- fff -->
+"
+    (flyspell-buffer)
+    (search-forward "aaa")
+    (should (markdown-test-flyspell-incorrect-word-p))
+    (search-forward "bbb") ;; in code block
+    (should-not (markdown-test-flyspell-incorrect-word-p))
+    (search-forward "ccc")
+    (should (markdown-test-flyspell-incorrect-word-p))
+    (search-forward "ddd") ;; in inline code
+    (should-not (markdown-test-flyspell-incorrect-word-p))
+    (search-forward "eee")
+    (should (markdown-test-flyspell-incorrect-word-p))
+    (search-forward "fff") ;; in comment
+    (should-not (markdown-test-flyspell-incorrect-word-p))))
+
 (ert-deftest test-markdown-flyspell/remove-overlay ()
   "Test non-dictionary word in code block with `flyspell-mode'.
 Details: https://github.com/jrblevin/markdown-mode/issues/311"
@@ -6448,13 +6483,10 @@ bbb
     (flyspell-buffer)
 
     ;; check 'bbb' in code block
-    (let ((ovs (overlays-in (line-beginning-position) (line-end-position))))
-      (should-not ovs))
-
+    (should-not (markdown-test-flyspell-incorrect-word-p))
     ;; check 'bbb' outside block
     (goto-char (point-min))
-    (let ((ovs (overlays-in (line-beginning-position) (line-end-position))))
-      (should ovs))))
+    (should (markdown-test-flyspell-incorrect-word-p))))
 
 (provide 'markdown-test)
 
