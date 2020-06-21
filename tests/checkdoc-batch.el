@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (require 'checkdoc)
 
 (defun markdown-test--checkdoc-file (file)
