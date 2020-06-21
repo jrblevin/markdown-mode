@@ -6317,6 +6317,7 @@ https://github.com/jrblevin/markdown-mode/issues/235"
 
 (ert-deftest test-markdown-command/string-command ()
   "Test `markdown-command' for string which has only command."
+  (skip-unless (executable-find "pandoc"))
   (markdown-test-string "foo"
     (let ((markdown-command "pandoc"))
       ;; check exception is not thrown
@@ -6324,12 +6325,14 @@ https://github.com/jrblevin/markdown-mode/issues/235"
 
 (ert-deftest test-markdown-command/string-command-with-options ()
   "Test `markdown-command' for string which has command and options."
+  (skip-unless (executable-find "pandoc"))
   (markdown-test-string "foo"
     (let ((markdown-command "pandoc --from=markdown --to=html5"))
       (should (markdown)))))
 
 (ert-deftest test-markdown-command/list-of-strings ()
   "Test `markdown-command' for list of strings."
+  (skip-unless (executable-find "pandoc"))
   (markdown-test-string "foo"
     (let ((markdown-command '("pandoc" "--from=markdown" "--to=html5")))
       (should (markdown)))))
