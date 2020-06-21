@@ -1,4 +1,4 @@
-;;;; markdown-test.el --- Tests for markdown-mode
+;;;; markdown-test.el --- Tests for markdown-mode  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013-2017 Jason R. Blevins <jblevins@xbeta.org>
 ;; Copyright (C) 2013 Makoto Motohashi <mkt.motohashi@gmail.com>
@@ -4063,7 +4063,7 @@ puts 'hello, world'
      (cl-loop for (range . value) in values
            do (goto-char (point-min))
               (forward-line (1- (car range)))
-              (dotimes (n (- (cdr range) (car range)))
+              (dotimes (_ (- (cdr range) (car range)))
                 (should (equal (markdown-calculate-list-levels) value))
                 (forward-line))))))
 
@@ -4078,7 +4078,7 @@ puts 'hello, world'
      (cl-loop for (range . value) in values
            do (goto-char (point-min))
               (forward-line (1- (car range)))
-              (dotimes (n (- (cdr range) (car range)))
+              (dotimes (_ (- (cdr range) (car range)))
                 (should (equal (markdown-calculate-list-levels) value))
                 (forward-line))))))
 
@@ -4890,7 +4890,7 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
   (markdown-test-string "[text](http://path?query=foo#id)"
     (let* ((opened-url nil)
            (browse-url-browser-function
-            (lambda (url &rest args) (setq opened-url url))))
+            (lambda (url &rest _args) (setq opened-url url))))
       (markdown-follow-thing-at-point nil)
       (should (equal opened-url "http://path?query=foo#id"))))
   (when (featurep 'url-parse)
@@ -4908,7 +4908,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/430"
     (forward-line +1)
     (let* ((opened-url nil)
            (browse-url-browser-function
-            (lambda (url &rest args) (setq opened-url url))))
+            (lambda (url &rest _args) (setq opened-url url))))
       (markdown-follow-thing-at-point nil)
       (should (equal opened-url "https://link-in-header.com")))))
 
@@ -5298,7 +5298,7 @@ this is not header line
   "Test `markdown-fill-paragraph' on code blocks."
   (let ((text "test\n\n```\nhello\nworld\n```"))
     (markdown-test-string text
-      (dotimes (n 5)
+      (dotimes (_ 5)
         ;; Fill at each line; buffer should not change.
         (fill-paragraph)
         (should (string-equal (buffer-string) text))))))
@@ -6046,7 +6046,7 @@ Based on GH-298."
    "[|
 -|-
 x|"
-   (dotimes (x 3)
+   (dotimes (_ 3)
      (should (gfm--table-at-point-p))
      (forward-line))))
 
@@ -6383,9 +6383,8 @@ https://github.com/jrblevin/markdown-mode/issues/235"
 (ert-deftest test-markdown-open-image-command ()
   "Test ‘markdown-open’ with ‘markdown-open-command’ being a function."
   (markdown-test-string "![foo](./bar.jpg)"
-    (let* ((calls 0)
-           (markdown-open-image-command
-            (lambda (file) (should (string= file "./bar.jpg")))))
+    (let ((markdown-open-image-command
+           (lambda (file) (should (string= file "./bar.jpg")))))
       (forward-char 3)
       (markdown-follow-link-at-point))))
 
