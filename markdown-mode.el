@@ -6586,12 +6586,13 @@ Stop at the first and last headings of a superior heading."
             (setq arg (1- arg)))
         (user-error "No previous same-level heading")))))
 
-(defun markdown-up-heading (arg)
+(defun markdown-up-heading (arg &optional interactive)
   "Move to the visible heading line of which the present line is a subheading.
-With argument, move up ARG levels."
-  (interactive "p")
-  (and (called-interactively-p 'any)
-       (not (eq last-command 'markdown-up-heading)) (push-mark))
+With argument, move up ARG levels.  When called interactively (or
+INTERACTIVE is non-nil), also push the mark."
+  (interactive "p\np")
+  (and interactive (not (eq last-command 'markdown-up-heading))
+       (push-mark))
   (markdown-move-heading-common #'outline-up-heading arg 'adjust))
 
 (defun markdown-back-to-heading (&optional invisible-ok)
