@@ -8361,8 +8361,11 @@ or \\[markdown-toggle-inline-images]."
                      (valid-url (ignore-errors
                                   (member (downcase (url-type (url-generic-parse-url download-file)))
                                           markdown-remote-image-protocols))))
-                (when (and markdown-display-remote-images valid-url)
-                  (setq file (markdown--get-remote-image download-file)))))
+                (if (and markdown-display-remote-images valid-url)
+                    (setq file (markdown--get-remote-image download-file))
+                  (when (not valid-url)
+                    ;; strip query parameter
+                    (setq file (replace-regexp-in-string "?.+\\'" "" file))))))
             (when (file-exists-p file)
               (let* ((abspath (if (file-name-absolute-p file)
                                   file
