@@ -9,12 +9,14 @@
 
 *   Improvements:
     -   Cleanup test code
+    -   Strip query parameters from local file name at displaying inline images [GH-511][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue[GH-311][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
+  [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
 
 # Markdown Mode 2.4
 
