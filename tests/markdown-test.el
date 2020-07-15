@@ -4950,6 +4950,22 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/408"
       (let ((link (markdown-link-at-pos (point))))
         (should (string= (nth 3 link) url))))))
 
+(ert-deftest test-markdown-link/start-or-end-with-spaces ()
+  "Test `markdown-link-at-pos' return values with URL part starts/ends with spaces.
+Detail: https://github.com/jrblevin/markdown-mode/issues/514"
+  (markdown-test-string "[Broken](
+http://example.com  )
+"
+    (let ((values (markdown-link-at-pos (point))))
+      (should (string= (nth 3 values) "http://example.com"))))
+
+  (markdown-test-string "[Broken](
+http://example.com \"title\"  )
+"
+    (let ((values (markdown-link-at-pos (point))))
+      (should (string= (nth 3 values) "http://example.com"))
+      (should (string= (nth 5 values) "title")))))
+
 (ert-deftest test-markdown-link/follow-filename ()
   "Test that `markdown-follow-thing-at-pos' uses
 `markdown-translate-filename-function' to translate filenames."
