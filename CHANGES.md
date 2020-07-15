@@ -13,10 +13,12 @@
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue[GH-311][]
+    -   Fix inline URL regular expression which starts/ends with spaces[GH-514][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
   [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
+  [gh-514]: https://github.com/jrblevin/markdown-mode/issues/514
 
 # Markdown Mode 2.4
 
