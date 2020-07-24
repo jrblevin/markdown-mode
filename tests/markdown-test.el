@@ -4883,6 +4883,33 @@ like statement. Detail: https://github.com/jrblevin/markdown-mode/issues/75"
       (call-interactively #'markdown-backward-same-level)
       (should (looking-at-p "## Header 2-1")))))
 
+(ert-deftest test-markdown-movement/sentence ()
+  "Move sentencen which is wrapped markup characters.
+Detail: https://github.com/jrblevin/markdown-mode/issues/517"
+  (markdown-test-string "*Sentence one.*  **Sentence two.**  ~Sentence three.~
+_Sentence four._  `Sentence five.`  Sentence six.
+Sentence seven. Sentence eight.
+"
+    (forward-sentence 1)
+    (should (looking-back "one\\.\\*" (line-beginning-position)))
+    (forward-sentence 1)
+    (should (looking-back "two\\.\\*\\*" (line-beginning-position)))
+    (forward-sentence 1)
+    (should (looking-at-p "$"))
+    (save-excursion
+      (backward-sentence 2)
+      (should (looking-at-p "\\*\\*Sentence two")))
+    (forward-sentence 1)
+    (should (looking-back "four\\._" (line-beginning-position)))
+    (forward-sentence 1)
+    (should (looking-back "five\\.`" (line-beginning-position)))
+    (forward-sentence 1)
+    (should (looking-at-p "$"))
+    (forward-sentence 1)
+    (looking-back "seven\\." (line-beginning-position))
+    (forward-sentence 1)
+    (looking-at-p "$")))
+
 ;;; Link tests:
 
 (ert-deftest test-markdown-link/follow ()

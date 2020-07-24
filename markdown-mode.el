@@ -9392,6 +9392,8 @@ rows and columns and the column alignment."
   (setq-local comment-column 0)
   (setq-local comment-auto-fill-only-comments nil)
   (setq-local comment-use-syntax t)
+  ;; Sentence
+  (setq-local sentence-end-base "[.?!…‽][]\"'”’)}»›*_`~]*")
   ;; Syntax
   (add-hook 'syntax-propertize-extend-region-functions
             #'markdown-syntax-propertize-extend-region)

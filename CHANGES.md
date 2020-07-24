@@ -10,6 +10,7 @@
 *   Improvements:
     -   Cleanup test code
     -   Strip query parameters from local file name at displaying inline images [GH-511][]
+    -   Improve forward/backward sentences which are wrapped markup characters [GH-517][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue[GH-311][]
@@ -19,6 +20,7 @@
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
   [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
   [gh-514]: https://github.com/jrblevin/markdown-mode/issues/514
+  [gh-517]: https://github.com/jrblevin/markdown-mode/issues/517
 
 # Markdown Mode 2.4
 
