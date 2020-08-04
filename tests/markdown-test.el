@@ -3036,6 +3036,27 @@ date: 2015-08-13 11:35:25 EST
      (markdown-test-range-has-face 164 213 'markdown-pre-face)
      (markdown-test-range-has-face 215 217 'markdown-markup-face))))
 
+(ert-deftest test-markdown-font-lock/yaml-metadata-nested ()
+  "Test font lock for metadata which has nested values
+Detail: https://github.com/jrblevin/markdown-mode/issues/476"
+  (markdown-test-string
+   "---
+references:
+- type: article-journal
+  author:
+  - family: Watson
+    given: J. D.
+---
+"
+   (markdown-test-range-has-face 5 14 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 19 22 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 25 39 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 43 48 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 55 60 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 63 68 'markdown-metadata-value-face)
+   (markdown-test-range-has-face 74 78 'markdown-metadata-key-face)
+   (markdown-test-range-has-face 81 85 'markdown-metadata-value-face)))
+
 (ert-deftest test-markdown-font-lock/line-break ()
   "Basic line break tests."
   (markdown-test-string "    \nasdf  \n"

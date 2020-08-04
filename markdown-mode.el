@@ -905,7 +905,7 @@ Group 5 matches the closing brace (optional) and any surrounding whitespace.
 Groups need to agree with `markdown-regex-gfm-code-block-open'.")
 
 (defconst markdown-regex-declarative-metadata
-  "^\\([[:alpha:]][[:alpha:] _-]*?\\)\\([:=][ \t]*\\)\\(.*\\)$"
+  "^[ \t]*\\(?:-[ \t]*\\)?\\([[:alpha:]][[:alpha:] _-]*?\\)\\([:=][ \t]*\\)\\(.*\\)$"
   "Regular expression for matching declarative metadata statements.
 This matches MultiMarkdown metadata as well as YAML and TOML
 assignments such as the following:
