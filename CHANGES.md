@@ -11,6 +11,7 @@
     -   Cleanup test code
     -   Strip query parameters from local file name at displaying inline images [GH-511][]
     -   Improve forward/backward sentences which are wrapped markup characters [GH-517][]
+    -   Improve fontification for nested meta data [GH-476][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue[GH-311][]
@@ -18,6 +19,7 @@
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
+  [gh-476]: https://github.com/jrblevin/markdown-mode/issues/476
   [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
   [gh-514]: https://github.com/jrblevin/markdown-mode/issues/514
   [gh-517]: https://github.com/jrblevin/markdown-mode/issues/517
