@@ -789,7 +789,7 @@ Groups 3 and 5 matches the opening and closing delimiters.
 Group 4 matches the text inside the delimiters.")
 
 (defconst markdown-regex-gfm-italic
-  "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[*_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(?4:\\2\\)\\)"
+  "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[*_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?\\)\\(?4:\\2\\)\\)"
   "Regular expression for matching italic text in GitHub Flavored Markdown.
 Underscores in words are not treated as special.
 Group 1 matches the entire expression, including delimiters.

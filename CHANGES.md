@@ -14,8 +14,9 @@
     -   Improve fontification for nested meta data [GH-476][]
 
 *   Bug fixes:
-    -   Fix remaining flyspell overlay in code block or comment issue[GH-311][]
-    -   Fix inline URL regular expression which starts/ends with spaces[GH-514][]
+    -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
+    -   Fix inline URL regular expression which starts/ends with spaces [GH-514][]
+    -   Fix GFM italic fontification for one character [GH-524][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -23,6 +24,7 @@
   [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
   [gh-514]: https://github.com/jrblevin/markdown-mode/issues/514
   [gh-517]: https://github.com/jrblevin/markdown-mode/issues/517
+  [gh-524]: https://github.com/jrblevin/markdown-mode/issues/524
 
 # Markdown Mode 2.4
 
