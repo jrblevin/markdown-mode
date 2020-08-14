@@ -9091,7 +9091,7 @@ Create new table lines if required."
         (progn
           (re-search-forward "\\(?:^\\|[^\\]\\)|" end)
           (when (looking-at "[ \t]*$")
-            (re-search-forward "\\(?^|[^\\]:\\)|" end))
+            (re-search-forward "\\(?:^\\|[^\\]:\\)|" end))
           (when (and (looking-at "[-:]")
                      (re-search-forward "^\\(?:[ \t]*\\|[^\\]\\)|\\([^-:]\\)" end t))
             (goto-char (match-beginning 1)))
