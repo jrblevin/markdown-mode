@@ -5910,6 +5910,21 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/489"
 |      |
 "))))
 
+(ert-deftest test-markdown-table/forward-cell-at-last-column ()
+  "Test for table forward-cell at last column.
+Detail: https://github.com/jrblevin/markdown-mode/issues/522"
+  (markdown-test-string "| one  | two  |
+| three | four |
+"
+    (search-forward "two")
+    (markdown-table-forward-cell)
+    (should (string= (thing-at-point 'word) "three"))
+    (markdown-table-forward-cell)
+    (should (string= (thing-at-point 'word) "four"))
+    (markdown-table-forward-cell)
+    (should (string= (buffer-substring-no-properties (line-beginning-position) (line-end-position))
+                     "|       |      |"))))
+
 (ert-deftest test-markdown-table/backward-cell-with-escaped-vertical-bar ()
   "Test for table backward-cell with escaped vertical bar."
   (markdown-test-string "| x \\| |   |"
