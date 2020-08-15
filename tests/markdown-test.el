@@ -5996,6 +5996,41 @@ Details: https://github.com/jrblevin/markdown-mode/issues/524"
     (markdown-test-range-has-face 6 6 'markdown-italic-face)
     (markdown-test-range-has-face 7 7 'markdown-markup-face)))
 
+(ert-deftest test-markdown-gfm/bold-underscore ()
+  "Test for GFM bold font lock test.
+Details: https://github.com/jrblevin/markdown-mode/issues/525"
+(markdown-test-string-gfm "**strong**
+st**ro**ng
+**str**ong
+str**ong**
+**still strong**
+**still str**ong
+sti**ll strong**
+sti**ll str**ong
+__strong__
+not__str__ong
+__not__strong
+not__strong__
+__still strong__
+no__t strong__
+__not str__ong
+no__t str__ong
+"
+    (markdown-test-range-has-face 3 8 'markdown-bold-face)
+    (markdown-test-range-has-face 16 17 'markdown-bold-face)
+    (markdown-test-range-has-face 27 27 'markdown-bold-face)
+    (markdown-test-range-has-face 39 41 'markdown-bold-face)
+    (markdown-test-range-has-face 47 58 'markdown-bold-face)
+    (markdown-test-range-has-face 64 72 'markdown-bold-face)
+    (markdown-test-range-has-face 84 92 'markdown-bold-face)
+    (markdown-test-range-has-face 101 106 'markdown-bold-face)
+    (markdown-test-range-has-face 115 120 'markdown-bold-face)
+    (markdown-test-range-has-face 129 131 nil)
+    (markdown-test-range-has-face 140 142 nil)
+    (markdown-test-range-has-face 168 179 'markdown-bold-face)
+    (markdown-test-range-has-face 200 206 nil)
+    (markdown-test-range-has-face 217 221 nil)))
+
 (ert-deftest test-markdown-gfm/strike-through-1 ()
   "GFM strike through font lock test."
   (markdown-test-string-gfm "one ~~two~~ three"
