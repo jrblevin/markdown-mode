@@ -12,6 +12,7 @@
     -   Strip query parameters from local file name at displaying inline images [GH-511][]
     -   Improve forward/backward sentences which are wrapped markup characters [GH-517][]
     -   Improve fontification for nested meta data [GH-476][]
+    -   `markdown-cycle` accpets universal-argument like org-cycle [GH-530][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
@@ -29,6 +30,7 @@
   [gh-522]: https://github.com/jrblevin/markdown-mode/issues/522
   [gh-524]: https://github.com/jrblevin/markdown-mode/issues/524
   [gh-525]: https://github.com/jrblevin/markdown-mode/issues/525
+  [gh-530]: https://github.com/jrblevin/markdown-mode/issues/530
 
 # Markdown Mode 2.4
 

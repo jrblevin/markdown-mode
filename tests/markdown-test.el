@@ -4544,7 +4544,15 @@ date = 2015-08-13 11:35:25 EST
      (setq this-command 'markdown-cycle)
      (markdown-cycle t)
      ;; Check that text is visible
-     (markdown-test-range-has-property (point-min) (point-max) 'invisible nil))))
+     (markdown-test-range-has-property (point-min) (point-max) 'invisible nil))
+
+   (let (last-command this-command)
+     ;; Cycle global visibility to "overview" mode
+     (setq this-command 'markdown-cycle)
+     (let ((current-prefix-arg '(4)))
+      (markdown-cycle)
+      ;; Check that text is visible
+      (markdown-test-range-has-property (point-min) (point-max) 'invisible nil)))))
 
 (ert-deftest test-markdown-outline/level ()
   "Test `markdown-outline-level'."
