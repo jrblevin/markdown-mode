@@ -6685,7 +6685,7 @@ setext header, but should not be folded."
   "Visibility cycling for Markdown mode.
 This function is called with a `\\[universal-argument]' or if ARG is t, perform
 global visibility cycling.  If the point is at an atx-style header, cycle
-visibility of thecorresponding subtree.  Otherwise, indent the current line
+visibility of the corresponding subtree.  Otherwise, indent the current line
  or insert a tab, as appropriate, by calling `indent-for-tab-command'."
   (interactive "P")
   (cond
