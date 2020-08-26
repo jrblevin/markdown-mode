@@ -2818,7 +2818,9 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                                    markdown-list-face
                                    markdown-hr-face
                                    markdown-math-face))
-                (and is-gfm (not (markdown--gfm-markup-underscore-p begin close-end))))
+                (and is-gfm
+                     (or (char-equal (char-after begin) (char-after (1+ begin))) ;; check bold case
+                         (not (markdown--gfm-markup-underscore-p begin close-end)))))
             (progn (goto-char (min (1+ begin) last))
                    (when (< (point) last)
                      (markdown-match-italic last)))
