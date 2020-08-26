@@ -21,6 +21,7 @@
     -   Fix GFM italic fontification for one character [GH-524][]
     -   Fix `markdown-table-forward-cell` at last column issue [GH-522][]
     -   Fix GFM bold fontification with underscore issue [GH-525][]
+    -   Fix wrong fontification words between strong markups [GH-534][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -33,6 +34,7 @@
   [gh-525]: https://github.com/jrblevin/markdown-mode/issues/525
   [gh-530]: https://github.com/jrblevin/markdown-mode/issues/530
   [gh-532]: https://github.com/jrblevin/markdown-mode/issues/532
+  [gh-534]: https://github.com/jrblevin/markdown-mode/issues/534
 
 # Markdown Mode 2.4
 

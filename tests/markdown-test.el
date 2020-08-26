@@ -6039,6 +6039,18 @@ no__t str__ong
     (markdown-test-range-has-face 200 206 nil)
     (markdown-test-range-has-face 217 221 nil)))
 
+(ert-deftest test-markdown-gfm/string-between-strong-markup ()
+  "Test for string between strong markup.
+Details: https://github.com/jrblevin/markdown-mode/issues/534"
+  (markdown-test-string-gfm "**foo** and **bar**"
+    (markdown-test-range-has-face 1 2 'markdown-markup-face)
+    (markdown-test-range-has-face 3 5 'markdown-bold-face)
+    (markdown-test-range-has-face 6 7 'markdown-markup-face)
+    (markdown-test-range-has-face 8 12 nil)
+    (markdown-test-range-has-face 13 14 'markdown-markup-face)
+    (markdown-test-range-has-face 15 17 'markdown-bold-face)
+    (markdown-test-range-has-face 18 19 'markdown-markup-face)))
+
 (ert-deftest test-markdown-gfm/strike-through-1 ()
   "GFM strike through font lock test."
   (markdown-test-string-gfm "one ~~two~~ three"
