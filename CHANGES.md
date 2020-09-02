@@ -6,6 +6,10 @@
 
 *   New features:
     -   Introduce `markdown-mouse-follow-link` variable [GH-290][]
+    -   Option to define a `markdown-link-make-text-function` function
+        to automatically define a default link text before prompting the user.
+    -   Option to inhibit the prompt for a tooltip text via
+        `markdown-disable-tooltip-prompt`.
 
 *   Improvements:
     -   Cleanup test code
