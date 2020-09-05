@@ -224,7 +224,12 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     reference will be inserted according to the value of
     `markdown-reference-location`.  If a title is given, it will be
     added to the end of the reference definition and will be used
-    to populate the title attribute when converted to HTML.
+    to populate the title attribute when converted to HTML.  In addition, it is
+    possible to have the `markdown-link-make-text-function` function, if
+    non-nil, define the default link text before prompting the user for it.
+
+    If `markdown-disable-tooltip-prompt` is non-nil, the user will not be
+    prompted to add or modify a tooltip text.
 
     Images associated with image links may be displayed
     inline in the buffer by pressing <kbd>C-c C-x C-i</kbd>

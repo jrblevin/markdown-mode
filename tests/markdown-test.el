@@ -1289,6 +1289,22 @@ Don't adjust spacing if tabs are used as whitespace."
       (should (= (point) 31))
       (transient-mark-mode tmm-orig))))
 
+(ert-deftest test-markdown-insertion/disable-tooltip-prompt ()
+  "Test `markdown-insert-link' with
+`markdown-disable-tooltip-prompt' option t."
+  (markdown-test-string "<https://www.gnu.org/>"
+    (let ((markdown-disable-tooltip-prompt t))
+      (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET RET GNU RET"))
+      (should (string-equal (buffer-string) "[GNU](https://www.gnu.org/)")))))
+
+(ert-deftest test-markdown-insertion/link-make-text-function ()
+  "Test `markdown-insert-link' with custom
+`markdown-link-make-text-function'."
+  (markdown-test-string "<https://www.gnu.org/>"
+    (let ((markdown-link-make-text-function (lambda (url) (ignore url) "GNU")))
+      (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET RET RET RET"))
+      (should (string-equal (buffer-string) "[GNU](https://www.gnu.org/)")))))
+
 ;;; Footnote tests:
 
 (ert-deftest test-markdown-footnote/basic-end ()
