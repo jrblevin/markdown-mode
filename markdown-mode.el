@@ -1630,35 +1630,39 @@ region of a YAML metadata block as propertized by
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
-  (let* ((in-comment (nth 4 (syntax-ppss)))
-         (comment-begin (nth 8 (syntax-ppss))))
+  ;; Implement by loop instead of recursive call for avoiding
+  ;; exceed max-lisp-eval-depth issue
+  ;; https://github.com/jrblevin/markdown-mode/issues/536
+  (let (finish)
     (goto-char start)
-    (cond
-     ;; Comment start
-     ((and (not in-comment)
-           (re-search-forward markdown-regex-comment-start end t)
-           (not (markdown-inline-code-at-point-p))
-           (not (markdown-code-block-at-point-p)))
-      (let ((open-beg (match-beginning 0)))
-        (put-text-property open-beg (1+ open-beg)
-                           'syntax-table (string-to-syntax "<"))
-        (markdown-syntax-propertize-comments
-         (min (1+ (match-end 0)) end (point-max)) end)))
-     ;; Comment end
-     ((and in-comment comment-begin
-           (re-search-forward markdown-regex-comment-end end t))
-      (let ((comment-end (match-end 0)))
-        (put-text-property (1- comment-end) comment-end
-                           'syntax-table (string-to-syntax ">"))
-        ;; Remove any other text properties inside the comment
-        (remove-text-properties comment-begin comment-end
-                                markdown--syntax-properties)
-        (put-text-property comment-begin comment-end
-                           'markdown-comment (list comment-begin comment-end))
-        (markdown-syntax-propertize-comments
-         (min (1+ comment-end) end (point-max)) end)))
-     ;; Nothing found
-     (t nil))))
+    (while (not finish)
+      (let* ((in-comment (nth 4 (syntax-ppss)))
+             (comment-begin (nth 8 (syntax-ppss))))
+        (cond
+         ;; Comment start
+         ((and (not in-comment)
+               (re-search-forward markdown-regex-comment-start end t)
+               (not (markdown-inline-code-at-point-p))
+               (not (markdown-code-block-at-point-p)))
+          (let ((open-beg (match-beginning 0)))
+            (put-text-property open-beg (1+ open-beg)
+                               'syntax-table (string-to-syntax "<"))
+            (goto-char (min (1+ (match-end 0)) end (point-max)))))
+         ;; Comment end
+         ((and in-comment comment-begin
+               (re-search-forward markdown-regex-comment-end end t))
+          (let ((comment-end (match-end 0)))
+            (put-text-property (1- comment-end) comment-end
+                               'syntax-table (string-to-syntax ">"))
+            ;; Remove any other text properties inside the comment
+            (remove-text-properties comment-begin comment-end
+                                    markdown--syntax-properties)
+            (put-text-property comment-begin comment-end
+                               'markdown-comment (list comment-begin comment-end))
+            (goto-char (min (1+ comment-end) end (point-max)))))
+         ;; Nothing found
+         (t (setq finish t)))))
+    nil))
 
 (defun markdown-syntax-propertize (start end)
   "Function used as `syntax-propertize-function'.
