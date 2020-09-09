@@ -19,6 +19,7 @@
     -   `markdown-cycle` accepts universal-argument like org-cycle [GH-530][]
     -   Improve mode check for derived modes [GH-532][]
     -   Improve for file which contains many comments [GH-536][]
+    -   Improve for file which contains many pre blocks [GH-512][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
@@ -32,6 +33,7 @@
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
   [gh-476]: https://github.com/jrblevin/markdown-mode/issues/476
   [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
+  [gh-512]: https://github.com/jrblevin/markdown-mode/issues/512
   [gh-514]: https://github.com/jrblevin/markdown-mode/issues/514
   [gh-517]: https://github.com/jrblevin/markdown-mode/issues/517
   [gh-522]: https://github.com/jrblevin/markdown-mode/issues/522
