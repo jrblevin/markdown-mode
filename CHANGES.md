@@ -18,6 +18,7 @@
     -   Improve fontification for nested meta data [GH-476][]
     -   `markdown-cycle` accepts universal-argument like org-cycle [GH-530][]
     -   Improve mode check for derived modes [GH-532][]
+    -   Improve for file which contains many comments [GH-536][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
@@ -39,6 +40,7 @@
   [gh-530]: https://github.com/jrblevin/markdown-mode/issues/530
   [gh-532]: https://github.com/jrblevin/markdown-mode/issues/532
   [gh-534]: https://github.com/jrblevin/markdown-mode/issues/534
+  [gh-536]: https://github.com/jrblevin/markdown-mode/issues/536
 
 # Markdown Mode 2.4
 
