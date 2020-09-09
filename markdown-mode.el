@@ -1189,50 +1189,54 @@ giving the bounds of the current and parent list items."
   "Match preformatted text blocks from START to END."
   (save-excursion
     (goto-char start)
-    (let ((levels (markdown-calculate-list-levels))
-          indent pre-regexp close-regexp open close)
-      (while (and (< (point) end) (not close))
-        ;; Search for a region with sufficient indentation
-        (if (null levels)
-            (setq indent 1)
-          (setq indent (1+ (length levels))))
-        (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" indent))
-        (setq close-regexp (format "^\\(    \\|\t\\)\\{0,%d\\}\\([^ \t]\\)" (1- indent)))
+    (let (finish)
+      ;; Use loop for avoiding too many recursive calls
+      ;; https://github.com/jrblevin/markdown-mode/issues/512
+      (while (not finish)
+        (let ((levels (markdown-calculate-list-levels))
+              indent pre-regexp close-regexp open close)
+          (while (and (< (point) end) (not close))
+            ;; Search for a region with sufficient indentation
+            (if (null levels)
+                (setq indent 1)
+              (setq indent (1+ (length levels))))
+            (setq pre-regexp (format "^\\(    \\|\t\\)\\{%d\\}" indent))
+            (setq close-regexp (format "^\\(    \\|\t\\)\\{0,%d\\}\\([^ \t]\\)" (1- indent)))
 
-        (cond
-         ;; If not at the beginning of a line, move forward
-         ((not (bolp)) (forward-line))
-         ;; Move past blank lines
-         ((markdown-cur-line-blank-p) (forward-line))
-         ;; At headers and horizontal rules, reset levels
-         ((markdown-new-baseline) (forward-line) (setq levels nil))
-         ;; If the current line has sufficient indentation, mark out pre block
-         ;; The opening should be preceded by a blank line.
-         ((and (markdown-prev-line-blank) (looking-at pre-regexp))
-          (setq open (match-beginning 0))
-          (while (and (or (looking-at-p pre-regexp) (markdown-cur-line-blank-p))
-                      (not (eobp)))
-            (forward-line))
-          (skip-syntax-backward "-")
-          (setq close (point)))
-         ;; If current line has a list marker, update levels, move to end of block
-         ((looking-at markdown-regex-list)
-          (setq levels (markdown-update-list-levels
-                        (match-string 2) (current-indentation) levels))
-          (markdown-end-of-text-block))
-         ;; If this is the end of the indentation level, adjust levels accordingly.
-         ;; Only match end of indentation level if levels is not the empty list.
-         ((and (car levels) (looking-at-p close-regexp))
-          (setq levels (markdown-update-list-levels
-                        nil (current-indentation) levels))
-          (markdown-end-of-text-block))
-         (t (markdown-end-of-text-block))))
+            (cond
+             ;; If not at the beginning of a line, move forward
+             ((not (bolp)) (forward-line))
+             ;; Move past blank lines
+             ((markdown-cur-line-blank-p) (forward-line))
+             ;; At headers and horizontal rules, reset levels
+             ((markdown-new-baseline) (forward-line) (setq levels nil))
+             ;; If the current line has sufficient indentation, mark out pre block
+             ;; The opening should be preceded by a blank line.
+             ((and (markdown-prev-line-blank) (looking-at pre-regexp))
+              (setq open (match-beginning 0))
+              (while (and (or (looking-at-p pre-regexp) (markdown-cur-line-blank-p))
+                          (not (eobp)))
+                (forward-line))
+              (skip-syntax-backward "-")
+              (setq close (point)))
+             ;; If current line has a list marker, update levels, move to end of block
+             ((looking-at markdown-regex-list)
+              (setq levels (markdown-update-list-levels
+                            (match-string 2) (current-indentation) levels))
+              (markdown-end-of-text-block))
+             ;; If this is the end of the indentation level, adjust levels accordingly.
+             ;; Only match end of indentation level if levels is not the empty list.
+             ((and (car levels) (looking-at-p close-regexp))
+              (setq levels (markdown-update-list-levels
+                            nil (current-indentation) levels))
+              (markdown-end-of-text-block))
+             (t (markdown-end-of-text-block))))
 
-      (when (and open close)
-        ;; Set text property data
-        (put-text-property open close 'markdown-pre (list open close))
-        ;; Recursively search again
-        (markdown-syntax-propertize-pre-blocks (point) end)))))
+          (if (and open close)
+              ;; Set text property data and continue to search
+              (put-text-property open close 'markdown-pre (list open close))
+            (setq finish t))))
+      nil)))
 
 (defconst markdown-fenced-block-pairs
   `(((,markdown-regex-tilde-fence-begin markdown-tilde-fence-begin)
