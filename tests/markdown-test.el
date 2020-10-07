@@ -2344,6 +2344,19 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/359"
     (markdown-range-property-any 27 32 'face '(markdown-italic-face)))
    (markdown-range-property-any 36 38 'face '(markdown-bold-face))))
 
+(ert-deftest test-markdown-font-lock/italic-after-code-block ()
+  "Test italic fontification after code block.
+Detail: https://github.com/jrblevin/markdown-mode/issues/548"
+  (markdown-test-string "`(`*italic*`)` plain text
+*italic*"
+    (markdown-test-range-has-face 4 4 'markdown-markup-face)
+    (markdown-test-range-has-face 5 10 'markdown-italic-face)
+    (markdown-test-range-has-face 11 11 'markdown-markup-face)
+    (markdown-test-range-has-face 16 25 nil)
+    (markdown-test-range-has-face 27 27 'markdown-markup-face)
+    (markdown-test-range-has-face 28 33 'markdown-italic-face)
+    (markdown-test-range-has-face 34 34 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
