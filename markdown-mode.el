@@ -2772,10 +2772,10 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
       (save-excursion
         (save-match-data
           (goto-char begin)
-          (and (looking-back "\\(?:^\\|[[:blank:]]\\)" (1- begin))
+          (and (looking-back "\\(?:^\\|[[:blank:][:punct:]]\\)" (1- begin))
                (progn
                  (goto-char end)
-                 (looking-at-p "\\(?:[[:blank:]]\\|$\\)"))))))))
+                 (looking-at-p "\\(?:[[:blank:][:punct:]]\\|$\\)"))))))))
 
 (defun markdown-match-bold (last)
   "Match inline bold from the point to LAST."

@@ -45,6 +45,7 @@
   [gh-534]: https://github.com/jrblevin/markdown-mode/issues/534
   [gh-536]: https://github.com/jrblevin/markdown-mode/issues/536
   [gh-548]: https://github.com/jrblevin/markdown-mode/issues/548
+  [gh-553]: https://github.com/jrblevin/markdown-mode/issues/553
 
 # Markdown Mode 2.4
 

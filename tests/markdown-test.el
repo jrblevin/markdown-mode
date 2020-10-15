@@ -6033,6 +6033,25 @@ Details: https://github.com/jrblevin/markdown-mode/issues/524"
     (markdown-test-range-has-face 6 6 'markdown-italic-face)
     (markdown-test-range-has-face 7 7 'markdown-markup-face)))
 
+(ert-deftest test-markdown-gfm/italic-underscore-following-functuation-character ()
+  "Test for GFM italic font lock with following punctuation character
+Details: https://github.com/jrblevin/markdown-mode/issues/553"
+  (markdown-test-string-gfm "_One_, _two_, or _three_."
+    ;; one
+    (markdown-test-range-has-face 1 1 'markdown-markup-face)
+    (markdown-test-range-has-face 2 4 'markdown-italic-face)
+    (markdown-test-range-has-face 5 5 'markdown-markup-face)
+    ;; two
+    (markdown-test-range-has-face 8 8 'markdown-markup-face)
+    (markdown-test-range-has-face 9 11 'markdown-italic-face)
+    (markdown-test-range-has-face 12 12 'markdown-markup-face)
+    ;; or
+    (markdown-test-range-has-face 15 16 nil)
+    ;; three
+    (markdown-test-range-has-face 18 18 'markdown-markup-face)
+    (markdown-test-range-has-face 19 23 'markdown-italic-face)
+    (markdown-test-range-has-face 24 24 'markdown-markup-face)))
+
 (ert-deftest test-markdown-gfm/bold-underscore ()
   "Test for GFM bold font lock test.
 Details: https://github.com/jrblevin/markdown-mode/issues/525"
