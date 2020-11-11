@@ -8585,7 +8585,6 @@ position."
 (defun markdown--edit-indirect-before-commit-hook ()
   "Ensure correct indentation of code block content."
   (when markdown--code-block-indirect-indentation
-    (print "success!\n")
     (indent-rigidly (point-min) (point-max)
                     markdown--code-block-indirect-indentation)))
 
