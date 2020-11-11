@@ -8604,9 +8604,10 @@ position."
                                markdown-edit-code-block-default-mode))
                      (edit-indirect-guess-mode-function
                       (lambda (_parent-buffer _beg _end)
-                        (funcall mode))))
+                        (funcall mode)))
+                     (indirect-buf (edit-indirect-region begin end 'display-buffer)))
                 (when (> indentation 0)
-                  (with-current-buffer (edit-indirect-region begin end 'display-buffer)
+                  (with-current-buffer indirect-buf
                     (setq-local markdown--code-block-indirect-indentation
                                 indentation)
                     (indent-rigidly (point-min) (point-max) (- indentation)))))
