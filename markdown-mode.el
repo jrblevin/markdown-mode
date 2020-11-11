@@ -8574,7 +8574,7 @@ position."
 (require 'edit-indirect nil t)
 (defvar edit-indirect-guess-mode-function)
 (defvar edit-indirect-after-commit-functions)
-;; (defvar edit-indirect-before-commit-hook)
+(defvar edit-indirect-before-commit-hook)
 
 (defun markdown--edit-indirect-after-commit-function (_beg end)
   "Ensure trailing newlines at the END of code blocks."
@@ -8607,8 +8607,9 @@ position."
                      (indirect-buf (edit-indirect-region begin end 'display-buffer)))
                 (when (> indentation 0)
                   (with-current-buffer indirect-buf
+                    (defvar markdown--code-block-indirect-indentation)
                     (setq-local markdown--code-block-indirect-indentation
-                                indentation)
+                      indentation)
                     (indent-rigidly (point-min) (point-max) (- indentation)))))
             (user-error "Not inside a GFM or tilde fenced code block")))
       (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
