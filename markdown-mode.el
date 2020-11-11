@@ -8574,7 +8574,7 @@ position."
 (require 'edit-indirect nil t)
 (defvar edit-indirect-guess-mode-function)
 (defvar edit-indirect-after-commit-functions)
-(defvar edit-indirect-before-commit-hook)
+;; (defvar edit-indirect-before-commit-hook)
 
 (defun markdown--edit-indirect-after-commit-function (_beg end)
   "Ensure trailing newlines at the END of code blocks."
@@ -9555,8 +9555,7 @@ rows and columns and the column alignment."
             #'markdown--edit-indirect-after-commit-function
             nil 'local)
   (add-hook 'edit-indirect-before-commit-hook
-            #'markdown--edit-indirect-before-commit-hook
-            nil 'local)
+            #'markdown--edit-indirect-before-commit-hook)
 
   ;; Marginalized headings
   (when markdown-marginalize-headers
