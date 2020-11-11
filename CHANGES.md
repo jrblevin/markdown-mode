@@ -12,6 +12,7 @@
         `markdown-disable-tooltip-prompt`.
 
 *   Improvements:
+    -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
     -   Cleanup test code
     -   Strip query parameters from local file name at displaying inline images [GH-511][]
     -   Improve forward/backward sentences which are wrapped markup characters [GH-517][]
@@ -32,6 +33,7 @@
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
+  [gh-375]: https://github.com/jrblevin/markdown-mode/issues/375
   [gh-476]: https://github.com/jrblevin/markdown-mode/issues/476
   [gh-511]: https://github.com/jrblevin/markdown-mode/issues/511
   [gh-512]: https://github.com/jrblevin/markdown-mode/issues/512
