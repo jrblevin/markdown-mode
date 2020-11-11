@@ -8574,12 +8574,20 @@ position."
 (require 'edit-indirect nil t)
 (defvar edit-indirect-guess-mode-function)
 (defvar edit-indirect-after-commit-functions)
+(defvar edit-indirect-before-commit-hook)
 
 (defun markdown--edit-indirect-after-commit-function (_beg end)
   "Ensure trailing newlines at the END of code blocks."
   (goto-char end)
   (unless (eq (char-before) ?\n)
     (insert "\n")))
+
+(defun markdown--edit-indirect-before-commit-hook ()
+  "Ensure correct indentation of code block content."
+  (when markdown--code-block-indirect-indentation
+    (print "success!\n")
+    (indent-rigidly (point-min) (point-max)
+                    markdown--code-block-indirect-indentation)))
 
 (defun markdown-edit-code-block ()
   "Edit Markdown code block in an indirect buffer."
@@ -8590,13 +8598,18 @@ position."
                (begin (and bounds (goto-char (nth 0 bounds)) (point-at-bol 2)))
                (end (and bounds (goto-char (nth 1 bounds)) (point-at-bol 1))))
           (if (and begin end)
-              (let* ((lang (markdown-code-block-lang))
+              (let* ((indentation (and (goto-char (nth 0 bounds)) (current-indentation)))
+                     (lang (markdown-code-block-lang))
                      (mode (or (and lang (markdown-get-lang-mode lang))
                                markdown-edit-code-block-default-mode))
                      (edit-indirect-guess-mode-function
                       (lambda (_parent-buffer _beg _end)
                         (funcall mode))))
-                (edit-indirect-region begin end 'display-buffer))
+                (when (> indentation 0)
+                  (with-current-buffer (edit-indirect-region begin end 'display-buffer)
+                    (setq-local markdown--code-block-indirect-indentation
+                                indentation)
+                    (indent-rigidly (point-min) (point-max) (- indentation)))))
             (user-error "Not inside a GFM or tilde fenced code block")))
       (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
         (progn (package-refresh-contents)
@@ -9539,6 +9552,9 @@ rows and columns and the column alignment."
   ;; edit-indirect
   (add-hook 'edit-indirect-after-commit-functions
             #'markdown--edit-indirect-after-commit-function
+            nil 'local)
+  (add-hook 'edit-indirect-before-commit-hook
+            #'markdown--edit-indirect-before-commit-hook
             nil 'local)
 
   ;; Marginalized headings
