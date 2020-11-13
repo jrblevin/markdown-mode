@@ -8576,18 +8576,19 @@ position."
 (defvar edit-indirect-after-commit-functions)
 (defvar edit-indirect-before-commit-hook)
 
-(defun markdown--edit-indirect-after-commit-function (_beg end)
-  "Ensure trailing newlines at the END of code blocks."
+(defun markdown--edit-indirect-after-commit-function (beg end)
+  "Corrective logic run on code block content from lines BEG to END.
+Restores code block indentation from BEG to END, and ensures trailing newlines
+at the END of code blocks."
+  ;; ensure trailing newlines
   (goto-char end)
   (unless (eq (char-before) ?\n)
-    (insert "\n")))
-
-(defun markdown--edit-indirect-before-commit-hook ()
-  "Ensure correct indentation of code block content."
-  (when (and (boundp 'markdown--code-block-indirect-indentation)
-             markdown--code-block-indirect-indentation)
-    (indent-rigidly (point-min) (point-max)
-                    markdown--code-block-indirect-indentation)))
+    (insert "\n"))
+  ;; restore code block indentation
+  (goto-char (- beg 1))
+  (let ((block-indentation (current-indentation)))
+    (when (> block-indentation 0)
+      (indent-rigidly beg end block-indentation))))
 
 (defun markdown-edit-code-block ()
   "Edit Markdown code block in an indirect buffer."
@@ -8606,11 +8607,8 @@ position."
                       (lambda (_parent-buffer _beg _end)
                         (funcall mode)))
                      (indirect-buf (edit-indirect-region begin end 'display-buffer)))
-                (when (> indentation 0)
+                (when (> indentation 0) ;; un-indent in edit-indirect buffer
                   (with-current-buffer indirect-buf
-                    (defvar markdown--code-block-indirect-indentation)
-                    (setq-local markdown--code-block-indirect-indentation
-                      indentation)
                     (indent-rigidly (point-min) (point-max) (- indentation)))))
             (user-error "Not inside a GFM or tilde fenced code block")))
       (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
@@ -9555,8 +9553,6 @@ rows and columns and the column alignment."
   (add-hook 'edit-indirect-after-commit-functions
             #'markdown--edit-indirect-after-commit-function
             nil 'local)
-  (add-hook 'edit-indirect-before-commit-hook
-            #'markdown--edit-indirect-before-commit-hook)
 
   ;; Marginalized headings
   (when markdown-marginalize-headers
