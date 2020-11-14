@@ -8574,7 +8574,6 @@ position."
 (require 'edit-indirect nil t)
 (defvar edit-indirect-guess-mode-function)
 (defvar edit-indirect-after-commit-functions)
-(defvar edit-indirect-before-commit-hook)
 
 (defun markdown--edit-indirect-after-commit-function (beg end)
   "Corrective logic run on code block content from lines BEG to END.
