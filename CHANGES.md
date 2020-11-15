@@ -22,6 +22,7 @@
     -   Improve for file which contains many comments [GH-536][]
     -   Improve for file which contains many pre blocks [GH-512][]
     -   Enable flyspell check at yaml metadata[GH-560][]
+    -   Clean up Makefile
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]

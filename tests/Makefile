@@ -12,7 +12,6 @@ TEST_HTML = $(TEST_SRCS:.text=.html)
 
 test: compile-all checkdoc
 	$(EMACS) -Q --batch \
-	    --eval '(setq byte-compile-warnings (quote (not cl-functions)))' \
 	    -l ert -l ../markdown-mode.elc -l markdown-test.elc \
 	    --eval '(ert-run-tests-batch-and-exit $(SELECTOR))'
 
@@ -22,7 +21,6 @@ checkdoc:
 
 compile-all:
 	$(EMACS) -Q --batch \
-	    --eval '(setq byte-compile-warnings (quote (not cl-functions)))' \
 	    --eval '(setq byte-compile-error-on-warn t)' \
 	    -l ../markdown-mode.el \
 	    -f batch-byte-compile ../markdown-mode.el markdown-test.el
