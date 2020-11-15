@@ -2150,7 +2150,10 @@ Depending on your font, some reasonable choices are:
 Used for `flyspell-generic-check-word-predicate'."
   (save-excursion
     (goto-char (1- (point)))
-    (if (or (markdown-code-block-at-point-p)
+    ;; https://github.com/jrblevin/markdown-mode/issues/560
+    ;; enable spell check YAML meta data
+    (if (or (and (markdown-code-block-at-point-p)
+                 (not (markdown-text-property-at-point 'markdown-yaml-metadata-section)))
             (markdown-inline-code-at-point-p)
             (markdown-in-comment-p)
             (markdown--face-p (point) '(markdown-reference-face
