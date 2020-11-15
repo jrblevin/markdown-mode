@@ -21,6 +21,7 @@
     -   Improve mode check for derived modes [GH-532][]
     -   Improve for file which contains many comments [GH-536][]
     -   Improve for file which contains many pre blocks [GH-512][]
+    -   Enable flyspell check at yaml metadata[GH-560][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
@@ -48,6 +49,7 @@
   [gh-536]: https://github.com/jrblevin/markdown-mode/issues/536
   [gh-548]: https://github.com/jrblevin/markdown-mode/issues/548
   [gh-553]: https://github.com/jrblevin/markdown-mode/issues/553
+  [gh-560]: https://github.com/jrblevin/markdown-mode/issues/560
 
 # Markdown Mode 2.4
 

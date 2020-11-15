@@ -6691,6 +6691,19 @@ bbb
     (goto-char (point-min))
     (should (markdown-test-flyspell-incorrect-word-p))))
 
+(ert-deftest test-markdown-flyspell/yaml-metadata ()
+  "Test spell check in YAML metadata with `flyspell-mode'.
+Details: https://github.com/jrblevin/markdown-mode/issues/560"
+  (markdown-test-string "---
+title: asdasdasd
+---
+"
+    (flyspell-mode +1)
+    (flyspell-buffer)
+    (goto-char (point-min))
+    (search-forward "title: ")
+    (should (markdown-test-flyspell-incorrect-word-p))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
