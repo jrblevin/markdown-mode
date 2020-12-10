@@ -2650,16 +2650,21 @@ See https://github.com/jrblevin/markdown-mode/issues/405 ."
     * level 3
       * level 4
         * level 5"
-      (markdown-test-range-has-face 62 62 'markdown-list-face)))
+      (markdown-test-range-has-face 62 62 'markdown-list-face))))
 
-  (let ((markdown-list-indent-width 4))
-    (markdown-test-string "
-* level 1
-  * level 2
-    * level 3
-      * level 4
-        * level 5"
-      (markdown-test-range-has-face 62 62 nil))))
+(ert-deftest test-markdown-font-lock/lists-3 ()
+  "Test markdown-list-face for too intended line.
+Too indented line is also treated as list rf previous line is line
+in Common mark.
+See https://github.com/jrblevin/markdown-mode/issues/569"
+  (markdown-test-string "* [ ] One
+  * [ ] Two
+    * [ ] Three
+      * [ ] Four
+        * [ ] Five
+          * [ ] Six"
+    (markdown-test-range-has-face 64 64 'markdown-list-face)
+    (markdown-test-range-has-face 85 85 'markdown-list-face)))
 
 (ert-deftest test-markdown-font-lock/definition-list ()
   "A simple definition list marker font lock test."
