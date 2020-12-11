@@ -1154,7 +1154,8 @@ this property is a list with elements of the form (begin . end)
 giving the bounds of the current and parent list items."
   (save-excursion
     (goto-char start)
-    (let (bounds level pre-regexp)
+    (let ((prev-list-line -100)
+          bounds level pre-regexp)
       ;; Find a baseline point with zero list indentation
       (markdown-search-backward-baseline)
       ;; Search for all list items between baseline and END
@@ -1171,7 +1172,9 @@ giving the bounds of the current and parent list items."
          ((markdown-new-baseline)
           (setq bounds nil))
          ;; Make sure this is not a line from a pre block
-         ((looking-at-p pre-regexp))
+         ((and (looking-at-p pre-regexp)
+               ;; too indented line is also treated as list if previous line is list
+               (>= (- (line-number-at-pos) prev-list-line) 2)))
          ;; If not, then update levels and propertize list item when in range.
          (t
           (let* ((indent (current-indentation))
@@ -1182,6 +1185,7 @@ giving the bounds of the current and parent list items."
             (setq bounds (markdown--append-list-item-bounds
                           marker indent cur-bounds bounds))
           (when (and (<= start (point)) (<= (point) end))
+            (setq prev-list-line (line-number-at-pos first))
             (put-text-property first last 'markdown-list-item bounds)))))
         (end-of-line)))))
 
