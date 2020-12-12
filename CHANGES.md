@@ -32,6 +32,7 @@
     -   Fix GFM bold fontification with underscore issue [GH-525][]
     -   Fix wrong fontification words between strong markups [GH-534][]
     -   Fix wrong italic fontification just after code block [GH-548][]
+    -   Fix too indended list face issue [GH-569][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -51,6 +52,7 @@
   [gh-548]: https://github.com/jrblevin/markdown-mode/issues/548
   [gh-553]: https://github.com/jrblevin/markdown-mode/issues/553
   [gh-560]: https://github.com/jrblevin/markdown-mode/issues/560
+  [gh-560]: https://github.com/jrblevin/markdown-mode/issues/569
 
 # Markdown Mode 2.4
 
