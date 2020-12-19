@@ -6510,6 +6510,26 @@ https://github.com/jrblevin/markdown-mode/issues/235"
       (should-not (member "^fn1" entries))
       (should-not (member "^fn2" entries)))))
 
+(ert-deftest test-markdown-imenu/no-level-one-header ()
+  "Create imenu entries if there is no level-1 header
+https://github.com/jrblevin/markdown-mode/issues/571"
+  (markdown-test-string "---
+title: Wat
+---
+
+## Section a
+
+### Sub 1
+
+### Sub 11
+
+## Section b
+
+### Sub 2"
+    (let ((entries (markdown-imenu-create-nested-index)))
+      (should (string= (car (nth 0 entries)) "Section a"))
+      (should (string= (car (nth 1 entries)) "Section b")))))
+
 (ert-deftest test-markdown-command/function ()
   "Test ‘markdown’ with ‘markdown-command’ being a function."
   (markdown-test-string "foo"
