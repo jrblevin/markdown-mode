@@ -33,6 +33,7 @@
     -   Fix wrong fontification words between strong markups [GH-534][]
     -   Fix wrong italic fontification just after code block [GH-548][]
     -   Fix too indended list face issue [GH-569][]
+    -   Fix creating imenu index issue when there is no level-1 header too[GH-571][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -52,7 +53,8 @@
   [gh-548]: https://github.com/jrblevin/markdown-mode/issues/548
   [gh-553]: https://github.com/jrblevin/markdown-mode/issues/553
   [gh-560]: https://github.com/jrblevin/markdown-mode/issues/560
-  [gh-560]: https://github.com/jrblevin/markdown-mode/issues/569
+  [gh-569]: https://github.com/jrblevin/markdown-mode/issues/569
+  [gh-571]: https://github.com/jrblevin/markdown-mode/issues/571
 
 # Markdown Mode 2.4
 
