@@ -10,6 +10,7 @@
         to automatically define a default link text before prompting the user.
     -   Option to inhibit the prompt for a tooltip text via
         `markdown-disable-tooltip-prompt`.
+    -   Add ability to resize inline image display without Imagemagick in the computer (emulating Org Mode)
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
