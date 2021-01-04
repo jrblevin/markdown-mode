@@ -10,7 +10,6 @@
         to automatically define a default link text before prompting the user.
     -   Option to inhibit the prompt for a tooltip text via
         `markdown-disable-tooltip-prompt`.
-    -   Add ability to resize inline image display without Imagemagick in the computer (emulating Org Mode)
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -25,6 +24,7 @@
     -   Enable flyspell check at yaml metadata[GH-560][]
     -   Clean up Makefile
     -   Support to display local image with percent encoding file path
+    -   Add ability to resize inline image display (`markdown-toggle-inline-images`) without Imagemagick installed in the computer (emulating Org Mode)
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
