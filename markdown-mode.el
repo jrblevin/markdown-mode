@@ -4302,11 +4302,7 @@ opening code fence and an info string."
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-code-block-braces nil
-<<<<<<< HEAD
   "When non-nil, automatically insert braces for GFM code blocks."
-=======
-  "When non-nil, automatically insert braces for GFM code blocks"
->>>>>>> eb1f00f23f03204bc3aa8b71adcc840b100d6804
   :group 'markdown
   :type 'boolean)
 
