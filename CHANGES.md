@@ -24,6 +24,7 @@
     -   Enable flyspell check at yaml metadata[GH-560][]
     -   Clean up Makefile
     -   Support to display local image with percent encoding file path
+    -   Support including braces around the language specification in GFM code blocks
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]

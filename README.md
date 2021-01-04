@@ -991,6 +991,12 @@ by `markdown-mode` and `gfm-mode` as described below.
   region will be placed inside the code block.  You will be
   prompted for the name of the language, but may press enter to
   continue without naming a language.
+  
+  In addition, in `gfm-mode`, GFM code blocks can be inserted via the
+  option `markdown-gfm-use-electric-backquote`. If the option
+  `markdown-code-block-braces` is set to `t`, code blocks inserted with
+  <kbd>C-c C-s C</kbd> or electric backquotes will include braces ("{}")
+  around the language attributes.
 
 * **Strikethrough:** Strikethrough text is supported in both
   `markdown-mode` and `gfm-mode`.  It can be inserted (and toggled)
