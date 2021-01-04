@@ -4352,7 +4352,7 @@ code block in an indirect buffer after insertion."
             (forward-line -1))
           (markdown-ensure-blank-line-before)
           (indent-to indent)
-          (insert "```" gfm-open-brace lang gfm-close-brace "\n")
+          (insert "```" gfm-open-brace lang gfm-close-brace)
           (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
       (let ((indent (current-indentation))
             start-bol)
