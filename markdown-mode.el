@@ -4301,6 +4301,11 @@ opening code fence and an info string."
   :safe #'natnump
   :package-version '(markdown-mode . "2.3"))
 
+(defcustom markdown-code-block-braces nil
+  "When non-nil, automatically insert braces for GFM code blocks."
+  :group 'markdown
+  :type 'boolean)
+
 (defun markdown-insert-gfm-code-block (&optional lang edit)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
@@ -4321,7 +4326,8 @@ code block in an indirect buffer after insertion."
              (quit "")))
          current-prefix-arg))
   (unless (string= lang "") (markdown-gfm-add-used-language lang))
-  (when (> (length lang) 0)
+  (when (and (> (length lang) 0)
+             (not markdown-code-block-braces))
     (setq lang (concat (make-string markdown-spaces-after-code-fence ?\s)
                        lang)))
   (if (use-region-p)
@@ -4346,12 +4352,15 @@ code block in an indirect buffer after insertion."
         (indent-to indent)
         (insert "```" lang)
         (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
-    (let ((indent (current-indentation)) start-bol)
+    (let ((indent (current-indentation))
+          (gfm-open-brace (if markdown-code-block-braces "{" ""))
+          (gfm-close-brace (if markdown-code-block-braces "}" ""))
+          start-bol)
       (delete-horizontal-space :backward-only)
       (markdown-ensure-blank-line-before)
       (indent-to indent)
       (setq start-bol (point-at-bol))
-      (insert "```" lang "\n")
+      (insert "```" gfm-open-brace lang gfm-close-brace "\n")
       (indent-to indent)
       (unless edit (insert ?\n))
       (indent-to indent)
