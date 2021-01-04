@@ -4588,6 +4588,25 @@ date = 2015-08-13 11:35:25 EST
       ;; Check that text is visible
       (markdown-test-range-has-property (point-min) (point-max) 'invisible nil)))))
 
+(ert-deftest test-markdown-outline/visibility-content-after-yaml-header ()
+  "Test not hiding content from YAML header end to first header
+https://github.com/jrblevin/markdown-mode/issues/576."
+  (markdown-test-string
+   "---
+title: \"My Presentation\"
+---
+
+Some preamble goes here.
+
+# My first heading
+
+Here's some text in the first section.
+"
+   (let (last-command this-command)
+     (setq this-command 'markdown-cycle)
+     (markdown-cycle t)
+     (markdown-test-range-has-property 35 59 'invisible nil))))
+
 (ert-deftest test-markdown-outline/level ()
   "Test `markdown-outline-level'."
   (markdown-test-file "outline.text"
