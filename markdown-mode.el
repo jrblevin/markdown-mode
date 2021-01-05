@@ -1251,7 +1251,12 @@ giving the bounds of the current and parent list items."
      markdown-yaml-metadata-section)
     ((,markdown-regex-gfm-code-block-open markdown-gfm-block-begin)
      (,markdown-regex-gfm-code-block-close markdown-gfm-block-end)
-     markdown-gfm-code))
+     markdown-gfm-code)
+    ;; TODO: This adds recognition of ‘+++’ blocks as TOML metadata,
+    ;; but it needs to be cleaned up.
+    (("\\(+\\{3\\}\\)$" markdown-tilde-fence-begin)
+     ("\\(+\\{3\\}\\)$" markdown-tilde-fence-end)
+     markdown-fenced-code))
   "Mapping of regular expressions to \"fenced-block\" constructs.
 These constructs are distinguished by having a distinctive start
 and end pattern, both of which take up an entire line of text,
@@ -4379,14 +4384,19 @@ at the beginning of the block."
     (goto-char (car pos-prop))
     (set-match-data (get-text-property (point) (cdr pos-prop)))
     ;; Note: Hard-coded group number assumes tilde
-    ;; and GFM fenced code regexp groups agree.
-    (let ((begin (match-beginning 3))
+    ;; and GFM fenced code or metadata regexp groups agree.
+    (let ((fence (match-string 1))
+          (begin (match-beginning 3))
           (end (match-end 3)))
-      (when (and begin end)
-        ;; Fix language strings beginning with periods, like ".ruby".
-        (when (eq (char-after begin) ?.)
-          (setq begin (1+ begin)))
-        (buffer-substring-no-properties begin end)))))
+      (cond ((string= fence "+++") "TOML")
+            ;; TODO: YAML metadata sections aren’t be processed as a
+            ;; proper code block, otherwise this would highlight them.
+            ((string= fence "---") "YAML")
+            ((and begin end)
+             ;; Fix language strings beginning with periods, like ".ruby".
+             (when (eq (char-after begin) ?.)
+               (setq begin (1+ begin)))
+             (buffer-substring-no-properties begin end))))))
 
 (defun markdown-gfm-parse-buffer-for-languages (&optional buffer)
   (with-current-buffer (or buffer (current-buffer))
