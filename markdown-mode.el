@@ -116,7 +116,8 @@ arguments."
   :type '(choice file function (const :tag "None" nil)))
 
 (defcustom markdown-open-image-command nil
-  "Command used for opening image files directly at `markdown-follow-link-at-point'."
+  "Command used for opening image files directly.
+This is used at `markdown-follow-link-at-point'."
   :group 'markdown
   :type '(choice file function (const :tag "None" nil)))
 
@@ -2140,7 +2141,7 @@ Depending on your font, some reasonable choices are:
 
 (defconst markdown-footnote-chars
   "[[:alnum:]-]"
-  "Regular expression matching any character that is allowed in a footnote identifier.")
+  "Regular expression matching any character for a footnote identifier.")
 
 (defconst markdown-regex-footnote-definition
   (concat "^ \\{0,3\\}\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
