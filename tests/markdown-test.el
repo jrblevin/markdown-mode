@@ -6185,6 +6185,13 @@ Details: https://github.com/jrblevin/markdown-mode/issues/534"
     (should (equal (buffer-substring-no-properties (point) (point-max))
                    "\n    bar\n    ```\n\n"))))
 
+(ert-deftest test-markdown-gfm/markdown-code-block-braces ()
+  "Test `markdown-gfm-use-electric-backquote'."
+  (markdown-test-string-gfm ""
+    (let ((markdown-code-block-braces t))
+      (markdown-insert-gfm-code-block "elisp")
+      (should (equal (buffer-string) "```{elisp}\n\n```")))))
+
 (ert-deftest test-markdown-gfm/gfm-parse-buffer-for-languages ()
   "Parse buffer for existing languages for `markdown-gfm-used-languages' test."
   (markdown-test-string-gfm "``` MADEUP\n\n```\n``` LANGUAGES\n\n```\n```MaDeUp\n\n```\n```\n\n```\n``` \n\n```\n"

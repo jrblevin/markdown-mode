@@ -4301,6 +4301,11 @@ opening code fence and an info string."
   :safe #'natnump
   :package-version '(markdown-mode . "2.3"))
 
+(defcustom markdown-code-block-braces nil
+  "When non-nil, automatically insert braces for GFM code blocks."
+  :group 'markdown
+  :type 'boolean)
+
 (defun markdown-insert-gfm-code-block (&optional lang edit)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
@@ -4321,45 +4326,49 @@ code block in an indirect buffer after insertion."
              (quit "")))
          current-prefix-arg))
   (unless (string= lang "") (markdown-gfm-add-used-language lang))
-  (when (> (length lang) 0)
+  (when (and (> (length lang) 0)
+             (not markdown-code-block-braces))
     (setq lang (concat (make-string markdown-spaces-after-code-fence ?\s)
                        lang)))
-  (if (use-region-p)
-      (let* ((b (region-beginning)) (e (region-end)) end
-             (indent (progn (goto-char b) (current-indentation))))
-        (goto-char e)
-        ;; if we're on a blank line, don't newline, otherwise the ```
-        ;; should go on its own line
-        (unless (looking-back "\n" nil)
-          (newline))
+  (let ((gfm-open-brace (if markdown-code-block-braces "{" ""))
+        (gfm-close-brace (if markdown-code-block-braces "}" "")))
+    (if (use-region-p)
+        (let* ((b (region-beginning)) (e (region-end)) end
+               (indent (progn (goto-char b) (current-indentation))))
+          (goto-char e)
+          ;; if we're on a blank line, don't newline, otherwise the ```
+          ;; should go on its own line
+          (unless (looking-back "\n" nil)
+            (newline))
+          (indent-to indent)
+          (insert "```")
+          (markdown-ensure-blank-line-after)
+          (setq end (point))
+          (goto-char b)
+          ;; if we're on a blank line, insert the quotes here, otherwise
+          ;; add a new line first
+          (unless (looking-at-p "\n")
+            (newline)
+            (forward-line -1))
+          (markdown-ensure-blank-line-before)
+          (indent-to indent)
+          (insert "```" gfm-open-brace lang gfm-close-brace)
+          (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
+      (let ((indent (current-indentation))
+            start-bol)
+        (delete-horizontal-space :backward-only)
+        (markdown-ensure-blank-line-before)
+        (indent-to indent)
+        (setq start-bol (point-at-bol))
+        (insert "```" gfm-open-brace lang gfm-close-brace "\n")
+        (indent-to indent)
+        (unless edit (insert ?\n))
         (indent-to indent)
         (insert "```")
         (markdown-ensure-blank-line-after)
-        (setq end (point))
-        (goto-char b)
-        ;; if we're on a blank line, insert the quotes here, otherwise
-        ;; add a new line first
-        (unless (looking-at-p "\n")
-          (newline)
-          (forward-line -1))
-        (markdown-ensure-blank-line-before)
-        (indent-to indent)
-        (insert "```" lang)
-        (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
-    (let ((indent (current-indentation)) start-bol)
-      (delete-horizontal-space :backward-only)
-      (markdown-ensure-blank-line-before)
-      (indent-to indent)
-      (setq start-bol (point-at-bol))
-      (insert "```" lang "\n")
-      (indent-to indent)
-      (unless edit (insert ?\n))
-      (indent-to indent)
-      (insert "```")
-      (markdown-ensure-blank-line-after)
-      (markdown-syntax-propertize-fenced-block-constructs start-bol (point)))
-    (end-of-line 0)
-    (when edit (markdown-edit-code-block))))
+        (markdown-syntax-propertize-fenced-block-constructs start-bol (point)))
+      (end-of-line 0)
+      (when edit (markdown-edit-code-block)))))
 
 (defun markdown-code-block-lang (&optional pos-prop)
   "Return the language name for a GFM or tilde fenced code block.
