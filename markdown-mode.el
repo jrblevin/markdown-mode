@@ -8429,13 +8429,17 @@ or \\[markdown-toggle-inline-images]."
                                   unhex_file
                                 (concat default-directory unhex_file)))
                      (image
-                      (if (and markdown-max-image-size
+                      (cond ((and markdown-max-image-size
                                (image-type-available-p 'imagemagick))
-                          (create-image
-                           abspath 'imagemagick nil
-                           :max-width (car markdown-max-image-size)
-                           :max-height (cdr markdown-max-image-size))
-                        (create-image abspath))))
+                             (create-image
+                              abspath 'imagemagick nil
+                              :max-width (car markdown-max-image-size)
+                              :max-height (cdr markdown-max-image-size)))
+                            (markdown-max-image-size
+                             (create-image abspath nil nil
+                                           :max-width (car markdown-max-image-size)
+                                           :max-height (cdr markdown-max-image-size)))
+                            (t (create-image abspath)))))
                 (when image
                   (let ((ov (make-overlay start end)))
                     (overlay-put ov 'display image)
