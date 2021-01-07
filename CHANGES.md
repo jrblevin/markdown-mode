@@ -24,6 +24,7 @@
     -   Enable flyspell check at yaml metadata[GH-560][]
     -   Clean up Makefile
     -   Support to display local image with percent encoding file path
+    -   Add ability to resize inline image display (`markdown-toggle-inline-images`) without Imagemagick installed in the computer (emulating Org Mode)
     -   Support including braces around the language specification in GFM code blocks
 
 *   Bug fixes:
