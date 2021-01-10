@@ -1254,8 +1254,8 @@ giving the bounds of the current and parent list items."
      markdown-gfm-code)
     ;; TODO: This adds recognition of ‘+++’ blocks as TOML metadata,
     ;; but it needs to be cleaned up.
-    (("\\(+\\{3\\}\\)$" markdown-tilde-fence-begin)
-     ("\\(+\\{3\\}\\)$" markdown-tilde-fence-end)
+    (("\\(+\\{3\\}\\)$" markdown-yaml-metadata-begin)
+     ("\\(+\\{3\\}\\)$" markdown-yaml-metadata-end)
      markdown-fenced-code))
   "Mapping of regular expressions to \"fenced-block\" constructs.
 These constructs are distinguished by having a distinctive start
