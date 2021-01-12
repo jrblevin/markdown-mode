@@ -37,6 +37,7 @@
     -   Fix wrong italic fontification just after code block [GH-548][]
     -   Fix too indended list face issue [GH-569][]
     -   Fix creating imenu index issue when there is no level-1 header too[GH-571][]
+    -   Fix highlighting consecutive HTML comments[GH-584][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -58,6 +59,7 @@
   [gh-560]: https://github.com/jrblevin/markdown-mode/issues/560
   [gh-569]: https://github.com/jrblevin/markdown-mode/issues/569
   [gh-571]: https://github.com/jrblevin/markdown-mode/issues/571
+  [gh-584]: https://github.com/jrblevin/markdown-mode/issues/584
 
 # Markdown Mode 2.4
 
