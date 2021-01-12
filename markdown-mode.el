@@ -1668,7 +1668,7 @@ region of a YAML metadata block as propertized by
                                     markdown--syntax-properties)
             (put-text-property comment-begin comment-end
                                'markdown-comment (list comment-begin comment-end))
-            (goto-char (min (1+ comment-end) end (point-max)))))
+            (goto-char (min comment-end end (point-max)))))
          ;; Nothing found
          (t (setq finish t)))))
     nil))
