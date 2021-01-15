@@ -830,6 +830,14 @@ provides an interface to all of the possible customizations:
 
   * `markdown-add-footnotes-to-imenu` - Add footnote definitions to
     the end of the imenu index (default: `t`).
+    
+  * `markdown-footnote-default-type` - Wither to insert a number or
+      text tag by default when creating a footnote with
+      `markdown-insert-footnote` (default: `'number`).
+  
+  * `markdown-footnote-always-recalculate-number` - Wither to
+    recalculate the next footnote number when inserting a new number
+    tagged footnote (default: `nil`).
 
   * `comment-auto-fill-only-comments` - variable is made
     buffer-local and set to `nil` by default.  In programming
