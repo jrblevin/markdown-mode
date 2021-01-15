@@ -10,6 +10,7 @@
         to automatically define a default link text before prompting the user.
     -   Option to inhibit the prompt for a tooltip text via
         `markdown-disable-tooltip-prompt`.
+    -   Allow insertion of text taged footnotes.
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -26,6 +27,7 @@
     -   Support to display local image with percent encoding file path
     -   Add ability to resize inline image display (`markdown-toggle-inline-images`) without Imagemagick installed in the computer (emulating Org Mode)
     -   Support including braces around the language specification in GFM code blocks
+    -   Custom variable to force footnote recount before insertion
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]

@@ -2147,6 +2147,18 @@ Depending on your font, some reasonable choices are:
   (concat "^ \\{0,3\\}\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
   "Regular expression matching a footnote definition, capturing the label.")
 
+(defcustom markdown-footnote-default-type 'number
+  "Either `number' or `text', indicating what type of footnotes to insert by default."
+  :group 'markdown
+  :type 'symbol
+  :package-version '(markdown-mode . "2.5"))
+
+(defcustom markdown-footnote-always-recalculate-number nil
+  "Non-nil if the footnote number should be recalculated before each insertion."
+  :group 'markdown
+  :type 'bool
+  :safe 'booleanp)
+
 
 ;;; Compatibility =============================================================
 
@@ -4415,7 +4427,8 @@ at the beginning of the block."
 
 (defun markdown-footnote-counter-inc ()
   "Increment `markdown-footnote-counter' and return the new value."
-  (when (= markdown-footnote-counter 0) ; hasn't been updated in this buffer yet.
+  (when (or markdown-footnote-always-recalculate-number
+            (= markdown-footnote-counter 0)) ; hasn't been updated in this buffer yet.
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward (concat "^\\[\\^\\(" markdown-footnote-chars "*?\\)\\]:")
@@ -4425,16 +4438,24 @@ at the beginning of the block."
             (setq markdown-footnote-counter fn))))))
   (cl-incf markdown-footnote-counter))
 
-(defun markdown-insert-footnote ()
-  "Insert footnote with a new number and move point to footnote definition."
+(defun markdown-insert-footnote (&optional tag)
+  "Insert footnote and move point to footnote definition.
+If TAG is `number', insert a number as the footnote identifier.
+If TAG is `text', ask for text to name the footnote."
   (interactive)
-  (let ((fn (markdown-footnote-counter-inc)))
-    (insert (format "[^%d]" fn))
+  (let ((fn (cond
+             ((equal (or tag markdown-footnote-default-type) 'number)
+              (number-to-string (markdown-footnote-counter-inc)))
+             ((equal (or tag markdown-footnote-default-type) 'text)
+              (read-string "Footnote tag: "))
+             (t
+              (error "Expected 'number or 'text. Found %s" (symbol-name tag))))))
+    (insert (format "[^%s]" fn))
     (markdown-footnote-text-find-new-location)
     (markdown-ensure-blank-line-before)
     (unless (markdown-cur-line-blank-p)
       (insert "\n"))
-    (insert (format "[^%d]: " fn))
+    (insert (format "[^%s]: " fn))
     (markdown-ensure-blank-line-after)))
 
 (defun markdown-footnote-text-find-new-location ()
