@@ -427,6 +427,12 @@ The car is used for subscript, the cdr is used for superscripts."
   :group 'markdown
   :type 'string)
 
+(defcustom markdown-ordered-list-disable-enumeration nil
+  "Instead of enumerating ('1. 2. 3. etc.') only use '1. '.
+This will by most viewers renderers be accepted as a numbered list"
+  :group 'markdown
+  :type 'boolean)
+
 (defcustom markdown-nested-imenu-heading-index t
   "Use nested or flat imenu heading index.
 A nested index may provide more natural browsing from the menu,
@@ -6048,7 +6054,7 @@ increase the indentation by one level."
                           (>= (forward-line -1) 0))))
             (let* ((old-prefix (match-string 1))
                    (old-spacing (match-string 2))
-                   (new-prefix (if old-prefix
+                   (new-prefix (if (and old-prefix (not markdown-ordered-list-disable-enumeration))
                                    (int-to-string (1+ (string-to-number old-prefix)))
                                  "1"))
                    (space-adjust (- (length old-prefix) (length new-prefix)))
@@ -6172,8 +6178,11 @@ a list."
          ((or (= (length cpfx) (length pfx))
               (= (length cur-item) (length prev-item)))
           (save-excursion
+            (setq idx (1+ idx))
             (replace-match
-             (concat pfx (number-to-string (setq idx (1+ idx))) ". ")))
+             (if markdown-ordered-list-disable-enumeration
+                 (concat pfx "1. ")
+                 (concat pfx (number-to-string idx) ". "))))
           (setq sep nil))
          ;; indented a level
          ((< (length pfx) (length cpfx))
