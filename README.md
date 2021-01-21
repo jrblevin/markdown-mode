@@ -905,6 +905,10 @@ provides an interface to all of the possible customizations:
   * `markdown-translate-filename-function` - A function to be used to
     translate filenames in links.
 
+  * `markdown-unordered-list-item-prefix` - When non-nil,
+    `markdown-insert-list-item` inserts enumerated numbers for
+    ordered list marker. While nil, it always inserts `1.`.
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode

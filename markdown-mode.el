@@ -427,11 +427,12 @@ The car is used for subscript, the cdr is used for superscripts."
   :group 'markdown
   :type 'string)
 
-(defcustom markdown-ordered-list-disable-enumeration nil
-  "Instead of enumerating ('1. 2. 3. etc.') only use '1. '.
-This will by most viewers renderers be accepted as a numbered list"
+(defcustom markdown-ordered-list-enumeration t
+  "When non-nil, use enumerated numbers(1. 2. 3. etc.) for ordered list marker.
+While nil, always uses '1.' for the marker"
   :group 'markdown
-  :type 'boolean)
+  :type 'boolean
+  :package-version '(markdown-mode . "2.5"))
 
 (defcustom markdown-nested-imenu-heading-index t
   "Use nested or flat imenu heading index.
@@ -6054,7 +6055,7 @@ increase the indentation by one level."
                           (>= (forward-line -1) 0))))
             (let* ((old-prefix (match-string 1))
                    (old-spacing (match-string 2))
-                   (new-prefix (if (and old-prefix (not markdown-ordered-list-disable-enumeration))
+                   (new-prefix (if (and old-prefix markdown-ordered-list-enumeration)
                                    (int-to-string (1+ (string-to-number old-prefix)))
                                  "1"))
                    (space-adjust (- (length old-prefix) (length new-prefix)))
@@ -6178,11 +6179,11 @@ a list."
          ((or (= (length cpfx) (length pfx))
               (= (length cur-item) (length prev-item)))
           (save-excursion
-            (setq idx (1+ idx))
             (replace-match
-             (if markdown-ordered-list-disable-enumeration
+             (if (not markdown-ordered-list-enumeration)
                  (concat pfx "1. ")
-                 (concat pfx (number-to-string idx) ". "))))
+               (cl-incf idx)
+               (concat pfx (number-to-string idx) ". "))))
           (setq sep nil))
          ;; indented a level
          ((< (length pfx) (length cpfx))

@@ -1157,6 +1157,25 @@ Don't adjust spacing if tabs are used as whitespace."
             (buffer-string)
             "1. A\n    * AA\n        1. AAA\n    * \n2. \n3. "))))
 
+(ert-deftest test-markdown-insertion/with-markdown-ordered-list-enumeration ()
+  "Test for `markdown-ordered-list-enumeration'.
+Detail: https://github.com/jrblevin/markdown-mode/issues"
+  (markdown-test-string "1. A"
+    (goto-char (point-max))
+    (let ((markdown-ordered-list-enumeration t))
+      (call-interactively 'markdown-insert-list-item)
+      (let ((line (buffer-substring-no-properties
+                   (line-beginning-position) (line-end-position))))
+        (should (string= line "2. "))))
+
+    (markdown-test-string "1. A"
+      (goto-char (point-max))
+      (let ((markdown-ordered-list-enumeration nil))
+        (call-interactively 'markdown-insert-list-item)
+        (let ((line (buffer-substring-no-properties
+                     (line-beginning-position) (line-end-position))))
+          (should (string= line "1. ")))))))
+
 (ert-deftest test-markdown-insertion/reference-link ()
   "Basic tests for `markdown-insert-reference-link'."
   ;; Test optional parameters (leave point after link)
