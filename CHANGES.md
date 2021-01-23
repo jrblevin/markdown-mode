@@ -10,6 +10,7 @@
         to automatically define a default link text before prompting the user.
     -   Option to inhibit the prompt for a tooltip text via
         `markdown-disable-tooltip-prompt`.
+    -   Introduce `markdown-ordered-list-enumeration` variable [GH-587][]
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -60,6 +61,7 @@
   [gh-569]: https://github.com/jrblevin/markdown-mode/issues/569
   [gh-571]: https://github.com/jrblevin/markdown-mode/issues/571
   [gh-584]: https://github.com/jrblevin/markdown-mode/issues/584
+  [gh-587]: https://github.com/jrblevin/markdown-mode/issues/587
 
 # Markdown Mode 2.4
 
