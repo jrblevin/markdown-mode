@@ -39,6 +39,7 @@
     -   Fix too indended list face issue [GH-569][]
     -   Fix creating imenu index issue when there is no level-1 header too[GH-571][]
     -   Fix highlighting consecutive HTML comments[GH-584][]
+    -   Fix `markdown-follow-thing-at-point` failing on subdir search [GH-590][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -62,6 +63,7 @@
   [gh-571]: https://github.com/jrblevin/markdown-mode/issues/571
   [gh-584]: https://github.com/jrblevin/markdown-mode/issues/584
   [gh-587]: https://github.com/jrblevin/markdown-mode/issues/587
+  [gh-590]: https://github.com/jrblevin/markdown-mode/issues/590
 
 # Markdown Mode 2.4
 
