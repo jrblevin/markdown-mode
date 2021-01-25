@@ -7811,8 +7811,9 @@ link name must be available via `match-string'."
            (not (markdown-code-block-at-point-p))
            (or (not buffer-file-name)
                (not (string-equal (buffer-file-name)
-                                  (markdown-convert-wiki-link-to-filename
-                                   (markdown-wiki-link-link)))))))))
+                                  (save-match-data 
+                                   (markdown-convert-wiki-link-to-filename
+                                    (markdown-wiki-link-link))))))))))
 
 (defun markdown-wiki-link-link ()
   "Return the link part of the wiki link using current match data.
