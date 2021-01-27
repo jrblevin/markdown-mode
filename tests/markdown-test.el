@@ -6352,6 +6352,23 @@ x|"
             (markdown-test-range-has-property 19 26 'font-lock-face 'markdown-link-face))
         (kill-buffer)))))
 
+(ert-deftest test-markdown-ext/wiki-link-keep-match-data ()
+  "Test that markdown-wiki-link-p keeps expected match data.
+Detail: https://github.com/jrblevin/markdown-mode/pull/590"
+  (let ((markdown-enable-wiki-links t)
+        (markdown-link-space-sub-char " ")
+        (markdown-wiki-link-search-subdirectories t))
+    (progn
+      (find-file "wiki/pr590/Guide.md")
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            (re-search-forward "Zettel Markdown")
+            (goto-char (match-beginning 0))
+            (should (markdown-wiki-link-p))
+            (should (string= (markdown-wiki-link-link) "Zettel Markdown")))
+        (kill-buffer)))))
+
 (ert-deftest test-markdown-ext/wiki-link-major-mode ()
   "Test major-mode of linked page."
   (let ((markdown-enable-wiki-links t)
