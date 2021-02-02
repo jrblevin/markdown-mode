@@ -931,13 +931,12 @@ are also supported.  Since some wikis reverse these components, set
 is also non-nil, Markdown Mode will highlight wiki links with
 missing target file in a different color.  By default, Markdown
 Mode only searches for target files in the current directory.
-Search in subdirectories can be enabled by setting
-`markdown-wiki-link-search-subdirectories` to a non-nil value.
-Sequential parent directory search (as in [Ikiwiki][]) can be
-enabled by setting `markdown-wiki-link-search-parent-directories`
-to a non-nil value.
+You can control search type by setting `markdown-wiki-link-search-type`.
+This value type is a symbol list. Possible values are
 
-[Ikiwiki]: https://ikiwiki.info
+- `sub-directories` : search in sub directories
+- `parent-directories` : search in parent directories
+- `project` : search under project root
 
 [SmartyPants][] support is possible by customizing `markdown-command`.
 If you install `SmartyPants.pl` at, say, `/usr/local/bin/smartypants`,

@@ -11,6 +11,7 @@
     -   Option to inhibit the prompt for a tooltip text via
         `markdown-disable-tooltip-prompt`.
     -   Introduce `markdown-ordered-list-enumeration` variable [GH-587][]
+    -   Search wiki link under project
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
