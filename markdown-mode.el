@@ -7859,6 +7859,14 @@ The location of the alias component depends on the value of
       (push 'parent-directories ret))
     ret))
 
+(defun markdown--project-root ()
+  (or (cl-loop for dir in '(".git" ".hg" ".svn")
+               when (locate-dominating-file default-directory dir)
+               return it)
+      (progn
+        (require 'project)
+        (car (project-roots (project-current t))))))
+
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
 Spaces in NAME are replaced with `markdown-link-space-sub-char'.
@@ -7899,11 +7907,9 @@ in parent directories if
              (setq dir (locate-dominating-file directory default)))
         (concat dir default))
        ((and (memq 'project search-types)
-             (progn
-               (require 'project)
-               (let ((roots (project-roots (project-current t))))
-                 (setq candidates
-                       (directory-files-recursively (car roots) (concat "^" default "$"))))))
+             (setq candidates
+                   (directory-files-recursively
+                    (markdown--project-root) (concat "^" default "$"))))
         (car candidates))
        ;; If nothing is found, return default in current directory.
        (t default)))))
