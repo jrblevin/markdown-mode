@@ -48,6 +48,8 @@
 (defvar flyspell-generic-check-word-predicate)
 (defvar electric-pair-pairs)
 
+(declare-function project-roots "project")
+
 
 ;;; Constants =================================================================
 
@@ -242,6 +244,22 @@ This is the default search behavior of Ikiwiki."
   :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.2"))
+
+(defcustom markdown-wiki-link-search-type nil
+  "Searching type for markdown wiki link.
+
+sub-directories: search for wiki link targets in sub directories
+parent-directories: search for wiki link targets in parent directories
+project: search for wiki link targets under project root"
+  :group 'markdown
+  :type '(set
+          (const :tag "search wiki link from subdirectories" sub-directories)
+          (const :tag "search wiki link from parent directories" parent-directories)
+          (const :tag "search wiki link under project root" project))
+  :package-version '(markdown-mode . "2.5"))
+
+(make-obsolete-variable 'markdown-wiki-link-search-subdirectories 'markdown-wiki-link-search-type "2.5")
+(make-obsolete-variable 'markdown-wiki-link-search-parent-directories 'markdown-wiki-link-search-type "2.5")
 
 (defcustom markdown-wiki-link-fontify-missing nil
   "When non-nil, change wiki link face according to existence of target files.
@@ -7830,6 +7848,25 @@ The location of the alias component depends on the value of
       (match-string-no-properties 3)
     (or (match-string-no-properties 5) (match-string-no-properties 3))))
 
+(defun markdown--wiki-link-search-types ()
+  (let ((ret (and markdown-wiki-link-search-type
+                  (cl-copy-list markdown-wiki-link-search-type))))
+    (when (and markdown-wiki-link-search-subdirectories
+               (not (memq 'sub-directories markdown-wiki-link-search-type)))
+      (push 'sub-directories ret))
+    (when (and markdown-wiki-link-search-parent-directories
+               (not (memq 'parent-directories markdown-wiki-link-search-type)))
+      (push 'parent-directories ret))
+    ret))
+
+(defun markdown--project-root ()
+  (or (cl-loop for dir in '(".git" ".hg" ".svn")
+               when (locate-dominating-file default-directory dir)
+               return it)
+      (progn
+        (require 'project)
+        (car (project-roots (project-current t))))))
+
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
 Spaces in NAME are replaced with `markdown-link-space-sub-char'.
@@ -7847,6 +7884,7 @@ in parent directories if
                          (concat (upcase (substring basename 0 1))
                                  (downcase (substring basename 1 nil)))
                        basename))
+           (search-types (markdown--wiki-link-search-types))
            directory extension default candidates dir)
       (when buffer-file-name
         (setq directory (file-name-directory buffer-file-name)
@@ -7859,15 +7897,20 @@ in parent directories if
             (file-exists-p default))
         default)
        ;; Possibly search in subdirectories, next.
-       ((and markdown-wiki-link-search-subdirectories
+       ((and (memq 'sub-directories search-types)
              (setq candidates
                    (directory-files-recursively
                     directory (concat "^" default "$"))))
         (car candidates))
        ;; Possibly search in parent directories as a last resort.
-       ((and markdown-wiki-link-search-parent-directories
+       ((and (memq 'parent-directories search-types)
              (setq dir (locate-dominating-file directory default)))
         (concat dir default))
+       ((and (memq 'project search-types)
+             (setq candidates
+                   (directory-files-recursively
+                    (markdown--project-root) (concat "^" default "$"))))
+        (car candidates))
        ;; If nothing is found, return default in current directory.
        (t default)))))
 

@@ -6365,8 +6365,27 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
             (markdown-mode)
             (re-search-forward "Zettel Markdown")
             (goto-char (match-beginning 0))
-            (should (markdown-wiki-link-p))
+            (should (markdown-wiki-link-p)) ;; create match-data
             (should (string= (markdown-wiki-link-link) "Zettel Markdown")))
+        (kill-buffer)))))
+
+(ert-deftest test-markdown-ext/wiki-link-search-under-project ()
+  "Test that searching link under project root."
+  (let ((markdown-enable-wiki-links t)
+        (markdown-link-space-sub-char " ")
+        (markdown-wiki-link-search-type '(project))
+        (expected (concat (expand-file-name default-directory)
+                          "wiki/pr590/Guide/Zettel Markdown/math.md")))
+    (progn
+      (find-file "wiki/pr590/Guide/Plugin/Link.md")
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            (re-search-forward "math")
+            (goto-char (match-beginning 0))
+            (markdown-wiki-link-p) ;; create match-data
+            (let ((link (markdown-convert-wiki-link-to-filename (markdown-wiki-link-link))))
+              (should (string= (expand-file-name link) expected))))
         (kill-buffer)))))
 
 (ert-deftest test-markdown-ext/wiki-link-major-mode ()
