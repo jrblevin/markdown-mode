@@ -7865,7 +7865,11 @@ The location of the alias component depends on the value of
                return it)
       (progn
         (require 'project)
-        (car (project-roots (project-current t))))))
+        (let ((project (project-current t)))
+          (with-no-warnings
+            (if (fboundp 'project-root)
+                (project-root project)
+              (car (project-roots project))))))))
 
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
