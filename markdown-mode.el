@@ -4333,9 +4333,9 @@ opening code fence and an info string."
   :type 'boolean)
 
 (defun markdown-insert-gfm-foldable-block ()
-  "Insert details disclosure element which creates a disclosure
-  widget that can be used for having foldable content. More
-  detais here 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details'"
+  "Insert details disclosure element to make content foldable.
+If a region is active, wrap this region with the disclosure
+element. More detais here 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details'."
   (interactive
    (let ((details-open-tag "<details>")
          (details-close-tag "</details>")
