@@ -4332,56 +4332,6 @@ opening code fence and an info string."
   :group 'markdown
   :type 'boolean)
 
-(defun markdown-insert-gfm-foldable-block ()
-  "Insert details disclosure element to make content foldable.
-If a region is active, wrap this region with the disclosure
-element. More detais here 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details'."
-  (interactive
-   (let ((details-open-tag "<details>")
-         (details-close-tag "</details>")
-         (summary-open-tag "<summary>")
-         (summary-close-tag " </summary>"))
-     (if (use-region-p)
-         (let* ((b (region-beginning)) (e (region-end)) end
-                (indent (progn (goto-char b) (current-indentation))))
-           (goto-char e)
-           ;; if we're on a blank line, don't newline, otherwise the tags
-           ;; should go on its own line
-           (unless (looking-back "\n" nil)
-             (newline))
-           (indent-to indent)
-           (insert details-close-tag)
-           (markdown-ensure-blank-line-after)
-           (setq end (point))
-           (goto-char b)
-           ;; if we're on a blank line, insert the quotes here, otherwise
-           ;; add a new line first
-           (unless (looking-at-p "\n")
-             (newline)
-             (forward-line -1))
-           (markdown-ensure-blank-line-before)
-           (indent-to indent)
-           (insert details-open-tag "\n")
-           (insert summary-open-tag summary-close-tag)
-           (search-backward summary-close-tag)
-           (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
-       (let ((indent (current-indentation))
-             start-bol)
-         (delete-horizontal-space :backward-only)
-         (markdown-ensure-blank-line-before)
-         (indent-to indent)
-         (setq start-bol (point-at-bol))
-         (insert details-open-tag "\n")
-         (insert summary-open-tag summary-close-tag "\n")
-         (insert details-close-tag "\n")
-         (indent-to indent)
-         (markdown-ensure-blank-line-after)
-         (markdown-syntax-propertize-fenced-block-constructs start-bol (point))
-         (search-backward summary-close-tag))
-       )
-     )
-   ))
-
 (defun markdown-insert-gfm-code-block (&optional lang edit)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
@@ -4484,6 +4434,49 @@ at the beginning of the block."
        for lang = (markdown-code-block-lang pos-prop)
        do (progn (when lang (markdown-gfm-add-used-language lang))
                  (goto-char (next-single-property-change (point) prop)))))))
+
+(defun markdown-insert-foldable-block ()
+  "Insert details disclosure element to make content foldable.
+If a region is active, wrap this region with the disclosure
+element. More detais here 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details'."
+  (interactive)
+  (let ((details-open-tag "<details>")
+        (details-close-tag "</details>")
+        (summary-open-tag "<summary>")
+        (summary-close-tag " </summary>"))
+    (if (use-region-p)
+        (let* ((b (region-beginning))
+               (e (region-end))
+               (indent (progn (goto-char b) (current-indentation))))
+          (goto-char e)
+          ;; if we're on a blank line, don't newline, otherwise the tags
+          ;; should go on its own line
+          (unless (looking-back "\n" nil)
+            (newline))
+          (indent-to indent)
+          (insert details-close-tag)
+          (markdown-ensure-blank-line-after)
+          (goto-char b)
+          ;; if we're on a blank line, insert the quotes here, otherwise
+          ;; add a new line first
+          (unless (looking-at-p "\n")
+            (newline)
+            (forward-line -1))
+          (markdown-ensure-blank-line-before)
+          (indent-to indent)
+          (insert details-open-tag "\n")
+          (insert summary-open-tag summary-close-tag)
+          (search-backward summary-close-tag))
+      (let ((indent (current-indentation)))
+        (delete-horizontal-space :backward-only)
+        (markdown-ensure-blank-line-before)
+        (indent-to indent)
+        (insert details-open-tag "\n")
+        (insert summary-open-tag summary-close-tag "\n")
+        (insert details-close-tag)
+        (indent-to indent)
+        (markdown-ensure-blank-line-after)
+        (search-backward summary-close-tag)))))
 
 
 ;;; Footnotes =================================================================
