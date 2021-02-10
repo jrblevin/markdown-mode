@@ -12,6 +12,7 @@
         `markdown-disable-tooltip-prompt`.
     -   Introduce `markdown-ordered-list-enumeration` variable [GH-587][]
     -   Search wiki link under project
+    -   Add `markdown-insert-gfm-foldable-block` function [GH-596][]
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -65,6 +66,7 @@
   [gh-584]: https://github.com/jrblevin/markdown-mode/issues/584
   [gh-587]: https://github.com/jrblevin/markdown-mode/issues/587
   [gh-590]: https://github.com/jrblevin/markdown-mode/pull/590
+  [gh-596]: https://github.com/jrblevin/markdown-mode/pull/596
 
 # Markdown Mode 2.4
 

@@ -4435,6 +4435,49 @@ at the beginning of the block."
        do (progn (when lang (markdown-gfm-add-used-language lang))
                  (goto-char (next-single-property-change (point) prop)))))))
 
+(defun markdown-insert-foldable-block ()
+  "Insert details disclosure element to make content foldable.
+If a region is active, wrap this region with the disclosure
+element. More detais here 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details'."
+  (interactive)
+  (let ((details-open-tag "<details>")
+        (details-close-tag "</details>")
+        (summary-open-tag "<summary>")
+        (summary-close-tag " </summary>"))
+    (if (use-region-p)
+        (let* ((b (region-beginning))
+               (e (region-end))
+               (indent (progn (goto-char b) (current-indentation))))
+          (goto-char e)
+          ;; if we're on a blank line, don't newline, otherwise the tags
+          ;; should go on its own line
+          (unless (looking-back "\n" nil)
+            (newline))
+          (indent-to indent)
+          (insert details-close-tag)
+          (markdown-ensure-blank-line-after)
+          (goto-char b)
+          ;; if we're on a blank line, insert the quotes here, otherwise
+          ;; add a new line first
+          (unless (looking-at-p "\n")
+            (newline)
+            (forward-line -1))
+          (markdown-ensure-blank-line-before)
+          (indent-to indent)
+          (insert details-open-tag "\n")
+          (insert summary-open-tag summary-close-tag)
+          (search-backward summary-close-tag))
+      (let ((indent (current-indentation)))
+        (delete-horizontal-space :backward-only)
+        (markdown-ensure-blank-line-before)
+        (indent-to indent)
+        (insert details-open-tag "\n")
+        (insert summary-open-tag summary-close-tag "\n")
+        (insert details-close-tag)
+        (indent-to indent)
+        (markdown-ensure-blank-line-after)
+        (search-backward summary-close-tag)))))
+
 
 ;;; Footnotes =================================================================
 
@@ -5180,6 +5223,7 @@ Assumes match data is available for `markdown-regex-italic'."
      (propertize "C = GFM code" 'face 'markdown-code-face) ", "
      (propertize "pre" 'face 'markdown-pre-face) ", "
      (propertize "footnote" 'face 'markdown-footnote-text-face) ", "
+     (propertize "F = foldable" 'face 'markdown-bold-face) ", "
      (propertize "q = blockquote" 'face 'markdown-blockquote-face) ", "
      (propertize "h & 1-6 = heading" 'face 'markdown-header-face) ", "
      (propertize "- = hr" 'face 'markdown-hr-face) ", "
@@ -5213,6 +5257,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "c") 'markdown-insert-code)
     (define-key map (kbd "C") 'markdown-insert-gfm-code-block)
     (define-key map (kbd "f") 'markdown-insert-footnote)
+    (define-key map (kbd "F") 'markdown-insert-foldable-block)
     (define-key map (kbd "h") 'markdown-insert-header-dwim)
     (define-key map (kbd "H") 'markdown-insert-header-setext-dwim)
     (define-key map (kbd "i") 'markdown-insert-italic)
@@ -5524,6 +5569,7 @@ See also `markdown-mode-map'.")
      ["GFM Code Block" markdown-insert-gfm-code-block]
      ["Edit Code Block" markdown-edit-code-block
       :enable (markdown-code-block-at-point-p)]
+     ["Foldable Block" markdown-insert-foldable-block]
      "---"
      ["Blockquote Region" markdown-blockquote-region]
      ["Preformatted Region" markdown-pre-region]
