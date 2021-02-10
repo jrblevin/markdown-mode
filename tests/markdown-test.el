@@ -1324,6 +1324,21 @@ Detail: https://github.com/jrblevin/markdown-mode/issues"
       (execute-kbd-macro (read-kbd-macro "M-x markdown-insert-link RET RET RET RET"))
       (should (string-equal (buffer-string) "[GNU](https://www.gnu.org/)")))))
 
+(ert-deftest test-markdown-insertion/foldable-block ()
+  "Test `markdown-insert-foldable-block'."
+  (markdown-test-string ""
+    (call-interactively 'markdown-insert-foldable-block)
+    (should (string= (buffer-string) "<details>\n<summary> </summary>\n</details>"))
+    (should (looking-back "<summary>")))
+
+  (markdown-test-string "foo"
+    (push-mark (point) t t)
+    (end-of-line)
+    (should (use-region-p))
+    (call-interactively 'markdown-insert-foldable-block)
+    (should (string= (buffer-string) "<details>\n<summary> </summary>\nfoo\n</details>"))
+    (should (looking-back "<summary>"))))
+
 ;;; Footnote tests:
 
 (ert-deftest test-markdown-footnote/basic-end ()
