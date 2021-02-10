@@ -5223,6 +5223,7 @@ Assumes match data is available for `markdown-regex-italic'."
      (propertize "C = GFM code" 'face 'markdown-code-face) ", "
      (propertize "pre" 'face 'markdown-pre-face) ", "
      (propertize "footnote" 'face 'markdown-footnote-text-face) ", "
+     (propertize "F = foldable" 'face 'markdown-bold-face) ", "
      (propertize "q = blockquote" 'face 'markdown-blockquote-face) ", "
      (propertize "h & 1-6 = heading" 'face 'markdown-header-face) ", "
      (propertize "- = hr" 'face 'markdown-hr-face) ", "
@@ -5256,6 +5257,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "c") 'markdown-insert-code)
     (define-key map (kbd "C") 'markdown-insert-gfm-code-block)
     (define-key map (kbd "f") 'markdown-insert-footnote)
+    (define-key map (kbd "F") 'markdown-insert-foldable-block)
     (define-key map (kbd "h") 'markdown-insert-header-dwim)
     (define-key map (kbd "H") 'markdown-insert-header-setext-dwim)
     (define-key map (kbd "i") 'markdown-insert-italic)
@@ -5567,6 +5569,7 @@ See also `markdown-mode-map'.")
      ["GFM Code Block" markdown-insert-gfm-code-block]
      ["Edit Code Block" markdown-edit-code-block
       :enable (markdown-code-block-at-point-p)]
+     ["Foldable Block" markdown-insert-foldable-block]
      "---"
      ["Blockquote Region" markdown-blockquote-region]
      ["Preformatted Region" markdown-pre-region]
