@@ -9247,15 +9247,23 @@ Create new table lines if required."
   (unless (markdown-table-at-point-p)
     (user-error "Not at a table"))
   (markdown-table-align)
-  (when (markdown-table-hline-at-point-p) (end-of-line 1))
+  (when (markdown-table-hline-at-point-p) (beginning-of-line 1))
   (condition-case nil
       (progn
         (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin))
+        ;; When this function is called while in the first cell in a
+        ;; table, the point will now be at the beginning of a line. In
+        ;; this case, we need to move past one additional table
+        ;; boundary, the end of the table on the previous line.
+        (when (= (point) (line-beginning-position))
+          (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin)))
         (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin)))
     (error (user-error "Cannot move to previous table cell")))
-  (while (looking-at "|\\([-:]\\|[ \t]*$\\)")
-    (re-search-backward "\\(?:^\\|[^\\]\\)|" (markdown-table-begin)))
-  (when (looking-at "| ?") (goto-char (match-end 0))))
+  (when (looking-at "\\(?:^\\|[^\\]\\)| ?") (goto-char (match-end 0)))
+
+  ;; This may have dropped point on the hline.
+  (when (markdown-table-hline-at-point-p)
+    (markdown-table-backward-cell)))
 
 (defun markdown-table-transpose ()
   "Transpose table at point.
