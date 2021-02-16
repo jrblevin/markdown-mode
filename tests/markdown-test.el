@@ -31,6 +31,7 @@
 (require 'markdown-mode)
 (require 'ert)
 (require 'cl-lib)
+(require 'ispell)
 
 (defvar electric-pair-pairs)
 
@@ -39,7 +40,7 @@
                      (or load-file-name buffer-file-name))))
 
 (defconst markdown-test-font-lock-function
-  (if (and noninteractive (fboundp 'font-lock-ensure))
+  (if (fboundp 'font-lock-ensure)
       #'font-lock-ensure #'font-lock-fontify-buffer))
 
 (defmacro markdown-test-string-mode (mode string &rest body)
@@ -120,9 +121,10 @@ This file is not saved."
              (markdown-mode)
              (goto-char (point-min))
              (funcall markdown-test-font-lock-function)
-             ,@body
-             (set-buffer-modified-p nil))
-         (when (buffer-live-p buf) (kill-buffer buf))
+             ,@body)
+         (when (buffer-live-p buf)
+           (set-buffer-modified-p nil)
+           (kill-buffer buf))
          (delete-file tmp)))))
 (def-edebug-spec markdown-test-temp-file (form body))
 
@@ -5028,8 +5030,7 @@ Sentence seven. Sentence eight.
   (when (featurep 'url-parse)
     (markdown-test-string "[text](path?query=foo#id)"
       (markdown-follow-thing-at-point nil)
-      (should (equal (file-name-nondirectory (buffer-file-name)) "path"))
-      (kill-buffer))))
+      (should (equal (file-name-nondirectory (buffer-file-name)) "path")))))
 
 (ert-deftest test-markdown-link/link-in-header ()
   "Test link following even if it is in header.
@@ -6333,7 +6334,7 @@ x|"
         (markdown-wiki-link-search-subdirectories t)
         (markdown-wiki-link-search-parent-directories t))
     (progn
-      (find-file "wiki/root")
+      (find-file (expand-file-name "wiki/root" markdown-test-dir))
       (unwind-protect
           (progn
             (markdown-mode)
@@ -6351,7 +6352,7 @@ x|"
             (markdown-test-range-has-property 45 60 'font-lock-face 'markdown-missing-link-face))
         (kill-buffer)))
     (progn
-      (find-file "wiki/sub/foo")
+      (find-file (expand-file-name "wiki/sub/foo" markdown-test-dir))
       (unwind-protect
           (progn
             (markdown-mode)
@@ -6374,7 +6375,7 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
         (markdown-link-space-sub-char " ")
         (markdown-wiki-link-search-subdirectories t))
     (progn
-      (find-file "wiki/pr590/Guide.md")
+      (find-file (expand-file-name "wiki/pr590/Guide.md" markdown-test-dir))
       (unwind-protect
           (progn
             (markdown-mode)
@@ -6389,10 +6390,10 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
   (let ((markdown-enable-wiki-links t)
         (markdown-link-space-sub-char " ")
         (markdown-wiki-link-search-type '(project))
-        (expected (concat (expand-file-name default-directory)
-                          "wiki/pr590/Guide/Zettel Markdown/math.md")))
+        (expected (expand-file-name "wiki/pr590/Guide/Zettel Markdown/math.md"
+                                    markdown-test-dir)))
     (progn
-      (find-file "wiki/pr590/Guide/Plugin/Link.md")
+      (find-file (expand-file-name "wiki/pr590/Guide/Plugin/Link.md" markdown-test-dir))
       (unwind-protect
           (progn
             (markdown-mode)
@@ -6407,7 +6408,7 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
   "Test major-mode of linked page."
   (let ((markdown-enable-wiki-links t)
         (auto-mode-alist (cons '("bar\\.md" . gfm-mode) auto-mode-alist)))
-    (find-file "wiki/root")
+    (find-file (expand-file-name "wiki/root" markdown-test-dir))
     (unwind-protect
         (progn
           (markdown-mode)
@@ -6754,6 +6755,7 @@ foo(bar=None)
 
 (ert-deftest test-markdown-flyspell/check-word-p ()
   "Test for `flyspell'."
+  (skip-unless (executable-find ispell-program-name))
   (markdown-test-string "aaa
 
 ```
@@ -6785,6 +6787,7 @@ eee
 (ert-deftest test-markdown-flyspell/remove-overlay ()
   "Test non-dictionary word in code block with `flyspell-mode'.
 Details: https://github.com/jrblevin/markdown-mode/issues/311"
+  (skip-unless (executable-find ispell-program-name))
   (markdown-test-string "bbb
 ```
 bbb
@@ -6805,6 +6808,7 @@ bbb
 (ert-deftest test-markdown-flyspell/yaml-metadata ()
   "Test spell check in YAML metadata with `flyspell-mode'.
 Details: https://github.com/jrblevin/markdown-mode/issues/560"
+  (skip-unless (executable-find ispell-program-name))
   (markdown-test-string "---
 title: asdasdasd
 ---
