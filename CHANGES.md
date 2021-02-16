@@ -42,6 +42,7 @@
     -   Fix creating imenu index issue when there is no level-1 header too[GH-571][]
     -   Fix highlighting consecutive HTML comments[GH-584][]
     -   Fix `markdown-follow-thing-at-point` failing on subdir search [GH-590][]
+    -   Fix `markdown-table-backward-cell' so it always goes back a single cell
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311

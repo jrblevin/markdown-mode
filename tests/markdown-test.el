@@ -6815,6 +6815,53 @@ title: asdasdasd
     (search-forward "title: ")
     (should (markdown-test-flyspell-incorrect-word-p))))
 
+(ert-deftest test-markdown-table/navigation-forward-cell ()
+  "Test table navigation."
+  (markdown-test-string "
+| 1  | 2  | 3  | 4  |
+|----|----|----|----|
+| 5  | 6  | 7  | 8  |
+| 9  | 10 | 11 | 12 |"
+    (search-forward "1 ")
+    (let ((index 2))
+      (while (<= index 12)
+        (markdown-table-forward-cell)
+        (should (looking-at (format "%d" index)))
+        (cl-incf index)))))
+
+(ert-deftest test-markdown-table/navigation-backward-cell ()
+  "Test table navigation."
+  (markdown-test-string "
+| 1  | 2  | 3  | 4  |
+|----|----|----|----|
+| 5  | 6  | 7  | 8  |
+| 9  | 10 | 11 | 12 |
+"
+    (search-forward "12")
+    (let ((index 11))
+      (while (>= index 1)
+        (markdown-table-backward-cell)
+        (should (looking-at (format "%d" index)))
+        (cl-decf index)))))
+
+(ert-deftest test-markdown-table/align ()
+  "Test table realignment."
+  (markdown-test-string "
+| Header 1 |Header 2|
+|------|----|
+| | |
+| A very very very long cell| |
+"
+    (search-forward "Header")
+    (markdown-table-align)
+    (message "\"%s\"" (buffer-string))
+    (should (string= (buffer-string) "
+| Header 1                   | Header 2 |
+|----------------------------|----------|
+|                            |          |
+| A very very very long cell |          |
+"))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
