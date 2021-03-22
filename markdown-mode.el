@@ -8525,11 +8525,10 @@ or \\[markdown-toggle-inline-images]."
         (let* ((start (match-beginning 0))
               (imagep (match-beginning 1))
               (end (match-end 0))
-              (file (match-string-no-properties 6))
-              (unhex_file (url-unhex-string file)))
+              (file (match-string-no-properties 6)))
           (when (and imagep
                      (not (zerop (length file))))
-            (unless (file-exists-p unhex_file)
+            (unless (file-exists-p file)
               (let* ((download-file (funcall markdown-translate-filename-function file))
                      (valid-url (ignore-errors
                                   (member (downcase (url-type (url-generic-parse-url download-file)))
@@ -8538,11 +8537,13 @@ or \\[markdown-toggle-inline-images]."
                     (setq file (markdown--get-remote-image download-file))
                   (when (not valid-url)
                     ;; strip query parameter
-                    (setq file (replace-regexp-in-string "?.+\\'" "" file))))))
-            (when (file-exists-p unhex_file)
-              (let* ((abspath (if (file-name-absolute-p unhex_file)
-                                  unhex_file
-                                (concat default-directory unhex_file)))
+                    (setq file (replace-regexp-in-string "?.+\\'" "" file))
+                    (unless (file-exists-p file)
+                      (setq file (file (url-unhex-string file))))))))
+            (when (file-exists-p file)
+              (let* ((abspath (if (file-name-absolute-p file)
+                                  file
+                                (concat default-directory file)))
                      (image
                       (cond ((and markdown-max-image-size
                                (image-type-available-p 'imagemagick))
