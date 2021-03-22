@@ -8539,7 +8539,7 @@ or \\[markdown-toggle-inline-images]."
                     ;; strip query parameter
                     (setq file (replace-regexp-in-string "?.+\\'" "" file))
                     (unless (file-exists-p file)
-                      (setq file (file (url-unhex-string file))))))))
+                      (setq file (url-unhex-string file)))))))
             (when (file-exists-p file)
               (let* ((abspath (if (file-name-absolute-p file)
                                   file
