@@ -79,9 +79,7 @@ example; adjust settings as desired):
 ```lisp
 (use-package markdown-mode
   :ensure t
-  :mode (("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode)
-         ("README\\.md\\'" . gfm-mode))
+  :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
 ```
 
