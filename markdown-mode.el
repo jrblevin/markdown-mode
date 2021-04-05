@@ -1777,7 +1777,7 @@ See `markdown-hide-markup' for additional details."
 (require 'font-lock)
 
 (defgroup markdown-faces nil
-  "Faces used in Markdown Mode"
+  "Faces used in Markdown Mode."
   :group 'markdown
   :group 'faces)
 
@@ -5416,7 +5416,7 @@ See also `markdown-mode-map'.")
 ;;; Menu ======================================================================
 
 (easy-menu-define markdown-mode-menu markdown-mode-map
-  "Menu for Markdown mode"
+  "Menu for Markdown mode."
   '("Markdown"
     "---"
     ("Movement"
