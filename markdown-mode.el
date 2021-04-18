@@ -617,7 +617,7 @@ requires Emacs to be built with ImageMagick support."
   "Non-nil means mouse on a link will follow the link.
 This variable must be set before loading markdown-mode."
   :group 'markdown
-  :type 'bool
+  :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.5"))
 
@@ -5396,11 +5396,11 @@ Assumes match data is available for `markdown-regex-italic'."
   "Keymap for Markdown major mode.")
 
 (defvar markdown-mode-mouse-map
-  (when markdown-mouse-follow-link
-    (let ((map (make-sparse-keymap)))
+  (let ((map (make-sparse-keymap)))
+    (when markdown-mouse-follow-link
       (define-key map [follow-link] 'mouse-face)
-      (define-key map [mouse-2] #'markdown-follow-thing-at-point)
-      map))
+      (define-key map [mouse-2] #'markdown-follow-thing-at-point))
+      map)
   "Keymap for following links with mouse.")
 
 (defvar gfm-mode-map
@@ -7730,6 +7730,7 @@ Translate filenames using `markdown-filename-translate-function'."
 
 (defun markdown-fontify-inline-links (last)
   "Add text properties to next inline link from point to LAST."
+  (when markdown-mouse-follow-link
   (when (markdown-match-generic-links last nil)
     (let* ((link-start (match-beginning 3))
            (link-end (match-end 3))
@@ -7773,7 +7774,7 @@ Translate filenames using `markdown-filename-translate-function'."
       (when title-start (add-text-properties url-end title-end tp))
       (when (and markdown-hide-urls url-start)
         (compose-region url-start (or title-end url-end) url-char))
-      t)))
+      t))))
 
 (defun markdown-fontify-reference-links (last)
   "Add text properties to next reference link from point to LAST."
