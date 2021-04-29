@@ -33,6 +33,15 @@
     -   Support including braces around the language specification in GFM code blocks
     -   Improve `markdown-insert-{bold,italic}` when region starts with spaces[GH-613][]
     -   Disable buffer-read-only if possible when markdown-mode is called [GH-622][]
+    -   Generate the `defface` via a macro rather than a function.
+    -   Memoize `markdown--first-displayable` to avoid performance
+        problems.
+    -   Allow the use of `add-function` on
+        `markdown-table-at-point-p-function`.
+    -   Comment out redundant bindings and use the more standard `RET`
+        name for `C-m`.
+    -   Give `markdown-table-at-point-p-function` a non-nil default.
+        Simplify `markdown-table-at-point-p` accordingly.
 
 *   Bug fixes:
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
@@ -47,9 +56,16 @@
     -   Fix creating imenu index issue when there is no level-1 header too[GH-571][]
     -   Fix highlighting consecutive HTML comments[GH-584][]
     -   Fix `markdown-follow-thing-at-point` failing on subdir search [GH-590][]
-    -   Fix `markdown-table-backward-cell' so it always goes back a single cell
-    -   Fix 'markdown-table-align' to detect delimiters surrounded by spaces
-    -   Fix customization for `markdown-mouse-follow-link` and `markdown-table-align-p`
+    -   Fix `markdown-table-backward-cell` so it always goes back a single cell
+    -   Fix `markdown-table-align` to detect delimiters surrounded by spaces
+    -   Fix customization for `markdown-mouse-follow-link` and
+        `markdown-table-align-p`
+    -   Fix accessing locations beyond `point-max` in
+        `markdown-syntax-propertize`
+    -   Set `syntax-propertize-extend-region-functions` buffer-locally
+        instead of globally
+    -   Modify only the buffer-local part of
+        `syntax-propertize-extend-region-functions`.
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311

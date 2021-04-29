@@ -498,7 +498,7 @@ If this value is 'any and `display-buffer-alist' is set then
   :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-live-preview-window-function
-  'markdown-live-preview-window-eww
+  #'markdown-live-preview-window-eww
   "Function to display preview of Markdown output within Emacs.
 Function must update the buffer containing the preview and return
 the buffer."
@@ -1105,9 +1105,16 @@ Function is called repeatedly until it returns nil. For details, see
                                  (max end (match-beginning 0))
                                (point-max))))
              (code-match (markdown-code-block-at-pos new-start))
-             (new-start (or (and code-match (cl-first code-match)) new-start))
-             (code-match (and (< end (point-max)) (markdown-code-block-at-pos end)))
-             (new-end (or (and code-match (cl-second code-match)) new-end)))
+             ;; FIXME: The `code-match' can return bogus values
+             ;; when text has been inserted/deleted!
+             (new-start (min (or (and code-match (cl-first code-match))
+                                 (point-max))
+                             new-start))
+             (code-match (and (< end (point-max))
+                              (markdown-code-block-at-pos end)))
+             (new-end (max (or (and code-match (cl-second code-match)) 0)
+                           new-end)))
+
         (unless (and (eq new-start start) (eq new-end end))
           (cons new-start (min new-end (point-max))))))))
 
@@ -1976,7 +1983,7 @@ When non-nil, `markdown-header-face' will inherit from
 `markdown-header-scaling-values' will be applied to
 headers of levels one through six respectively."
   :type 'boolean
-  :initialize 'custom-initialize-default
+  :initialize #'custom-initialize-default
   :set (lambda (symbol value)
          (set-default symbol value)
          (markdown-update-header-faces value))
@@ -1988,37 +1995,39 @@ headers of levels one through six respectively."
   "List of scaling values for headers of level one through six.
 Used when `markdown-header-scaling' is non-nil."
   :type 'list
-  :initialize 'custom-initialize-default
+  :initialize #'custom-initialize-default
   :set (lambda (symbol value)
          (set-default symbol value)
-         (markdown-update-header-faces markdown-header-scaling value))
-  :group 'markdown-faces)
+         (markdown-update-header-faces markdown-header-scaling value)))
 
-(defun markdown-make-header-faces ()
-  "Build the faces used for Markdown headers."
-  (let ((inherit-faces '(font-lock-function-name-face)))
-    (when markdown-header-scaling
-      (setq inherit-faces (cons 'variable-pitch inherit-faces)))
-    (defface markdown-header-face
-      `((t (:inherit ,inherit-faces :weight bold)))
-      "Base face for headers."
-      :group 'markdown-faces))
-  (dotimes (num 6)
-    (let* ((num1 (1+ num))
-           (face-name (intern (format "markdown-header-face-%s" num1)))
-           (scale (if markdown-header-scaling
-                      (float (nth num markdown-header-scaling-values))
-                    1.0)))
-      (eval
-       `(defface ,face-name
-          '((t (:inherit markdown-header-face :height ,scale)))
-          (format "Face for level %s headers.
+(defmacro markdown--dotimes-when-compile (i-n body)
+  (declare (indent 1) (debug ((symbolp form) form)))
+  (let ((var (car i-n))
+        (n (cadr i-n))
+        (code ()))
+    (dotimes (i (eval n t))
+      (push (eval body `((,var . ,i))) code))
+    `(progn ,@(nreverse code))))
+
+(defface markdown-header-face
+  `((t (:inherit (,@(when markdown-header-scaling '(variable-pitch))
+                  font-lock-function-name-face)
+        :weight bold)))
+  "Base face for headers.")
+
+(markdown--dotimes-when-compile (num 6)
+  (let* ((num1 (1+ num))
+         (face-name (intern (format "markdown-header-face-%s" num1))))
+    `(defface ,face-name
+       (,'\` ((t (:inherit markdown-header-face
+                  :height
+                  (,'\, (if markdown-header-scaling
+                            (float (nth ,num markdown-header-scaling-values))
+                          1.0))))))
+       (format "Face for level %s headers.
 You probably don't want to customize this face directly. Instead
 you can customize the base face `markdown-header-face' or the
-variable-height variable `markdown-header-scaling'." ,num1)
-          :group 'markdown-faces)))))
-
-(markdown-make-header-faces)
+variable-height variable `markdown-header-scaling'." ,num1))))
 
 (defun markdown-update-header-faces (&optional scaling scaling-values)
   "Update header faces, depending on if header SCALING is desired.
@@ -3306,17 +3315,24 @@ Group 7: closing filename delimiter"
 
 ;;; Markdown Font Fontification Functions =====================================
 
+(defvar markdown--first-displayable-cache (make-hash-table :test #'equal))
+
 (defun markdown--first-displayable (seq)
   "Return the first displayable character or string in SEQ.
 SEQ may be an atom or a sequence."
-  (let ((seq (if (listp seq) seq (list seq))))
-    (cond ((stringp (car seq))
-           (cl-find-if
-            (lambda (str)
-              (and (mapcar #'char-displayable-p (string-to-list str))))
-            seq))
-          ((characterp (car seq))
-           (cl-find-if #'char-displayable-p seq)))))
+  (let ((c (gethash seq markdown--first-displayable-cache t)))
+    (if (not (eq c t))
+        c
+      (puthash seq
+               (let ((seq (if (listp seq) seq (list seq))))
+                 (cond ((stringp (car seq))
+                        (cl-find-if
+                         (lambda (str)
+                           (and (mapcar #'char-displayable-p (string-to-list str))))
+                         seq))
+                       ((characterp (car seq))
+                        (cl-find-if #'char-displayable-p seq))))
+               markdown--first-displayable-cache))))
 
 (defun markdown--marginalize-string (level)
   "Generate atx markup string of given LEVEL for left margin."
@@ -4897,7 +4913,7 @@ duplicate positions, which are handled up by calling functions."
     ;; Return reversed list
     (reverse positions)))
 
-(defun markdown-enter-key ()
+(defun markdown-enter-key ()        ;FIXME: Partly obsoleted by electric-indent
   "Handle RET depending on the context.
 If the point is at a table, move to the next row.  Otherwise,
 indent according to value of `markdown-indent-on-enter'.
@@ -5104,7 +5120,7 @@ Handle all elements of `markdown-complete-alist' in order."
   (interactive "*")
   (let ((list markdown-complete-alist) found changed)
     (while list
-      (let ((regexp (eval (caar list)))
+      (let ((regexp (eval (caar list) t)) ;FIXME: Why `eval'?
             (function (cdar list)))
         (setq list (cdr list))
         (when (thing-at-point-looking-at regexp)
@@ -5124,7 +5140,7 @@ match."
   (let ((end-marker (set-marker (make-marker) end))
         previous)
     (dolist (element markdown-complete-alist)
-      (let ((regexp (eval (car element)))
+      (let ((regexp (eval (car element) t)) ;FIXME: Why `eval'?
             (function (cdr element)))
         (goto-char beg)
         (while (re-search-forward regexp end-marker 'limit)
@@ -5331,14 +5347,16 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-c C-d") 'markdown-do)
     (define-key map (kbd "C-c '") 'markdown-edit-code-block)
     ;; Indentation
-    (define-key map (kbd "C-m") 'markdown-enter-key)
+    (define-key map (kbd "RET") 'markdown-enter-key)
     (define-key map (kbd "DEL") 'markdown-outdent-or-delete)
     (define-key map (kbd "C-c >") 'markdown-indent-region)
     (define-key map (kbd "C-c <") 'markdown-outdent-region)
     ;; Visibility cycling
     (define-key map (kbd "TAB") 'markdown-cycle)
-    (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
-    (define-key map (kbd "<S-tab>")  'markdown-shifttab)
+    ;; S-iso-lefttab and S-tab should both be mapped to `backtab' by
+    ;; (local-)function-key-map.
+    ;;(define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
+    ;;(define-key map (kbd "<S-tab>")  'markdown-shifttab)
     (define-key map (kbd "<backtab>") 'markdown-shifttab)
     ;; Heading and list navigation
     (define-key map (kbd "C-c C-n") 'markdown-outline-next)
@@ -7039,8 +7057,8 @@ ones already marked."
          (goto-char (mark))
          (markdown-forward-paragraph)
          (point)))
-    (let ((beginning-of-defun-function 'markdown-backward-paragraph)
-          (end-of-defun-function 'markdown-forward-paragraph))
+    (let ((beginning-of-defun-function #'markdown-backward-paragraph)
+          (end-of-defun-function #'markdown-forward-paragraph))
       (mark-defun))))
 
 (defun markdown-mark-block ()
@@ -7058,16 +7076,16 @@ ones already marked."
          (goto-char (mark))
          (markdown-forward-block)
          (point)))
-    (let ((beginning-of-defun-function 'markdown-backward-block)
-          (end-of-defun-function 'markdown-forward-block))
+    (let ((beginning-of-defun-function #'markdown-backward-block)
+          (end-of-defun-function #'markdown-forward-block))
       (mark-defun))))
 
 (defun markdown-narrow-to-block ()
   "Make text outside current block invisible.
 The current block is the one that contains point or follows point."
   (interactive)
-  (let ((beginning-of-defun-function 'markdown-backward-block)
-        (end-of-defun-function 'markdown-forward-block))
+  (let ((beginning-of-defun-function #'markdown-backward-block)
+        (end-of-defun-function #'markdown-forward-block))
     (narrow-to-defun)))
 
 (defun markdown-mark-text-block ()
@@ -7085,8 +7103,8 @@ ones already marked."
          (goto-char (mark))
          (markdown-end-of-text-block)
          (point)))
-    (let ((beginning-of-defun-function 'markdown-beginning-of-text-block)
-          (end-of-defun-function 'markdown-end-of-text-block))
+    (let ((beginning-of-defun-function #'markdown-beginning-of-text-block)
+          (end-of-defun-function #'markdown-end-of-text-block))
       (mark-defun))))
 
 (defun markdown-mark-page ()
@@ -7105,16 +7123,16 @@ ones already marked."
          (goto-char (mark))
          (markdown-forward-page)
          (point)))
-    (let ((beginning-of-defun-function 'markdown-backward-page)
-          (end-of-defun-function 'markdown-forward-page))
+    (let ((beginning-of-defun-function #'markdown-backward-page)
+          (end-of-defun-function #'markdown-forward-page))
       (mark-defun))))
 
 (defun markdown-narrow-to-page ()
   "Make text outside current top level section invisible.
 The current section is the one that contains point or follows point."
   (interactive)
-  (let ((beginning-of-defun-function 'markdown-backward-page)
-        (end-of-defun-function 'markdown-forward-page))
+  (let ((beginning-of-defun-function #'markdown-backward-page)
+        (end-of-defun-function #'markdown-forward-page))
     (narrow-to-defun)))
 
 (defun markdown-mark-subtree ()
@@ -7739,15 +7757,17 @@ returns nil."
                 (process-file markdown-open-image-command nil nil nil link-file))
             (find-file link-file)))))))
 
-(defun markdown-follow-link-at-point ()
-  "Open the current non-wiki link.
+(defun markdown-follow-link-at-point (&optional event)
+  "Open the non-wiki link at point or EVENT.
 If the link is a complete URL, open in browser with `browse-url'.
 Otherwise, open with `find-file' after stripping anchor and/or query string.
 Translate filenames using `markdown-filename-translate-function'."
-  (interactive)
-  (if (markdown-link-p)
-      (markdown--browse-url (markdown-link-url))
-    (user-error "Point is not at a Markdown link or URL")))
+  (interactive (list last-command-event))
+  (save-excursion
+    (if event (posn-set-point (event-start event)))
+    (if (markdown-link-p)
+        (markdown--browse-url (markdown-link-url))
+      (user-error "Point is not at a Markdown link or URL"))))
 
 (defun markdown-fontify-inline-links (last)
   "Add text properties to next inline link from point to LAST."
@@ -8125,9 +8145,9 @@ These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
   (if (and markdown-enable-wiki-links
            markdown-wiki-link-fontify-missing)
       (add-hook 'after-change-functions
-                'markdown-check-change-for-wiki-link-after-change t t)
+                #'markdown-check-change-for-wiki-link-after-change t t)
     (remove-hook 'after-change-functions
-                 'markdown-check-change-for-wiki-link-after-change t))
+                 #'markdown-check-change-for-wiki-link-after-change t))
   ;; If we left the buffer there is a really good chance we were
   ;; creating one of the wiki link documents. Make sure we get
   ;; refontified when we come back.
@@ -8135,10 +8155,10 @@ These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
            markdown-wiki-link-fontify-missing)
       (progn
         (add-hook 'window-configuration-change-hook
-                  'markdown-fontify-buffer-wiki-links t t)
+                  #'markdown-fontify-buffer-wiki-links t t)
         (markdown-fontify-buffer-wiki-links))
     (remove-hook 'window-configuration-change-hook
-                 'markdown-fontify-buffer-wiki-links t)
+                 #'markdown-fontify-buffer-wiki-links t)
     (markdown-unfontify-region-wiki-links (point-min) (point-max))))
 
 
@@ -8601,7 +8621,7 @@ mode to use.  The language to mode mapping may be customized by
 setting the variable `markdown-code-lang-modes'."
   :group 'markdown
   :type 'boolean
-  :safe 'booleanp
+  :safe #'booleanp
   :package-version '(markdown-mode . "2.3"))
 
 (defcustom markdown-fontify-code-block-default-mode nil
@@ -8845,7 +8865,7 @@ This version removes characters with invisibility property
 
 ;; Functions for maintaining tables
 
-(defvar markdown-table-at-point-p-function nil
+(defvar markdown-table-at-point-p-function #'markdown--table-at-point-p
   "Function to decide if point is inside a table.
 
 The indirection serves to differentiate between standard markdown
@@ -8862,9 +8882,7 @@ tables and gfm tables which are less strict about the markup.")
 
 (defun markdown-table-at-point-p ()
   "Return non-nil when point is inside a table."
-  (if (functionp markdown-table-at-point-p-function)
-      (funcall markdown-table-at-point-p-function)
-    (markdown--table-at-point-p)))
+  (funcall markdown-table-at-point-p-function))
 
 (defun markdown--table-at-point-p ()
   "Return non-nil when point is inside a table."
@@ -9626,7 +9644,7 @@ rows and columns and the column alignment."
   (setq-local sentence-end-base "[.?!…‽][]\"'”’)}»›*_`~]*")
   ;; Syntax
   (add-hook 'syntax-propertize-extend-region-functions
-            #'markdown-syntax-propertize-extend-region)
+            #'markdown-syntax-propertize-extend-region nil t)
   (add-hook 'jit-lock-after-change-extend-region-functions
             #'markdown-font-lock-extend-region-function t t)
   (setq-local syntax-propertize-function #'markdown-syntax-propertize)
@@ -9765,7 +9783,7 @@ rows and columns and the column alignment."
   "Major mode for editing GitHub Flavored Markdown files."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
-  (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
+  (setq-local markdown-table-at-point-p-function #'gfm--table-at-point-p)
   (add-hook 'post-self-insert-hook #'gfm--electric-pair-fence-code-block 'append t)
   (markdown-gfm-parse-buffer-for-languages))
 
@@ -9776,7 +9794,7 @@ rows and columns and the column alignment."
   "Enable hidden markup mode in `markdown-view-mode' and `gfm-view-mode'."
   :group 'markdown
   :type 'boolean
-  :safe 'booleanp)
+  :safe #'booleanp)
 
 (defvar markdown-view-mode-map
   (let ((map (make-sparse-keymap)))
