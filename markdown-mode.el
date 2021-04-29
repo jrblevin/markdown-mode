@@ -6995,7 +6995,7 @@ demote."
       (markdown-backward-same-level 1))))
 
 (defun markdown-outline-up ()
-  "Move to previous list item, when in a list, or next heading."
+  "Move to previous list item, when in a list, or previous heading."
   (interactive)
   (unless (markdown-up-list)
     (markdown-up-heading 1)))
