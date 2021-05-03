@@ -29,6 +29,7 @@
     -   Support to display local image with percent encoding file path
     -   Add ability to resize inline image display (`markdown-toggle-inline-images`) without Imagemagick installed in the computer (emulating Org Mode)
     -   Support including braces around the language specification in GFM code blocks
+    -   Improve `markdown-insert-{bold,italic}` when region starts with spaces[GH-613][]
 
 *   Bug fixes:
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
@@ -68,6 +69,7 @@
   [gh-587]: https://github.com/jrblevin/markdown-mode/issues/587
   [gh-590]: https://github.com/jrblevin/markdown-mode/pull/590
   [gh-598]: https://github.com/jrblevin/markdown-mode/pull/598
+  [gh-613]: https://github.com/jrblevin/markdown-mode/issues/613
 
 # Markdown Mode 2.4
 

@@ -530,6 +530,15 @@ Test point position upon removal and insertion."
     (should (string-equal (buffer-string) "**one two** three"))
     (should (= (point) 10))))
 
+(ert-deftest test-markdown-insertion/bold-region-begin-with-space ()
+  "Test region functionality of `markdown-insert-bold'.
+When region starts with spaces"
+  (markdown-test-string "  one two three"
+    (push-mark (point) t t)
+    (forward-word 2)
+    (markdown-insert-bold)
+    (should (string-equal (buffer-string) "  **one two** three"))))
+
 (ert-deftest test-markdown-insertion/italic-region ()
   "Test region functionality of `markdown-insert-italic'."
   (markdown-test-string "one two three"
@@ -539,6 +548,16 @@ Test point position upon removal and insertion."
     (markdown-insert-italic)
     (should (string-equal (buffer-string) "*one two* three"))
     (should (= (point) 9))))
+
+(ert-deftest test-markdown-insertion/italic-region-begin-with-space ()
+  "Test region functionality of `markdown-insert-italic'.
+When region starts with spaces"
+  (markdown-test-string "  one two three"
+    (transient-mark-mode)
+    (push-mark (point) t t)
+    (forward-word 2)
+    (markdown-insert-italic)
+    (should (string-equal (buffer-string) "  *one two* three"))))
 
 (ert-deftest test-markdown-insertion/code-region ()
   "Test region functionality of `markdown-insert-code'."
@@ -6155,6 +6174,19 @@ Details: https://github.com/jrblevin/markdown-mode/issues/534"
     (markdown-test-range-has-face 7 9 'markdown-strike-through-face)
     (markdown-test-range-has-face 10 11 'markdown-markup-face)
     (markdown-test-range-has-face 12 17 nil)))
+
+(ert-deftest test-markdown-gfm/insert-strike-through ()
+  "Test `markdown-insert-strike-through'."
+  (markdown-test-string-gfm "one two three"
+    (push-mark (point) t t)
+    (forward-word 2)
+    (markdown-insert-strike-through)
+    (should (string-equal (buffer-string) "~~one two~~ three")))
+  (markdown-test-string-gfm "  one two three"
+    (push-mark (point) t t)
+    (forward-word 2)
+    (markdown-insert-strike-through)
+    (should (string-equal (buffer-string) "  ~~one two~~ three"))))
 
 (ert-deftest test-markdown-gfm/toggle-strike-through ()
   "Test toggling functionality of `markdown-insert-strike-through'."
