@@ -532,12 +532,17 @@ Test point position upon removal and insertion."
 
 (ert-deftest test-markdown-insertion/bold-region-begin-with-space ()
   "Test region functionality of `markdown-insert-bold'.
-When region starts with spaces"
+When region starts/ends with spaces"
   (markdown-test-string "  one two three"
     (push-mark (point) t t)
     (forward-word 2)
     (markdown-insert-bold)
-    (should (string-equal (buffer-string) "  **one two** three"))))
+    (should (string-equal (buffer-string) "  **one two** three")))
+  (markdown-test-string "  one two  three"
+    (push-mark (point) t t)
+    (goto-char 11)
+    (markdown-insert-bold)
+    (should (string-equal (buffer-string) "  **one two**  three"))))
 
 (ert-deftest test-markdown-insertion/italic-region ()
   "Test region functionality of `markdown-insert-italic'."
@@ -551,13 +556,13 @@ When region starts with spaces"
 
 (ert-deftest test-markdown-insertion/italic-region-begin-with-space ()
   "Test region functionality of `markdown-insert-italic'.
-When region starts with spaces"
-  (markdown-test-string "  one two three"
+When region starts/ends with spaces"
+  (markdown-test-string "  one two  three"
     (transient-mark-mode)
     (push-mark (point) t t)
-    (forward-word 2)
+    (goto-char 11)
     (markdown-insert-italic)
-    (should (string-equal (buffer-string) "  *one two* three"))))
+    (should (string-equal (buffer-string) "  *one two*  three"))))
 
 (ert-deftest test-markdown-insertion/code-region ()
   "Test region functionality of `markdown-insert-code'."
@@ -6182,11 +6187,11 @@ Details: https://github.com/jrblevin/markdown-mode/issues/534"
     (forward-word 2)
     (markdown-insert-strike-through)
     (should (string-equal (buffer-string) "~~one two~~ three")))
-  (markdown-test-string-gfm "  one two three"
+  (markdown-test-string-gfm "  one two  three"
     (push-mark (point) t t)
-    (forward-word 2)
+    (goto-char 11)
     (markdown-insert-strike-through)
-    (should (string-equal (buffer-string) "  ~~one two~~ three"))))
+    (should (string-equal (buffer-string) "  ~~one two~~  three"))))
 
 (ert-deftest test-markdown-gfm/toggle-strike-through ()
   "Test toggling functionality of `markdown-insert-strike-through'."
