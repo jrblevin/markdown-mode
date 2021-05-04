@@ -3599,6 +3599,11 @@ prefixed with an integer from 1 to the length of
             (goto-char beg)
             (skip-chars-forward "[ \t]")
             (setq beg (point))))
+        (when (and end skip-space)
+          (save-excursion
+            (goto-char end)
+            (skip-chars-backward "[ \t]")
+            (setq end (point))))
         (markdown-wrap-or-insert start-delim end-delim nil beg end))
     (if (markdown--face-p (point) (list face))
         (save-excursion
