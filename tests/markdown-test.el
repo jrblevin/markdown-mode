@@ -5921,7 +5921,7 @@ Details: https://github.com/jrblevin/markdown-mode/issues/308"
     (markdown-table-align)
     (should (string= (buffer-substring-no-properties (point-min) (point-max))
                      "| Col1 | Col2 |
-| :-:  | :-:  |
+|:----:|:----:|
 | AAA  | A\\|B |\n"))))
 
 (ert-deftest test-markdown-table/align-with-wiki-link ()
