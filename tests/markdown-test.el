@@ -6903,6 +6903,21 @@ title: asdasdasd
 | A very very very long cell |          |
 "))))
 
+(ert-deftest test-markdown-table/align-with-spaces-before-delimiter ()
+  "Test table realignment when there are spaces before a delimiter"
+  (markdown-test-string "
+| A | B | C | D |
+| - | :- | :-: | -: |
+| aaa | bbbb | ccccc | dddddd |
+"
+    (search-forward "A")
+    (markdown-table-align)
+    (should (string= (buffer-string) "
+| A   | B    | C     |      D |
+|-----|:-----|:-----:|-------:|
+| aaa | bbbb | ccccc | dddddd |
+"))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
