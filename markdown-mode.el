@@ -9087,7 +9087,7 @@ This function assumes point is on a table."
             (indent (progn (looking-at "[ \t]*") (match-string 0)))
             ;; Split table in lines and save column format specifier
             (lines (mapcar (lambda (l)
-                             (if (string-match-p "\\`[ \t]*|[-:]" l)
+                             (if (string-match-p "\\`[ \t]*|[ \t]*[-:]" l)
                                  (progn (setq fmtspec (or fmtspec l)) nil) l))
                            (markdown--split-string (buffer-substring begin end) "\n")))
             ;; Split lines in cells

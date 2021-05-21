@@ -5921,7 +5921,7 @@ Details: https://github.com/jrblevin/markdown-mode/issues/308"
     (markdown-table-align)
     (should (string= (buffer-substring-no-properties (point-min) (point-max))
                      "| Col1 | Col2 |
-| :-:  | :-:  |
+|:----:|:----:|
 | AAA  | A\\|B |\n"))))
 
 (ert-deftest test-markdown-table/align-with-wiki-link ()
@@ -6901,6 +6901,36 @@ title: asdasdasd
 |----------------------------|----------|
 |                            |          |
 | A very very very long cell |          |
+"))))
+
+(ert-deftest test-markdown-table/align-with-spaces-before-delimiter ()
+  "Test table realignment when there are spaces before a delimiter"
+  (markdown-test-string "
+| A | B | C | D |
+| - | :- | :-: | -: |
+| aaa | bbbb | ccccc | dddddd |
+"
+    (search-forward "A")
+    (markdown-table-align)
+    (should (string= (buffer-string) "
+| A   | B    | C     |      D |
+|-----|:-----|:-----:|-------:|
+| aaa | bbbb | ccccc | dddddd |
+"))))
+
+(ert-deftest test-markdown-table/align-with-tabs-before-delimiter ()
+  "Test table realignment when there are tabs before a delimiter"
+  (markdown-test-string "
+| A | B | C | D |
+|	-	|	:-|:-:	|-:|
+| aaa | bbbb | ccccc | dddddd |
+"
+    (search-forward "A")
+    (markdown-table-align)
+    (should (string= (buffer-string) "
+| A   | B    | C     |      D |
+|-----|:-----|:-----:|-------:|
+| aaa | bbbb | ccccc | dddddd |
 "))))
 
 (provide 'markdown-test)
