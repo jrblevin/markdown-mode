@@ -135,6 +135,12 @@ This file is not saved."
   (dolist (loc (number-sequence begin end))
     (message "%d: %s" loc (get-char-property loc prop))))
 
+(defun markdown-test-range-has-face-attribute (begin end plst)
+  "Verify that range BEGIN to END has face containing PROP=VALUE."
+  (dolist (loc (number-sequence begin end))
+    (cl-loop for (k v) on plst by #'cddr
+             do (should (equal (face-attribute (get-char-property loc 'face) k) v)))))
+
 (defun markdown-test-range-has-property (begin end prop value)
   "Verify that range BEGIN to END has PROP equal to or containing VALUE."
   (let (vals fail-loc)
@@ -3330,6 +3336,25 @@ takes precedence)."
     (beginning-of-line)
     (should (markdown-on-heading-p))
     (should-not (markdown-range-property-any 453 484 'face '(markdown-hr-face)))))
+
+(ert-deftest test-markdown-font-lock/heading-height ()
+  "User customizes scaling, and restarts emacs.  Scaling needs to render."
+  (let ((restore-scaling markdown-header-scaling)
+        (restore-scaling-values markdown-header-scaling-values))
+    (markdown-test-string
+        "# h1
+"
+      (custom-set-variables '(markdown-header-scaling t t))
+      (markdown-test-range-has-face-attribute 3 4
+                            `(:height ,(car markdown-header-scaling-values)))
+      (custom-set-variables '(markdown-header-scaling nil t))
+      (markdown-test-range-has-face-attribute 3 4 '(:height 1.0))
+      (custom-set-variables '(markdown-header-scaling t t)
+                            '(markdown-header-scaling-values
+                              `(3.0 ,(cdr markdown-header-scaling-values))))
+      (markdown-test-range-has-face-attribute 3 4 '(:height 3.0))
+      (custom-set-variables '(markdown-header-scaling restore-scaling t)
+                            '(markdown-header-scaling-values restore-scaling-values t)))))
 
 (ert-deftest test-markdown-font-lock/heading-code-block-no-whitespace ()
   "Headings immediately before code blocks should be identified correctly.

@@ -1972,7 +1972,7 @@ headers of levels one through six respectively."
   :initialize 'custom-initialize-default
   :set (lambda (symbol value)
          (set-default symbol value)
-         (markdown-update-header-faces value))
+         (markdown-update-header-faces))
   :group 'markdown-faces
   :package-version '(markdown-mode . "2.2"))
 
@@ -1984,44 +1984,37 @@ Used when `markdown-header-scaling' is non-nil."
   :initialize 'custom-initialize-default
   :set (lambda (symbol value)
          (set-default symbol value)
-         (markdown-update-header-faces markdown-header-scaling value))
+         (markdown-update-header-faces))
   :group 'markdown-faces)
 
 (defun markdown-make-header-faces ()
   "Build the faces used for Markdown headers."
-  (let ((inherit-faces '(font-lock-function-name-face)))
-    (when markdown-header-scaling
-      (setq inherit-faces (cons 'variable-pitch inherit-faces)))
+  (unless (facep 'markdown-header-face)
     (defface markdown-header-face
-      `((t (:inherit ,inherit-faces :weight bold)))
+      '((t (:inherit (font-lock-function-name-face) :weight bold)))
       "Base face for headers."
-      :group 'markdown-faces))
-  (dotimes (num 6)
-    (let* ((num1 (1+ num))
-           (face-name (intern (format "markdown-header-face-%s" num1)))
-           (scale (if markdown-header-scaling
-                      (float (nth num markdown-header-scaling-values))
-                    1.0)))
-      (eval
-       `(defface ,face-name
-          '((t (:inherit markdown-header-face :height ,scale)))
-          (format "Face for level %s headers.
+      :group 'markdown-faces)
+    (dotimes (num 6)
+      (let* ((num1 (1+ num))
+             (face-name (intern (format "markdown-header-face-%s" num1)))
+             (scale (float (nth num markdown-header-scaling-values))))
+        (eval
+         `(defface ,face-name
+            '((t (:inherit (variable-pitch markdown-header-face) :height ,scale)))
+            (format "Face for level %s headers.
 You probably don't want to customize this face directly. Instead
 you can customize the base face `markdown-header-face' or the
 variable-height variable `markdown-header-scaling'." ,num1)
-          :group 'markdown-faces)))))
+            :group 'markdown-faces))))))
 
-(markdown-make-header-faces)
-
-(defun markdown-update-header-faces (&optional scaling scaling-values)
-  "Update header faces, depending on if header SCALING is desired.
-If so, use given list of SCALING-VALUES relative to the baseline
-size of `markdown-header-face'."
+(defun markdown-update-header-faces (&optional _scaling _scaling-values)
+  "Update header faces using current values of markdown-header-scaling and markdown-header-scaling-values.  Arguments are ignored but retained to avoid breakage."
+  (markdown-make-header-faces)
   (dotimes (num 6)
     (let* ((face-name (intern (format "markdown-header-face-%s" (1+ num))))
-           (scale (cond ((not scaling) 1.0)
-                        (scaling-values (float (nth num scaling-values)))
-                        (t (float (nth num markdown-header-scaling-values))))))
+           (scale (if markdown-header-scaling
+                      (float (nth num markdown-header-scaling-values))
+                    1.0)))
       (unless (get face-name 'saved-face) ; Don't update customized faces
         (set-face-attribute face-name nil :height scale)))))
 
@@ -9827,6 +9820,7 @@ rows and columns and the column alignment."
     (markdown-live-preview-remove)))
 
 
+(markdown-update-header-faces)
 (provide 'markdown-mode)
 
 ;; Local Variables:
