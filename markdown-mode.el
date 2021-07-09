@@ -5682,6 +5682,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
                      (setcdr sibling-alist alist)
                      (setq cur-alist alist))
                    (setq cur-level level)))))
+      (setq root (copy-tree root))
       ;; Footnotes
       (let ((fn (markdown-get-defined-footnotes)))
         (if (or (zerop (length fn))
