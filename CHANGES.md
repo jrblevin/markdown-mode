@@ -32,6 +32,7 @@
     -   Improve `markdown-insert-{bold,italic}` when region starts with spaces[GH-613][]
 
 *   Bug fixes:
+    -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
     -   Fix inline URL regular expression which starts/ends with spaces [GH-514][]
     -   Fix GFM italic fontification for one character [GH-524][]
