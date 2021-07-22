@@ -13,6 +13,8 @@
     -   Introduce `markdown-ordered-list-enumeration` variable [GH-587][]
     -   Search wiki link under project
     -   Add `markdown-insert-foldable-block` function [GH-598][]
+    -   Add `markdown-table-align-p` flag [GH-625][]
+        Control table alignment after table operation
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -72,6 +74,7 @@
   [gh-590]: https://github.com/jrblevin/markdown-mode/pull/590
   [gh-598]: https://github.com/jrblevin/markdown-mode/pull/598
   [gh-613]: https://github.com/jrblevin/markdown-mode/issues/613
+  [gh-625]: https://github.com/jrblevin/markdown-mode/issues/625
 
 # Markdown Mode 2.4
 
