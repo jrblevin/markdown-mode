@@ -9610,6 +9610,9 @@ rows and columns and the column alignment."
 ;;;###autoload
 (define-derived-mode markdown-mode text-mode "Markdown"
   "Major mode for editing Markdown files."
+  (when buffer-read-only
+    (when (or (not (buffer-file-name)) (file-writable-p (buffer-file-name)))
+      (setq-local buffer-read-only nil)))
   ;; Natural Markdown tab width
   (setq tab-width 4)
   ;; Comments
