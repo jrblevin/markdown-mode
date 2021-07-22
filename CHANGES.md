@@ -32,6 +32,7 @@
     -   Add ability to resize inline image display (`markdown-toggle-inline-images`) without Imagemagick installed in the computer (emulating Org Mode)
     -   Support including braces around the language specification in GFM code blocks
     -   Improve `markdown-insert-{bold,italic}` when region starts with spaces[GH-613][]
+    -   Disable buffer-read-only if possible when markdown-mode is called [GH-622][]
 
 *   Bug fixes:
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
@@ -74,6 +75,7 @@
   [gh-590]: https://github.com/jrblevin/markdown-mode/pull/590
   [gh-598]: https://github.com/jrblevin/markdown-mode/pull/598
   [gh-613]: https://github.com/jrblevin/markdown-mode/issues/613
+  [gh-622]: https://github.com/jrblevin/markdown-mode/issues/622
   [gh-625]: https://github.com/jrblevin/markdown-mode/issues/625
 
 # Markdown Mode 2.4

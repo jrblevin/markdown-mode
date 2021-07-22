@@ -6768,6 +6768,14 @@ foo(bar=None)
     (markdown-test-string-gfm-view test-string
       (funcall test-func))))
 
+(ert-deftest test-markdown-view-mode/buffer-read-only ()
+  "Test disable buffer-read-only."
+  (markdown-test-string "foo"
+    (markdown-view-mode)
+    (should buffer-read-only)
+    (markdown-mode)
+    (should-not buffer-read-only)))
+
 ;;; Tests for electric pair
 
 (ert-deftest test-markdown-electric-pair-mode ()
@@ -6934,7 +6942,7 @@ title: asdasdasd
 "))))
 
 (ert-deftest test-markdown-table/disable-table-align ()
-  "Test table navigation."
+  "Test disable table alignment."
   (let ((input "| 12345 | 6 |
 | 7 | 8 |"))
     (markdown-test-string input
