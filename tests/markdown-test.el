@@ -6933,6 +6933,24 @@ title: asdasdasd
 | aaa | bbbb | ccccc | dddddd |
 "))))
 
+(ert-deftest test-markdown-table/disable-table-align ()
+  "Test table navigation."
+  (let ((input "| 12345 | 6 |
+| 7 | 8 |"))
+    (markdown-test-string input
+      (save-excursion
+        (search-forward "1")
+        (let ((markdown-table-align-p nil))
+          (markdown-table-forward-cell)
+          (should (string= (buffer-string) input))))
+
+      (search-forward "1")
+      (let ((expected "| 12345 | 6 |
+| 7     | 8 |
+"))
+        (markdown-table-forward-cell)
+        (should (string= (buffer-string) expected))))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
