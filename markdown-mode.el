@@ -617,14 +617,14 @@ requires Emacs to be built with ImageMagick support."
   "Non-nil means mouse on a link will follow the link.
 This variable must be set before loading markdown-mode."
   :group 'markdown
-  :type 'bool
+  :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.5"))
 
 (defcustom markdown-table-align-p t
   "Non-nil means that table is aligned after table operation."
   :group 'markdown
-  :type 'bool
+  :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.5"))
 
