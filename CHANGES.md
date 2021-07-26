@@ -49,6 +49,7 @@
     -   Fix `markdown-follow-thing-at-point` failing on subdir search [GH-590][]
     -   Fix `markdown-table-backward-cell' so it always goes back a single cell
     -   Fix 'markdown-table-align' to detect delimiters surrounded by spaces
+    -   Fix customization for `markdown-mouse-follow-link` and `markdown-table-align-p`
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
