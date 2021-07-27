@@ -47,8 +47,10 @@
 (defvar jit-lock-end)
 (defvar flyspell-generic-check-word-predicate)
 (defvar electric-pair-pairs)
+(defvar sh-ancestor-alist)
 
 (declare-function project-roots "project")
+(declare-function sh-set-shell "sh-script")
 
 
 ;;; Constants =================================================================
@@ -8784,6 +8786,15 @@ at the END of code blocks."
                       (lambda (_parent-buffer _beg _end)
                         (funcall mode)))
                      (indirect-buf (edit-indirect-region begin end 'display-buffer)))
+                  ;; reset `sh-shell' when indirect buffer
+                (when (and (not (member system-type '(ms-dos windows-nt)))
+                           (member mode '(shell-script-mode sh-mode))
+                           (member lang (append
+                                         (mapcar (lambda (e) (symbol-name (car e)))
+                                                 sh-ancestor-alist)
+                                         '("csh" "rc" "sh"))))
+                  (with-current-buffer indirect-buf
+                    (sh-set-shell lang)))
                 (when (> indentation 0) ;; un-indent in edit-indirect buffer
                   (with-current-buffer indirect-buf
                     (indent-rigidly (point-min) (point-max) (- indentation)))))
