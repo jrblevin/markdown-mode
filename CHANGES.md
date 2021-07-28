@@ -42,6 +42,7 @@
         name for `C-m`.
     -   Give `markdown-table-at-point-p-function` a non-nil default.
         Simplify `markdown-table-at-point-p` accordingly.
+    -   Auto set `sh-shell` when `markdown-edit-code-block` enter indirect buffer with `sh-mode`
 
 *   Bug fixes:
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
