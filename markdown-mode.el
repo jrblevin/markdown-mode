@@ -3419,7 +3419,8 @@ SEQ may be an atom or a sequence."
 
 (defun markdown-fontify-list-items (last)
   "Apply font-lock properties to list markers from point to LAST."
-  (when (markdown-match-list-items last)
+  (when (and (markdown-match-list-items last)
+             (not (markdown-code-block-at-point-p (match-beginning 2))))
     (let* ((indent (length (match-string-no-properties 1)))
            (level (/ indent markdown-list-indent-width)) ;; level = 0, 1, 2, ...
            (bullet (nth (mod level (length markdown-list-item-bullets))

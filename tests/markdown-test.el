@@ -2734,6 +2734,17 @@ See https://github.com/jrblevin/markdown-mode/issues/569"
     (markdown-test-range-has-face 64 64 'markdown-list-face)
     (markdown-test-range-has-face 85 85 'markdown-list-face)))
 
+(ert-deftest test-markdown-font-lock/lists-in-code-block ()
+  "Test markdown-list-face in code block like diff format.
+See https://github.com/jrblevin/markdown-mode/issues/631"
+  (markdown-test-string "```diff
+- plugins=(...)
++ plugins=(... fzf-collection)
+```
+"
+    (should-not (markdown-range-property-any 9 9 'face '(markdown-list-face)))
+    (should-not (markdown-range-property-any 16 16 'face '(markdown-list-face)))))
+
 (ert-deftest test-markdown-font-lock/definition-list ()
   "A simple definition list marker font lock test."
   (markdown-test-file "definition-list.text"

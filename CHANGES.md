@@ -67,6 +67,7 @@
         instead of globally
     -   Modify only the buffer-local part of
         `syntax-propertize-extend-region-functions`.
+    -   Fix list highlighting issue in code block
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -95,6 +96,7 @@
   [gh-613]: https://github.com/jrblevin/markdown-mode/issues/613
   [gh-622]: https://github.com/jrblevin/markdown-mode/issues/622
   [gh-625]: https://github.com/jrblevin/markdown-mode/issues/625
+  [gh-631]: https://github.com/jrblevin/markdown-mode/issues/631
 
 # Markdown Mode 2.4
 
