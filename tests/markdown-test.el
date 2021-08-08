@@ -6312,12 +6312,21 @@ Details: https://github.com/jrblevin/markdown-mode/issues/534"
                            (append markdown-gfm-additional-languages
                                    markdown-gfm-recognized-languages))))))))
 
+(ert-deftest test-markdown-gfm/insert-code-block-at-end-of-buffer ()
+  "Insert GFM code block at end of buffer.
+Details: https://github.com/jrblevin/markdown-mode/issues/634"
+  (markdown-test-string-gfm ""
+    (goto-char (point-max))
+    (execute-kbd-macro (read-kbd-macro "C-c C-s C RET"))
+    ;; don't raise exception
+    (should t)))
+
 (ert-deftest test-markdown-gfm/code-block-font-lock ()
   "GFM code block font lock test."
   (markdown-test-file-gfm "gfm.text"
     (markdown-test-range-has-face 2639 2641 'markdown-markup-face) ; ```
     (markdown-test-range-has-face 2642 2645 'markdown-language-keyword-face) ; lang
-    (markdown-test-range-has-face 2647 2728 'markdown-pre-face) ; code
+    (markdown-test-range-has-face 2647 2728 'markdown-pre-face)      ; code
     (markdown-test-range-has-face 2730 2732 'markdown-markup-face))) ; ```
 
 (ert-deftest test-markdown-gfm/code-block-font-lock-2 ()
