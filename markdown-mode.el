@@ -9000,7 +9000,8 @@ This function assumes point is on a table."
     (save-excursion
       (beginning-of-line)
       (while (search-forward "|" pos t)
-        (unless (markdown--thing-at-wiki-link (match-beginning 0))
+        (when (and (not (looking-back "\\\\|" (line-beginning-position)))
+                   (not (markdown--thing-at-wiki-link (match-beginning 0))))
           (setq cnt (1+ cnt)))))
     cnt))
 
@@ -9039,7 +9040,8 @@ table."
   (beginning-of-line 1)
   (when (> n 0)
     (while (and (> n 0) (search-forward "|" (point-at-eol) t))
-      (unless (markdown--thing-at-wiki-link (match-beginning 0))
+      (when (and (not (looking-back "\\\\|" (line-beginning-position)))
+                 (not (markdown--thing-at-wiki-link (match-beginning 0))))
         (cl-decf n)))
     (if on-delim
         (backward-char 1)
@@ -9257,7 +9259,7 @@ With optional argument UP, move it up."
      (goto-char begin)
      (while (< (point) end)
        (markdown-table-goto-column col t)
-       (and (looking-at "|[^|\n]+|")
+       (and (looking-at "|\\(?:\\\\|\\|[^|\n]\\)+|")
             (replace-match "|"))
        (forward-line)))
     (set-marker end nil)
@@ -9284,7 +9286,7 @@ With optional argument LEFT, move it to the left."
      (goto-char begin)
      (while (< (point) end)
        (markdown-table-goto-column col1 t)
-       (when (looking-at "|\\([^|\n]+\\)|\\([^|\n]+\\)|")
+       (when (looking-at "|\\(\\(?:\\\\|\\|[^|\n]\\|\\)+\\)|\\(\\(?:\\\\|\\|[^|\n]\\|\\)+\\)|")
          (replace-match "|\\2|\\1|"))
        (forward-line)))
     (set-marker end nil)

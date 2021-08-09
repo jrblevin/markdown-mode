@@ -6003,6 +6003,17 @@ Details: https://github.com/jrblevin/markdown-mode/issues/308"
       (markdown-table-goto-column 2)
       (should (string= (thing-at-point 'word) "Content")))))
 
+(ert-deftest test-markdown-table/get-column-with-escaped-vertical-bar ()
+  "Test for getting column number with escaped vertical bar.
+Details: https://github.com/jrblevin/markdown-mode/issues/635"
+  (markdown-test-string "| Col1 | Col2 \\| Col2 \\| Col2 |"
+    (search-forward "Col2")
+    (should (= (markdown-table-get-column) 2))
+    (search-forward "Col2")
+    (should (= (markdown-table-get-column) 2))
+    (search-forward "Col2")
+    (should (= (markdown-table-get-column) 2))))
+
 (ert-deftest test-markdown-table/transpose-with-wiki-link ()
   "Test for table transpose with link.
 Detail: https://github.com/jrblevin/markdown-mode/commit/44a1c5bbc5d9514e97c7cc0a90a0c578130cd1dc"
@@ -6052,6 +6063,44 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/522"
     (backward-char 1)
     (markdown-table-backward-cell)
     (should (char-equal (char-after) ?x))))
+
+(ert-deftest test-markdown-table/column-move-with-escaped-vertical-bar ()
+  "Test for column move with escaped vertical bar.
+Details: https://github.com/jrblevin/markdown-mode/issues/635"
+  (markdown-test-string "| a \\| | b |"
+    (search-forward "b")
+    (markdown-table-move-column-left)
+    (should (string= (buffer-substring-no-properties (line-beginning-position) (line-end-position))
+                     "| b | a \\| |")))
+
+  (markdown-test-string "| a \\| | b |"
+    (search-forward "a")
+    (markdown-table-move-column-right)
+    (should (string= (buffer-substring-no-properties (line-beginning-position) (line-end-position))
+                     "| b | a \\| |"))))
+
+(ert-deftest test-markdown-table/insert-column-with-escaped-vertical-bar ()
+  "Test for inserting column with escaped vertical bar.
+Details: https://github.com/jrblevin/markdown-mode/issues/635"
+  (markdown-test-string "| a | b \\| bb |
+| c | d |"
+    (search-forward "bb")
+    (markdown-table-insert-column)
+    (should (string= (buffer-string)
+                     "| a |   | b \\| bb |
+| c |   | d       |
+"))))
+
+(ert-deftest test-markdown-table/delete-column-with-escaped-vertical-bar ()
+  "Test for deleting column with escaped vertical bar.
+Details: https://github.com/jrblevin/markdown-mode/issues/635"
+  (markdown-test-string "| a | b \\| bb |
+| c | d |"
+    (search-forward "bb")
+    (markdown-table-delete-column)
+    (should (string= (buffer-string)
+                     "| a |
+| c |"))))
 
 ;;; gfm-mode tests:
 
