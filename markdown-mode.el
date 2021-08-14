@@ -842,7 +842,7 @@ Group 2 matches the separating whitespace.
 Group 3 matches the text.")
 
 (defconst markdown-regex-line-break
-  "[^ \n\t][ \t]*\\(  \\)$"
+  "[^ \n\t][ \t]*\\(  \\)\n"
   "Regular expression for matching line breaks.")
 
 (defconst markdown-regex-wiki-link

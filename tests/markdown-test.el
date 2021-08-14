@@ -3176,6 +3176,12 @@ references:
     (markdown-test-range-has-face 1 9 nil)
     (markdown-test-range-has-face 10 11 'markdown-line-break-face)))
 
+(ert-deftest test-markdown-font-lock/line-break-at-end-of-buffer ()
+  "Don't apply markdown-line-break-face at end of buffer without new line.
+Details: https://github.com/jrblevin/markdown-mode/issues/621"
+  (markdown-test-string "    \nasdf  "
+    (markdown-test-range-has-face 10 11 'nil)))
+
 (ert-deftest test-markdown-font-lock/blockquote-bold ()
   "Test font lock for bold inside of a blockquote."
   (markdown-test-string

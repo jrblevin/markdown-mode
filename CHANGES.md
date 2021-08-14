@@ -74,6 +74,7 @@
     -   Fix wrong markdown table command issue in menu [GH-639][]
     -   Fix table conversion issue [GH-639][]
     -   Fix fill paragraph issue with setext heading [GH-638][]
+    -   Fix line break highlighting issue at end of buffer [GH-621][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -100,6 +101,7 @@
   [gh-590]: https://github.com/jrblevin/markdown-mode/pull/590
   [gh-598]: https://github.com/jrblevin/markdown-mode/pull/598
   [gh-613]: https://github.com/jrblevin/markdown-mode/issues/613
+  [gh-621]: https://github.com/jrblevin/markdown-mode/issues/621
   [gh-622]: https://github.com/jrblevin/markdown-mode/issues/622
   [gh-625]: https://github.com/jrblevin/markdown-mode/issues/625
   [gh-631]: https://github.com/jrblevin/markdown-mode/issues/631
