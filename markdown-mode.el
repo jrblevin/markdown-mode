@@ -5542,10 +5542,10 @@ See also `markdown-mode-map'.")
      ["Move Row Down" markdown-move-down
       :enable (markdown-table-at-point-p)
       :keys "C-c <down>"]
-     ["Move Column Left" markdown-demote
+     ["Move Column Left" markdown-promote
       :enable (markdown-table-at-point-p)
       :keys "C-c <left>"]
-     ["Move Column Right" markdown-promote
+     ["Move Column Right" markdown-demote
       :enable (markdown-table-at-point-p)
       :keys "C-c <right>"]
      ["Delete Row" markdown-table-delete-row

@@ -71,6 +71,7 @@
     -   Fix exception when inserting code block at end of buffer [GH-634][]
     -   Fix table operations when table column contains escaped vertical bars [GH-635][]
     -   Fix issue that executing `markdown-table-sort-lines` via menu-bar with older Emacs(< 28) [GH-641][]
+    -   Fix wrong markdown table command issue in menu [GH-639][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -102,6 +103,7 @@
   [gh-631]: https://github.com/jrblevin/markdown-mode/issues/631
   [gh-634]: https://github.com/jrblevin/markdown-mode/issues/634
   [gh-635]: https://github.com/jrblevin/markdown-mode/issues/635
+  [gh-639]: https://github.com/jrblevin/markdown-mode/issues/639
   [gh-641]: https://github.com/jrblevin/markdown-mode/issues/641
 
 # Markdown Mode 2.4
