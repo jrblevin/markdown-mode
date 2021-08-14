@@ -7028,6 +7028,21 @@ title: asdasdasd
         (markdown-table-forward-cell)
         (should (string= (buffer-string) expected))))))
 
+(ert-deftest test-markdown-table/convert-table-region ()
+  "Test markdown-table-convert-region.
+https://github.com/jrblevin/markdown-mode/issues/640"
+  (let ((markdown-table-align-p t))
+    (markdown-test-string "1 2 3
+4 5 6"
+      (markdown-table-convert-region (point-min) (point-max))
+      (should (string= (buffer-substring-no-properties (point-min) (point-max))
+                       "| 1 | 2 | 3 |
+| 4 | 5 | 6 |\n")))
+    (markdown-test-string "1 2 3 \n4 5 6 "
+      (markdown-table-convert-region (point-min) (point-max))
+      (should (string= (buffer-substring-no-properties (point-min) (point-max))
+                       "| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n")))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
