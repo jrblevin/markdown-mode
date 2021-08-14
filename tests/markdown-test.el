@@ -5566,6 +5566,16 @@ This includes preserving whitespace after the pipe."
       (fill-region (point-min) (point-max))
       (should (string-equal (buffer-string) text)))))
 
+(ert-deftest test-markdown-filling/setext-heading ()
+  "Fill paragraph at setext heading.
+Details: https://github.com/jrblevin/markdown-mode/issues/638"
+  (let ((input "Heading
+=======
+"))
+    (markdown-test-string input
+      (markdown-fill-paragraph)
+      (should (string= (buffer-string) input)))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()

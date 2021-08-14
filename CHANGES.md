@@ -73,6 +73,7 @@
     -   Fix issue that executing `markdown-table-sort-lines` via menu-bar with older Emacs(< 28) [GH-641][]
     -   Fix wrong markdown table command issue in menu [GH-639][]
     -   Fix table conversion issue [GH-639][]
+    -   Fix fill paragraph issue with setext heading [GH-638][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -104,6 +105,7 @@
   [gh-631]: https://github.com/jrblevin/markdown-mode/issues/631
   [gh-634]: https://github.com/jrblevin/markdown-mode/issues/634
   [gh-635]: https://github.com/jrblevin/markdown-mode/issues/635
+  [gh-638]: https://github.com/jrblevin/markdown-mode/issues/638
   [gh-639]: https://github.com/jrblevin/markdown-mode/issues/639
   [gh-640]: https://github.com/jrblevin/markdown-mode/issues/640
   [gh-641]: https://github.com/jrblevin/markdown-mode/issues/641
