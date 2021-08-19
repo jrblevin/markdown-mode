@@ -861,7 +861,7 @@ Group 5 matches the second component of the wiki link, when present.
 Group 6 matches the closing square brackets.")
 
 (defconst markdown-regex-uri
-  (concat "\\(" (regexp-opt markdown-uri-types) ":[^]\t\n\r<>,;() ]+\\)")
+  (concat "\\(" (regexp-opt markdown-uri-types) ":[^]\t\n\r<>; ]+\\)")
   "Regular expression for matching inline URIs.")
 
 (defconst markdown-regex-angle-uri

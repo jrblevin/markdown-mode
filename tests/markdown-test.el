@@ -2282,6 +2282,12 @@ See GH-245."
       "[cd\\_z\\_path.m](http://jblevins.org/research/centroid/cd_z_path.m)"
     (markdown-test-range-face-equals 17 65 'markdown-url-face)))
 
+(ert-deftest test-markdown-font-lock/url-face-with-comma-and-parenthesis ()
+  "Test URL highlighting with comma and parenthesis.
+Detail: https://github.com/jrblevin/markdown-mode/issues/649"
+  (markdown-test-string "<https://en.wikipedia.org/wiki/File:L%C3%A1szl%C3%B3_Moholy-Nagy,_nuclear_II,_1946_(milwaukee_art_museum).jpg>"
+    (markdown-test-range-face-equals 2 109 'markdown-plain-url-face)))
+
 (ert-deftest test-markdown-font-lock/italics-after-hr ()
   "Test italics after a horizontal rule with asterisks."
   (markdown-test-string "* * *\n\n*italic*\n"
