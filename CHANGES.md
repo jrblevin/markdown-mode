@@ -75,6 +75,7 @@
     -   Fix table conversion issue [GH-639][]
     -   Fix fill paragraph issue with setext heading [GH-638][]
     -   Fix line break highlighting issue at end of buffer [GH-621][]
+    -   Fix URL highlighting which contains comma or parentheis [GH-649][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -111,6 +112,7 @@
   [gh-639]: https://github.com/jrblevin/markdown-mode/issues/639
   [gh-640]: https://github.com/jrblevin/markdown-mode/issues/640
   [gh-641]: https://github.com/jrblevin/markdown-mode/issues/641
+  [gh-649]: https://github.com/jrblevin/markdown-mode/issues/649
 
 # Markdown Mode 2.4
 
