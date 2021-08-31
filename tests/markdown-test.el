@@ -5586,7 +5586,24 @@ Details: https://github.com/jrblevin/markdown-mode/issues/638"
 "))
     (markdown-test-string input
       (markdown-fill-paragraph)
-      (should (string= (buffer-string) input)))))
+      (should (string= (buffer-string) input))))
+  (let ((input "Heading
+-
+"))
+    (markdown-test-string input
+      (markdown-fill-paragraph)
+      (should (string= (buffer-string) input))))
+  ;; leading 3 spaces and trailing spaces is ok
+  (let ((input "Heading
+   ====     \t\n"))
+    (markdown-test-string input
+      (markdown-fill-paragraph)
+      (should (string= (buffer-string) input))))
+  ;; fill-paragraph is applied for list element
+  (markdown-test-string "- foo
+bar baz"
+    (markdown-fill-paragraph)
+    (should (string= (buffer-string) "- foo bar baz"))))
 
 ;;; Export tests:
 
