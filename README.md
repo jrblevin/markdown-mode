@@ -907,6 +907,9 @@ provides an interface to all of the possible customizations:
     `markdown-insert-list-item` inserts enumerated numbers for
     ordered list marker. While nil, it always inserts `1.`.
 
+  * `markdown-enable-highlighting-syntax` - font lock for highlighting
+     syntax like Obsidian, Quilt(default: `nil`).
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode
@@ -992,7 +995,7 @@ by `markdown-mode` and `gfm-mode` as described below.
   region will be placed inside the code block.  You will be
   prompted for the name of the language, but may press enter to
   continue without naming a language.
-  
+
   In addition, in `gfm-mode`, GFM code blocks can be inserted via the
   option `markdown-gfm-use-electric-backquote`. If the option
   `markdown-code-block-braces` is set to `t`, code blocks inserted with

@@ -3561,6 +3561,16 @@ across blocks]"
     (markdown-test-range-has-face 29 37 'markdown-html-attr-value-face)
     (markdown-test-range-has-face 38 38 'markdown-html-tag-delimiter-face)))
 
+(ert-deftest test-markdown-font-lock/highlighting-syntax ()
+  "Test highlighting syntax ==foo==."
+  (let ((markdown-enable-highlighting-syntax t))
+    (markdown-test-string "==foo=="
+      (markdown-test-range-has-face 1 2 'markdown-markup-face)
+      (markdown-test-range-has-face 3 5 'markdown-highlighting-face)
+      (markdown-test-range-has-face 6 7 'markdown-markup-face)))
+  (markdown-test-string "==foo=="
+    (markdown-test-range-has-face 1 7 nil)))
+
 ;;; Markdown Parsing Functions:
 
 (ert-deftest test-markdown-parsing/extend-region-function ()
