@@ -15,6 +15,7 @@
     -   Add `markdown-insert-foldable-block` function [GH-598][]
     -   Add `markdown-table-align-p` flag [GH-625][]
         Control table alignment after table operation
+    -   Support highlighting syntax like Obsidian, Quilt. [GH-652][]
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -113,6 +114,7 @@
   [gh-640]: https://github.com/jrblevin/markdown-mode/issues/640
   [gh-641]: https://github.com/jrblevin/markdown-mode/issues/641
   [gh-649]: https://github.com/jrblevin/markdown-mode/issues/649
+  [gh-652]: https://github.com/jrblevin/markdown-mode/issues/652
 
 # Markdown Mode 2.4
 
