@@ -105,7 +105,7 @@ to load automatically by adding the following to your init file:
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 ```
 
-[markdown-mode.el]: https://jblevins.org/projects/markdown-mode/markdown-mode.el
+[markdown-mode.el]: https://raw.githubusercontent.com/jrblevin/markdown-mode/v2.4/markdown-mode.el
 
 **Development Version**
 
