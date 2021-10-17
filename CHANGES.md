@@ -44,6 +44,7 @@
     -   Give `markdown-table-at-point-p-function` a non-nil default.
         Simplify `markdown-table-at-point-p` accordingly.
     -   Auto set `sh-shell` when `markdown-edit-code-block` enter indirect buffer with `sh-mode`
+    -   Add value check and avoid raising the exception at `markdown-edit-code-block` [GH-663][]
 
 *   Bug fixes:
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
@@ -115,6 +116,7 @@
   [gh-641]: https://github.com/jrblevin/markdown-mode/issues/641
   [gh-649]: https://github.com/jrblevin/markdown-mode/issues/649
   [gh-652]: https://github.com/jrblevin/markdown-mode/issues/652
+  [gh-663]: https://github.com/jrblevin/markdown-mode/issues/663
 
 # Markdown Mode 2.4
 
