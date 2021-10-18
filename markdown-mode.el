@@ -2656,7 +2656,8 @@ intact additional processing."
                          (match-beginning 5) (match-end 5)))))))))
 
 (defun markdown-get-defined-references ()
-  "Return all defined reference labels and their line numbers (not including square brackets)."
+  "Return all defined reference labels and their line numbers.
+They does not include square brackets)."
   (save-excursion
     (goto-char (point-min))
     (let (refs)
@@ -3916,7 +3917,7 @@ This is an internal function called by
         (markdown-insert-uri uri))))))
 
 (defun markdown-insert-link ()
-  "Insert new or update an existing link, with interactive prompts.
+  "Insert new or update an existing link, with interactive prompt.
 If the point is at an existing link or URL, update the link text,
 URL, reference label, and/or title.  Otherwise, insert a new link.
 The type of link inserted (inline, reference, or plain URL)
@@ -3951,7 +3952,7 @@ selectively adding or removing information via the prompts."
   (markdown--insert-link-or-image nil))
 
 (defun markdown-insert-image ()
-  "Insert new or update an existing image, with interactive prompts.
+  "Insert new or update an existing image, with interactive prompt.
 If the point is at an existing image, update the alt text, URL,
 reference label, and/or title. Otherwise, insert a new image.
 The type of image inserted (inline or reference) depends on which
