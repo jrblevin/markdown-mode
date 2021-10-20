@@ -8222,9 +8222,6 @@ Jumps between reference links and definitions; between footnote
 markers and footnote text."
   (interactive)
   (cond
-   ;; Link
-   ((or (markdown-link-p) (markdown-wiki-link-p))
-    (markdown-follow-thing-at-point nil))
    ;; Footnote definition
    ((markdown-footnote-text-positions)
     (markdown-footnote-return))
@@ -8237,6 +8234,9 @@ markers and footnote text."
    ;; Reference definition
    ((thing-at-point-looking-at markdown-regex-reference-definition)
     (markdown-reference-goto-link (match-string-no-properties 2)))
+   ;; Link
+   ((or (markdown-link-p) (markdown-wiki-link-p))
+    (markdown-follow-thing-at-point nil))
    ;; GFM task list item
    ((markdown-gfm-task-list-item-at-point)
     (markdown-toggle-gfm-checkbox))

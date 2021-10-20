@@ -1558,6 +1558,33 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
       (markdown-footnote-kill)
       (should (string-equal (current-kill 0) "foo\n")))))
 
+(ert-deftest test-markdown-do/jump-wikilink ()
+  "Test `markdown-do' jumps to wiki links"
+  (markdown-test-string
+      "[[Foo]]"
+    (goto-char 3) ; Foo
+    (markdown-do) ; open Foo.md
+    (should (string= (buffer-string) ""))))
+
+(ert-deftest test-markdown-do/jump-link ()
+  "Test `markdown-do' jumps to markdown links"
+  (markdown-test-string
+      "[bar](https://duckduckgo.com)"
+    (goto-char 3) ; Foo
+    (markdown-do) ; open browser
+    (should (string= (buffer-string) ""))))
+
+(ert-deftest test-markdown-do/wikilink-in-table ()
+  "Test `markdown-do' jumps to markdown links"
+  (markdown-test-string
+      "| [[Foo]]     |"
+    (goto-char 1) ; Table cell
+    (markdown-do) ; align
+    (should (string= (buffer-string) "| [[Foo]] |"))
+    (goto-char 4) ; Foo
+    (markdown-do) ; open Foo.md
+    (should (string= (buffer-string) "| [[Foo]] |"))))
+
 (ert-deftest test-markdown-footnote-reference/jump ()
   "Test `markdown-do' for footnotes and reference links."
   (markdown-test-string
