@@ -8222,6 +8222,9 @@ Jumps between reference links and definitions; between footnote
 markers and footnote text."
   (interactive)
   (cond
+   ;; Link
+   ((or (markdown-link-p) (markdown-wiki-link-p))
+    (markdown-follow-thing-at-point nil))
    ;; Footnote definition
    ((markdown-footnote-text-positions)
     (markdown-footnote-return))
