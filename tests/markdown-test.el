@@ -6604,6 +6604,18 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
           (should (eq major-mode 'gfm-mode)))
       (kill-buffer))))
 
+(ert-deftest test-markdown-ext/wiki-link-nonexistent-file ()
+  "Test following wiki link to nonexistent file visits the buffer."
+  (let ((markdown-enable-wiki-links t))
+    (find-file (expand-file-name "wiki/foo.md" markdown-test-dir))
+    (unwind-protect
+        (progn
+          (markdown-mode)
+          (search-forward "[[doesnotexist]]")
+          (markdown-follow-wiki-link-at-point)
+          (should (string= (buffer-name) "doesnotexist.md")))
+      (kill-buffer))))
+
 (defadvice markdown-live-preview-window-eww
     (around markdown-test-create-fake-eww disable)
   (setq ad-return-value (get-buffer-create "*eww*")))
