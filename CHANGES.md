@@ -3,6 +3,8 @@
 *Under development*
 
 *   **Breaking changes:**
+    -   `markdown-do` supports following link [GH-666][]
+        This changes behavior of `markdown-do` at table
 
 *   New features:
     -   Introduce `markdown-mouse-follow-link` variable [GH-290][]
@@ -117,6 +119,7 @@
   [gh-649]: https://github.com/jrblevin/markdown-mode/issues/649
   [gh-652]: https://github.com/jrblevin/markdown-mode/issues/652
   [gh-663]: https://github.com/jrblevin/markdown-mode/issues/663
+  [gh-666]: https://github.com/jrblevin/markdown-mode/issues/666
 
 # Markdown Mode 2.4
 

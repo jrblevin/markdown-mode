@@ -1558,6 +1558,38 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
       (markdown-footnote-kill)
       (should (string-equal (current-kill 0) "foo\n")))))
 
+(ert-deftest test-markdown-do/jump-wiki-link ()
+  "Test `markdown-do' jumps to wiki links"
+  (with-current-buffer (find-file-noselect "wiki/pr666/jump_wiki_link.md")
+    (let ((markdown-enable-wiki-links t))
+      (goto-char 3)
+      (markdown-do)
+      (should (string= (buffer-name) "Foo.md")))))
+
+(ert-deftest test-markdown-do/jump-link ()
+  "Test `markdown-do' jumps to markdown links"
+  (markdown-test-string "[bar](https://duckduckgo.com)"
+    (let* ((opened-url nil)
+           (browse-url-browser-function
+            (lambda (url &rest _args) (setq opened-url url))))
+      (goto-char 3)
+      (markdown-do)
+      (should (string= opened-url "https://duckduckgo.com")))))
+
+(ert-deftest test-markdown-do/wiki-link-in-table ()
+  "Test `markdown-do' jumps to markdown links"
+  (with-current-buffer (find-file-noselect "wiki/pr666/wiki_link_in_table.md")
+    (let ((markdown-enable-wiki-links t))
+      ;; alignment
+      (markdown-do)
+      (should (string= (buffer-string) "| [[Foo]] |\n"))
+
+      (forward-char 4)
+
+      ;; wiki link
+      (markdown-do)
+      (should (string= (buffer-name) "Foo.md")))))
+
 (ert-deftest test-markdown-footnote-reference/jump ()
   "Test `markdown-do' for footnotes and reference links."
   (markdown-test-string
