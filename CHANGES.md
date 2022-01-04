@@ -47,6 +47,7 @@
         Simplify `markdown-table-at-point-p` accordingly.
     -   Auto set `sh-shell` when `markdown-edit-code-block` enter indirect buffer with `sh-mode`
     -   Add value check and avoid raising the exception at `markdown-edit-code-block` [GH-663][]
+    -   Add NonGNU ELPA badge to README and website
 
 *   Bug fixes:
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]

@@ -1,5 +1,8 @@
-# Emacs Markdown Mode [![MELPA badge][melpa-badge]][melpa-link] [![MELPA stable badge][melpa-stable-badge]][melpa-stable-link] [![Github Actions Status][github-actions-badge]][github-actions-link] [![Guide to Markdown Mode for Emacs][leanpub-badge]][leanpub-link]
+# Emacs Markdown Mode
+[![NonGNU ELPA badge][nongnu-elpa-badge]][nongnu-elpa-link] [![MELPA badge][melpa-badge]][melpa-link] [![MELPA stable badge][melpa-stable-badge]][melpa-stable-link] [![Github Actions Status][github-actions-badge]][github-actions-link] [![Guide to Markdown Mode for Emacs][leanpub-badge]][leanpub-link]
 
+  [nongnu-elpa-link]: https://elpa.nongnu.org/nongnu/markdown-mode.html
+  [nongnu-elpa-badge]: https://elpa.nongnu.org/nongnu/markdown-mode.svg
   [melpa-link]: https://melpa.org/#/markdown-mode
   [melpa-stable-link]: https://stable.melpa.org/#/markdown-mode
   [melpa-badge]: https://melpa.org/packages/markdown-mode-badge.svg
