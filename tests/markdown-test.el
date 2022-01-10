@@ -2224,6 +2224,18 @@ See GH-245."
       (should (invisible-p 154))
       (should (invisible-p 156)))))
 
+;;; Markup hiding url tests:
+
+(ert-deftest test-markdown-url-hiding/eldoc ()
+  "Test hiding URL and eldoc.
+Detail: https://github.com/jrblevin/markdown-mode/pull/674"
+  (markdown-test-string "[This is a hidden link](http://hidden.link)"
+    (markdown-toggle-url-hiding +1)
+    (search-forward "(")
+    (markdown-eldoc-function)
+    ;; markdown-eldoc-function doesn't raise an exception
+    (should t)))
+
 ;;; Font lock tests:
 
 (ert-deftest test-markdown-font-lock/italics-1 ()
