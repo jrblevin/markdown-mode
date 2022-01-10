@@ -9645,22 +9645,21 @@ rows and columns and the column alignment."
              (thing-at-point-looking-at markdown-regex-link-reference))
          (or markdown-hide-urls markdown-hide-markup))
     (let* ((imagep (string-equal (match-string 1) "!"))
+           (referencep (string-equal (match-string 5) "["))
+           (link (match-string-no-properties 6))
            (edit-keys (markdown--substitute-command-keys
                        (if imagep
                            "\\[markdown-insert-image]"
                          "\\[markdown-insert-link]")))
            (edit-str (propertize edit-keys 'face 'font-lock-constant-face))
-           (referencep (string-equal (match-string 5) "["))
            (object (if referencep "reference" "URL")))
       (format "Hidden %s (%s to edit): %s" object edit-str
               (if referencep
                   (concat
                    (propertize "[" 'face 'markdown-markup-face)
-                   (propertize (match-string-no-properties 6)
-                               'face 'markdown-reference-face)
+                   (propertize link 'face 'markdown-reference-face)
                    (propertize "]" 'face 'markdown-markup-face))
-                (propertize (match-string-no-properties 6)
-                            'face 'markdown-url-face)))))
+                (propertize link 'face 'markdown-url-face)))))
    ;; Hidden language name for fenced code blocks
    ((and (markdown-code-block-at-point-p)
          (not (get-text-property (point) 'markdown-pre))
