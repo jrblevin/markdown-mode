@@ -2970,7 +2970,8 @@ $..$ or `markdown-regex-math-inline-double' for matching $$..$$."
 (defun markdown-match-math-double (last)
   "Match double quoted $$..$$ math from point to LAST."
   (when markdown-enable-math
-    (when (and (char-equal (char-after) ?$)
+    (when (and (< (1+ (point)) (point-max))
+               (char-equal (char-after) ?$)
                (char-equal (char-after (1+ (point))) ?$)
                (not (bolp))
                (not (char-equal (char-before) ?\\))
