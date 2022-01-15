@@ -81,8 +81,9 @@
     -   Fix fill paragraph issue with setext heading [GH-638][]
     -   Fix line break highlighting issue at end of buffer [GH-621][]
     -   Fix URL highlighting which contains comma or parentheis [GH-649][]
-    -   Fix eldoc function issue with `markdown-toggle-url-hiding  [GH-674][]
+    -   Fix eldoc function issue with `markdown-toggle-url-hiding` [GH-674][]
         Thanks to Ta Quang Trung for a patch
+    -   Fix `markdown-enable-math` exception issue [GH-676][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -124,6 +125,7 @@
   [gh-663]: https://github.com/jrblevin/markdown-mode/issues/663
   [gh-666]: https://github.com/jrblevin/markdown-mode/issues/666
   [gh-674]: https://github.com/jrblevin/markdown-mode/pull/674
+  [gh-676]: https://github.com/jrblevin/markdown-mode/pull/676
 
 # Markdown Mode 2.4
 
