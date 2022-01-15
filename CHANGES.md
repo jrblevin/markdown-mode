@@ -50,6 +50,7 @@
     -   Add NonGNU ELPA badge to README and website
 
 *   Bug fixes:
+    -   Fix `markdown-marginalize-headers` rendering in tty mode
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
     -   Fix inline URL regular expression which starts/ends with spaces [GH-514][]
