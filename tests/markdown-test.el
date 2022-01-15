@@ -5955,6 +5955,16 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/352"
       (markdown-test-range-has-face 9 9 'markdown-math-face)
       (markdown-test-range-has-face 10 11 'markdown-markup-face))))
 
+(ert-deftest test-markdown-math/math-inline-small-buffer ()
+  "Test that font-lock parsing works with a single dollar."
+  (let ((markdown-enable-math t))
+    (markdown-test-string "$"
+      (should t))
+    (markdown-test-string "$$"
+      (should t))
+    (markdown-test-string "$$$"
+      (should t))))
+
 ;;; Extension: pipe table editing
 
 (ert-deftest test-markdown-table/table-begin-top-of-file ()
