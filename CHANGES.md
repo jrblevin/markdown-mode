@@ -50,7 +50,6 @@
     -   Add NonGNU ELPA badge to README and website
 
 *   Bug fixes:
-    -   Fix `markdown-marginalize-headers` rendering in tty mode
     -   Fix issue with `nil` being returned from `markdown-imenu-create-nested-index` [GH-578][]
     -   Fix remaining flyspell overlay in code block or comment issue [GH-311][]
     -   Fix inline URL regular expression which starts/ends with spaces [GH-514][]
@@ -85,6 +84,7 @@
     -   Fix eldoc function issue with `markdown-toggle-url-hiding` [GH-674][]
         Thanks to Ta Quang Trung for a patch
     -   Fix `markdown-enable-math` exception issue [GH-676][]
+    -   Fix `markdown-marginalize-headers` rendering in tty mode [GH-677][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -127,6 +127,7 @@
   [gh-666]: https://github.com/jrblevin/markdown-mode/issues/666
   [gh-674]: https://github.com/jrblevin/markdown-mode/pull/674
   [gh-676]: https://github.com/jrblevin/markdown-mode/pull/676
+  [gh-677]: https://github.com/jrblevin/markdown-mode/pull/677
 
 # Markdown Mode 2.4
 
