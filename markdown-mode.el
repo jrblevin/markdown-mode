@@ -3384,7 +3384,7 @@ SEQ may be an atom or a sequence."
              (margin-char-width (/ margin-pixel-width (default-font-width))))
         (set-window-margins nil margin-char-width))
     ;; As a fallback, simply set margin based on character count.
-    (set-window-margins nil markdown-marginalize-headers-margin-width)))
+    (set-window-margins nil (1+ markdown-marginalize-headers-margin-width))))
 
 (defun markdown-fontify-headings (last)
   "Add text properties to headings from point to LAST."
