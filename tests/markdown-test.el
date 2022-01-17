@@ -3323,7 +3323,12 @@ takes precedence)."
     (markdown-test-range-has-face 1 3 nil) ; 334
     (markdown-test-range-has-face 4 4 'markdown-markup-face) ; First ^
     (markdown-test-range-has-face 5 6 nil) ; 10
-    (markdown-test-range-has-face 7 7 'markdown-markup-face))) ; Second ^
+    (markdown-test-range-has-face 7 7 'markdown-markup-face)) ; Second ^
+  (markdown-test-string "1.0 x 10^-15^"
+    (markdown-test-range-has-face 1 8 nil)
+    (markdown-test-range-has-face 9 9 'markdown-markup-face)
+    (markdown-test-range-has-face 10 12 nil)
+    (markdown-test-range-has-face 13 13 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/hidden-urls-inline ()
   "Test URL hiding and toggling."
