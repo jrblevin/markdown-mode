@@ -86,6 +86,7 @@
         Thanks to Ta Quang Trung for a patch
     -   Fix `markdown-enable-math` exception issue [GH-676][]
     -   Fix `markdown-marginalize-headers` rendering in tty mode [GH-677][]
+    -   Fix table and list fontification [GH-680][]
 
   [gh-290]: https://github.com/jrblevin/markdown-mode/issues/290
   [gh-311]: https://github.com/jrblevin/markdown-mode/issues/311
@@ -130,6 +131,7 @@
   [gh-674]: https://github.com/jrblevin/markdown-mode/pull/674
   [gh-676]: https://github.com/jrblevin/markdown-mode/pull/676
   [gh-677]: https://github.com/jrblevin/markdown-mode/pull/677
+  [gh-680]: https://github.com/jrblevin/markdown-mode/pull/680
 
 # Markdown Mode 2.4
 
