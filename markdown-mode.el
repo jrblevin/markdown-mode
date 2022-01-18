@@ -3426,11 +3426,11 @@ SEQ may be an atom or a sequence."
     t))
 
 (defun markdown-fontify-tables (last)
-  (when (and (re-search-forward "|" last t)
-             (markdown-table-at-point-p))
-    (font-lock-append-text-property
-     (line-beginning-position) (min (1+ (line-end-position)) (point-max))
-     'face 'markdown-table-face)
+  (when (re-search-forward "|" last t)
+    (when (markdown-table-at-point-p)
+      (font-lock-append-text-property
+       (line-beginning-position) (min (1+ (line-end-position)) (point-max))
+       'face 'markdown-table-face))
     (forward-line 1)
     t))
 
@@ -3450,27 +3450,27 @@ SEQ may be an atom or a sequence."
 
 (defun markdown-fontify-list-items (last)
   "Apply font-lock properties to list markers from point to LAST."
-  (when (and (markdown-match-list-items last)
-             (not (markdown-code-block-at-point-p (match-beginning 2))))
-    (let* ((indent (length (match-string-no-properties 1)))
-           (level (/ indent markdown-list-indent-width)) ;; level = 0, 1, 2, ...
-           (bullet (nth (mod level (length markdown-list-item-bullets))
-                        markdown-list-item-bullets)))
-      (add-text-properties
-       (match-beginning 2) (match-end 2) '(face markdown-list-face))
-      (when markdown-hide-markup
-        (cond
-         ;; Unordered lists
-         ((string-match-p "[\\*\\+-]" (match-string 2))
-          (add-text-properties
-           (match-beginning 2) (match-end 2) `(display ,bullet)))
-         ;; Definition lists
-         ((string-equal ":" (match-string 2))
-          (let ((display-string
-                 (char-to-string (markdown--first-displayable
-                                  markdown-definition-display-char))))
-            (add-text-properties (match-beginning 2) (match-end 2)
-                                 `(display ,display-string)))))))
+  (when (markdown-match-list-items last)
+    (when (not (markdown-code-block-at-point-p (match-beginning 2)))
+      (let* ((indent (length (match-string-no-properties 1)))
+             (level (/ indent markdown-list-indent-width)) ;; level = 0, 1, 2, ...
+             (bullet (nth (mod level (length markdown-list-item-bullets))
+                          markdown-list-item-bullets)))
+        (add-text-properties
+         (match-beginning 2) (match-end 2) '(face markdown-list-face))
+        (when markdown-hide-markup
+          (cond
+           ;; Unordered lists
+           ((string-match-p "[\\*\\+-]" (match-string 2))
+            (add-text-properties
+             (match-beginning 2) (match-end 2) `(display ,bullet)))
+           ;; Definition lists
+           ((string-equal ":" (match-string 2))
+            (let ((display-string
+                   (char-to-string (markdown--first-displayable
+                                    markdown-definition-display-char))))
+              (add-text-properties (match-beginning 2) (match-end 2)
+                                   `(display ,display-string))))))))
     t))
 
 (defun markdown-fontify-hrs (last)
