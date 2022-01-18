@@ -2795,6 +2795,19 @@ See https://github.com/jrblevin/markdown-mode/issues/631"
     (should-not (markdown-range-property-any 9 9 'face '(markdown-list-face)))
     (should-not (markdown-range-property-any 16 16 'face '(markdown-list-face)))))
 
+
+(ert-deftest test-markdown-font-lock/repeated-lists ()
+  "A simple definition list marker font lock test."
+  (markdown-test-file "repeated-elements.text"
+    (markdown-test-range-has-face 163 164 'markdown-list-face)
+    (markdown-test-range-has-face 190 191 'markdown-list-face)))
+
+(ert-deftest test-markdown-font-lock/repeated-tables ()
+  "A simple definition list marker font lock test."
+  (markdown-test-file "repeated-elements.text"
+    (markdown-test-range-has-face 149 155 nil)
+    (markdown-test-range-has-face 218 336 'markdown-table-face)))
+
 (ert-deftest test-markdown-font-lock/definition-list ()
   "A simple definition list marker font lock test."
   (markdown-test-file "definition-list.text"
