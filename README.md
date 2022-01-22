@@ -829,6 +829,10 @@ provides an interface to all of the possible customizations:
     flat list may allow for faster keyboard navigation via tab
     completion.
 
+  * `markdown-imenu-empty-heading` - empty heading string in nested imenu
+
+  * `markdown-imenu-self-heading` - parent heading string in nested imnu
+
   * `markdown-add-footnotes-to-imenu` - Add footnote definitions to
     the end of the imenu index (default: `t`).
 

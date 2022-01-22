@@ -18,6 +18,7 @@
     -   Add `markdown-table-align-p` flag [GH-625][]
         Control table alignment after table operation
     -   Support highlighting syntax like Obsidian, Quilt. [GH-652][]
+    -   Introduce variables for nested imenu [GH-683][]
 
 *   Improvements:
     -   Correct indirect buffer's indentation in `markdown-edit-code-block` [GH-375][]
@@ -132,6 +133,7 @@
   [gh-676]: https://github.com/jrblevin/markdown-mode/pull/676
   [gh-677]: https://github.com/jrblevin/markdown-mode/pull/677
   [gh-680]: https://github.com/jrblevin/markdown-mode/pull/680
+  [gh-683]: https://github.com/jrblevin/markdown-mode/issues/683
 
 # Markdown Mode 2.4
 

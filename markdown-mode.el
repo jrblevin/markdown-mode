@@ -471,6 +471,20 @@ completion."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.2"))
 
+(defcustom markdown-imenu-empty-heading "-"
+  "Empty heading string in nested imenu."
+  :group 'markdown
+  :type 'string
+  :safe 'stringp
+  :package-version '(markdown-mode . "2.5"))
+
+(defcustom markdown-imenu-self-heading "."
+  "Self heading string in nested imenu."
+  :group 'markdown
+  :type 'string
+  :safe 'stringp
+  :package-version '(markdown-mode . "2.5"))
+
 (defcustom markdown-add-footnotes-to-imenu t
   "Add footnotes to end of imenu heading index."
   :group 'markdown
@@ -5714,8 +5728,8 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
                         :level (- (length hashes) (1- min-level))) headers)))))
       (cl-loop with cur-level = 0
                with cur-alist = nil
-               with empty-heading = "-"
-               with self-heading = "."
+               with empty-heading = markdown-imenu-empty-heading
+               with self-heading = markdown-imenu-self-heading
                for header in (reverse headers)
                for level = (plist-get header :level)
                do
