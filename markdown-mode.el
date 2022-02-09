@@ -1574,6 +1574,13 @@ MIDDLE-BEGIN is the start of the \"middle\" section of the block."
       (put-text-property close-begin close-end
                          (cl-cadadr fence-spec) close-data))))
 
+(defun markdown--triple-quote-single-line-p (begin)
+  (save-excursion
+    (goto-char begin)
+    (save-match-data
+      (and (search-forward "```" nil t)
+           (search-forward "```" (line-end-position) t)))))
+
 (defun markdown-syntax-propertize-fenced-block-constructs (start end)
   "Propertize according to `markdown-fenced-block-pairs' from START to END.
 If unable to propertize an entire block (if the start of a block is within START
@@ -1608,7 +1615,8 @@ start which was previously propertized."
       (while (re-search-forward start-reg end t)
         ;; we assume the opening constructs take up (only) an entire line,
         ;; so we re-check the current line
-        (let* ((cur-line (buffer-substring (point-at-bol) (point-at-eol)))
+        (let* ((block-start (match-beginning 0))
+               (cur-line (buffer-substring (point-at-bol) (point-at-eol)))
                ;; find entry in `markdown-fenced-block-pairs' corresponding
                ;; to regex which was matched
                (correct-entry
@@ -1625,18 +1633,20 @@ start which was previously propertized."
                  (cl-caadr correct-entry)
                  (if (and (match-beginning 1) (match-end 1))
                      (- (match-end 1) (match-beginning 1))
-                   0))))
-          ;; get correct match data
-          (save-excursion
-            (beginning-of-line)
-            (re-search-forward
-             (markdown-maybe-funcall-regexp (caar correct-entry))
-             (point-at-eol)))
-          ;; mark starting, even if ending is outside of region
-          (put-text-property (match-beginning 0) (match-end 0)
-                             (cl-cadar correct-entry) (match-data t))
-          (markdown-propertize-end-match
-           end-reg end correct-entry enclosed-text-start))))))
+                   0)))
+               (prop (cl-cadar correct-entry)))
+          (when (or (not (eq prop 'markdown-gfm-block-begin))
+                    (not (markdown--triple-quote-single-line-p block-start)))
+            ;; get correct match data
+            (save-excursion
+              (beginning-of-line)
+              (re-search-forward
+               (markdown-maybe-funcall-regexp (caar correct-entry))
+               (point-at-eol)))
+            ;; mark starting, even if ending is outside of region
+            (put-text-property (match-beginning 0) (match-end 0) prop (match-data t))
+            (markdown-propertize-end-match
+             end-reg end correct-entry enclosed-text-start)))))))
 
 (defun markdown-syntax-propertize-blockquotes (start end)
   "Match blockquotes from START to END."
