@@ -3308,6 +3308,24 @@ takes precedence)."
     (markdown-test-range-has-face 2647 2728 'markdown-pre-face) ; code
     (markdown-test-range-has-face 2730 2732 'markdown-markup-face))) ; ```
 
+(ert-deftest test-markdown-font-lock/gfm-code-block-with-one-line-block ()
+  "Highlighting gfm code block with one line triple quote blocks.
+Detail: https://github.com/jrblevin/markdown-mode/issues/684"
+  (markdown-test-string-gfm "```sudo ln -s `which mkdir` /usr/bin/mkdir```
+
+Install Foreman. For running Rails, Sidekiq and anything else:
+
+```ruby
+rails db:migrate RAILS_ENV=test
+```"
+    (forward-line 2)
+    (markdown-test-range-has-face (point) (line-end-position) nil)
+    (re-search-forward "ruby")
+    (goto-char (match-beginning 0))
+    (markdown-test-range-has-face (point) (+ (point) 3) 'markdown-language-keyword-face)
+    (forward-line 1)
+    (markdown-test-range-has-face (point) (line-end-position) 'markdown-pre-face)))
+
 (ert-deftest test-markdown-font-lock/reference-definition ()
   "Reference definitions should not include ]."
   (let ((markdown-hide-urls nil))
