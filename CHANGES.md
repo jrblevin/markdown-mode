@@ -133,7 +133,7 @@
   [gh-676]: https://github.com/jrblevin/markdown-mode/pull/676
   [gh-677]: https://github.com/jrblevin/markdown-mode/pull/677
   [gh-680]: https://github.com/jrblevin/markdown-mode/pull/680
-  [gh-666]: https://github.com/jrblevin/markdown-mode/issues/684
+  [gh-684]: https://github.com/jrblevin/markdown-mode/issues/684
 
 # Markdown Mode 2.4
 
