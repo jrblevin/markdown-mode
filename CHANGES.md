@@ -1,7 +1,5 @@
 # Markdown Mode 2.5
 
-*Under development*
-
 *   **Breaking changes:**
     -   `markdown-do` supports following link [GH-666][]
         This changes behavior of `markdown-do` at table
