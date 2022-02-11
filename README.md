@@ -665,13 +665,16 @@ that can be customized.  The <kbd>M-x customize-mode</kbd> command
 provides an interface to all of the possible customizations:
 
   * `markdown-command` - the command used to run Markdown (default:
-    `markdown`).  This variable may be customized to pass
-    command-line options to your Markdown processor of choice. We recommend
-    you to use list of strings if you want to set command line options like.
+    `markdown`).  This variable may be customized to pass command-line
+    options to your Markdown processor of choice. We recommend you to
+    use list of strings if you want to set command line options like.
     `'("pandoc" "--from=markdown" "--to=html5")`.  It can also be a
     function; in this case `markdown` will call it with three
-    arguments: the beginning and end of the region to process, and
-    a buffer to write the output to.
+    arguments or four arguments, depending on
+    `markdown-command-needs-filename`.  The first three arguments are:
+    the beginning and end of the region to process, and a buffer to
+    write the output to. When `markdown-command-needs-filename` is `t`, the fourth
+    argument is set to the name of the file.
 
   * `markdown-command-needs-filename` - set to `t` if
     `markdown-command` does not accept standard input (default:
@@ -680,9 +683,7 @@ provides an interface to all of the possible customizations:
     When set to `t`, `markdown-mode` will pass the name of the file
     as the final command-line argument to `markdown-command`.  Note
     that in the latter case, you will only be able to run
-    `markdown-command` from buffers which are visiting a file.  If
-    `markdown-command` is a function, `markdown-command-needs-filename`
-    is ignored.
+    `markdown-command` from buffers which are visiting a file. 
 
   * `markdown-open-command` - the command used for calling a standalone
     Markdown previewer which is capable of opening Markdown source files
