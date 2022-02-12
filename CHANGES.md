@@ -2,6 +2,11 @@
 
 *Under development*
 
+*   Improvements:
+    -   `markdown` passes `buffer-file-name` as a parameter to
+        `markdown-command` when `markdown-command-needs-filename` is
+        `t` and `markdown-command` is a function.
+
 # Markdown Mode 2.5
 
 *   **Breaking changes:**

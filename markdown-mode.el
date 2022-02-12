@@ -7351,7 +7351,11 @@ Return the name of the output buffer used."
                      (if (not (null command-args))
                          (apply #'call-process-region begin-region end-region command nil buf nil command-args)
                        (call-process-region begin-region end-region command nil buf))
-                   (funcall markdown-command begin-region end-region buf)
+                   (if markdown-command-needs-filename
+                       (if (not buffer-file-name)
+                           (user-error "Must be visiting a file")
+                         (funcall markdown-command begin-region end-region buf buffer-file-name))
+                     (funcall markdown-command begin-region end-region buf))
                    ;; If the ‘markdown-command’ function didn’t signal an
                    ;; error, assume it succeeded by binding ‘exit-code’ to 0.
                    0))))))
