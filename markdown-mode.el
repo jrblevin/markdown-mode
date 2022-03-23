@@ -3522,6 +3522,7 @@ SEQ may be an atom or a sequence."
 
 (defvar markdown-mode-syntax-table
   (let ((tab (make-syntax-table text-mode-syntax-table)))
+    (modify-syntax-entry ?` "\"" tab)
     (modify-syntax-entry ?\" "." tab)
     tab)
   "Syntax table for `markdown-mode'.")

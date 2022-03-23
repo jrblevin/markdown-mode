@@ -6,6 +6,7 @@
     -   `markdown` passes `buffer-file-name` as a parameter to
         `markdown-command` when `markdown-command-needs-filename` is
         `t` and `markdown-command` is a function.
+    -   Set syntax of backtick to "string"
 
 # Markdown Mode 2.5
 
