@@ -1065,7 +1065,7 @@ contributions!  See the [contributors graph][contrib] for details.
 ## Bugs
 
 markdown-mode is developed and tested primarily for compatibility
-with GNU Emacs 25.1 and later.  If you find any bugs in
+with GNU Emacs 26.1 and later.  If you find any bugs in
 markdown-mode, please construct a test case or a patch and open a
 ticket on the [GitHub issue tracker][issues].  See the
 contributing guidelines in `CONTRIBUTING.md` for details on
