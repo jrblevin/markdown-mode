@@ -29,11 +29,3 @@ html: $(TEST_HTML)
 
 clean:
 	rm -f $(TEST_HTML) *.elc ../*.elc
-
-evm:
-	$(MAKE) test EMACS="$(shell evm bin emacs-25.1)"
-	$(MAKE) test EMACS="$(shell evm bin emacs-25.2)"
-	$(MAKE) test EMACS="$(shell evm bin emacs-25.3)"
-	$(MAKE) test EMACS="$(shell evm bin emacs-26.1)"
-	$(MAKE) test EMACS="$(shell evm bin emacs-26.2)"
-	$(MAKE) test EMACS="$(shell evm bin emacs-26.3)"

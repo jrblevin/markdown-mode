@@ -2,6 +2,9 @@
 
 *Under development*
 
+*   **Breaking changes:**
+    -   GNU Emacs 26.1 or later is required.
+
 *   Improvements:
     -   `markdown` passes `buffer-file-name` as a parameter to
         `markdown-command` when `markdown-command-needs-filename` is
