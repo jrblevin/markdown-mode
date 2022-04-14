@@ -2224,6 +2224,19 @@ See GH-245."
       (should (invisible-p 154))
       (should (invisible-p 156)))))
 
+(ert-deftest test-markdown-markup-hiding/escape-1 ()
+  "Test hiding markup for escape."
+  (let ((markdown-hide-markup t))
+    (markdown-test-file "escape.txt"
+      (markdown-test-range-has-property 1 1 'invisible 'markdown-markup)
+      (markdown-test-range-has-property 10 10 'invisible 'markdown-markup)
+      (markdown-test-range-has-property 26 26 'invisible 'markdown-markup)
+      (should (invisible-p 1)) ;; leading backslash
+      (should-not (invisible-p 2)) ;; an escaped character
+      (should-not (invisible-p 3)) ;; inside escped markdown element
+      (should (invisible-p 10))
+      (should (invisible-p 26)))))
+
 ;;; Markup hiding url tests:
 
 (ert-deftest test-markdown-url-hiding/eldoc ()
@@ -2262,7 +2275,9 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/674"
   "Test that slash inside asterisks is not italic."
   (markdown-test-string
       "not italic *\\*"
-    (markdown-test-range-has-face (point-min) (point-max) nil)))
+    (markdown-test-range-has-face (point-min) (+ 11 (point-min)) nil)
+    (markdown-test-range-has-face (+ 12 (point-min)) (+ 12 (point-min)) 'markdown-escape-char-face)
+    (markdown-test-range-has-face (+ 13 (point-min)) (+ 13 (point-min)) nil)))
 
 (ert-deftest test-markdown-font-lock/italics-4 ()
   "Test escaped asterisk inside italics."
@@ -3663,6 +3678,14 @@ across blocks]"
       (markdown-test-range-has-face 6 7 'markdown-markup-face)))
   (markdown-test-string "==foo=="
     (markdown-test-range-has-face 1 7 nil)))
+
+(ert-deftest test-markdown-font-lock/escape ()
+  "Test font-lock for escape"
+  (markdown-test-string "\\_foo\\_"
+    (markdown-test-range-face-equals 1 1 'markdown-escape-char-face) ;; leading backslash
+    (markdown-test-range-face-equals 2 5 nil) ;; an escaped char and inside escaped markdown element
+    (markdown-test-range-face-equals 6 6 'markdown-escape-char-face) ;; backslash
+    (markdown-test-range-face-equals 7 7 nil))) ;; trailing underscore
 
 ;;; Markdown Parsing Functions:
 

@@ -928,6 +928,12 @@ Group 3 matches the mathematical expression contained within.
 Group 2 matches the opening slashes, and is used internally to
 match the closing slashes.")
 
+(defconst markdown-regex-escaped-char
+  "\\(?1:\\\\\\)\\(?2:[-~_.*\\\\]\\)"
+  "Regular expression for escaped character.
+Group 1 matches leading backslash.
+Group 2 matches the escaped character.")
+
 (defsubst markdown-make-tilde-fence-regex (num-tildes &optional end-of-line)
   "Return regexp matching a tilde code fence at least NUM-TILDES long.
 END-OF-LINE is the regexp construct to indicate end of line; $ if
@@ -1774,6 +1780,10 @@ START and END delimit region to propertize."
   '(face markdown-link-title-face invisible markdown-markup)
   "List of properties and values to apply to included code titles.")
 
+(defconst markdown-escape-char-properties
+  '(face markdown-escape-char-face invisible markdown-markup)
+  "List of properties and values to apply to escape characters.")
+
 (defcustom markdown-hide-markup nil
   "Determines whether markup in the buffer will be hidden.
 When set to nil, all markup is displayed in the buffer as it
@@ -2010,6 +2020,11 @@ For example, this applies to plain angle bracket URLs:
   "Face for highlighting."
   :group 'markdown-faces)
 
+(defface markdown-escape-char-face
+  '((t (:inherit font-lock-comment-face)))
+  "Face for escape character."
+  :group 'markdown-faces)
+
 (defcustom markdown-header-scaling nil
   "Whether to use variable-height faces for headers.
 When non-nil, `markdown-header-face' will inherit from
@@ -2210,7 +2225,8 @@ Depending on your font, some reasonable choices are:
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
     (markdown-fontify-blockquotes)
-    (markdown-match-wiki-link . ((0 'markdown-link-face prepend))))
+    (markdown-match-wiki-link . ((0 'markdown-link-face prepend)))
+    (,markdown-regex-escaped-char . ((1 markdown-escape-char-properties))))
   "Syntax highlighting for Markdown files.")
 
 ;; Footnotes

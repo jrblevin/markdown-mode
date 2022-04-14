@@ -9,6 +9,8 @@
     -   `markdown` passes `buffer-file-name` as a parameter to
         `markdown-command` when `markdown-command-needs-filename` is
         `t` and `markdown-command` is a function.
+    -   Highlight bachslashes which escape Markdown elements, and make it
+        hidden in `*-view-mode` [GH-377][]
 
 # Markdown Mode 2.5
 
