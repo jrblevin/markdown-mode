@@ -637,6 +637,15 @@ This variable must be set before loading markdown-mode."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.5"))
 
+(defcustom markdown-fontify-whole-heading-line nil
+  "Non-nil means fontify the whole line for headings.
+This is useful when setting a background color for the
+markdown-header-face-* faces."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.5"))
+
 
 ;;; Markdown-Specific `rx' Macro ==============================================
 
@@ -3426,13 +3435,17 @@ SEQ may be an atom or a sequence."
                    (add-text-properties
                     (match-beginning 3) (match-end 3) rule-props)))
         ;; atx heading
-        (add-text-properties
-         (match-beginning 4) (match-end 4) left-markup-props)
-        (add-text-properties
-         (match-beginning 5) (match-end 5) heading-props)
-        (when (match-end 6)
+        (if markdown-fontify-whole-heading-line
+            (let ((header-end (min (point-max) (1+ (match-end 0)))))
+              (add-text-properties
+               (match-beginning 0) header-end heading-props))
           (add-text-properties
-           (match-beginning 6) (match-end 6) right-markup-props))))
+           (match-beginning 4) (match-end 4) left-markup-props)
+          (add-text-properties
+           (match-beginning 5) (match-end 5) heading-props)
+          (when (match-end 6)
+            (add-text-properties
+             (match-beginning 6) (match-end 6) right-markup-props)))))
     t))
 
 (defun markdown-fontify-tables (last)

@@ -2948,6 +2948,14 @@ puts markdown.to_html
   (markdown-test-string "###"
     (markdown-test-range-has-face 1 3 nil)))
 
+(ert-deftest test-markdown-font-lock/atx-whole-line ()
+  "Test font-lock for atx headers with whole line flag."
+  (let ((markdown-fontify-whole-heading-line t))
+    (markdown-test-string "## abc  "
+      (markdown-test-range-has-face 1 8 'markdown-header-face-2))
+    (markdown-test-string "## abc ##"
+      (markdown-test-range-has-face 1 9 'markdown-header-face-2))))
+
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
   "An edge case for level-one setext headers."
   (markdown-test-string "a\n=\n"
