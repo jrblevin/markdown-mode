@@ -683,7 +683,7 @@ provides an interface to all of the possible customizations:
     When set to `t`, `markdown-mode` will pass the name of the file
     as the final command-line argument to `markdown-command`.  Note
     that in the latter case, you will only be able to run
-    `markdown-command` from buffers which are visiting a file. 
+    `markdown-command` from buffers which are visiting a file.
 
   * `markdown-open-command` - the command used for calling a standalone
     Markdown previewer which is capable of opening Markdown source files
@@ -913,6 +913,9 @@ provides an interface to all of the possible customizations:
 
   * `markdown-enable-highlighting-syntax` - font lock for highlighting
      syntax like Obsidian, Quilt(default: `nil`).
+
+  * `markdown-fontify-whole-heading-line` - font lock for highlighting
+     the whole line for headings.(default: `nil`)
 
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>

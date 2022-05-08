@@ -5,10 +5,16 @@
 *   **Breaking changes:**
     -   GNU Emacs 26.1 or later is required.
 
+*   New Feature:
+    - Introduce `markdown-fontify-whole-heading-line` variable for highlighting
+      whole header line. [GH-705][]
+
 *   Improvements:
     -   `markdown` passes `buffer-file-name` as a parameter to
         `markdown-command` when `markdown-command-needs-filename` is
         `t` and `markdown-command` is a function.
+
+  [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
 
 # Markdown Mode 2.5
 
