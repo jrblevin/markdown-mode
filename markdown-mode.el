@@ -9663,7 +9663,7 @@ rows and columns and the column alignment."
 
 ;;; ElDoc Support =============================================================
 
-(defun markdown-eldoc-function ()
+(defun markdown-eldoc-function (&rest _ignored)
   "Return a helpful string when appropriate based on context.
 * Report URL when point is at a hidden URL.
 * Report language name when point is a code block with hidden markup."
@@ -9803,8 +9803,10 @@ rows and columns and the column alignment."
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
   ;; ElDoc support
-  (add-function :before-until (local 'eldoc-documentation-function)
-                #'markdown-eldoc-function)
+  (if (boundp 'eldoc-documentation-functions)
+      (add-hook 'eldoc-documentation-functions #'markdown-eldoc-function nil t)
+    (add-function :before-until (local 'eldoc-documentation-function)
+                  #'markdown-eldoc-function))
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)

@@ -13,6 +13,7 @@
     -   `markdown` passes `buffer-file-name` as a parameter to
         `markdown-command` when `markdown-command-needs-filename` is
         `t` and `markdown-command` is a function.
+    -   Support newer version Eldoc ships with Emacs 28.
 
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
 
