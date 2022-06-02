@@ -10,12 +10,15 @@
       whole header line. [GH-705][]
 
 *   Improvements:
-    -   `markdown` passes `buffer-file-name` as a parameter to
-        `markdown-command` when `markdown-command-needs-filename` is
-        `t` and `markdown-command` is a function.
-    -   Support newer version Eldoc ships with Emacs 28.
+    - `markdown` passes `buffer-file-name` as a parameter to
+      `markdown-command` when `markdown-command-needs-filename` is
+      `t` and `markdown-command` is a function.
+    - Support newer version Eldoc ships with Emacs 28.
+    - Don't spell-check against pandoc references. [GH-572][]
 
+  [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
+
 
 # Markdown Mode 2.5
 

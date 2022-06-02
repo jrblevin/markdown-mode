@@ -2237,6 +2237,11 @@ Depending on your font, some reasonable choices are:
 
 ;;; Compatibility =============================================================
 
+(defun markdown--pandoc-reference-p ()
+  (let ((bounds (bounds-of-thing-at-point 'word)))
+    (when (and bounds (char-before (car bounds)))
+      (= (char-before (car bounds)) ?@))))
+
 (defun markdown-flyspell-check-word-p ()
   "Return t if `flyspell' should check word just before point.
 Used for `flyspell-generic-check-word-predicate'."
@@ -2252,7 +2257,8 @@ Used for `flyspell-generic-check-word-predicate'."
                                         markdown-markup-face
                                         markdown-plain-url-face
                                         markdown-inline-code-face
-                                        markdown-url-face)))
+                                        markdown-url-face))
+            (markdown--pandoc-reference-p))
         (prog1 nil
           ;; If flyspell overlay is put, then remove it
           (let ((bounds (bounds-of-thing-at-point 'word)))

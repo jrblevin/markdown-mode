@@ -7055,6 +7055,8 @@ ccc
 eee
 
 <!-- fff -->
+
+@ref9999
 "
     (flyspell-buffer)
     (search-forward "aaa")
@@ -7068,6 +7070,8 @@ eee
     (search-forward "eee")
     (should (markdown-test-flyspell-incorrect-word-p))
     (search-forward "fff") ;; in comment
+    (should-not (markdown-test-flyspell-incorrect-word-p))
+    (search-forward "@ref") ;; pandoc reference
     (should-not (markdown-test-flyspell-incorrect-word-p))))
 
 (ert-deftest test-markdown-flyspell/remove-overlay ()
