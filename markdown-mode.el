@@ -7678,20 +7678,18 @@ displaying the rendered output."
          (setq markdown-live-preview-source-buffer nil))))
 
 (defun markdown-live-preview-switch-to-output ()
-  "Switch to output buffer."
-  (interactive)
   "Turn on `markdown-live-preview-mode' if not already on, and switch to its
 output buffer in another window."
+  (interactive)
   (if markdown-live-preview-mode
       (markdown-display-buffer-other-window (markdown-live-preview-export)))
   (markdown-live-preview-mode))
 
 (defun markdown-live-preview-re-export ()
-  "Re export source buffer."
-  (interactive)
   "If the current buffer is a buffer displaying the exported version of a
 `markdown-live-preview-mode' buffer, call `markdown-live-preview-export' and
 update this buffer's contents."
+  (interactive)
   (when markdown-live-preview-source-buffer
     (with-current-buffer markdown-live-preview-source-buffer
       (markdown-live-preview-export))))
