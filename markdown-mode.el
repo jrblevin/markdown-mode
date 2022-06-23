@@ -601,7 +601,10 @@ use its return value instead of the filename in the link.  For
 example, if absolute filenames are actually relative to a server
 root directory, you can set
 `markdown-translate-filename-function' to a function that
-prepends the root directory to the given filename."
+prepends the root directory to the given filename. Another
+example would be to set this to
+`markdown-search-file-with-extension` which will find a given
+filename but also filename.md."
   :group 'markdown
   :type 'function
   :risky t
@@ -7724,6 +7727,16 @@ update this buffer's contents."
 
 
 ;;; Links =====================================================================
+
+(defun markdown-search-file-with-extension (file)
+  "Search for a file named FILE but also common markdown extensions."
+  (if (file-exists-p file)
+      file
+    (cl-loop for extension in '("mdown" "mkd" "md" "markdown")
+             for md-file = (concat file "." extension)
+             when (file-exists-p md-file)
+             return md-file
+             finally return file)))
 
 (defun markdown-backward-to-link-start ()
   "Backward link start position if current position is in link title."
