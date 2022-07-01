@@ -7858,15 +7858,13 @@ Translate filenames using `markdown-filename-translate-function'."
                      'help-echo (if title (concat title "\n" url) url)))
            ;; URL part
            (up (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-url-face
                      'invisible 'markdown-markup
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
            ;; URL composition character
            (url-char (markdown--first-displayable markdown-url-compose-char))
            ;; Title part
-           (tp (list 'face 'markdown-link-title-face
-                     'invisible 'markdown-markup
+           (tp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
@@ -7874,10 +7872,13 @@ Translate filenames using `markdown-filename-translate-function'."
       ;; Preserve existing faces applied to link part (e.g., inline code)
       (when link-start
         (add-text-properties link-start link-end lp)
-        (add-face-text-property link-start link-end
-                                'markdown-link-face 'append))
-      (when url-start (add-text-properties url-start url-end up))
-      (when title-start (add-text-properties url-end title-end tp))
+        (add-face-text-property link-start link-end 'markdown-link-face))
+      (when url-start
+        (add-text-properties url-start url-end up)
+        (add-face-text-property url-start url-end 'markdown-url-face))
+      (when title-start
+        (add-text-properties url-end title-end tp)
+        (add-face-text-property url-end title-end 'markdown-link-title-face))
       (when (and markdown-hide-urls url-start)
         (compose-region url-start (or title-end url-end) url-char))
       t)))
@@ -7896,7 +7897,6 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-link-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (lambda (_ __ pos)
@@ -7908,16 +7908,19 @@ Translate filenames using `markdown-filename-translate-function'."
            ;; URL composition character
            (url-char (markdown--first-displayable markdown-url-compose-char))
            ;; Reference part
-           (rp (list 'face 'markdown-reference-face
-                     'invisible 'markdown-markup
+           (rp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)))
-      (when link-start (add-text-properties link-start link-end lp))
-      (when ref-start (add-text-properties ref-start ref-end rp)
-            (when (and markdown-hide-urls (> (- ref-end ref-start) 2))
-              (compose-region ref-start ref-end url-char)))
+      (when link-start
+        (add-text-properties link-start link-end lp)
+        (add-face-text-property link-start link-end 'markdown-link-face))
+      (when ref-start
+        (add-text-properties ref-start ref-end rp)
+        (add-face-text-property ref-start ref-end 'markdown-reference-face)
+        (when (and markdown-hide-urls (> (- ref-end ref-start) 2))
+          (compose-region ref-start ref-end url-char)))
       t)))
 
 (defun markdown-fontify-angle-uris (last)

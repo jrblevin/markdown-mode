@@ -16,8 +16,12 @@
     - Support newer version Eldoc ships with Emacs 28.
     - Don't spell-check against pandoc references. [GH-572][]
 
+*   Bug fixes:
+    - Don't override table faces by link faces [GH-716][]
+
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
+  [gh-716]: https://github.com/jrblevin/markdown-mode/issues/716
 
 
 # Markdown Mode 2.5

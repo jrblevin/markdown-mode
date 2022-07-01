@@ -3018,6 +3018,31 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/409"
                  (1+ (point-min)) (- (point-max) 2) 'face
                  '(markdown-markup-face markdown-link-face markdown-url-face)))))
 
+(ert-deftest test-markdown-font-lock/do-not-overwrite-by-link-face ()
+  "Test links inside of table.
+Don't override table faces by link faces.
+Detail: https://github.com/jrblevin/markdown-mode/issues/716"
+  (markdown-test-string "| Links                        |
+|------------------------------|
+| [Link 1](https://github.com) |
+| [Link 2][link-reference]     |
+"
+    (search-forward "Link 1")
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-link-face)
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face)
+
+    (search-forward "https://github.com")
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-url-face)
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face)
+
+    (search-forward "Link 2")
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-link-face)
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face)
+
+    (search-forward "link-reference")
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-reference-face)
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face)))
+
 (ert-deftest test-markdown-font-lock/comment-hanging-indent ()
   "Test comments with hanging indentation."
   (markdown-test-string "<!-- This comment has\n    hanging indentation -->"
