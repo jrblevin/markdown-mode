@@ -7847,8 +7847,7 @@ Translate filenames using `markdown-filename-translate-function'."
            (title-end (match-end 7))
            (title (match-string-no-properties 7))
            ;; Markup part
-           (mp (list 'face 'markdown-markup-face
-                     'invisible 'markdown-markup
+           (mp (list 'invisible 'markdown-markup
                      'rear-nonsticky t
                      'font-lock-multiline t))
            ;; Link part (without face)
@@ -7868,7 +7867,8 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
-          (add-text-properties (match-beginning g) (match-end g) mp)))
+          (add-text-properties (match-beginning g) (match-end g) mp)
+          (add-face-text-property (match-beginning g) (match-end g) 'markdown-markup-face)))
       ;; Preserve existing faces applied to link part (e.g., inline code)
       (when link-start
         (add-text-properties link-start link-end lp)
@@ -7891,8 +7891,7 @@ Translate filenames using `markdown-filename-translate-function'."
            (ref-start (match-beginning 6))
            (ref-end (match-end 6))
            ;; Markup part
-           (mp (list 'face 'markdown-markup-face
-                     'invisible 'markdown-markup
+           (mp (list 'invisible 'markdown-markup
                      'rear-nonsticky t
                      'font-lock-multiline t))
            ;; Link part
@@ -7912,7 +7911,8 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
-          (add-text-properties (match-beginning g) (match-end g) mp)))
+          (add-text-properties (match-beginning g) (match-end g) mp)
+          (add-face-text-property (match-beginning g) (match-end g) 'markdown-markup-face)))
       (when link-start
         (add-text-properties link-start link-end lp)
         (add-face-text-property link-start link-end 'markdown-link-face))
