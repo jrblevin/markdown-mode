@@ -3041,7 +3041,13 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/716"
 
     (search-forward "link-reference")
     (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-reference-face)
-    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face)))
+    (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face)
+
+    ;; check [] and ()
+    (goto-char (point-min))
+    (while (re-search-forward "[][()]" nil t)
+      (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-markup-face)
+      (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face))))
 
 (ert-deftest test-markdown-font-lock/comment-hanging-indent ()
   "Test comments with hanging indentation."
