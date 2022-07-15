@@ -18,11 +18,12 @@
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
+    - Stop `save-some-buffers` from saving `markdown-code-fontification` buffers [GH-719][]
 
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
   [gh-716]: https://github.com/jrblevin/markdown-mode/issues/716
-
+  [gh-719]: https://github.com/jrblevin/markdown-mode/issues/719
 
 # Markdown Mode 2.5
 

@@ -8815,7 +8815,8 @@ position."
                 (put-text-property
                  (+ start (1- pos)) (1- (+ start next)) 'face
                  val markdown-buffer)))
-            (setq pos next)))
+            (setq pos next))
+          (set-buffer-modified-p nil)) ;; disable `save-some-buffers'
         (add-text-properties
          start end
          '(font-lock-fontified t fontified t font-lock-multiline t))
