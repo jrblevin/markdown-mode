@@ -18,10 +18,13 @@
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
+    - Don't bytecompile symbol unless it's required for imenu based
+      functions. This fixes [mt-51][]
 
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
   [gh-716]: https://github.com/jrblevin/markdown-mode/issues/716
+  [mt-51]: https://github.com/ardumont/markdown-toc/issues/51
 
 
 # Markdown Mode 2.5
