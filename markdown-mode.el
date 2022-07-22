@@ -9765,8 +9765,8 @@ rows and columns and the column alignment."
   ;; For imenu support
   (setq imenu-create-index-function
         (if markdown-nested-imenu-heading-index
-            #'markdown-imenu-create-nested-index
-          #'markdown-imenu-create-flat-index))
+            'markdown-imenu-create-nested-index
+          'markdown-imenu-create-flat-index))
 
   ;; Defun movement
   (setq-local beginning-of-defun-function #'markdown-beginning-of-defun)
