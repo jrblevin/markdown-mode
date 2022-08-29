@@ -3058,10 +3058,10 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/716"
   "Test multiple single-line comments in arow."
   (markdown-test-string "<!-- This is a comment -->\n<!-- And so is this -->"
     (markdown-test-range-has-face
-     (point-at-bol) (1- (point-at-eol)) 'markdown-comment-face)
+     (line-beginning-position) (1- (line-end-position)) 'markdown-comment-face)
     (forward-line)
     (markdown-test-range-has-face
-     (point-at-bol) (1- (point-at-eol)) 'markdown-comment-face)))
+     (line-beginning-position) (1- (line-end-position)) 'markdown-comment-face)))
 
 (ert-deftest test-markdown-font-lock/comment-list-items ()
   "Test comment with list inside."
@@ -3497,7 +3497,7 @@ const styles = require('gadgets/dist/styles.css');
     (goto-char (point-min))
     (forward-word)
     (should (markdown-on-heading-p))
-    (should (markdown-match-propertized-text 'markdown-heading (point-at-eol)))
+    (should (markdown-match-propertized-text 'markdown-heading (line-end-position)))
     (goto-char (match-beginning 0))
     (should (markdown-outline-level))
     (should (= (markdown-outline-level) 4))
@@ -4147,10 +4147,10 @@ only partially propertized."
   (markdown-test-file
       "inline.text"
     (should (markdown-range-property-any
-             (point-min) (point-at-eol)
+             (point-min) (line-end-position)
              'face '(markdown-markup-face markdown-italic-face)))
     (should-not (markdown-range-property-any
-                 (point-min) (point-at-eol)
+                 (point-min) (line-end-position)
                  'face '(markdown-bold-face)))))
 
 (ert-deftest test-markdown-parsing/inline-code ()
@@ -4217,13 +4217,13 @@ x: x
 [site2](http://site2.com)
 [site3](http://site3.com)"
     (goto-char (point-min))
-    (let ((limit (point-at-eol)))
+    (let ((limit (line-end-position)))
       ;; The first link is broken and shouldn't match.
       (should-not (markdown-match-generic-links limit nil))
       ;; Subsequent search shouldn't match, so point should move to limit.
       (should (= (point) limit)))
     ;; The second link should still match, starting from (point-min).
-    (let ((limit (point-at-eol 2)))
+    (let ((limit (line-end-position 2)))
       (should (markdown-match-generic-links limit nil))
       (should (= (point) (match-end 0))))
     ;; The third link should match when starting past the second one.
@@ -6628,8 +6628,7 @@ x|"
   "Test wiki link search rules and font lock for missing pages."
   (let ((markdown-enable-wiki-links t)
         (markdown-wiki-link-fontify-missing t)
-        (markdown-wiki-link-search-subdirectories t)
-        (markdown-wiki-link-search-parent-directories t))
+        (markdown-wiki-link-search-type '(project)))
     (progn
       (find-file (expand-file-name "wiki/root" markdown-test-dir))
       (unwind-protect
@@ -6670,7 +6669,7 @@ x|"
 Detail: https://github.com/jrblevin/markdown-mode/pull/590"
   (let ((markdown-enable-wiki-links t)
         (markdown-link-space-sub-char " ")
-        (markdown-wiki-link-search-subdirectories t))
+        (markdown-wiki-link-search-type '(sub-directories)))
     (progn
       (find-file (expand-file-name "wiki/pr590/Guide.md" markdown-test-dir))
       (unwind-protect
