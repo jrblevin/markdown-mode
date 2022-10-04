@@ -83,7 +83,9 @@ example; adjust settings as desired):
 (use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+         ("C-c C-e" . markdown-do)))
 ```
 
 [MELPA Stable]: http://stable.melpa.org/
@@ -106,6 +108,9 @@ to load automatically by adding the following to your init file:
 (autoload 'gfm-mode "markdown-mode"
    "Major mode for editing GitHub Flavored Markdown files" t)
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+
+(with-eval-after-load 'markdown-mode
+  (define-key markdown-mode-map (kbd "C-c C-e") #'markdown-do))
 ```
 
 [markdown-mode.el]: https://raw.githubusercontent.com/jrblevin/markdown-mode/v2.5/markdown-mode.el
