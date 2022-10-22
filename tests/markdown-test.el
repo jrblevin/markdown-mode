@@ -39,10 +39,6 @@
   (expand-file-name (file-name-directory
                      (or load-file-name buffer-file-name))))
 
-(defconst markdown-test-font-lock-function
-  (if (fboundp 'font-lock-ensure)
-      #'font-lock-ensure #'font-lock-fontify-buffer))
-
 (defmacro markdown-test-string-mode (mode string &rest body)
   "Run BODY in a temporary buffer containing STRING in MODE."
   (declare (indent 2))
@@ -55,7 +51,7 @@
            (funcall ,mode)
            (setq-default indent-tabs-mode nil)
            (goto-char (point-min))
-           (funcall markdown-test-font-lock-function)
+           (font-lock-ensure)
            (prog1 ,@body (kill-buffer))))))
 
 (defmacro markdown-test-file-mode (mode file &rest body)
@@ -67,7 +63,7 @@
          (insert-file-contents fn)
          (funcall ,mode)
          (goto-char (point-min))
-         (funcall markdown-test-font-lock-function)
+         (font-lock-ensure)
          ,@body))))
 
 (defmacro markdown-test-string (string &rest body)
@@ -120,7 +116,7 @@ This file is not saved."
              (insert-file-contents fn)
              (markdown-mode)
              (goto-char (point-min))
-             (funcall markdown-test-font-lock-function)
+             (font-lock-ensure)
              ,@body)
          (when (buffer-live-p buf)
            (set-buffer-modified-p nil)
