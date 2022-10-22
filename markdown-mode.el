@@ -2923,7 +2923,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                 (markdown-in-comment-p)
                 (markdown-range-property-any
                  begin begin 'face '(markdown-url-face
-                                     markdown-plain-url-face))
+                                     markdown-plain-url-face
+                                     markdown-markup-face))
                 (markdown-range-property-any
                  begin end 'face '(markdown-bold-face
                                    markdown-list-face
@@ -8156,13 +8157,13 @@ newline after."
   (let* ((modified (buffer-modified-p))
          (buffer-undo-list t)
          (inhibit-read-only t)
-         (inhibit-point-motion-hooks t)
          deactivate-mark
          buffer-file-truename)
     (unwind-protect
         (save-excursion
           (save-match-data
             (save-restriction
+              (cursor-intangible-mode +1) ;; inhibit-point-motion-hooks is obsoleted since Emacs 29
               ;; Extend the region to fontify so that it starts
               ;; and ends at safe places.
               (cl-multiple-value-bind (new-from new-to)
@@ -8179,6 +8180,7 @@ newline after."
                   (markdown-unfontify-region-wiki-links new-from new-to)
                   ;; Now do the fontification.
                   (markdown-fontify-region-wiki-links new-from new-to))))))
+      (cursor-intangible-mode -1)
       (and (not modified)
            (buffer-modified-p)
            (set-buffer-modified-p nil)))))
