@@ -2467,6 +2467,18 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/548"
     (markdown-test-range-has-face 28 33 'markdown-italic-face)
     (markdown-test-range-has-face 34 34 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/italic-after-bold ()
+  "Test italic fontification after after.
+Detail: https://github.com/jrblevin/markdown-mode/issues/548"
+  (markdown-test-string "__ONE__ TWO _THREE_"
+    (markdown-test-range-has-face 1 2 'markdown-markup-face)
+    (markdown-test-range-has-face 3 5 'markdown-bold-face)
+    (markdown-test-range-has-face 6 7 'markdown-markup-face)
+    (markdown-test-range-has-face 8 12 nil)
+    (markdown-test-range-has-face 13 13 'markdown-markup-face)
+    (markdown-test-range-has-face 14 18 'markdown-italic-face)
+    (markdown-test-range-has-face 19 19 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/bold-1 ()
   "A simple bold test."
   (markdown-test-file "inline.text"
