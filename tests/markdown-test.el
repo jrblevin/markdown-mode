@@ -2469,7 +2469,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/548"
 
 (ert-deftest test-markdown-font-lock/italic-after-bold ()
   "Test italic fontification after after.
-Detail: https://github.com/jrblevin/markdown-mode/issues/548"
+Detail: https://github.com/jrblevin/markdown-mode/issues/731"
   (markdown-test-string "__ONE__ TWO _THREE_"
     (markdown-test-range-has-face 1 2 'markdown-markup-face)
     (markdown-test-range-has-face 3 5 'markdown-bold-face)
