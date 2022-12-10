@@ -33,6 +33,11 @@
 (require 'cl-lib)
 (require 'ispell)
 
+(eval-when-compile
+  ;; This is for byte-compile warnings on older Emacs.
+  ;; eww-auto-rename-buffer is introduced at Emacs 29.1
+  (defvar eww-auto-rename-buffer))
+
 (defvar electric-pair-pairs)
 
 (defconst markdown-test-dir
@@ -6861,6 +6866,14 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
           (should (= (markdown-visual-lines-between-points
                       (window-start) (window-point))
                      final-win-st-diff)))))))
+
+(when (version< "29" emacs-version)
+  (ert-deftest test-markdown-live-preview/eww-auto-rename-buffer ()
+    "Test `eww-auto-rename-buffer' is non-nil.
+Detail: https://github.com/jrblevin/markdown-mode/issues/737"
+    (let ((markdown-command #'markdown-command-identity))
+      (let ((eww-auto-rename-buffer 'title))
+        (should (markdown-live-preview-window-eww "Markdown.md"))))))
 
 ;;; Tests for imenu
 

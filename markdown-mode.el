@@ -7541,8 +7541,17 @@ This is the inverse of `markdown-live-preview-buffer'.")
 (defun markdown-live-preview-window-eww (file)
   "Preview FILE with eww.
 To be used with `markdown-live-preview-window-function'."
+  (when (and (bound-and-true-p eww-auto-rename-buffer)
+             markdown-live-preview-buffer)
+    (kill-buffer markdown-live-preview-buffer))
   (eww-open-file file)
-  (get-buffer "*eww*"))
+  ;; #737 if `eww-auto-rename-buffer' is non-nil, the buffer name is not  "*eww*"
+  ;; Try to find the buffer whose name ends with "eww*"
+  (if (bound-and-true-p eww-auto-rename-buffer)
+      (cl-loop for buf in (buffer-list)
+               when (string-match-p "eww\\*\\'" (buffer-name buf))
+               return buf)
+    (get-buffer "*eww*")))
 
 (defun markdown-visual-lines-between-points (beg end)
   (save-excursion
