@@ -19,11 +19,13 @@
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
     - Fix invalid italic fontification after bold markups[GH-731][]
+    - Fix `markdown-live-preview-mode` fails when `eww-auto-rename-buffer` is non-nil[GH-737][]
 
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
   [gh-716]: https://github.com/jrblevin/markdown-mode/issues/716
   [gh-731]: https://github.com/jrblevin/markdown-mode/issues/731
+  [gh-737]: https://github.com/jrblevin/markdown-mode/issues/737
 
 
 # Markdown Mode 2.5
