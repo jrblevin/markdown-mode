@@ -15,6 +15,7 @@
       `t` and `markdown-command` is a function.
     - Support newer version Eldoc ships with Emacs 28.
     - Don't spell-check against pandoc references. [GH-572][]
+    - Support tree-sitter-based major modes used by Emacs 29.
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
