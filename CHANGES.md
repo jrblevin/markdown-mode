@@ -16,6 +16,7 @@
     - Support newer version Eldoc ships with Emacs 28.
     - Don't spell-check against pandoc references. [GH-572][]
     - Support tree-sitter-based major modes used by Emacs 29.
+    - Highlight "geo" URI scheme [GH-739][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
@@ -27,6 +28,7 @@
   [gh-716]: https://github.com/jrblevin/markdown-mode/issues/716
   [gh-731]: https://github.com/jrblevin/markdown-mode/issues/731
   [gh-737]: https://github.com/jrblevin/markdown-mode/issues/737
+  [gh-739]: https://github.com/jrblevin/markdown-mode/issues/739
 
 
 # Markdown Mode 2.5
