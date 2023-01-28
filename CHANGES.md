@@ -17,6 +17,7 @@
     - Don't spell-check against pandoc references. [GH-572][]
     - Support tree-sitter-based major modes used by Emacs 29.
     - Highlight "geo" URI scheme [GH-739][]
+    - `clear-image-cache` to make toggle inline image update.
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
