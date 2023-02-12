@@ -7270,6 +7270,16 @@ https://github.com/jrblevin/markdown-mode/issues/640"
       (should (string= (buffer-substring-no-properties (point-min) (point-max))
                        "| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n")))))
 
+(ert-deftest test-markdown-table/decide-delimiter-line ()
+  "Test `markdown-table-aligh' for the line which starts with dash.
+Detail: https://github.com/jrblevin/markdown-mode/issues/747"
+  (let ((markdown-table-align-p t))
+    (markdown-test-string "| -c | some text |\n"
+      (search-forward "some")
+      (call-interactively 'markdown-table-next-row)
+      (should (string= (buffer-substring-no-properties (point-min) (point-max))
+                       "| -c | some text |\n|    |           |\n")))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
