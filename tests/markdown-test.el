@@ -2605,6 +2605,30 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/325"
       "<https://example.com/__not-bold__>"
     (should-not (markdown-range-property-any 23 30 'face '(markdown-bold-face)))))
 
+(ert-deftest test-markdown-font-lock/autolinks ()
+  "Test highlighting inside brackets if it looks like URI.
+Detail: https://github.com/jrblevin/markdown-mode/issues/743"
+  (markdown-test-string "<https://example.com/>
+<mailto:nobody@example.com>
+<MAILTO:nobody@example.com>
+<uri://example.com>
+<tel:+555>
+<geo:59.5,11.0>
+<irc://example.com/channel>
+<x-web-search://>
+<x-apple-reminder://>
+"
+    (while (re-search-forward "<\\([^>]+\\)>" nil t)
+      (markdown-test-range-face-equals (match-beginning 1) (1- (match-end 1)) 'markdown-plain-url-face)))
+
+  ;; valid scheme length is 2..32 characters
+  (markdown-test-string "<a:abcde>
+<this-is-very-very-very-very-long-scheme://example.com>
+"
+    (while (re-search-forward "<\\([^>]+\\)>" nil t)
+      (should-not
+       (markdown-range-property-any (match-beginning 1) (1- (match-end 1)) 'face '(markdown-plain-url-face))))))
+
 (ert-deftest test-markdown-font-lock/code-1 ()
   "A simple inline code test."
   (markdown-test-file "inline.text"
