@@ -18,6 +18,8 @@
     - Support tree-sitter-based major modes used by Emacs 29.
     - Highlight "geo" URI scheme [GH-739][]
     - `clear-image-cache` to make toggle inline image update.
+    - Highlight autolinks if a scheme is valid and it is not registered in markdown-uri-types
+      [GH-743][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
@@ -31,6 +33,7 @@
   [gh-731]: https://github.com/jrblevin/markdown-mode/issues/731
   [gh-737]: https://github.com/jrblevin/markdown-mode/issues/737
   [gh-739]: https://github.com/jrblevin/markdown-mode/issues/739
+  [gh-743]: https://github.com/jrblevin/markdown-mode/issues/743
   [gh-747]: https://github.com/jrblevin/markdown-mode/issues/747
 
 
