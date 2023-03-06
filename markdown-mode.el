@@ -3507,14 +3507,14 @@ SEQ may be an atom or a sequence."
 (defun markdown-fontify-hrs (last)
   "Add text properties to horizontal rules from point to LAST."
   (when (markdown-match-hr last)
-    (let ((hr-char (markdown--first-displayable markdown-hr-display-char)))
+    (let* ((hr-char (markdown--first-displayable markdown-hr-display-char))
+           (hr-len (and hr-char (/ (window-max-chars-per-line) (char-width hr-char)))))
       (add-text-properties
        (match-beginning 0) (match-end 0)
        `(face markdown-hr-face
               font-lock-multiline t
               ,@(when (and markdown-hide-markup hr-char)
-                  `(display ,(make-string
-                              (1- (window-body-width)) hr-char)))))
+                  `(display ,(make-string hr-len hr-char)))))
       t)))
 
 (defun markdown-fontify-sub-superscripts (last)

@@ -5241,7 +5241,7 @@ Sentence seven. Sentence eight.
     (forward-sentence 1)
     (looking-back "seven\\." (line-beginning-position))
     (forward-sentence 1)
-    (looking-at-p "$")))
+    (should (looking-at-p "$"))))
 
 ;;; Link tests:
 
