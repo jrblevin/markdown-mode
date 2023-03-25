@@ -5,9 +5,10 @@
 *   **Breaking changes:**
     -   GNU Emacs 26.1 or later is required.
 
-*   New Feature:
+*   New Features:
     - Introduce `markdown-fontify-whole-heading-line` variable for highlighting
       whole header line. [GH-705][]
+    - Backslashes in escape sequences are now treated as markup. [GH-377][]
 
 *   Improvements:
     - `markdown` passes `buffer-file-name` as a parameter to
@@ -28,6 +29,7 @@
     - Fix to mistake to handle the line as delimiter row[GH-747][]
     - Fix wrong displaying horizontal rule in `markdown-view-mode` [GH-747][]
 
+  [gh-377]: https://github.com/jrblevin/markdown-mode/issues/377
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
   [gh-705]: https://github.com/jrblevin/markdown-mode/issues/705
   [gh-716]: https://github.com/jrblevin/markdown-mode/issues/716

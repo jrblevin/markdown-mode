@@ -2225,6 +2225,16 @@ See GH-245."
       (should (invisible-p 154))
       (should (invisible-p 156)))))
 
+(ert-deftest test-markdown-markup-hiding/escape ()
+  "Test hiding markup for backslash escapes."
+  (markdown-test-string "\\#"
+    (markdown-test-range-has-property (point) (point) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point)))
+    (should-not (invisible-p (1+ (point))))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p (point)))
+    (should-not (invisible-p (1+ (point))))))
+
 ;;; Markup hiding url tests:
 
 (ert-deftest test-markdown-url-hiding/eldoc ()
@@ -2263,7 +2273,10 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/674"
   "Test that slash inside asterisks is not italic."
   (markdown-test-string
       "not italic *\\*"
-    (markdown-test-range-has-face (point-min) (point-max) nil)))
+    (markdown-test-range-has-face 1 12 nil)
+    ;; Check face of the backslash
+    (markdown-test-range-has-face 13 13 'markdown-markup-face)
+    (markdown-test-range-has-face 14 14 nil)))
 
 (ert-deftest test-markdown-font-lock/italics-4 ()
   "Test escaped asterisk inside italics."
@@ -2656,10 +2669,17 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/743"
     (markdown-test-range-has-face 461 467 'markdown-inline-code-face)
     (markdown-test-range-has-face 468 468 'markdown-markup-face)
     ;; Escaping of leading backquotes
-    (markdown-test-range-has-face 586 592 nil)
-    (markdown-test-range-has-face 597 603 nil)
+    (markdown-test-range-has-face 586 586 'markdown-markup-face)
+    (markdown-test-range-has-face 587 590 nil)
+    (markdown-test-range-has-face 591 591 'markdown-markup-face)
+    (markdown-test-range-has-face 592 592 nil)
+    (markdown-test-range-has-face 597 597 'markdown-markup-face)
+    (markdown-test-range-has-face 598 601 nil)
+    (markdown-test-range-has-face 602 602 'markdown-markup-face)
+    (markdown-test-range-has-face 603 603 nil)
     ;; A code span crossing lines
-    (markdown-test-range-has-face 652 656 nil)
+    (markdown-test-range-has-face 652 652 'markdown-markup-face)
+    (markdown-test-range-has-face 653 656 nil)
     (markdown-test-range-has-face 657 657 'markdown-markup-face)
     (markdown-test-range-has-face 658 665 'markdown-inline-code-face)
     (markdown-test-range-has-face 666 666 'markdown-markup-face)
