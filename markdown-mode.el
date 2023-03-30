@@ -3510,7 +3510,7 @@ SEQ may be an atom or a sequence."
     t))
 
 (defun markdown--fontify-hrs-view-mode (hr-char)
-  (if (and hr-char (display-supports-face-attributes-p '(:underline t)))
+  (if (and hr-char (display-supports-face-attributes-p '(:extend t)))
       (add-text-properties
        (match-beginning 0) (match-end 0)
        `(face
