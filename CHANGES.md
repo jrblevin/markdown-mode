@@ -21,6 +21,7 @@
     - `clear-image-cache` to make toggle inline image update.
     - Highlight autolinks if a scheme is valid and it is not registered in markdown-uri-types
       [GH-743][]
+    - Improve horizontal rule rendering in `markdown-view-mode` [GH-753][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
