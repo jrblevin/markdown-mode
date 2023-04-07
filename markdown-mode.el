@@ -7445,6 +7445,12 @@ Standalone XHTML output is identified by an occurrence of
               stylesheet-path)
           "\"  />"))
 
+(defun markdown-escape-title (title)
+  "Escape a minimum set of characters in TITLE so they don't clash with html."
+  (string-replace ">" "&gt;"
+    (string-replace "<" "&lt;"
+      (string-replace "&" "&amp;" title))))
+
 (defun markdown-add-xhtml-header-and-footer (title)
   "Wrap XHTML header and footer with given TITLE around current buffer."
   (goto-char (point-min))
@@ -7453,7 +7459,7 @@ Standalone XHTML output is identified by an occurrence of
           "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\n"
           "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\n"
           "<head>\n<title>")
-  (insert title)
+  (insert (markdown-escape-title title))
   (insert "</title>\n")
   (unless (= (length markdown-content-type) 0)
     (insert
