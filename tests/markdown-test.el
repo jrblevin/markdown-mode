@@ -7325,6 +7325,14 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/747"
       (should (string= (buffer-substring-no-properties (point-min) (point-max))
                        "| -c | some text |\n|    |           |\n")))))
 
+(ert-deftest test-markdown-table/ensure-valid-html-title ()
+  "Test `markdown-table-aligh' for the line which starts with dash.
+Detail: https://github.com/jrblevin/markdown-mode/issues/747"
+  (markdown-test-string "simple"
+    (markdown-add-xhtml-header-and-footer "test<&>")
+    (goto-char (point-min))
+    (should (search-forward "test&lt;&amp;&gt;"))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
