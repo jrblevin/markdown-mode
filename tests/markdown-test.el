@@ -57,7 +57,8 @@
            (setq-default indent-tabs-mode nil)
            (goto-char (point-min))
            (font-lock-ensure)
-           (prog1 ,@body (kill-buffer))))))
+           (prog1 ,@body (kill-buffer)))
+       (ignore))))
 
 (defmacro markdown-test-file-mode (mode file &rest body)
   "Open FILE from `markdown-test-dir' in MODE and execute BODY."
