@@ -7,7 +7,7 @@
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
 ;; Version: 2.6-alpha
-;; Package-Requires: ((emacs "26.1") (compat "28"))
+;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
 
@@ -34,7 +34,6 @@
 ;;; Code:
 
 (require 'easymenu)
-(require 'compat)
 (require 'outline)
 (require 'thingatpt)
 (require 'cl-lib)
@@ -7448,9 +7447,9 @@ Standalone XHTML output is identified by an occurrence of
 
 (defun markdown-escape-title (title)
   "Escape a minimum set of characters in TITLE so they don't clash with html."
-  (string-replace ">" "&gt;"
-    (string-replace "<" "&lt;"
-      (string-replace "&" "&amp;" title))))
+  (replace-regexp-in-string ">" "&gt;"
+    (replace-regexp-in-string "<" "&lt;"
+      (replace-regexp-in-string "&" "&amp;" title))))
 
 (defun markdown-add-xhtml-header-and-footer (title)
   "Wrap XHTML header and footer with given TITLE around current buffer."
