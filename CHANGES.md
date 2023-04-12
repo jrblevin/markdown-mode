@@ -29,6 +29,7 @@
     - Fix `markdown-live-preview-mode` fails when `eww-auto-rename-buffer` is non-nil[GH-737][]
     - Fix to mistake to handle the line as delimiter row[GH-747][]
     - Fix wrong displaying horizontal rule in `markdown-view-mode` [GH-747][]
+    - HTML-escape title in `markdown-add-xhtml-header-and-footer` [markdown-xwidget-issue-9](https://github.com/cfclrk/markdown-xwidget/issues/9)
 
   [gh-377]: https://github.com/jrblevin/markdown-mode/issues/377
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
