@@ -5330,6 +5330,14 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/408"
       (let ((link (markdown-link-at-pos (point))))
         (should (string= (nth 3 link) url))))))
 
+(ert-deftest test-markdown-link/link-contains-parenthesis-and-label ()
+  "Test URL which contains close parenthesis.
+Detail: https://github.com/jrblevin/markdown-mode/issues/762"
+  (markdown-test-string "![Text](url(par).png \"label\")"
+    (let ((link (markdown-link-at-pos (point))))
+      (should (string= (nth 3 link) "url(par).png"))
+      (should (string= (nth 5 link) "label")))))
+
 (ert-deftest test-markdown-link/start-or-end-with-spaces ()
   "Test `markdown-link-at-pos' return values with URL part starts/ends with spaces.
 Detail: https://github.com/jrblevin/markdown-mode/issues/514"
