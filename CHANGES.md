@@ -30,6 +30,7 @@
     - Fix to mistake to handle the line as delimiter row[GH-747][]
     - Fix wrong displaying horizontal rule in `markdown-view-mode` [GH-747][]
     - HTML-escape title in `markdown-add-xhtml-header-and-footer` [markdown-xwidget-issue-9](https://github.com/cfclrk/markdown-xwidget/issues/9)
+    - Fix wrong inline link parsing that has link title[GH-762][]
 
   [gh-377]: https://github.com/jrblevin/markdown-mode/issues/377
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
@@ -41,6 +42,7 @@
   [gh-743]: https://github.com/jrblevin/markdown-mode/issues/743
   [gh-747]: https://github.com/jrblevin/markdown-mode/issues/747
   [gh-753]: https://github.com/jrblevin/markdown-mode/issues/753
+  [gh-762]: https://github.com/jrblevin/markdown-mode/issues/762
 
 
 # Markdown Mode 2.5
