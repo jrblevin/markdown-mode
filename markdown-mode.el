@@ -5734,7 +5734,7 @@ See also `markdown-mode-map'.")
 (defun markdown-imenu-create-nested-index ()
   "Create and return a nested imenu index alist for the current buffer.
 See `imenu-create-index-function' and `imenu--index-alist' for details."
-  (let* ((root '(nil . nil))
+  (let* ((root (list nil))
          (min-level 9999)
          hashes headers)
     (save-excursion
