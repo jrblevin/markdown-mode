@@ -4306,6 +4306,15 @@ x: x
     (should (string-equal (markdown-code-block-lang
                            '(83 . markdown-tilde-fence-begin)) "bash"))))
 
+(ert-deftest test-markdown-parsing/get-lang-mode ()
+  "Test `markdown-get-lang-mode'.
+Do not load major-mode function if it isn't in auto-mode-alist.
+Details: https://github.com/jrblevin/markdown-mode/issues/761"
+  (should (eq (markdown-get-lang-mode "emacs-lisp") 'emacs-lisp-mode))
+
+  (let ((auto-mode-alist nil))
+    (should (null (markdown-get-lang-mode "emacs-lisp")))))
+
 (ert-deftest test-markdown-parsing/code-block-lang-period ()
   "Test `markdown-code-block-lang' when language name begins with a period."
   (markdown-test-string "~~~ { .ruby }

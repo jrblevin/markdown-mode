@@ -22,6 +22,7 @@
     - Highlight autolinks if a scheme is valid and it is not registered in markdown-uri-types
       [GH-743][]
     - Improve horizontal rule rendering in `markdown-view-mode` [GH-753][]
+    - Don't load major-mode if it isn't in `auto-mode-alist`[GH-761][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
@@ -42,6 +43,7 @@
   [gh-743]: https://github.com/jrblevin/markdown-mode/issues/743
   [gh-747]: https://github.com/jrblevin/markdown-mode/issues/747
   [gh-753]: https://github.com/jrblevin/markdown-mode/issues/753
+  [gh-761]: https://github.com/jrblevin/markdown-mode/issues/761
   [gh-762]: https://github.com/jrblevin/markdown-mode/issues/762
 
 
