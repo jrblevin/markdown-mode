@@ -2144,6 +2144,22 @@ See GH-245."
     (should (invisible-p (point)))
     (should-not (invisible-p (1+ (point))))))
 
+(ert-deftest test-markdown-markup-hiding/code-2 ()
+  "Test hiding markup for inline code with backslashes."
+  (markdown-test-file "inline.text"
+    (goto-char 460)
+    (should (looking-at "`C-h C-\\\\`"))
+    (markdown-test-range-has-property (point) (point) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point)))
+    (should-not (invisible-p (+ 1 (point))))
+    (should-not (invisible-p (+ 7 (point))))
+    (should-not (invisible-p (+ 8 (point))))
+    (markdown-toggle-markup-hiding t)
+    (should (invisible-p (point)))
+    (should-not (invisible-p (+ 1 (point))))
+    (should-not (invisible-p (+ 7 (point))))
+    (should (invisible-p (+ 8 (point))))))
+
 (ert-deftest test-markdown-markup-hiding/kbd-1 ()
   "Test hiding markup for <kbd> tags."
   (markdown-test-string "<kbd>C-c C-x C-m</kbd>"
