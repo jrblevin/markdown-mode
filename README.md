@@ -352,6 +352,19 @@ can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
     preview window to appear at the bottom or right, you can
     customize `markdown-split-window-direction`.
 
+      ```lisp
+      ;; Set custom markdown preview function
+      (setq markdown-live-preview-window-function #'my-markdown-preview-function)
+
+      ;; always open the preview window at the right
+      (setq markdown-split-window-direction 'right)
+      ;; always open the preview window at the bottom
+      (setq markdown-split-window-direction 'below)
+
+      ;; delete exported HTML file after markdown-live-preview-export is called
+      (setq markdown-live-preview-delete-export 'delete-on-export)
+      ```
+
     To summarize:
 
       - <kbd>C-c C-c m</kbd>: `markdown-command` > `*markdown-output*` buffer.
