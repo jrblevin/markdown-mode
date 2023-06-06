@@ -9734,8 +9734,8 @@ spaces, or alternatively a TAB should be used as the separator."
 Optional arguments ROWS, COLUMNS, and ALIGN specify number of
 rows and columns and the column alignment."
   (interactive)
-  (let* ((rows (or rows (string-to-number (read-string "Row size: "))))
-         (columns (or columns (string-to-number (read-string "Column size: "))))
+  (let* ((rows (or rows (read-number "Number of Rows: ")))
+         (columns (or columns (read-number "Number of Columns: ")))
          (align (or align (read-string "Alignment ([l]eft, [r]ight, [c]enter, or RET for default): ")))
          (align (cond ((equal align "l") ":--")
                       ((equal align "r") "--:")
