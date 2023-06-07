@@ -23,6 +23,7 @@
       [GH-743][]
     - Improve horizontal rule rendering in `markdown-view-mode` [GH-753][]
     - Don't load major-mode if it isn't in `auto-mode-alist`[GH-761][]
+    - Improve `markdown-insert-table` prompt message [GH-771][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
@@ -48,6 +49,7 @@
   [gh-762]: https://github.com/jrblevin/markdown-mode/issues/762
   [gh-766]: https://github.com/jrblevin/markdown-mode/issues/766
   [gh-768]: https://github.com/jrblevin/markdown-mode/pull/768
+  [gh-771]: https://github.com/jrblevin/markdown-mode/issues/771
 
 
 # Markdown Mode 2.5
