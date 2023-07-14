@@ -5441,7 +5441,7 @@ http://example.com \"title\"  )
       (should (eq (markdown-next-link) 8))
       ;; Advance to second link
       (should (eq (markdown-next-link) 73))
-      ;; Avance to final link
+      ;; Advance to final link
       (should (eq (markdown-next-link) 155))
       ;; Return nil and don't advance point
       (should (eq (markdown-next-link) nil))
