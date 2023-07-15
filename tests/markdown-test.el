@@ -5407,6 +5407,11 @@ http://example.com \"title\"  )
     (goto-char 13)
     (should (markdown-link-p))))
 
+(ert-deftest test-markdown-link/link-p-2 ()
+  "Don't allow space between label and text in reference link."
+  (markdown-test-string "[one] [two]"
+    (should-not (markdown-link-p))))
+
 ;;; Wiki link tests:
 
 (ert-deftest test-markdown-wiki-link/file-local-variables ()

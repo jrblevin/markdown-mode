@@ -3,7 +3,8 @@
 *Under development*
 
 *   **Breaking changes:**
-    -   GNU Emacs 26.1 or later is required.
+    - GNU Emacs 26.1 or later is required.
+    - Don't allow space between label and text in reference link same as CommonMark [GH-774][]
 
 *   New Features:
     - Introduce `markdown-fontify-whole-heading-line` variable for highlighting
@@ -50,6 +51,7 @@
   [gh-766]: https://github.com/jrblevin/markdown-mode/issues/766
   [gh-768]: https://github.com/jrblevin/markdown-mode/pull/768
   [gh-771]: https://github.com/jrblevin/markdown-mode/issues/771
+  [gh-774]: https://github.com/jrblevin/markdown-mode/issues/774
 
 
 # Markdown Mode 2.5
