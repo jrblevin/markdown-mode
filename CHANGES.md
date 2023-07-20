@@ -5,6 +5,7 @@
 *   **Breaking changes:**
     - GNU Emacs 26.1 or later is required.
     - Don't allow space between label and text in reference link same as CommonMark [GH-774][]
+    - Whitespace is required before the closing sequence of an atx header. [GH-778][]
 
 *   New Features:
     - Introduce `markdown-fontify-whole-heading-line` variable for highlighting
