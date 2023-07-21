@@ -3013,6 +3013,16 @@ puts markdown.to_html
       (markdown-test-range-has-face 70 72 'font-lock-builtin-face) ; puts
       (markdown-test-range-has-face 92 94 'markdown-markup-face)))) ; ```
 
+(ert-deftest test-markdown-font-lock/atx-headers ()
+  "Test font-lock for atx headers"
+  (markdown-test-string "## abc  "
+    (markdown-test-range-has-face 1 3 'markdown-header-delimiter-face)
+    (markdown-test-range-has-face 4 8 'markdown-header-face-2))
+  (markdown-test-string "## abc ##"
+    (markdown-test-range-has-face 1 3 'markdown-header-delimiter-face)
+    (markdown-test-range-has-face 4 6 'markdown-header-face-2)
+    (markdown-test-range-has-face 7 9 'markdown-header-delimiter-face)))
+
 (ert-deftest test-markdown-font-lock/atx-no-spaces ()
   "Test font-lock for atx headers with no spaces."
   (markdown-test-string "##abc##"
@@ -3020,7 +3030,10 @@ puts markdown.to_html
   (markdown-test-string "##"
     (markdown-test-range-has-face 1 2 nil))
   (markdown-test-string "###"
-    (markdown-test-range-has-face 1 3 nil)))
+    (markdown-test-range-has-face 1 3 nil))
+  (markdown-test-string "## abc##"
+    (markdown-test-range-has-face 1 3 'markdown-header-delimiter-face)
+    (markdown-test-range-has-face 4 8 'markdown-header-face-2)))
 
 (ert-deftest test-markdown-font-lock/atx-whole-line ()
   "Test font-lock for atx headers with whole line flag."
