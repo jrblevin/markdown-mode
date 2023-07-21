@@ -53,6 +53,7 @@
   [gh-768]: https://github.com/jrblevin/markdown-mode/pull/768
   [gh-771]: https://github.com/jrblevin/markdown-mode/issues/771
   [gh-774]: https://github.com/jrblevin/markdown-mode/issues/774
+  [gh-778]: https://github.com/jrblevin/markdown-mode/issues/778
 
 
 # Markdown Mode 2.5
