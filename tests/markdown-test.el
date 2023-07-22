@@ -3038,10 +3038,21 @@ puts markdown.to_html
 (ert-deftest test-markdown-font-lock/atx-whole-line ()
   "Test font-lock for atx headers with whole line flag."
   (let ((markdown-fontify-whole-heading-line t))
-    (markdown-test-string "## abc  "
-      (markdown-test-range-has-face 1 8 'markdown-header-face-2))
-    (markdown-test-string "## abc ##"
-      (markdown-test-range-has-face 1 9 'markdown-header-face-2))))
+    (let ((markdown-hide-markup nil))
+      (markdown-test-string "## abc  \n"
+                            (markdown-test-range-has-face 4 9 'markdown-header-face-2))
+      (markdown-test-string "## abc ##\n"
+                            (markdown-test-range-has-face 4 6 'markdown-header-face-2)
+                            (markdown-test-range-has-face 7 10 'markdown-header-delimiter-face)))
+
+    (let ((markdown-hide-markup t))
+      (markdown-test-string "## abc  \n"
+                            (markdown-test-range-has-face 4 9 'markdown-header-face-2))
+      (markdown-test-string "## abc ##\n"
+                            (markdown-test-range-has-face 4 6 'markdown-header-face-2)
+                            (markdown-test-range-has-face 7 9 'markdown-header-delimiter-face)
+                            (markdown-test-range-has-face 10 10 'markdown-header-face-2))
+      )))
 
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
   "An edge case for level-one setext headers."

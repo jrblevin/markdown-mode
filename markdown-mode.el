@@ -3483,17 +3483,30 @@ SEQ may be an atom or a sequence."
                    (add-text-properties
                     (match-beginning 3) (match-end 3) rule-props)))
         ;; atx heading
-        (if markdown-fontify-whole-heading-line
-            (let ((header-end (min (point-max) (1+ (match-end 0)))))
-              (add-text-properties
-               (match-beginning 0) header-end heading-props))
+        (let ((header-end
+               (if markdown-fontify-whole-heading-line
+                   (min (point-max) (1+ (match-end 0)))
+                 (match-end 0))))
           (add-text-properties
            (match-beginning 4) (match-end 4) left-markup-props)
-          (add-text-properties
-           (match-beginning 5) (match-end 5) heading-props)
-          (when (match-end 6)
+
+          ;; If closing tag is present
+          (if (match-end 6)
+              (progn
+                (if markdown-hide-markup
+                    (progn
+                      (add-text-properties
+                       (match-beginning 5) header-end heading-props)
+                      (add-text-properties
+                       (match-beginning 6) (match-end 6) right-markup-props))
+                  (add-text-properties
+                   (match-beginning 5) (match-end 5) heading-props)
+                  (add-text-properties
+                   (match-beginning 6) header-end right-markup-props)))
+            ;; If closing tag is not present
             (add-text-properties
-             (match-beginning 6) (match-end 6) right-markup-props)))))
+             (match-beginning 5) header-end heading-props))
+          )))
     t))
 
 (defun markdown-fontify-tables (last)

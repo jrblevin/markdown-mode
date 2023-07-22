@@ -9,7 +9,7 @@
 
 *   New Features:
     - Introduce `markdown-fontify-whole-heading-line` variable for highlighting
-      whole header line. [GH-705][]
+      whole header line. [GH-705][] [GH-773][]
     - Backslashes in escape sequences are now treated as markup. [GH-377][]
 
 *   Improvements:
@@ -52,9 +52,9 @@
   [gh-766]: https://github.com/jrblevin/markdown-mode/issues/766
   [gh-768]: https://github.com/jrblevin/markdown-mode/pull/768
   [gh-771]: https://github.com/jrblevin/markdown-mode/issues/771
+  [gh-773]: https://github.com/jrblevin/markdown-mode/issues/773
   [gh-774]: https://github.com/jrblevin/markdown-mode/issues/774
   [gh-778]: https://github.com/jrblevin/markdown-mode/issues/778
-
 
 # Markdown Mode 2.5
 
