@@ -5671,10 +5671,7 @@ indented the same amount."
       (let ((fill-column 10))
         (end-of-line)
         (funcall auto-fill-function)
-        ;; This test was known to fail in Emacs 25 and earlier.
-        (if (version< emacs-version "26.0")
-            (should-not (string-equal (buffer-string) str))
-          (should (string-equal (buffer-string) str)))))))
+        (should (string-equal (buffer-string) str))))))
 
 (ert-deftest test-markdown-filling/break-within-list-item ()
   "This doesn't suppress auto-fill within a multi-word list item."
