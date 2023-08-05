@@ -5066,9 +5066,10 @@ list simply adds a blank line)."
                (setq bounds (markdown-cur-list-item-bounds)))
           (let ((beg (cl-first bounds))
                 (end (cl-second bounds))
-                (length (cl-fourth bounds)))
+                (nonlist-indent (cl-fourth bounds))
+                (checkbox (cl-sixth bounds)))
             ;; Point is in a list item
-            (if (= (- end beg) length)
+            (if (= (- end beg) (+ nonlist-indent (length checkbox)))
                 ;; Delete blank list
                 (progn
                   (delete-region beg end)

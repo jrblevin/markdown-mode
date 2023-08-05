@@ -2054,6 +2054,18 @@ Should not cause an infinite loop."
       (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n\n"))
       (should (eq (point) 22)))))
 
+(ert-deftest test-markdown-indentation/indent-checkbox-list ()
+  "Test `markdown-indent-line' with a list item with checkbox."
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (markdown-test-string "  * [x] item 1"
+      (end-of-line)
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "  * [x] item 1\n  * [ ] "))
+      (should (eq (point) 24))
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "  * [x] item 1\n\n"))
+      (should (eq (point) 17)))))
+
 (ert-deftest test-markdown-indentation/indent-pre ()
   "Test `markdown-indent-line' with a pre block."
   (markdown-test-string

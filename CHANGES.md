@@ -36,6 +36,7 @@
     - HTML-escape title in `markdown-add-xhtml-header-and-footer` [markdown-xwidget-issue-9](https://github.com/cfclrk/markdown-xwidget/issues/9)
     - Fix wrong inline link parsing that has link title[GH-762][]
     - Don't treat backslashes as escapes inside literal blocks[GH-766][] [GH-768][]
+    - Fix `markdown-enter-key` doesn't delete empty checkbox list[GH-786]
 
   [gh-377]: https://github.com/jrblevin/markdown-mode/issues/377
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
@@ -55,6 +56,7 @@
   [gh-773]: https://github.com/jrblevin/markdown-mode/issues/773
   [gh-774]: https://github.com/jrblevin/markdown-mode/issues/774
   [gh-778]: https://github.com/jrblevin/markdown-mode/issues/778
+  [gh-786]: https://github.com/jrblevin/markdown-mode/pull/786
 
 # Markdown Mode 2.5
 
