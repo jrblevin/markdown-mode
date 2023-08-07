@@ -36,7 +36,9 @@
 (eval-when-compile
   ;; This is for byte-compile warnings on older Emacs.
   ;; eww-auto-rename-buffer is introduced at Emacs 29.1
-  (defvar eww-auto-rename-buffer))
+  (defvar eww-auto-rename-buffer)
+  ;; major-mode-remap-alist introduced at Emacs 29.1
+  (defvar major-mode-remap-alist))
 
 (defvar electric-pair-pairs)
 
@@ -4366,6 +4368,14 @@ Details: https://github.com/jrblevin/markdown-mode/issues/761"
 
   (let ((auto-mode-alist nil))
     (should (null (markdown-get-lang-mode "emacs-lisp")))))
+
+(ert-deftest test-markdown-parsing/get-lang-mode-from-remap-alist ()
+  "Test `markdown-get-lang-mode' from major-mode-remap-alist.
+Details: https://github.com/jrblevin/markdown-mode/issues/787"
+  (when (and (fboundp 'treesit-language-available-p)
+             (funcall 'treesit-language-available-p 'python))
+    (let ((major-mode-remap-alist '((python-mode . python-ts-mode))))
+      (should (eq (markdown-get-lang-mode "python") 'python-ts-mode)))))
 
 (ert-deftest test-markdown-parsing/code-block-lang-period ()
   "Test `markdown-code-block-lang' when language name begins with a period."
