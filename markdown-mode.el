@@ -8843,10 +8843,16 @@ LANG is a string, and the returned major mode is a symbol."
 (defun markdown--lang-mode-predicate (mode)
   (and mode
        (fboundp mode)
-       ;; https://github.com/jrblevin/markdown-mode/issues/761
-       (cl-loop for pair in auto-mode-alist
-                for func = (cdr pair)
-                thereis (and (atom func) (eq mode func)))))
+       (or
+        ;; https://github.com/jrblevin/markdown-mode/issues/787
+        ;; major-mode-remap-alist was introduced at Emacs 29.1
+        (cl-loop for pair in (bound-and-true-p major-mode-remap-alist)
+                 for func = (cdr pair)
+                 thereis (and (atom func) (eq mode func)))
+        ;; https://github.com/jrblevin/markdown-mode/issues/761
+        (cl-loop for pair in auto-mode-alist
+                 for func = (cdr pair)
+                 thereis (and (atom func) (eq mode func))))))
 
 (defun markdown-fontify-code-blocks-generic (matcher last)
   "Add text properties to next code block from point to LAST.
