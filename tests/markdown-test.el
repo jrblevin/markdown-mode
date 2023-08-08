@@ -2057,18 +2057,6 @@ Should not cause an infinite loop."
       (should (string-equal (buffer-string) "* foo\n* bar\n  * baz\n\n"))
       (should (eq (point) 22)))))
 
-(ert-deftest test-markdown-indentation/indent-checkbox-list ()
-  "Test `markdown-indent-line' with a list item with checkbox."
-  (let ((markdown-indent-on-enter 'indent-and-new-item))
-    (markdown-test-string "  * [x] item 1"
-      (end-of-line)
-      (call-interactively #'markdown-enter-key)
-      (should (string-equal (buffer-string) "  * [x] item 1\n  * [ ] "))
-      (should (eq (point) 24))
-      (call-interactively #'markdown-enter-key)
-      (should (string-equal (buffer-string) "  * [x] item 1\n\n"))
-      (should (eq (point) 17)))))
-
 (ert-deftest test-markdown-indentation/indent-pre ()
   "Test `markdown-indent-line' with a pre block."
   (markdown-test-string
@@ -2112,12 +2100,16 @@ See GH-245."
     (should (= (current-indentation) 0))))
 
 (ert-deftest test-markdown-indentation/continue-gfm-task-lists ()
-  (markdown-test-string "   -   [X] item"
-    (end-of-line)
-    (let ((markdown-indent-on-enter 'indent-and-new-item))
-      (call-interactively #'markdown-enter-key))
-    (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
-    (should (= (point) 28))))
+  "Test `markdown-enter-key' with a gfm task list item."
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (markdown-test-string "   -   [X] item"
+      (end-of-line)
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "   -   [X] item\n   -   [ ] "))
+      (should (= (point) 28))
+      (call-interactively #'markdown-enter-key)
+      (should (string-equal (buffer-string) "   -   [X] item\n\n"))
+      (should (= (point) 18)))))
 
 ;;; Markup hiding tests:
 
