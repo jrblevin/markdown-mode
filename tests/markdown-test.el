@@ -32,6 +32,7 @@
 (require 'ert)
 (require 'cl-lib)
 (require 'ispell)
+(require 'eww)
 
 (eval-when-compile
   ;; This is for byte-compile warnings on older Emacs.
@@ -6864,25 +6865,20 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
           (should (string= (buffer-name) "doesnotexist.md")))
       (kill-buffer))))
 
-(defadvice markdown-live-preview-window-eww
-    (around markdown-test-create-fake-eww disable)
-  (setq ad-return-value (get-buffer-create "*eww*")))
+(defun markdown-test-live-preview-window-eww (_orig-fun &rest _args)
+  (get-buffer-create "*eww*"))
 
 (defmacro markdown-test-fake-eww (&rest body)
   `(progn
-     ,@(if (and (fboundp 'libxml-parse-html-region) (require 'eww nil t)) body
-         `((ad-enable-advice #'markdown-live-preview-window-eww
-                             'around 'markdown-test-create-fake-eww)
-           (ad-activate #'markdown-live-preview-window-eww)
+     ,@(if (fboundp 'libxml-parse-html-region)
+           body
+         `((advice-add 'markdown-live-preview-window-eww :around #'markdown-test-live-preview-window-eww)
            ,@body
-           (ad-disable-advice #'markdown-live-preview-window-eww
-                              'around 'markdown-test-create-fake-eww)
-           (ad-activate #'markdown-live-preview-window-eww)))))
+           (advice-remove 'markdown-live-preview-window-eww #'markdown-test-live-preview-window-eww)))))
 
 (defmacro markdown-test-eww-or-nothing (test &rest body)
   (declare (indent 1))
-  (if (and (fboundp 'libxml-parse-html-region) (require 'eww nil t)
-           (executable-find markdown-command))
+  (if (and (fboundp 'libxml-parse-html-region) (executable-find markdown-command))
       `(progn ,@body)
     (message "no eww, no libxml2, or no %s found: skipping %s" markdown-command test)
     nil))
