@@ -27,6 +27,7 @@
     - Don't load major-mode if it isn't in `auto-mode-alist`[GH-761][]
     - Improve `markdown-insert-table` prompt message [GH-771][]
     - Consider `major-mode-remap-alist` to determine major-mode for code blocks [GH-787][]
+    - Set marker after footnote reference [GH-793][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
@@ -37,7 +38,7 @@
     - HTML-escape title in `markdown-add-xhtml-header-and-footer` [markdown-xwidget-issue-9](https://github.com/cfclrk/markdown-xwidget/issues/9)
     - Fix wrong inline link parsing that has link title[GH-762][]
     - Don't treat backslashes as escapes inside literal blocks[GH-766][] [GH-768][]
-    - Fix `markdown-enter-key` doesn't delete empty checkbox list[GH-786]
+    - Fix `markdown-enter-key` doesn't delete empty checkbox list[GH-786][]
 
   [gh-377]: https://github.com/jrblevin/markdown-mode/issues/377
   [gh-572]: https://github.com/jrblevin/markdown-mode/issues/572
@@ -59,6 +60,7 @@
   [gh-778]: https://github.com/jrblevin/markdown-mode/issues/778
   [gh-786]: https://github.com/jrblevin/markdown-mode/pull/786
   [gh-787]: https://github.com/jrblevin/markdown-mode/issues/787
+  [gh-793]: https://github.com/jrblevin/markdown-mode/pull/793
 
 # Markdown Mode 2.5
 
