@@ -28,6 +28,7 @@
     - Improve `markdown-insert-table` prompt message [GH-771][]
     - Consider `major-mode-remap-alist` to determine major-mode for code blocks [GH-787][]
     - Set marker after footnote reference [GH-793][]
+    - Improve putting text attribute for indented blocks [GH-794][]
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
@@ -61,6 +62,7 @@
   [gh-786]: https://github.com/jrblevin/markdown-mode/pull/786
   [gh-787]: https://github.com/jrblevin/markdown-mode/issues/787
   [gh-793]: https://github.com/jrblevin/markdown-mode/pull/793
+  [gh-794]: https://github.com/jrblevin/markdown-mode/issues/794
 
 # Markdown Mode 2.5
 

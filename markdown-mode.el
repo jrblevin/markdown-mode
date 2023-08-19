@@ -1317,6 +1317,7 @@ giving the bounds of the current and parent list items."
                           (not (eobp)))
                 (forward-line))
               (skip-syntax-backward "-")
+              (forward-line)
               (setq close (point)))
              ;; If current line has a list marker, update levels, move to end of block
              ((looking-at markdown-regex-list)
