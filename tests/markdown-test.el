@@ -3826,8 +3826,8 @@ returns nil."
     (should (equal (markdown-syntax-propertize-extend-region 93 157)
                    nil))
     (should (equal (markdown-syntax-propertize-extend-region 496 502)
-                   (cons 486 510)))
-    (should (equal (markdown-syntax-propertize-extend-region 486 510)
+                   (cons 486 511)))
+    (should (equal (markdown-syntax-propertize-extend-region 486 511)
                    nil))
     ;; Region that begins and ends with \n\n should not be extended
     (should (equal (markdown-syntax-propertize-extend-region 157 355)
