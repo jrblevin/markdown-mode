@@ -1,6 +1,8 @@
-# Markdown Mode 2.6
+# Markdown Mode 2.7
 
 *Under development*
+
+# Markdown Mode 2.6
 
 *   **Breaking changes:**
     - GNU Emacs 27.1 or later is required.
