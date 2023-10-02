@@ -168,7 +168,7 @@ defined by Markdown and HTML.  Increasing this produces extra
 whitespace on the left.  Decreasing it may be preferred when
 fewer than six nested heading levels are used."
   :group 'markdown
-  :type 'natnump
+  :type 'integer
   :safe 'natnump
   :package-version '(markdown-mode . "2.4"))
 
@@ -301,7 +301,6 @@ be used."
 This may be a single string or a list of string. In case of a
 list, the first one that satisfies `char-displayable-p' will be
 used."
-  :type 'string
   :type '(choice
           (string :tag "Single blockquote display string")
           (repeat :tag "List of possible blockquote display strings" string))
@@ -2066,7 +2065,7 @@ headers of levels one through six respectively."
   '(2.0 1.7 1.4 1.1 1.0 1.0)
   "List of scaling values for headers of level one through six.
 Used when `markdown-header-scaling' is non-nil."
-  :type 'list
+  :type '(repeat float)
   :initialize #'custom-initialize-default
   :set (lambda (symbol value)
          (set-default symbol value)
