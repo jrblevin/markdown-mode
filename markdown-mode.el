@@ -7855,10 +7855,13 @@ Value is a list of elements describing the link:
         (let* ((close-pos (scan-sexps (match-beginning 5) 1))
                (destination-part (string-trim (buffer-substring-no-properties (1+ (match-beginning 5)) (1- close-pos)))))
           (setq end close-pos)
-          (if (string-match "\\([^ ]+\\)\\s-+\\(.+\\)" destination-part)
-              (setq url (match-string-no-properties 1 destination-part)
-                    title (substring (match-string-no-properties 2 destination-part) 1 -1))
-            (setq url destination-part))))
+          ;; A link can contain spaces if it is wrapped with angle brackets
+          (cond ((string-match "\\`<\\(.+\\)>\\'" destination-part)
+                 (setq url (match-string-no-properties 1 destination-part)))
+                ((string-match "\\([^ ]+\\)\\s-+\\(.+\\)" destination-part)
+                 (setq url (match-string-no-properties 1 destination-part)
+                       title (substring (match-string-no-properties 2 destination-part) 1 -1)))
+                (t (setq url destination-part)))))
        ;; Reference link at point.
        ((thing-at-point-looking-at markdown-regex-link-reference)
         (setq bang (match-string-no-properties 1)

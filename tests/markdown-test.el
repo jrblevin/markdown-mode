@@ -5366,6 +5366,14 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/430"
   (markdown-test-string "![text](url \"title\")"
     (should (equal (markdown-link-at-pos (point)) '(1 21 "text" "url" nil "title" "!")))))
 
+(ert-deftest test-markdown-link/inline-link-with-brackets ()
+  "Test `markdown-link-at-pos' return values with .
+Details: https://github.com/jrblevin/markdown-mode/issues/800
+
+A link can contain spaces if it is wrapped with angle brackets"
+  (markdown-test-string "[text](<file name has space>)"
+    (should (equal (markdown-link-at-pos (point)) '(1 30 "text" "file name has space" nil nil nil)))))
+
 (ert-deftest test-markdown-link/reference-link-at-pos ()
   "Test `markdown-link-at-pos' return values with a reference link."
   (markdown-test-string "[text][ref]"
