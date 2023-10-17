@@ -2,6 +2,11 @@
 
 *Under development*
 
+*   Bug fixes:
+    - Don't highlight superscript/subscript in math inline/block [GH-802][]
+
+  [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
+
 # Markdown Mode 2.6
 
 *   **Breaking changes:**

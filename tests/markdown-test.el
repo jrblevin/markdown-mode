@@ -6183,6 +6183,18 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/352"
       (markdown-test-range-has-face 9 9 'markdown-math-face)
       (markdown-test-range-has-face 10 11 'markdown-markup-face))))
 
+(ert-deftest test-markdown-math/caret-in-math-inline ()
+  "Test for carets in math inline.
+Details: https://github.com/jrblevin/markdown-mode/issues/802"
+  (let ((markdown-enable-math t))
+    (markdown-test-string "$a^b^c$"
+      (markdown-test-range-has-face 3 3 'markdown-math-face)
+      (markdown-test-range-has-face 5 5 'markdown-math-face))
+
+    (markdown-test-string "$$a^b^c$$"
+      (markdown-test-range-has-face 4 4 'markdown-math-face)
+      (markdown-test-range-has-face 6 6 'markdown-math-face))))
+
 (ert-deftest test-markdown-math/math-inline-small-buffer ()
   "Test that font-lock parsing works with a single dollar."
   (let ((markdown-enable-math t))
