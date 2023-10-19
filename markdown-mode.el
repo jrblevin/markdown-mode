@@ -73,6 +73,13 @@
 (defvar markdown-gfm-language-history nil
   "History list of languages used in the current buffer in GFM code blocks.")
 
+(defvar markdown-follow-link-functions nil
+  "Functions used to follow a link.
+Each function is called with one argument, the link's URL. It
+should return non-nil if it followed the link, or nil if not.
+Functions are called in order until one of them returns non-nil;
+otherwise the default link-following function is used.")
+
 
 ;;; Customizable Variables ====================================================
 
@@ -7926,7 +7933,8 @@ Translate filenames using `markdown-filename-translate-function'."
   (save-excursion
     (if event (posn-set-point (event-start event)))
     (if (markdown-link-p)
-        (markdown--browse-url (markdown-link-url))
+        (or (run-hook-with-args-until-success 'markdown-follow-link-functions (markdown-link-url))
+            (markdown--browse-url (markdown-link-url)))
       (user-error "Point is not at a Markdown link or URL"))))
 
 (defun markdown-fontify-inline-links (last)
