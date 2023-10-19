@@ -8337,7 +8337,7 @@ See `markdown-follow-link-at-point' and
 `markdown-follow-wiki-link-at-point'."
   (interactive "P")
   (cond ((markdown-link-p)
-         (markdown--browse-url (markdown-link-url)))
+         (markdown-follow-link-at-point))
         ((markdown-wiki-link-p)
          (markdown-follow-wiki-link-at-point arg))
         (t
