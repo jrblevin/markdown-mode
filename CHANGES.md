@@ -5,7 +5,11 @@
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
 
+*   Improvements:
+    - Apply url-unescape against URL in an inline link [GH-805][]
+
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
+  [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
 
 # Markdown Mode 2.6
 

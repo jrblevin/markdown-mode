@@ -7866,7 +7866,8 @@ Value is a list of elements describing the link:
                 ((string-match "\\([^ ]+\\)\\s-+\\(.+\\)" destination-part)
                  (setq url (match-string-no-properties 1 destination-part)
                        title (substring (match-string-no-properties 2 destination-part) 1 -1)))
-                (t (setq url destination-part)))))
+                (t (setq url destination-part)))
+          (setq url (url-unhex-string url))))
        ;; Reference link at point.
        ((thing-at-point-looking-at markdown-regex-link-reference)
         (setq bang (match-string-no-properties 1)
