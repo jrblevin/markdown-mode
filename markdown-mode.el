@@ -52,6 +52,11 @@
 (declare-function project-roots "project")
 (declare-function sh-set-shell "sh-script")
 
+;; for older emacs<29
+(declare-function mailcap-mime-type-to-extension "mailcap")
+(declare-function file-name-with-extension "files")
+(declare-function yank-media-handler "yank-media")
+
 
 ;;; Constants =================================================================
 
@@ -9836,6 +9841,35 @@ rows and columns and the column alignment."
               (markdown--substitute-command-keys
                "\\[markdown-toggle-markup-hiding]"))))))
 
+(defun markdown--image-media-handler (mimetype data)
+  (let* ((ext (symbol-name (mailcap-mime-type-to-extension mimetype)))
+         (filename (read-string "Insert filename for image: "))
+         (link-text (read-string "Link text: "))
+         (filepath (file-name-with-extension filename ext))
+         (dir (file-name-directory filepath)))
+    (when (and dir (not (file-directory-p dir)))
+      (make-directory dir t))
+    (with-temp-file filepath
+      (insert data))
+    (when (string-match-p "\\s-" filepath)
+      (setq filepath (concat "<" filepath ">")))
+    (markdown-insert-inline-image link-text filepath)))
+
+(defun markdown--file-media-handler (_mimetype data)
+  (let* ((data (split-string data "[\0\r\n]" t "^file://"))
+         (files (cdr data)))
+    (while (not (null files))
+      (let* ((file (url-unhex-string (car files)))
+             (file (file-relative-name file))
+             (prompt (format "Link text(%s): " (file-name-nondirectory file)))
+             (link-text (read-string prompt)))
+        (when (string-match-p "\\s-" file)
+          (setq file (concat "<" file ">")))
+        (markdown-insert-inline-image link-text file)
+        (when (not (null (cdr files)))
+          (insert " "))
+        (setq files (cdr files))))))
+
 
 ;;; Mode Definition  ==========================================================
 
@@ -9963,6 +9997,12 @@ rows and columns and the column alignment."
   ;; Electric quoting
   (add-hook 'electric-quote-inhibit-functions
             #'markdown--inhibit-electric-quote nil :local)
+
+  ;; media handler
+  (when (version< "29" emacs-version)
+    (yank-media-handler "image/.*" #'markdown--image-media-handler)
+    ;; TODO other than GNOME support, like KDE etc
+    (yank-media-handler "x-special/gnome-copied-files" #'markdown--file-media-handler))
 
   ;; Make checkboxes buttons
   (when markdown-make-gfm-checkboxes-buttons
