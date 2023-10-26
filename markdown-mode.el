@@ -7930,12 +7930,11 @@ If the link is a complete URL, open in browser with `browse-url'.
 Otherwise, open with `find-file' after stripping anchor and/or query string.
 Translate filenames using `markdown-filename-translate-function'."
   (interactive (list last-command-event))
-  (save-excursion
-    (if event (posn-set-point (event-start event)))
-    (if (markdown-link-p)
-        (or (run-hook-with-args-until-success 'markdown-follow-link-functions (markdown-link-url))
-            (markdown--browse-url (markdown-link-url)))
-      (user-error "Point is not at a Markdown link or URL"))))
+  (if event (posn-set-point (event-start event)))
+  (if (markdown-link-p)
+      (or (run-hook-with-args-until-success 'markdown-follow-link-functions (markdown-link-url))
+          (markdown--browse-url (markdown-link-url)))
+    (user-error "Point is not at a Markdown link or URL")))
 
 (defun markdown-fontify-inline-links (last)
   "Add text properties to next inline link from point to LAST."
