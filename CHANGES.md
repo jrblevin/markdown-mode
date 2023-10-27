@@ -2,12 +2,19 @@
 
 *Under development*
 
+*   New Features:
+    - Variable `markdown-follow-link-functions` extends
+      `markdown-follow-link-at-point` similarly to Org's
+      `org-open-at-point-functions`, allowing other libraries to
+      handle links specially. [GH-780][]
+
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
 
+  [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
   [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
 

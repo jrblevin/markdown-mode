@@ -51,17 +51,15 @@
   "Run BODY in a temporary buffer containing STRING in MODE."
   (declare (indent 2))
   `(let ((win (selected-window)))
-     (unwind-protect
-         (with-temp-buffer
-           (set-window-buffer win (current-buffer) t)
-           (erase-buffer)
-           (insert ,string)
-           (funcall ,mode)
-           (setq-default indent-tabs-mode nil)
-           (goto-char (point-min))
-           (font-lock-ensure)
-           (prog1 ,@body (kill-buffer)))
-       (ignore))))
+     (with-temp-buffer
+       (set-window-buffer win (current-buffer) t)
+       (erase-buffer)
+       (insert ,string)
+       (funcall ,mode)
+       (setq-default indent-tabs-mode nil)
+       (goto-char (point-min))
+       (font-lock-ensure)
+       ,@body)))
 
 (defmacro markdown-test-file-mode (mode file &rest body)
   "Open FILE from `markdown-test-dir' in MODE and execute BODY."
