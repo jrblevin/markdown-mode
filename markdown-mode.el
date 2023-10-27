@@ -51,6 +51,8 @@
 
 (declare-function project-roots "project")
 (declare-function sh-set-shell "sh-script")
+(declare-function mailcap-file-name-to-mime-type "mailcap")
+(declare-function dnd-get-local-file-name "dnd")
 
 ;; for older emacs<29
 (declare-function mailcap-mime-type-to-extension "mailcap")
@@ -9872,11 +9874,16 @@ rows and columns and the column alignment."
 
 (defun markdown--dnd-local-file-handler (url _action)
   (require 'mailcap)
+  (require 'dnd)
   (let* ((filename (dnd-get-local-file-name url))
-         (file (file-relative-name filename)))
+         (mimetype (mailcap-file-name-to-mime-type filename))
+         (file (file-relative-name filename))
+         (link-text "link text"))
     (when (string-match-p "\\s-" file)
       (setq file (concat "<" file ">")))
-    (markdown-insert-inline-image "link text" file)))
+    (if (string-prefix-p "image/" mimetype)
+        (markdown-insert-inline-image link-text file)
+      (markdown-insert-inline-link link-text file))))
 
 
 ;;; Mode Definition  ==========================================================
