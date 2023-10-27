@@ -9870,6 +9870,14 @@ rows and columns and the column alignment."
           (insert " "))
         (setq files (cdr files))))))
 
+(defun markdown--dnd-local-file-handler (url _action)
+  (require 'mailcap)
+  (let* ((filename (dnd-get-local-file-name url))
+         (file (file-relative-name filename)))
+    (when (string-match-p "\\s-" file)
+      (setq file (concat "<" file ">")))
+    (markdown-insert-inline-image "link text" file)))
+
 
 ;;; Mode Definition  ==========================================================
 
@@ -9998,10 +10006,14 @@ rows and columns and the column alignment."
   (add-hook 'electric-quote-inhibit-functions
             #'markdown--inhibit-electric-quote nil :local)
 
+  ;; drag and drop handler
+  (setq-local dnd-protocol-alist  (cons '("^file:///" . markdown--dnd-local-file-handler)
+                                        dnd-protocol-alist))
+
   ;; media handler
   (when (version< "29" emacs-version)
     (yank-media-handler "image/.*" #'markdown--image-media-handler)
-    ;; TODO other than GNOME support, like KDE etc
+    ;; TODO support other than GNOME, like KDE etc
     (yank-media-handler "x-special/gnome-copied-files" #'markdown--file-media-handler))
 
   ;; Make checkboxes buttons
