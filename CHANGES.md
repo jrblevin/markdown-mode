@@ -7,6 +7,7 @@
       `markdown-follow-link-at-point` similarly to Org's
       `org-open-at-point-functions`, allowing other libraries to
       handle links specially. [GH-780][]
+    - Support media handler for images and drag and drop images [GH-804][]
 
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
@@ -16,6 +17,7 @@
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
+  [gh-804]: https://github.com/jrblevin/markdown-mode/issues/804
   [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
 
 # Markdown Mode 2.6
