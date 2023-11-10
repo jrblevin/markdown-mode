@@ -154,6 +154,11 @@ promotion and demotion functions."
   :group 'markdown
   :type '(repeat string))
 
+(defcustom markdown-need-active-region t
+  "Require region to be active for markup insertion commands."
+  :group 'markdown
+  :type 'boolean)
+
 (defcustom markdown-bold-underscore nil
   "Use two underscores when inserting bold text instead of two asterisks."
   :group 'markdown
@@ -3760,7 +3765,7 @@ prefixed with an integer from 1 to the length of
 
 (defun markdown--insert-common (start-delim end-delim regex start-group end-group face
                                             &optional skip-space)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       ;; Active region
       (let* ((bounds (markdown-unwrap-things-in-region
                       (region-beginning) (region-end)
