@@ -3670,7 +3670,7 @@ and S1 and S2 were only inserted."
             b end
             new-point (+ (point) (length s1))))
      ;; Active region
-     ((use-region-p)
+     ((or (use-region-p) (not markdown-need-active-region))
       (setq a (region-beginning)
             b (region-end)
             new-point (+ (point) (length s1))))
@@ -3833,7 +3833,7 @@ fragment.  If the point is at a word, make the word an inline
 code fragment.  Otherwise, simply insert code delimiters and
 place the point in between them."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       ;; Active region
       (let ((bounds (markdown-unwrap-things-in-region
                      (region-beginning) (region-end)
@@ -3850,7 +3850,7 @@ If there is an active region, use the region.  If the point is at
 a word, use the word.  Otherwise, simply insert <kbd> tags and
 place the point in between them."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       ;; Active region
       (let ((bounds (markdown-unwrap-things-in-region
                      (region-beginning) (region-end)
@@ -3976,7 +3976,7 @@ When IMAGE is non-nil, insert an image.  Otherwise, insert a link.
 This is an internal function called by
 `markdown-insert-link' and `markdown-insert-image'."
   (cl-multiple-value-bind (begin end text uri ref title)
-      (if (use-region-p)
+      (if (or (use-region-p) (not markdown-need-active-region))
           ;; Use region as either link text or URL as appropriate.
           (let ((region (buffer-substring-no-properties
                          (region-beginning) (region-end))))
@@ -4106,7 +4106,7 @@ at a URI, wrap it with angle brackets.  If the point is at an
 inline URI, remove the angle brackets.  Otherwise, simply insert
 angle brackets place the point between them."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       ;; Active region
       (let ((bounds (markdown-unwrap-things-in-region
                      (region-beginning) (region-end)
@@ -4126,7 +4126,7 @@ If the point is at a word, use the word as the link text.  If
 there is no active region and the point is not at word, simply
 insert link markup."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       ;; Active region
       (markdown-wrap-or-insert "[[" "]]" nil (region-beginning) (region-end))
     ;; Markup removal, wiki link at at point, or empty markup insertion
@@ -4164,7 +4164,7 @@ header will be inserted."
   (setq level (min (max (or level 1) 1) (if setext 2 6)))
   ;; Determine header text if not given
   (when (null text)
-    (if (use-region-p)
+    (if (or (use-region-p) (not markdown-need-active-region))
         ;; Active region
         (setq text (delete-and-extract-region (region-beginning) (region-end)))
       ;; No active region
@@ -4307,7 +4307,7 @@ Also see `markdown-pre-indentation'."
 If Transient Mark mode is on and a region is active, it is used as
 the blockquote text."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       (markdown-blockquote-region (region-beginning) (region-end))
     (markdown-ensure-blank-line-before)
     (insert (markdown-blockquote-indentation (point)) "> ")
@@ -4366,7 +4366,7 @@ Also see `markdown-blockquote-indentation'."
 If Transient Mark mode is on and a region is active, it is marked
 as preformatted text."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       (markdown-pre-region (region-beginning) (region-end))
     (markdown-ensure-blank-line-before)
     (insert (markdown-pre-indentation (point)))
@@ -4549,7 +4549,7 @@ code block in an indirect buffer after insertion."
                        lang)))
   (let ((gfm-open-brace (if markdown-code-block-braces "{" ""))
         (gfm-close-brace (if markdown-code-block-braces "}" "")))
-    (if (use-region-p)
+    (if (or (use-region-p) (not markdown-need-active-region))
         (let* ((b (region-beginning)) (e (region-end)) end
                (indent (progn (goto-char b) (current-indentation))))
           (goto-char e)
@@ -4635,7 +4635,7 @@ element. More details here https://developer.mozilla.org/en-US/docs/Web/HTML/Ele
         (details-close-tag "</details>")
         (summary-open-tag "<summary>")
         (summary-close-tag " </summary>"))
-    (if (use-region-p)
+    (if (or (use-region-p) (not markdown-need-active-region))
         (let* ((b (region-beginning))
                (e (region-end))
                (indent (progn (goto-char b) (current-indentation))))
@@ -5114,7 +5114,7 @@ before the current point, then outdent the line one level.
 Otherwise, do normal delete by repeating
 `backward-delete-char-untabify' ARG times."
   (interactive "*p")
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       (backward-delete-char-untabify arg)
     (let ((cur-pos (current-column))
           (start-of-indention (save-excursion
@@ -5267,7 +5267,7 @@ Return nil if markup was complete and non-nil if markup was completed."
 Handle all objects in `markdown-complete-alist', in order.
 See `markdown-complete-at-point' and `markdown-complete-region'."
   (interactive "*")
-  (if (use-region-p)
+  (if (or (use-region-p) (not markdown-need-active-region))
       (markdown-complete-region (region-beginning) (region-end))
     (markdown-complete-at-point)))
 
@@ -7427,7 +7427,7 @@ Return the name of the output buffer used."
            (command (car-safe commands))
            (command-args (cdr-safe commands))
            begin-region end-region)
-      (if (use-region-p)
+      (if (or (use-region-p) (not markdown-need-active-region))
           (setq begin-region (region-beginning)
                 end-region (region-end))
         (setq begin-region (point-min)
