@@ -233,7 +233,19 @@ Extracts region from BEGIN to END and inserts in OUTPUT-BUFFER."
     (should (eq font-lock-multiline t))
     (should (eq major-mode 'markdown-mode))))
 
-;;; Element insertion tests:
+;;; Utility tests:
+
+(ert-deftest test-markdown-mode/active-region ()
+  (markdown-test-string "hello world"
+    (transient-mark-mode)
+    (push-mark (point) t t)
+    (goto-char 5)
+    (should (markdown--region-active-p))
+
+    (let ((markdown-ignore-region t))
+      (should-not (markdown--region-active-p)))))
+
+;;; ELEMENT insertion tests:
 
 (ert-deftest test-markdown-insertion/blank-line-before-1 ()
   "Test function `markdown-ensure-blank-line-before' at beginning of line."

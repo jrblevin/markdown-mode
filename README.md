@@ -935,6 +935,9 @@ provides an interface to all of the possible customizations:
   * `markdown-fontify-whole-heading-line` - font lock for highlighting
      the whole line for headings.(default: `nil`)
 
+  * `markdown-ignore-region` - ignore region for inserting commands.
+     (default: `nil`)
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode

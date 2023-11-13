@@ -8,6 +8,7 @@
       `org-open-at-point-functions`, allowing other libraries to
       handle links specially. [GH-780][]
     - Support media handler for images and drag and drop images [GH-804][]
+    - Introduce customizable variable `markdown-ignore-region` [GH-812][]
 
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
@@ -19,6 +20,7 @@
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
   [gh-804]: https://github.com/jrblevin/markdown-mode/issues/804
   [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
+  [gh-812]: https://github.com/jrblevin/markdown-mode/pull/812
 
 # Markdown Mode 2.6
 
