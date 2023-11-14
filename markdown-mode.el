@@ -3665,7 +3665,7 @@ and S1 and S2 were only inserted."
             b end
             new-point (+ (point) (length s1))))
      ;; Active region
-     ((use-region-p)
+     ((or (use-region-p) (not transient-mark-mode))
       (setq a (region-beginning)
             b (region-end)
             new-point (+ (point) (length s1))))
@@ -3760,7 +3760,7 @@ prefixed with an integer from 1 to the length of
 
 (defun markdown--insert-common (start-delim end-delim regex start-group end-group face
                                             &optional skip-space)
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       ;; Active region
       (let* ((bounds (markdown-unwrap-things-in-region
                       (region-beginning) (region-end)
@@ -3828,7 +3828,7 @@ fragment.  If the point is at a word, make the word an inline
 code fragment.  Otherwise, simply insert code delimiters and
 place the point in between them."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       ;; Active region
       (let ((bounds (markdown-unwrap-things-in-region
                      (region-beginning) (region-end)
@@ -3845,7 +3845,7 @@ If there is an active region, use the region.  If the point is at
 a word, use the word.  Otherwise, simply insert <kbd> tags and
 place the point in between them."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       ;; Active region
       (let ((bounds (markdown-unwrap-things-in-region
                      (region-beginning) (region-end)
@@ -4121,7 +4121,7 @@ If the point is at a word, use the word as the link text.  If
 there is no active region and the point is not at word, simply
 insert link markup."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       ;; Active region
       (markdown-wrap-or-insert "[[" "]]" nil (region-beginning) (region-end))
     ;; Markup removal, wiki link at at point, or empty markup insertion
@@ -4302,7 +4302,7 @@ Also see `markdown-pre-indentation'."
 If Transient Mark mode is on and a region is active, it is used as
 the blockquote text."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       (markdown-blockquote-region (region-beginning) (region-end))
     (markdown-ensure-blank-line-before)
     (insert (markdown-blockquote-indentation (point)) "> ")
@@ -4361,7 +4361,7 @@ Also see `markdown-blockquote-indentation'."
 If Transient Mark mode is on and a region is active, it is marked
 as preformatted text."
   (interactive)
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       (markdown-pre-region (region-beginning) (region-end))
     (markdown-ensure-blank-line-before)
     (insert (markdown-pre-indentation (point)))
@@ -4544,7 +4544,7 @@ code block in an indirect buffer after insertion."
                        lang)))
   (let ((gfm-open-brace (if markdown-code-block-braces "{" ""))
         (gfm-close-brace (if markdown-code-block-braces "}" "")))
-    (if (use-region-p)
+    (if (or (use-region-p) (not transient-mark-mode))
         (let* ((b (region-beginning)) (e (region-end)) end
                (indent (progn (goto-char b) (current-indentation))))
           (goto-char e)
@@ -4630,7 +4630,7 @@ element. More details here https://developer.mozilla.org/en-US/docs/Web/HTML/Ele
         (details-close-tag "</details>")
         (summary-open-tag "<summary>")
         (summary-close-tag " </summary>"))
-    (if (use-region-p)
+    (if (or (use-region-p) (not transient-mark-mode))
         (let* ((b (region-beginning))
                (e (region-end))
                (indent (progn (goto-char b) (current-indentation))))
@@ -5109,7 +5109,7 @@ before the current point, then outdent the line one level.
 Otherwise, do normal delete by repeating
 `backward-delete-char-untabify' ARG times."
   (interactive "*p")
-  (if (use-region-p)
+  (if (or (use-region-p) (not transient-mark-mode))
       (backward-delete-char-untabify arg)
     (let ((cur-pos (current-column))
           (start-of-indention (save-excursion
@@ -7422,7 +7422,7 @@ Return the name of the output buffer used."
            (command (car-safe commands))
            (command-args (cdr-safe commands))
            begin-region end-region)
-      (if (use-region-p)
+      (if (or (use-region-p) (not transient-mark-mode))
           (setq begin-region (region-beginning)
                 end-region (region-end))
         (setq begin-region (point-min)
