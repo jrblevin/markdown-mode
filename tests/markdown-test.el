@@ -7379,6 +7379,21 @@ title: asdasdasd
 | aaa | bbbb | ccccc | dddddd |
 "))))
 
+(ert-deftest test-markdown-table/align-with-seperator-in-inline-code ()
+  "Test table realignment when separator is in inline code.
+Detail: https://github.com/jrblevin/markdown-mode/issues/817"
+  (markdown-test-string "| `<|--` | Inheritance   |
+| `..|>` | Realization   |
+"
+    (let ((columns (markdown--table-line-to-columns
+                    (buffer-substring (line-beginning-position) (line-end-position)))))
+      (should (equal columns '("`<|--`" "Inheritance"))))
+
+    (forward-line)
+    (let ((columns (markdown--table-line-to-columns
+                    (buffer-substring (line-beginning-position) (line-end-position)))))
+      (should (equal columns '("`..|>`" "Realization"))))))
+
 (ert-deftest test-markdown-table/disable-table-align ()
   "Test disable table alignment."
   (let ((input "| 12345 | 6 |
