@@ -9300,16 +9300,17 @@ This function assumes point is on a table."
     (goto-char (point-min))
     (let ((cur (point))
           ret)
-      (while (re-search-forward "\\s-*\\(|\\)\\s-*" nil t)
-        (if (markdown--first-column-p (match-beginning 1))
-            (setq cur (match-end 0))
-          (cond ((eql (char-before (match-beginning 1)) ?\\)
-                 ;; keep spaces
-                 (goto-char (match-end 1)))
-                ((markdown--thing-at-wiki-link (match-beginning 1))) ;; do nothing
-                (t
-                 (push (buffer-substring-no-properties cur (match-beginning 0)) ret)
-                 (setq cur (match-end 0))))))
+      (while (and (re-search-forward "\\s-*\\(|\\)\\s-*" nil t))
+        (when (not (markdown--face-p (match-beginning 1) '(markdown-inline-code-face)))
+          (if (markdown--first-column-p (match-beginning 1))
+              (setq cur (match-end 0))
+            (cond ((eql (char-before (match-beginning 1)) ?\\)
+                   ;; keep spaces
+                   (goto-char (match-end 1)))
+                  ((markdown--thing-at-wiki-link (match-beginning 1))) ;; do nothing
+                  (t
+                   (push (buffer-substring-no-properties cur (match-beginning 0)) ret)
+                   (setq cur (match-end 0)))))))
       (when (< cur (length line))
         (push (buffer-substring-no-properties cur (point-max)) ret))
       (nreverse ret))))
