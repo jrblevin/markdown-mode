@@ -6558,7 +6558,12 @@ With argument N not nil or 1, move forward N - 1 lines first."
             (when (and (= origin bol) (eq last-command this-command))
               (goto-char refpos))
           (when (or (> origin refpos) (<= origin bol))
-            (goto-char refpos)))))
+            (goto-char refpos)))
+        ;; Prevent automatic cursor movement caused by the command loop.
+        ;; Enable disable-point-adjustment to avoid unintended cursor repositioning.
+        (when (and markdown-hide-markup
+                   (equal (get-char-property (point) 'display) ""))
+          (setq disable-point-adjustment t))))
      ((looking-at markdown-regex-list)
       ;; At a list item, special position is after the list marker or checkbox.
       (let ((refpos (or (match-end 4) (match-end 3))))
@@ -6594,12 +6599,9 @@ With argument N not nil or 1, move forward N - 1 lines first."
       (move-beginning-of-line n))
     (cond
      ;; At a headline, with closing tags.
-     ((and special
-           (save-excursion
-             (forward-line 0)
-             (and
-              (looking-at markdown-regex-header-atx)
-              (match-end 3))))
+     ((save-excursion
+        (forward-line 0)
+        (and (looking-at markdown-regex-header-atx) (match-end 3)))
       (let ((refpos (match-end 2))
             (visual-end (and (bound-and-true-p visual-line-mode)
                              (save-excursion
@@ -6612,6 +6614,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
                     (< visual-end refpos)
                     (<= origin visual-end))
                (goto-char visual-end))
+              ((not special) (end-of-line))
               ((eq special 'reversed)
                (if (and (= origin (line-end-position))
                         (eq this-command last-command))
@@ -6620,7 +6623,12 @@ With argument N not nil or 1, move forward N - 1 lines first."
               (t
                (if (or (< origin refpos) (>= origin (line-end-position)))
                    (goto-char refpos)
-                 (end-of-line))))))
+                 (end-of-line))))
+        ;; Prevent automatic cursor movement caused by the command loop.
+        ;; Enable disable-point-adjustment to avoid unintended cursor repositioning.
+        (when (and markdown-hide-markup
+                   (equal (get-char-property (point) 'display) ""))
+          (setq disable-point-adjustment t))))
      ((bound-and-true-p visual-line-mode)
       (let ((bol (line-beginning-position)))
         (end-of-visual-line)
