@@ -935,6 +935,15 @@ provides an interface to all of the possible customizations:
   * `markdown-fontify-whole-heading-line` - font lock for highlighting
      the whole line for headings.(default: `nil`)
 
+  * `markdown-special-ctrl-a/e` - set to non-nil to behave specially in
+    headlines and items. When `t`, `C-a` will bring back the cursor to the
+    beginning of the headline text. In an item, this will be the position after
+    bullet and check-box, if any. `C-e` will jump to the end of the headline,
+    ignoring the presence of closing tags in the headline. When set to the
+    symbol `reversed`, the first `C-a` or `C-e` works normally, going to the
+    true line boundary first. Only a directly following, identical keypress will
+    bring the cursor to the special positions (default: `nil`).
+
 Additionally, the faces used for syntax highlighting can be modified to
 your liking by issuing <kbd>M-x customize-group RET markdown-faces</kbd>
 or by using the "Markdown Faces" link at the bottom of the mode

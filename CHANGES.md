@@ -8,6 +8,9 @@
       `org-open-at-point-functions`, allowing other libraries to
       handle links specially. [GH-780][]
     - Support media handler for images and drag and drop images [GH-804][]
+    - Add functions to move to the beginning and end of lines
+      (`markdown-beginning-of-line` and `markdown-end-of-line`), and the
+      variable `markdown-special-ctrl-a/e`, like Org mode.
 
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
