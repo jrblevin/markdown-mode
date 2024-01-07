@@ -659,6 +659,44 @@ markdown-header-face-* faces."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.5"))
 
+(defcustom markdown-special-ctrl-a/e nil
+  "Non-nil means `C-a' and `C-e' behave specially in headlines and items.
+
+When t, `C-a' will bring back the cursor to the beginning of the
+headline text. In an item, this will be the position after bullet
+and check-box, if any. When the cursor is already at that
+position, another `C-a' will bring it to the beginning of the
+line.
+
+`C-e' will jump to the end of the headline, ignoring the presence
+of closing tags in the headline. A second `C-e' will then jump to
+the true end of the line, after closing tags. This also means
+that, when this variable is non-nil, `C-e' also will never jump
+beyond the end of the heading of a folded section, i.e. not after
+the ellipses.
+
+When set to the symbol `reversed', the first `C-a' or `C-e' works
+normally, going to the true line boundary first.  Only a directly
+following, identical keypress will bring the cursor to the
+special positions.
+
+This may also be a cons cell where the behavior for `C-a' and
+`C-e' is set separately."
+  :group 'markdown
+  :type '(choice
+	  (const :tag "off" nil)
+	  (const :tag "on: after hashes/bullet and before closing tags first" t)
+	  (const :tag "reversed: true line boundary first" reversed)
+	  (cons :tag "Set C-a and C-e separately"
+		(choice :tag "Special C-a"
+			(const :tag "off" nil)
+			(const :tag "on: after hashes/bullet first" t)
+			(const :tag "reversed: before hashes/bullet first" reversed))
+		(choice :tag "Special C-e"
+			(const :tag "off" nil)
+			(const :tag "on: before closing tags first" t)
+			(const :tag "reversed: after closing tags first" reversed))))
+  :package-version '(markdown-mode . "2.7"))
 
 ;;; Markdown-Specific `rx' Macro ==============================================
 
@@ -5531,6 +5569,9 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "C-x n s") 'markdown-narrow-to-subtree)
     (define-key map (kbd "M-RET") 'markdown-insert-list-item)
     (define-key map (kbd "C-c C-j") 'markdown-insert-list-item)
+    ;; Lines
+    (define-key map [remap move-beginning-of-line] 'markdown-beginning-of-line)
+    (define-key map [remap move-end-of-line] 'markdown-end-of-line)
     ;; Paragraphs (Markdown context aware)
     (define-key map [remap backward-paragraph] 'markdown-backward-paragraph)
     (define-key map [remap forward-paragraph] 'markdown-forward-paragraph)
@@ -6473,6 +6514,130 @@ a list."
 
 
 ;;; Movement ==================================================================
+
+;; This function was originally derived from `org-beginning-of-line' from org.el.
+(defun markdown-beginning-of-line (&optional n)
+  "Go to the beginning of the current visible line.
+
+If this is a headline, and `markdown-special-ctrl-a/e' is not nil
+or symbol `reversed', on the first attempt move to where the
+headline text hashes, and only move to beginning of line when the
+cursor is already before the hashes of the text of the headline.
+
+If `markdown-special-ctrl-a/e' is symbol `reversed' then go to
+the hashes of the text on the second attempt.
+
+With argument N not nil or 1, move forward N - 1 lines first."
+  (interactive "^p")
+  (let ((origin (point))
+        (special (pcase markdown-special-ctrl-a/e
+                   (`(,C-a . ,_) C-a) (_ markdown-special-ctrl-a/e)))
+        deactivate-mark)
+    ;; First move to a visible line.
+    (if visual-line-mode
+        (beginning-of-visual-line n)
+      (move-beginning-of-line n)
+      ;; `move-beginning-of-line' may leave point after invisible
+      ;; characters if line starts with such of these (e.g., with
+      ;; a link at column 0).  Really move to the beginning of the
+      ;; current visible line.
+      (forward-line 0))
+    (cond
+     ;; No special behavior.  Point is already at the beginning of
+     ;; a line, logical or visual.
+     ((not special))
+     ;; `beginning-of-visual-line' left point before logical beginning
+     ;; of line: point is at the beginning of a visual line.  Bail
+     ;; out.
+     ((and visual-line-mode (not (bolp))))
+     ((looking-at markdown-regex-header-atx)
+      ;; At a header, special position is before the title.
+      (let ((refpos (match-beginning 2))
+            (bol (point)))
+        (if (eq special 'reversed)
+            (when (and (= origin bol) (eq last-command this-command))
+              (goto-char refpos))
+          (when (or (> origin refpos) (<= origin bol))
+            (goto-char refpos)))
+        ;; Prevent automatic cursor movement caused by the command loop.
+        ;; Enable disable-point-adjustment to avoid unintended cursor repositioning.
+        (when (and markdown-hide-markup
+                   (equal (get-char-property (point) 'display) ""))
+          (setq disable-point-adjustment t))))
+     ((looking-at markdown-regex-list)
+      ;; At a list item, special position is after the list marker or checkbox.
+      (let ((refpos (or (match-end 4) (match-end 3))))
+        (if (eq special 'reversed)
+            (when (and (= (point) origin) (eq last-command this-command))
+              (goto-char refpos))
+          (when (or (> origin refpos) (<= origin (line-beginning-position)))
+          (goto-char refpos)))))
+     ;; No special case, already at beginning of line.
+     (t nil))))
+
+;; This function was originally derived from `org-end-of-line' from org.el.
+(defun markdown-end-of-line (&optional n)
+  "Go to the end of the line, but before ellipsis, if any.
+
+If this is a headline, and `markdown-special-ctrl-a/e' is not nil
+or symbol `reversed', ignore closing tags on the first attempt,
+and only move to after the closing tags when the cursor is
+already beyond the end of the headline.
+
+If `markdown-special-ctrl-a/e' is symbol `reversed' then ignore
+closing tags on the second attempt.
+
+With argument N not nil or 1, move forward N - 1 lines first."
+  (interactive "^p")
+  (let ((origin (point))
+        (special (pcase markdown-special-ctrl-a/e
+                   (`(,_ . ,C-e) C-e) (_ markdown-special-ctrl-a/e)))
+        deactivate-mark)
+    ;; First move to a visible line.
+    (if visual-line-mode
+        (beginning-of-visual-line n)
+      (move-beginning-of-line n))
+    (cond
+     ;; At a headline, with closing tags.
+     ((save-excursion
+        (forward-line 0)
+        (and (looking-at markdown-regex-header-atx) (match-end 3)))
+      (let ((refpos (match-end 2))
+            (visual-end (and visual-line-mode
+                             (save-excursion
+                               (end-of-visual-line)
+                               (point)))))
+        ;; If `end-of-visual-line' brings us before end of line or even closing
+        ;; tags, i.e., the headline spans over multiple visual lines, move
+        ;; there.
+        (cond ((and visual-end
+                    (< visual-end refpos)
+                    (<= origin visual-end))
+               (goto-char visual-end))
+              ((not special) (end-of-line))
+              ((eq special 'reversed)
+               (if (and (= origin (line-end-position))
+                        (eq this-command last-command))
+                   (goto-char refpos)
+                 (end-of-line)))
+              (t
+               (if (or (< origin refpos) (>= origin (line-end-position)))
+                   (goto-char refpos)
+                 (end-of-line))))
+        ;; Prevent automatic cursor movement caused by the command loop.
+        ;; Enable disable-point-adjustment to avoid unintended cursor repositioning.
+        (when (and markdown-hide-markup
+                   (equal (get-char-property (point) 'display) ""))
+          (setq disable-point-adjustment t))))
+     (visual-line-mode
+      (let ((bol (line-beginning-position)))
+        (end-of-visual-line)
+        ;; If `end-of-visual-line' gets us past the ellipsis at the
+        ;; end of a line, backtrack and use `end-of-line' instead.
+        (when (/= bol (line-beginning-position))
+          (goto-char bol)
+          (end-of-line))))
+     (t (end-of-line)))))
 
 (defun markdown-beginning-of-defun (&optional arg)
   "`beginning-of-defun-function' for Markdown.
@@ -10042,7 +10207,18 @@ rows and columns and the column alignment."
 
   ;; add live preview export hook
   (add-hook 'after-save-hook #'markdown-live-preview-if-markdown t t)
-  (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t t))
+  (add-hook 'kill-buffer-hook #'markdown-live-preview-remove-on-kill t t)
+
+  ;; Add a custom keymap for `visual-line-mode' so that activating
+  ;; this minor mode does not override markdown-mode's keybindings.
+  ;; FIXME: Probably `visual-line-mode' should take care of this.
+  (let ((oldmap (cdr (assoc 'visual-line-mode minor-mode-map-alist)))
+        (newmap (make-sparse-keymap)))
+    (set-keymap-parent newmap oldmap)
+    (define-key newmap [remap move-beginning-of-line] nil)
+    (define-key newmap [remap move-end-of-line] nil)
+    (make-local-variable 'minor-mode-overriding-map-alist)
+    (push `(visual-line-mode . ,newmap) minor-mode-overriding-map-alist)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist

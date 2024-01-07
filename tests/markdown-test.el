@@ -4957,6 +4957,192 @@ date = 2015-08-13 11:35:25 EST
 
 ;;; Movement tests:
 
+(ert-deftest test-markdown-movement/beginning-of-line ()
+  "Test beginning of line movement"
+  (markdown-test-string "Some text\nSome other text"
+    (goto-char (point-max))
+    (markdown-beginning-of-line)
+    (should (bolp)))
+  (markdown-test-string "## Headline\n### Sub"
+    (goto-char (point-max))
+    (outline-hide-sublevels 2)
+    (markdown-beginning-of-line)
+    (should (= (line-beginning-position) 1)))
+
+  ;; With `visual-line-mode' active, move to beginning of visual line.
+  (markdown-test-string "Text "
+    (visual-line-mode)
+    (dotimes (_ 1000) (insert "Text "))
+    (goto-char (point-max))
+    (markdown-beginning-of-line)
+    (should-not (bolp)))
+
+  ;; In a wide headline, with `visual-line-mode', prefer going to the
+  ;; beginning of a visual line than to the logical beginning of line,
+  ;; even if special movement is active.
+  (markdown-test-string "## Headline"
+    (visual-line-mode)
+    (goto-char (point-max))
+    (dotimes (_ 1000) (insert "Text "))
+    (markdown-beginning-of-line)
+    (should-not (bolp)))
+  (markdown-test-string "## Headline"
+    (visual-line-mode)
+    (goto-char (point-max))
+    (dotimes (_ 1000) (insert "Text "))
+    (let ((markdown-special-ctrl-a/e t))
+      (markdown-beginning-of-line))
+    (should-not (bolp)))
+
+  ;; At an headline with special movement, first move at beginning of
+  ;; title, then at the beginning of line, rinse, repeat.
+  (markdown-test-string "## Headline"
+    (let ((markdown-special-ctrl-a/e t))
+      (goto-char (point-max))
+      (markdown-beginning-of-line)
+      (should (looking-at "Headline"))
+      (markdown-beginning-of-line)
+      (should (bolp))
+      (markdown-beginning-of-line)
+      (should (looking-at "Headline"))))
+  (markdown-test-string "## Headline"
+    (let ((markdown-special-ctrl-a/e nil))
+      (goto-char (point-max))
+      (markdown-beginning-of-line)
+      (should (bolp))))
+
+  ;; At an headline with reversed movement, first move to beginning of
+  ;; line, then to the beginning of title.
+  (markdown-test-string "## Headline"
+    (let ((markdown-special-ctrl-a/e 'reversed)
+	        (this-command last-command))
+      (goto-char (point-max))
+      (markdown-beginning-of-line)
+      (should (bolp))
+      (markdown-beginning-of-line)
+      (should (looking-at "Headline"))))
+
+  ;; At an item with special movement, first move after to beginning
+  ;; of title, then to the beginning of line, rinse, repeat.
+  (markdown-test-string "- [ ] Item"
+    (let ((markdown-special-ctrl-a/e nil))
+      (goto-char (point-max))
+      (markdown-beginning-of-line)
+      (should (bolp))))
+  (markdown-test-string "- [ ] Item"
+    (let ((markdown-special-ctrl-a/e t))
+      (goto-char (point-max))
+      (markdown-beginning-of-line)
+      (should (looking-at "Item"))
+      (markdown-beginning-of-line)
+      (should (bolp))
+      (markdown-beginning-of-line)
+      (should (looking-at "Item"))))
+  (markdown-test-string "- [ ] Item"
+    (let ((markdown-special-ctrl-a/e 'reversed)
+	        (this-command last-command))
+      (goto-char (point-max))
+      (markdown-beginning-of-line)
+      (should (bolp))
+      (markdown-beginning-of-line)
+      (should (looking-at "Item")))))
+
+(ert-deftest test-markdown-movement/end-of-line ()
+  "Test end of line movement"
+  (markdown-test-string
+   "Some text\nSome other text"
+   (markdown-end-of-line)
+   (should (eolp)))
+
+  ;; With `visual-line-mode' active, move to end of visual line.
+  ;; However, never go past ellipsis.
+  (markdown-test-string
+   "Some Text"
+   (visual-line-mode)
+   (goto-char (point-max))
+   (dotimes (_ 1000) (insert "Text "))
+   (markdown-end-of-line)
+   (should-not (eolp)))
+
+  ;; In a wide headline, with `visual-line-mode', prefer going to end
+  ;; of visible line if tags, or end of line, are farther.
+  (markdown-test-string "Text "
+    (visual-line-mode)
+    (goto-char (point-max))
+    (dotimes (_ 1000) (insert "Text "))
+    (goto-char (point-min))
+    (markdown-end-of-line)
+    (should-not (eolp)))
+  (markdown-test-string "## Heading\nSome contents"
+    (goto-char (point-max))
+    (outline-hide-sublevels 2)
+    (markdown-end-of-line)
+    (should (= (line-beginning-position) 1)))
+
+  ;; In a wide headline, with `visual-line-mode', prefer going to end
+  ;; of visible line if tags, or end of line, are farther.
+  (markdown-test-string "## Heading "
+    (visual-line-mode)
+    (goto-char (point-max))
+    (dotimes (_ 1000) (insert "Text "))
+    (goto-char (point-min))
+    (markdown-end-of-line)
+    (should-not (eolp)))
+  (markdown-test-string "## Heading ##"
+    (visual-line-mode)
+    (re-search-forward "## Heading ")
+    (dotimes (_ 1000) (insert "Text "))
+    (goto-char (point-min))
+    (markdown-end-of-line)
+    (should-not (eolp)))
+  ;; At an headline without special movement, go to end of line.
+  ;; However, never go past ellipsis.
+  (markdown-test-string "## Headline ##"
+    (let ((markdown-special-ctrl-a/e nil))
+      (markdown-end-of-line)
+      (should (eolp))))
+  (markdown-test-string "## Headline ##\n### Sub"
+    (let ((markdown-special-ctrl-a/e nil))
+      (goto-char (point-max))
+      (outline-hide-sublevels 2)
+      (markdown-end-of-line)
+      (should (= (line-beginning-position) 1))))
+
+  ;; At an headline with special movement, first move before close tag,
+  ;; then at the end of line, rinse, repeat.  However, never go past
+  ;; ellipsis.
+  (markdown-test-string "## Headline ##"
+    (let ((markdown-special-ctrl-a/e t))
+      (markdown-end-of-line)
+      (should (looking-at " ##"))
+      (markdown-end-of-line)
+      (should (eolp))
+      (markdown-end-of-line)
+      (should (looking-at " ##"))))
+  (markdown-test-string "## Headline ##\n### Sub"
+    (let ((markdown-special-ctrl-a/e t))
+      (goto-char (point-max))
+      (outline-hide-sublevels 2)
+      (markdown-end-of-line)
+      (should (= (line-beginning-position) 1))))
+
+  ;; At an headline, with reversed movement, first go to end of line,
+  ;; then before tags.  However, never go past ellipsis.
+  (markdown-test-string "## Headline ##"
+    (let ((markdown-special-ctrl-a/e 'reversed)
+	        (this-command last-command))
+      (markdown-end-of-line)
+      (should (eolp))
+      (markdown-end-of-line)
+      (should (looking-at " ##"))))
+  (markdown-test-string "## Headline ##\n### Sub"
+    (let ((markdown-special-ctrl-a/e 'reversed)
+	        (this-command last-command))
+      (goto-char (point-max))
+      (outline-hide-sublevels 2)
+      (markdown-end-of-line)
+      (should (= (line-beginning-position) 1)))))
+
 (ert-deftest test-markdown-movement/defun ()
   "Test defun navigation."
   (markdown-test-file "outline.text"
