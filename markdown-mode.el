@@ -6534,7 +6534,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
                    (`(,C-a . ,_) C-a) (_ markdown-special-ctrl-a/e)))
         deactivate-mark)
     ;; First move to a visible line.
-    (if (bound-and-true-p visual-line-mode)
+    (if visual-line-mode
         (beginning-of-visual-line n)
       (move-beginning-of-line n)
       ;; `move-beginning-of-line' may leave point after invisible
@@ -6549,7 +6549,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
      ;; `beginning-of-visual-line' left point before logical beginning
      ;; of line: point is at the beginning of a visual line.  Bail
      ;; out.
-     ((and (bound-and-true-p visual-line-mode) (not (bolp))))
+     ((and visual-line-mode (not (bolp))))
      ((looking-at markdown-regex-header-atx)
       ;; At a header, special position is before the title.
       (let ((refpos (match-beginning 2))
@@ -6594,7 +6594,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
                    (`(,_ . ,C-e) C-e) (_ markdown-special-ctrl-a/e)))
         deactivate-mark)
     ;; First move to a visible line.
-    (if (bound-and-true-p visual-line-mode)
+    (if visual-line-mode
         (beginning-of-visual-line n)
       (move-beginning-of-line n))
     (cond
@@ -6603,7 +6603,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
         (forward-line 0)
         (and (looking-at markdown-regex-header-atx) (match-end 3)))
       (let ((refpos (match-end 2))
-            (visual-end (and (bound-and-true-p visual-line-mode)
+            (visual-end (and visual-line-mode
                              (save-excursion
                                (end-of-visual-line)
                                (point)))))
@@ -6629,7 +6629,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
         (when (and markdown-hide-markup
                    (equal (get-char-property (point) 'display) ""))
           (setq disable-point-adjustment t))))
-     ((bound-and-true-p visual-line-mode)
+     (visual-line-mode
       (let ((bol (line-beginning-position)))
         (end-of-visual-line)
         ;; If `end-of-visual-line' gets us past the ellipsis at the
