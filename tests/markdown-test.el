@@ -2257,6 +2257,18 @@ See GH-245."
     (should (invisible-p (point)))
     (should-not (invisible-p (1+ (point))))))
 
+(ert-deftest test-markdown-markup-hiding/line-break ()
+  "Test hiding markup for line break markup."
+  (markdown-test-string "hello  \nworld"
+    (markdown-test-range-has-property (+ 5 (point)) (+ 6 (point)) 'invisible 'markdown-markup)
+    (should-not (invisible-p (point))) ;; part of "hello"
+    (should-not (invisible-p (+ 5 (point)))) ;; part of line break
+    (should-not (invisible-p (+ 7 (point)))) ;; part of "world"
+    (markdown-toggle-markup-hiding t)
+    (should-not (invisible-p (point))) ;; part of "hello"
+    (should (invisible-p (+ 5 (point)))) ;; part of line break
+    (should-not (invisible-p (+ 7 (point)))))) ;; inside "world"
+
 ;;; Markup hiding url tests:
 
 (ert-deftest test-markdown-url-hiding/eldoc ()

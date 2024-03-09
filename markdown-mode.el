@@ -1855,6 +1855,10 @@ START and END delimit region to propertize."
   '(face markdown-markup-face invisible markdown-markup)
   "List of properties and values to apply to markup.")
 
+(defconst markdown-line-break-properties
+  '(face markdown-line-break-face invisible markdown-markup)
+  "List of properties and values to apply to line break markup.")
+
 (defconst markdown-language-keyword-properties
   '(face markdown-language-keyword-face invisible markdown-markup)
   "List of properties and values to apply to code block language names.")
@@ -2298,7 +2302,7 @@ Depending on your font, some reasonable choices are:
     (markdown--match-highlighting . ((3 markdown-markup-properties)
                                      (4 'markdown-highlighting-face)
                                      (5 markdown-markup-properties)))
-    (,markdown-regex-line-break . (1 'markdown-line-break-face prepend))
+    (,markdown-regex-line-break . (1 markdown-line-break-properties prepend))
     (markdown-match-escape . ((1 markdown-markup-properties prepend)))
     (markdown-fontify-sub-superscripts)
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))

@@ -11,6 +11,8 @@
     - Add functions to move to the beginning and end of lines
       (`markdown-beginning-of-line` and `markdown-end-of-line`), and the
       variable `markdown-special-ctrl-a/e`, like Org mode.
+    - Trailing whitespace characters for line breaks are hidden when using
+      `markdown-hide-markup`
 
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
