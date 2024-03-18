@@ -17,6 +17,7 @@
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
     - Fix table alignment when a column has a seperator in code block [GH-817][]
+    - Fix the regexp in the download languages script [GH-827][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
@@ -26,6 +27,7 @@
   [gh-804]: https://github.com/jrblevin/markdown-mode/issues/804
   [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
+  [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
 
 # Markdown Mode 2.6
 
