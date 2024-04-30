@@ -10151,7 +10151,9 @@ rows and columns and the column alignment."
   ;; Wiki links
   (markdown-setup-wiki-link-hooks)
   ;; Math mode
-  (when markdown-enable-math (markdown-toggle-math t))
+  (when markdown-enable-math
+    (font-lock-add-keywords
+     'markdown-mode markdown-mode-font-lock-keywords-math))
   ;; Add a buffer-local hook to reload after file-local variables are read
   (add-hook 'hack-local-variables-hook #'markdown-handle-local-variables nil t)
   ;; For imenu support
