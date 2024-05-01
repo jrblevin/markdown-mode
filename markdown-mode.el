@@ -1905,10 +1905,10 @@ See `markdown-hide-markup' for additional details."
             (not markdown-hide-markup)
           (> (prefix-numeric-value arg) 0)))
   (if markdown-hide-markup
-      (progn (add-to-invisibility-spec 'markdown-markup)
-             (message "markdown-mode markup hiding enabled"))
-    (progn (remove-from-invisibility-spec 'markdown-markup)
-           (message "markdown-mode markup hiding disabled")))
+      (add-to-invisibility-spec 'markdown-markup)
+    (remove-from-invisibility-spec 'markdown-markup))
+  (when (called-interactively-p 'interactive)
+    (message "markdown-mode markup hiding %s" (if markdown-hide-markup "enabled" "disabled")))
   (markdown-reload-extensions))
 
 
@@ -8286,9 +8286,8 @@ and disable it otherwise."
         (if (eq arg 'toggle)
             (not markdown-hide-urls)
           (> (prefix-numeric-value arg) 0)))
-  (if markdown-hide-urls
-      (message "markdown-mode URL hiding enabled")
-    (message "markdown-mode URL hiding disabled"))
+  (when (called-interactively-p 'interactive)
+    (message "markdown-mode URL hiding %s" (if markdown-hide-urls "enabled" "disabled")))
   (markdown-reload-extensions))
 
 
@@ -8524,9 +8523,8 @@ and disable it otherwise."
         (if (eq arg 'toggle)
             (not markdown-enable-wiki-links)
           (> (prefix-numeric-value arg) 0)))
-  (if markdown-enable-wiki-links
-      (message "markdown-mode wiki link support enabled")
-    (message "markdown-mode wiki link support disabled"))
+  (when (called-interactively-p 'interactive)
+    (message "markdown-mode wiki link support %s" (if markdown-enable-wiki-links "enabled" "disabled")))
   (markdown-reload-extensions))
 
 (defun markdown-setup-wiki-link-hooks ()
@@ -8779,13 +8777,12 @@ if ARG is omitted or nil."
             (not markdown-enable-math)
           (> (prefix-numeric-value arg) 0)))
   (if markdown-enable-math
-      (progn
-        (font-lock-add-keywords
-         'markdown-mode markdown-mode-font-lock-keywords-math)
-        (message "markdown-mode math support enabled"))
+      (font-lock-add-keywords
+       'markdown-mode markdown-mode-font-lock-keywords-math)
     (font-lock-remove-keywords
-     'markdown-mode markdown-mode-font-lock-keywords-math)
-    (message "markdown-mode math support disabled"))
+     'markdown-mode markdown-mode-font-lock-keywords-math))
+  (when (called-interactively-p 'interactive)
+    (message "markdown-mode math support %s" (if markdown-enable-math "enabled" "disabled")))
   (markdown-reload-extensions))
 
 
@@ -9036,9 +9033,9 @@ and disable otherwise."
         (if (eq arg 'toggle)
             (not markdown-fontify-code-blocks-natively)
           (> (prefix-numeric-value arg) 0)))
-  (if markdown-fontify-code-blocks-natively
-      (message "markdown-mode native code block fontification enabled")
-    (message "markdown-mode native code block fontification disabled"))
+  (when (called-interactively-p 'interactive)
+    (message "markdown-mode native code block fontification %s"
+             (if markdown-fontify-code-blocks-natively "enabled" "disabled")))
   (markdown-reload-extensions))
 
 ;; This is based on `org-src-lang-modes' from org-src.el

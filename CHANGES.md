@@ -21,6 +21,7 @@
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
+    - Show mode toggle message only if it is called interactively
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
