@@ -7692,12 +7692,14 @@ Return the name of the output buffer used."
 Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (interactive)
   (setq output-buffer-name (markdown output-buffer-name))
-  (with-current-buffer output-buffer-name
-    (set-buffer output-buffer-name)
-    (unless (markdown-output-standalone-p)
-      (markdown-add-xhtml-header-and-footer output-buffer-name))
-    (goto-char (point-min))
-    (html-mode))
+  (let ((css-path markdown-css-paths))
+    (with-current-buffer output-buffer-name
+      (set-buffer output-buffer-name)
+      (setq-local markdown-css-paths css-path)
+      (unless (markdown-output-standalone-p)
+        (markdown-add-xhtml-header-and-footer output-buffer-name))
+      (goto-char (point-min))
+      (html-mode)))
   output-buffer-name)
 
 (defun markdown-other-window (&optional output-buffer-name)

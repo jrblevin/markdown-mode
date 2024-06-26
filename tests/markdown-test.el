@@ -6158,6 +6158,20 @@ bar baz"
       (kill-buffer obuffer)
       (delete-file ofile))))
 
+(ert-deftest test-markdown-export/buffer-local-css-path ()
+  "Test buffer local `markdown-css-paths'"
+  (let ((markdown-css-paths '("./global.css")))
+    (markdown-test-temp-file "inline.text"
+      (setq-local markdown-css-paths '("./local.css"))
+      (let* ((markdown-export-kill-buffer nil)
+             (file (markdown-export))
+             (buffer (get-file-buffer file)))
+        (with-current-buffer buffer
+          (goto-char (point-min))
+          (should (search-forward "href=\"./local.css\"")))
+        (kill-buffer buffer)
+        (delete-file file)))))
+
 ;;; Hook tests:
 
 (ert-deftest test-markdown-hook/before-export ()
