@@ -684,52 +684,36 @@ This may also be a cons cell where the behavior for `C-a' and
 `C-e' is set separately."
   :group 'markdown
   :type '(choice
-	  (const :tag "off" nil)
-	  (const :tag "on: after hashes/bullet and before closing tags first" t)
-	  (const :tag "reversed: true line boundary first" reversed)
-	  (cons :tag "Set C-a and C-e separately"
-		(choice :tag "Special C-a"
-			(const :tag "off" nil)
-			(const :tag "on: after hashes/bullet first" t)
-			(const :tag "reversed: before hashes/bullet first" reversed))
-		(choice :tag "Special C-e"
-			(const :tag "off" nil)
-			(const :tag "on: before closing tags first" t)
-			(const :tag "reversed: after closing tags first" reversed))))
+          (const :tag "off" nil)
+          (const :tag "on: after hashes/bullet and before closing tags first" t)
+          (const :tag "reversed: true line boundary first" reversed)
+          (cons :tag "Set C-a and C-e separately"
+                (choice :tag "Special C-a"
+                        (const :tag "off" nil)
+                        (const :tag "on: after hashes/bullet first" t)
+                        (const :tag "reversed: before hashes/bullet first" reversed))
+                (choice :tag "Special C-e"
+                        (const :tag "off" nil)
+                        (const :tag "on: before closing tags first" t)
+                        (const :tag "reversed: after closing tags first" reversed))))
   :package-version '(markdown-mode . "2.7"))
 
 ;;; Markdown-Specific `rx' Macro ==============================================
 
 ;; Based on python-rx from python.el.
-(eval-and-compile
-  (defconst markdown-rx-constituents
-    `((newline . ,(rx "\n"))
-      ;; Note: #405 not consider markdown-list-indent-width however this is never used
-      (indent . ,(rx (or (repeat 4 " ") "\t")))
-      (block-end . ,(rx (and (or (one-or-more (zero-or-more blank) "\n") line-end))))
-      (numeral . ,(rx (and (one-or-more (any "0-9#")) ".")))
-      (bullet . ,(rx (any "*+:-")))
-      (list-marker . ,(rx (or (and (one-or-more (any "0-9#")) ".")
-                              (any "*+:-"))))
-      (checkbox . ,(rx "[" (any " xX") "]")))
-    "Markdown-specific sexps for `markdown-rx'")
-
-  (defun markdown-rx-to-string (form &optional no-group)
-    "Markdown mode specialized `rx-to-string' function.
-This variant supports named Markdown expressions in FORM.
-NO-GROUP non-nil means don't put shy groups around the result."
-    (let ((rx-constituents (append markdown-rx-constituents rx-constituents)))
-      (rx-to-string form no-group)))
-
-  (defmacro markdown-rx (&rest regexps)
-    "Markdown mode specialized rx macro.
+(defmacro markdown-rx (&rest regexps)
+  "Markdown mode specialized rx macro.
 This variant of `rx' supports common Markdown named REGEXPS."
-    (cond ((null regexps)
-           (error "No regexp"))
-          ((cdr regexps)
-           (markdown-rx-to-string `(and ,@regexps) t))
-          (t
-           (markdown-rx-to-string (car regexps) t)))))
+  `(rx-let ((newline "\n")
+            ;; Note: #405 not consider markdown-list-indent-width however this is never used
+            (indent (or (repeat 4 " ") "\t"))
+            (block-end (and (or (one-or-more (zero-or-more blank) "\n") line-end)))
+            (numeral (and (one-or-more (any "0-9#")) "."))
+            (bullet (any "*+:-"))
+            (list-marker (or (and (one-or-more (any "0-9#")) ".")
+                             (any "*+:-")))
+            (checkbox (seq "[" (any " xX") "]")))
+     (rx ,@regexps)))
 
 
 ;;; Regular Expressions =======================================================
@@ -7692,12 +7676,14 @@ Return the name of the output buffer used."
 Insert the output in the buffer named OUTPUT-BUFFER-NAME."
   (interactive)
   (setq output-buffer-name (markdown output-buffer-name))
-  (with-current-buffer output-buffer-name
-    (set-buffer output-buffer-name)
-    (unless (markdown-output-standalone-p)
-      (markdown-add-xhtml-header-and-footer output-buffer-name))
-    (goto-char (point-min))
-    (html-mode))
+  (let ((css-path markdown-css-paths))
+    (with-current-buffer output-buffer-name
+      (set-buffer output-buffer-name)
+      (setq-local markdown-css-paths css-path)
+      (unless (markdown-output-standalone-p)
+        (markdown-add-xhtml-header-and-footer output-buffer-name))
+      (goto-char (point-min))
+      (html-mode)))
   output-buffer-name)
 
 (defun markdown-other-window (&optional output-buffer-name)
