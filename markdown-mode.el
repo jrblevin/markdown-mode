@@ -684,18 +684,18 @@ This may also be a cons cell where the behavior for `C-a' and
 `C-e' is set separately."
   :group 'markdown
   :type '(choice
-	  (const :tag "off" nil)
-	  (const :tag "on: after hashes/bullet and before closing tags first" t)
-	  (const :tag "reversed: true line boundary first" reversed)
-	  (cons :tag "Set C-a and C-e separately"
-		(choice :tag "Special C-a"
-			(const :tag "off" nil)
-			(const :tag "on: after hashes/bullet first" t)
-			(const :tag "reversed: before hashes/bullet first" reversed))
-		(choice :tag "Special C-e"
-			(const :tag "off" nil)
-			(const :tag "on: before closing tags first" t)
-			(const :tag "reversed: after closing tags first" reversed))))
+          (const :tag "off" nil)
+          (const :tag "on: after hashes/bullet and before closing tags first" t)
+          (const :tag "reversed: true line boundary first" reversed)
+          (cons :tag "Set C-a and C-e separately"
+                (choice :tag "Special C-a"
+                        (const :tag "off" nil)
+                        (const :tag "on: after hashes/bullet first" t)
+                        (const :tag "reversed: before hashes/bullet first" reversed))
+                (choice :tag "Special C-e"
+                        (const :tag "off" nil)
+                        (const :tag "on: before closing tags first" t)
+                        (const :tag "reversed: after closing tags first" reversed))))
   :package-version '(markdown-mode . "2.7"))
 
 ;;; Markdown-Specific `rx' Macro ==============================================
