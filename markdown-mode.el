@@ -701,35 +701,19 @@ This may also be a cons cell where the behavior for `C-a' and
 ;;; Markdown-Specific `rx' Macro ==============================================
 
 ;; Based on python-rx from python.el.
-(eval-and-compile
-  (defconst markdown-rx-constituents
-    `((newline . ,(rx "\n"))
-      ;; Note: #405 not consider markdown-list-indent-width however this is never used
-      (indent . ,(rx (or (repeat 4 " ") "\t")))
-      (block-end . ,(rx (and (or (one-or-more (zero-or-more blank) "\n") line-end))))
-      (numeral . ,(rx (and (one-or-more (any "0-9#")) ".")))
-      (bullet . ,(rx (any "*+:-")))
-      (list-marker . ,(rx (or (and (one-or-more (any "0-9#")) ".")
-                              (any "*+:-"))))
-      (checkbox . ,(rx "[" (any " xX") "]")))
-    "Markdown-specific sexps for `markdown-rx'")
-
-  (defun markdown-rx-to-string (form &optional no-group)
-    "Markdown mode specialized `rx-to-string' function.
-This variant supports named Markdown expressions in FORM.
-NO-GROUP non-nil means don't put shy groups around the result."
-    (let ((rx-constituents (append markdown-rx-constituents rx-constituents)))
-      (rx-to-string form no-group)))
-
-  (defmacro markdown-rx (&rest regexps)
-    "Markdown mode specialized rx macro.
+(defmacro markdown-rx (&rest regexps)
+  "Markdown mode specialized rx macro.
 This variant of `rx' supports common Markdown named REGEXPS."
-    (cond ((null regexps)
-           (error "No regexp"))
-          ((cdr regexps)
-           (markdown-rx-to-string `(and ,@regexps) t))
-          (t
-           (markdown-rx-to-string (car regexps) t)))))
+  `(rx-let ((newline "\n")
+            ;; Note: #405 not consider markdown-list-indent-width however this is never used
+            (indent (or (repeat 4 " ") "\t"))
+            (block-end (and (or (one-or-more (zero-or-more blank) "\n") line-end)))
+            (numeral (and (one-or-more (any "0-9#")) "."))
+            (bullet (any "*+:-"))
+            (list-marker (or (and (one-or-more (any "0-9#")) ".")
+                             (any "*+:-")))
+            (checkbox (seq "[" (any " xX") "]")))
+     (rx ,@regexps)))
 
 
 ;;; Regular Expressions =======================================================
