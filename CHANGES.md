@@ -18,6 +18,8 @@
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
     - Fix table alignment when a column has a seperator in code block [GH-817][]
     - Fix the regexp in the download languages script [GH-827][]
+    - Don't hide backslashes in code blocks when using `markdown-hide-markup`
+      and `markdown-fontify-code-blocks-natively` together [GH-766][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]

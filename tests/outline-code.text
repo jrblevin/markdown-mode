@@ -10,6 +10,8 @@
 #!/bin/bash
 
 # In a code block, this shouldn't be a header
+
+echo -e "foo\nbar"
 ~~~
 
 # Level one again
