@@ -2243,9 +2243,25 @@ See GH-245."
       (markdown-test-range-has-property 83 93 'invisible 'markdown-markup)
       (should (invisible-p 83))
       (should (invisible-p 93))
-      (markdown-test-range-has-property 154 156 'invisible 'markdown-markup)
-      (should (invisible-p 154))
-      (should (invisible-p 156)))))
+      ;; The backslash in the Bash script should be visible.
+      (should-not (invisible-p 167))
+      (markdown-test-range-has-property 174 176 'invisible 'markdown-markup)
+      (should (invisible-p 174))
+      (should (invisible-p 176)))))
+
+(ert-deftest test-markdown-markup-hiding/fenced-code-blocks-fontified ()
+  "Test hiding markup for tilde fenced code blocks with fontification."
+  (let ((markdown-hide-markup t)
+        (markdown-fontify-code-blocks-natively t))
+    (markdown-test-file "outline-code.text"
+      (markdown-test-range-has-property 83 93 'invisible 'markdown-markup)
+      (should (invisible-p 83))
+      (should (invisible-p 93))
+      ;; The backslash in the Bash script should be visible.
+      (should-not (invisible-p 167))
+      (markdown-test-range-has-property 174 176 'invisible 'markdown-markup)
+      (should (invisible-p 174))
+      (should (invisible-p 176)))))
 
 (ert-deftest test-markdown-markup-hiding/escape ()
   "Test hiding markup for backslash escapes."
@@ -4838,7 +4854,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/392"
   (markdown-test-file "outline-code.text"
     ;; Navigate forward at the same level
     (markdown-forward-same-level 1)
-    (should (eq (point) 159))
+    (should (eq (point) 179))
     (should (looking-at "^# Level one again"))))
 
 (ert-deftest test-markdown-outline/back-to-heading-over-code-block ()
@@ -4927,7 +4943,7 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/392"
       (should (eq (point) 69))
       (should (looking-at "^## Level two"))
       (outline-next-visible-heading 1)
-      (should (eq (point) 159))
+      (should (eq (point) 179))
       (should (looking-at "^# Level one again")))))
 
 (ert-deftest test-markdown-outline/visibility-with-metadata ()

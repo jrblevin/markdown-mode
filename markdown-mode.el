@@ -1141,7 +1141,8 @@ Group 4 matches the text inside the delimiters.")
   "Property list of all Markdown syntactic properties.")
 
 (defvar markdown-literal-faces
-  '(markdown-inline-code-face
+  '(markdown-code-face
+    markdown-inline-code-face
     markdown-pre-face
     markdown-math-face
     markdown-url-face
