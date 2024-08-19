@@ -63,6 +63,8 @@
     - Consider `major-mode-remap-alist` to determine major-mode for code blocks [GH-787][]
     - Set marker after footnote reference [GH-793][]
     - Improve putting text attribute for indented blocks [GH-794][]
+    - Some sources of pathological behavior of markdown-match-bold and markdown-match-italic
+      on large blocks have been mitigated
 
 *   Bug fixes:
     - Don't override table faces by link faces [GH-716][]
