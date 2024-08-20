@@ -2789,8 +2789,9 @@ They does not include square brackets)."
                       uris :test #'equal)))
       (reverse uris))))
 
-(defun markdown-inline-code-at-pos (pos)
-  "Return non-nil if there is an inline code fragment at POS.
+(defun markdown-inline-code-at-pos (pos &optional from)
+  "Return non-nil if there is an inline code fragment at POS starting at FROM.
+Uses the beginning of the block if FROM is nil.
 Return nil otherwise.  Set match data according to
 `markdown-match-code' upon success.
 This function searches the block for a code fragment that
@@ -2807,7 +2808,9 @@ Group 3 matches the closing backquotes."
     (let ((old-point (point))
           (end-of-block (progn (markdown-end-of-text-block) (point)))
           found)
-      (markdown-beginning-of-text-block)
+      (if from
+          (goto-char from)
+        (markdown-beginning-of-text-block))
       (while (and (markdown-match-code end-of-block)
                   (setq found t)
                   (< (match-end 0) old-point)))
@@ -2955,28 +2958,42 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
 
 (defun markdown-match-bold (last)
   "Match inline bold from the point to LAST."
-  (when (markdown-match-inline-generic markdown-regex-bold last)
-    (let ((is-gfm (derived-mode-p 'gfm-mode))
-          (begin (match-beginning 2))
-          (end (match-end 2)))
-      (if (or (markdown-inline-code-at-pos-p begin)
-              (markdown-inline-code-at-pos-p end)
-              (markdown-in-comment-p)
-              (markdown-range-property-any
-               begin begin 'face '(markdown-url-face
-                                   markdown-plain-url-face))
-              (markdown-range-property-any
-               begin end 'face '(markdown-hr-face
-                                 markdown-math-face))
-              (and is-gfm (not (markdown--gfm-markup-underscore-p begin end))))
-          (progn (goto-char (min (1+ begin) last))
-                 (when (< (point) last)
-                   (markdown-match-bold last)))
-        (set-match-data (list (match-beginning 2) (match-end 2)
-                              (match-beginning 3) (match-end 3)
-                              (match-beginning 4) (match-end 4)
-                              (match-beginning 5) (match-end 5)))
-        t))))
+  (let (done
+        retval
+        last-inline-code)
+    (while (not done)
+      (if (markdown-match-inline-generic markdown-regex-bold last)
+          (let ((is-gfm (derived-mode-p 'gfm-mode))
+                (begin (match-beginning 2))
+                (end (match-end 2)))
+            (if (or
+                 (and last-inline-code
+                      (>= begin (car last-inline-code))
+                      (< begin (cdr last-inline-code)))
+                 (save-match-data
+                   (when (markdown-inline-code-at-pos begin (cdr last-inline-code))
+                     (setq last-inline-code `(,(match-beginning 0) . ,(match-end 0)))))
+                 (markdown-inline-code-at-pos-p end)
+                 (markdown-in-comment-p)
+                 (markdown-range-property-any
+                  begin begin 'face '(markdown-url-face
+                                      markdown-plain-url-face))
+                 (markdown-range-property-any
+                  begin end 'face '(markdown-hr-face
+                                    markdown-math-face))
+                 (and is-gfm (not (markdown--gfm-markup-underscore-p begin end))))
+                (progn (goto-char (min (1+ begin) last))
+                       (unless (< (point) last)
+                         (setq
+                          done t)))
+              (set-match-data (list (match-beginning 2) (match-end 2)
+                                    (match-beginning 3) (match-end 3)
+                                    (match-beginning 4) (match-end 4)
+                                    (match-beginning 5) (match-end 5)))
+              (setq done t
+                    retval t)))
+        (setq done t)))
+    retval))
 
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
@@ -2984,37 +3001,51 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
          (regex (if is-gfm
                     markdown-regex-gfm-italic
                   markdown-regex-italic)))
-    (when (and (markdown-match-inline-generic regex last)
-               (not (markdown--face-p
-                     (match-beginning 1)
-                     '(markdown-html-attr-name-face markdown-html-attr-value-face))))
-      (let ((begin (match-beginning 1))
-            (end (match-end 1))
-            (close-end (match-end 4)))
-        (if (or (eql (char-before begin) (char-after begin))
-                (markdown-inline-code-at-pos-p begin)
-                (markdown-inline-code-at-pos-p (1- end))
-                (markdown-in-comment-p)
-                (markdown-range-property-any
-                 begin begin 'face '(markdown-url-face
-                                     markdown-plain-url-face
-                                     markdown-markup-face))
-                (markdown-range-property-any
-                 begin end 'face '(markdown-bold-face
-                                   markdown-list-face
-                                   markdown-hr-face
-                                   markdown-math-face))
-                (and is-gfm
-                     (or (char-equal (char-after begin) (char-after (1+ begin))) ;; check bold case
-                         (not (markdown--gfm-markup-underscore-p begin close-end)))))
-            (progn (goto-char (min (1+ begin) last))
-                   (when (< (point) last)
-                     (markdown-match-italic last)))
-          (set-match-data (list (match-beginning 1) (match-end 1)
-                                (match-beginning 2) (match-end 2)
-                                (match-beginning 3) (match-end 3)
-                                (match-beginning 4) (match-end 4)))
-          t)))))
+    (let (done
+          retval
+          last-inline-code)
+      (while (not done)
+        (if (and (markdown-match-inline-generic regex last)
+                   (not (markdown--face-p
+                         (match-beginning 1)
+                         '(markdown-html-attr-name-face markdown-html-attr-value-face))))
+            (let ((begin (match-beginning 1))
+                  (end (match-end 1))
+                  (close-end (match-end 4)))
+              (if (or (eql (char-before begin) (char-after begin))
+                      (and last-inline-code
+                           (>= begin (car last-inline-code))
+                           (< begin (cdr last-inline-code)))
+                      (save-match-data
+                        (when (markdown-inline-code-at-pos begin (cdr last-inline-code))
+                          (setq last-inline-code `(,(match-beginning 0) . ,(match-end 0)))))
+
+                      (markdown-inline-code-at-pos-p (1- end))
+                      (markdown-in-comment-p)
+                      (markdown-range-property-any
+                       begin begin 'face '(markdown-url-face
+                                           markdown-plain-url-face
+                                           markdown-markup-face))
+                      (markdown-range-property-any
+                       begin end 'face '(markdown-bold-face
+                                         markdown-list-face
+                                         markdown-hr-face
+                                         markdown-math-face))
+                      (and is-gfm
+                           (or (char-equal (char-after begin) (char-after (1+ begin))) ;; check bold case
+                               (not (markdown--gfm-markup-underscore-p begin close-end)))))
+                  (progn (goto-char (min (1+ begin) last))
+                         (unless (< (point) last)
+                           (setq
+                            done t)))
+                (set-match-data (list (match-beginning 1) (match-end 1)
+                                      (match-beginning 2) (match-end 2)
+                                      (match-beginning 3) (match-end 3)
+                                      (match-beginning 4) (match-end 4)))
+                (setq done t
+                      retval t)))
+          (setq done t)))
+      retval)))
 
 (defun markdown--match-highlighting (last)
   (when markdown-enable-highlighting-syntax
