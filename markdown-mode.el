@@ -4910,7 +4910,7 @@ footnote text is found, NIL is returned."
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward (concat "^ \\{0,3\\}\\[" id "\\]:") nil t)
-      (skip-chars-forward "[ \t]")
+      (skip-chars-forward " \t")
       (point))))
 
 (defun markdown-footnote-marker-positions ()
