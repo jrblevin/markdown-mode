@@ -3828,12 +3828,12 @@ prefixed with an integer from 1 to the length of
         (when (and beg skip-space)
           (save-excursion
             (goto-char beg)
-            (skip-chars-forward "[ \t]")
+            (skip-chars-forward " \t")
             (setq beg (point))))
         (when (and end skip-space)
           (save-excursion
             (goto-char end)
-            (skip-chars-backward "[ \t]")
+            (skip-chars-backward " \t")
             (setq end (point))))
         (markdown-wrap-or-insert start-delim end-delim nil beg end))
     (if (markdown--face-p (point) (list face))
@@ -4910,7 +4910,7 @@ footnote text is found, NIL is returned."
   (save-excursion
     (goto-char (point-min))
     (when (re-search-forward (concat "^ \\{0,3\\}\\[" id "\\]:") nil t)
-      (skip-chars-forward "[ \t]")
+      (skip-chars-forward " \t")
       (point))))
 
 (defun markdown-footnote-marker-positions ()
