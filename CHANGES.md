@@ -20,6 +20,7 @@
     - Fix the regexp in the download languages script [GH-827][]
     - Don't hide backslashes in code blocks when using `markdown-hide-markup`
       and `markdown-fontify-code-blocks-natively` together [GH-766][]
+    - Fix `markdown-fontify-whole-heading-line` regression [GH-848][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
@@ -33,6 +34,7 @@
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
   [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
+  [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
 
 # Markdown Mode 2.6
 
