@@ -15,6 +15,9 @@
       `markdown-hide-markup`
 
 *   Bug fixes:
+    - Fixes an issue where, when `markdown-fontify-whole-heading-line` is
+      enabled, the leading `#` characters in headers are not fontified the same
+      as the heading.
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
     - Fix table alignment when a column has a seperator in code block [GH-817][]
     - Fix the regexp in the download languages script [GH-827][]

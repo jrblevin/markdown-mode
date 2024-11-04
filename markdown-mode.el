@@ -3563,8 +3563,10 @@ SEQ may be an atom or a sequence."
                (if markdown-fontify-whole-heading-line
                    (min (point-max) (1+ (match-end 0)))
                  (match-end 0))))
-          (add-text-properties
-           (match-beginning 4) (match-end 4) left-markup-props)
+          (if markdown-fontify-whole-heading-line
+              (add-text-properties (match-beginning 0) header-end heading-props)
+            (add-text-properties
+             (match-beginning 4) (match-end 4) left-markup-props))
 
           ;; If closing tag is present
           (if (match-end 6)
