@@ -26,6 +26,7 @@
     - Apply url-unescape against URL in an inline link [GH-805][]
     - Show mode toggle message only if it is called interactively
     - Copy `markdown-css-paths` in the output buffer [GH-834][]
+    - Change temporary buffer name according to the Emacs naming convention [GH-848][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
@@ -34,6 +35,7 @@
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
   [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
+  [gh-845]: https://github.com/jrblevin/markdown-mode/issues/845
   [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
 
 # Markdown Mode 2.6
