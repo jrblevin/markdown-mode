@@ -9152,7 +9152,7 @@ position."
         (remove-text-properties start end '(face nil))
         (with-current-buffer
             (get-buffer-create
-             (concat " markdown-code-fontification:" (symbol-name lang-mode)))
+             (format " *markdown-code-fontification:%s*" (symbol-name lang-mode)))
           ;; Make sure that modification hooks are not inhibited in
           ;; the org-src-fontification buffer in case we're called
           ;; from `jit-lock-function' (Bug#25132).
