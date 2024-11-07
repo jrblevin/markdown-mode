@@ -6107,6 +6107,16 @@ bar baz"
     (markdown-fill-paragraph)
     (should (string= (buffer-string) "- foo bar baz"))))
 
+(ert-deftest test-markdown-filling/gfm-alert ()
+  "Fill paragraph at GFM alert."
+  (let ((levels '("NOTE" "TIP" "IMPORTANT" "WARNING" "CAUTION"))
+        (template "> [!%s]\foo bar baz"))
+    (dolist (level levels)
+      (let ((input (format template level)))
+        (markdown-test-string-mode 'gfm-mode input
+          (markdown-fill-paragraph)
+          (should (string= (buffer-string) input)))))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()

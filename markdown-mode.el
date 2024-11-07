@@ -10305,6 +10305,11 @@ rows and columns and the column alignment."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
   (setq-local markdown-table-at-point-p-function #'gfm--table-at-point-p)
+  (setq-local paragraph-separate
+              (concat paragraph-separate
+                      "\\|"
+                      ;; GFM alert syntax
+                      "^>\s-*\\[!\\(?:NOTE\\|TIP\\|IMPORTANT\\|WARNING\\|CAUTION\\)\\]"))
   (add-hook 'post-self-insert-hook #'gfm--electric-pair-fence-code-block 'append t)
   (markdown-gfm-parse-buffer-for-languages))
 

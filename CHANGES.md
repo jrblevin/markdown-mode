@@ -13,6 +13,7 @@
       variable `markdown-special-ctrl-a/e`, like Org mode.
     - Trailing whitespace characters for line breaks are hidden when using
       `markdown-hide-markup`
+    - `fill-paragraph` considers GFM alert syntax [GH-838][]
 
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
@@ -35,6 +36,7 @@
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
   [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
+  [gh-838]: https://github.com/jrblevin/markdown-mode/issues/838
   [gh-845]: https://github.com/jrblevin/markdown-mode/issues/845
   [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
 
