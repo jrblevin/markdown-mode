@@ -907,7 +907,6 @@ This matches typical bracketed [[WikiLinks]] as well as \\='aliased
 wiki links of the form [[PageName|link text]].
 The meanings of the first and second components depend
 on the value of `markdown-wiki-link-alias-first'.
-
 Group 1 matches the entire link.
 Group 2 matches the opening square brackets.
 Group 3 matches the first component of the wiki link.
@@ -3387,7 +3386,8 @@ the buffer)."
   (when (and markdown-enable-wiki-links
              (not markdown-wiki-link-fontify-missing)
              (markdown-match-inline-generic markdown-regex-wiki-link last))
-    (let ((begin (match-beginning 1)) (end (match-end 1)))
+    (let ((begin (match-beginning 1))
+          (end (match-end 1)))
       (if (or (markdown-in-comment-p begin)
               (markdown-in-comment-p end)
               (markdown-inline-code-at-pos-p begin)
@@ -3396,6 +3396,25 @@ the buffer)."
           (progn (goto-char (min (1+ begin) last))
                  (when (< (point) last)
                    (markdown-match-wiki-link last)))
+        ;; Add text properties for hiding markup
+        (when markdown-hide-markup
+          (if markdown-wiki-link-alias-first
+              (progn
+                (add-text-properties (match-beginning 3) (match-end 3)
+                                     '(face markdown-link-face))
+                (add-text-properties (match-beginning 5) (match-end 5)
+                                     '(invisible markdown-markup face markdown-url-face)))
+            (progn
+              (add-text-properties (match-beginning 3) (match-end 3)
+                                   '(invisible markdown-markup face markdown-url-face))
+              (add-text-properties (match-beginning 5) (match-end 5)
+                                   '(face markdown-link-face))))
+          (add-text-properties (match-beginning 2) (match-end 2)
+                               '(invisible markdown-markup face markdown-markup-face))
+          (add-text-properties (match-beginning 4) (match-end 4)
+                               '(invisible markdown-markup face markdown-markup-face))
+          (add-text-properties (match-beginning 6) (match-end 6)
+                               '(invisible markdown-markup face markdown-markup-face)))
         (set-match-data (list begin end))
         t))))
 
