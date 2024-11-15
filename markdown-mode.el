@@ -3388,6 +3388,7 @@ the buffer)."
              (markdown-match-inline-generic markdown-regex-wiki-link last))
     (let ((begin (match-beginning 1))
           (end (match-end 1))
+          (aliasp (string-equal (match-string-no-properties 4) "|"))
           (part1 (match-string-no-properties 3))
           (part2 (match-string-no-properties 5)))
       (if (or (markdown-in-comment-p begin)
@@ -3400,16 +3401,18 @@ the buffer)."
                    (markdown-fontify-wiki-links last)))
         ;; Add text properties for hiding markup
         (progn
-          (if markdown-wiki-link-alias-first
-              (progn
-                (add-text-properties (match-beginning 3) (match-end 3) (link-props part2))
-                (add-text-properties (match-beginning 5) (match-end 5) url-props))
-            (progn
-              (add-text-properties (match-beginning 3) (match-end 3) url-props)
-              (add-text-properties (match-beginning 5) (match-end 5) (link-props part1))))
+          (if aliasp
+              (if markdown-wiki-link-alias-first
+                  (progn
+                    (add-text-properties (match-beginning 3) (match-end 3) (link-props part2))
+                    (add-text-properties (match-beginning 5) (match-end 5) url-props))
+                (progn
+                  (add-text-properties (match-beginning 3) (match-end 3) url-props)
+                  (add-text-properties (match-beginning 5) (match-end 5) (link-props part1))))
+            (add-text-properties (match-beginning 3) (match-end 3) (link-props part1)))
           (add-text-properties (match-beginning 2) (match-end 2) markup-props)
-          (add-text-properties (match-beginning 4) (match-end 4) markup-props)
-          (add-text-properties (match-beginning 6) (match-end 6) markup-props))
+          (add-text-properties (match-beginning 6) (match-end 6) markup-props)
+          (add-text-properties (match-beginning 4) (match-end 4) markup-props))
         (set-match-data (list begin end))
         t))))
 
@@ -10071,9 +10074,10 @@ rows and columns and the column alignment."
    ((and (and markdown-enable-wiki-links
               (thing-at-point-looking-at markdown-regex-wiki-link))
          (or markdown-hide-urls markdown-hide-markup))
-    (let* ((part1 (match-string-no-properties 3))
+    (let* ((aliasp (string-equal (match-string-no-properties 4) "|"))
+           (part1 (match-string-no-properties 3))
            (part2 (match-string-no-properties 5))
-           (link (if markdown-wiki-link-alias-first part2 part1))
+           (link (if (and aliasp markdown-wiki-link-alias-first) part2 part1))
            (edit-keys (markdown--substitute-command-keys
                        "\\[markdown-insert-wiki-link]"))
            (edit-str (propertize edit-keys 'face 'font-lock-constant-face)))
