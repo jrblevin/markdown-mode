@@ -10067,6 +10067,20 @@ rows and columns and the column alignment."
                    (propertize link 'face 'markdown-reference-face)
                    (propertize "]" 'face 'markdown-markup-face))
                 (propertize link 'face 'markdown-url-face)))))
+   ;; Hidden URL for wiki links
+   ((and (and markdown-enable-wiki-links
+              (thing-at-point-looking-at markdown-regex-wiki-link))
+         (or markdown-hide-urls markdown-hide-markup))
+    (let* ((imagep (string-equal (match-string 1) "!"))
+           (referencep (string-equal (match-string 5) "["))
+           (part1 (match-string-no-properties 3))
+           (part2 (match-string-no-properties 5))
+           (link (if markdown-wiki-link-alias-first part2 part1))
+           (edit-keys (markdown--substitute-command-keys
+                       "\\[markdown-insert-wiki-link]"))
+           (edit-str (propertize edit-keys 'face 'font-lock-constant-face)))
+      (format "Hidden URL (%s to edit): %s"
+              edit-str (propertize link 'face 'markdown-reference-face))))
    ;; Hidden language name for fenced code blocks
    ((and (markdown-code-block-at-point-p)
          (not (get-text-property (point) 'markdown-pre))
