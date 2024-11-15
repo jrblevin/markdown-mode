@@ -2292,7 +2292,7 @@ Depending on your font, some reasonable choices are:
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
     (markdown-fontify-blockquotes)
-    (markdown-match-wiki-link . ((0 'markdown-link-face prepend))))
+    (markdown-fontify-wiki-links))
   "Syntax highlighting for Markdown files.")
 
 ;; Footnotes
@@ -3381,8 +3381,8 @@ the buffer)."
 (defun markdown-match-yaml-metadata-key (last)
   (markdown-match-propertized-text 'markdown-metadata-key last))
 
-(defun markdown-match-wiki-link (last)
-  "Match wiki links from point to LAST."
+(defun markdown-fontify-wiki-links (last)
+  "Add text properties to next wiki link from point to LAST."
   (when (and markdown-enable-wiki-links
              (not markdown-wiki-link-fontify-missing)
              (markdown-match-inline-generic markdown-regex-wiki-link last))
@@ -3395,9 +3395,9 @@ the buffer)."
               (markdown-code-block-at-pos begin))
           (progn (goto-char (min (1+ begin) last))
                  (when (< (point) last)
-                   (markdown-match-wiki-link last)))
+                   (markdown-fontify-wiki-links last)))
         ;; Add text properties for hiding markup
-        (when markdown-hide-markup
+        (progn
           (if markdown-wiki-link-alias-first
               (progn
                 (add-text-properties (match-beginning 3) (match-end 3)
@@ -8456,20 +8456,22 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
       (markdown-follow-wiki-link (markdown-wiki-link-link) arg)
     (user-error "Point is not at a Wiki Link")))
 
-(defun markdown-highlight-wiki-link (from to face)
-  "Highlight the wiki link in the region between FROM and TO using FACE."
-  (put-text-property from to 'font-lock-face face))
-
+;; TODO: Need to handle this function for a complete solution
 (defun markdown-unfontify-region-wiki-links (from to)
   "Remove wiki link faces from the region specified by FROM and TO."
   (interactive "*r")
-  (let ((modified (buffer-modified-p)))
-    (remove-text-properties from to '(font-lock-face markdown-link-face))
-    (remove-text-properties from to '(font-lock-face markdown-missing-link-face))
-    ;; remove-text-properties marks the buffer modified in emacs 24.3,
-    ;; undo that if it wasn't originally marked modified
-    (set-buffer-modified-p modified)))
+  nil
+  ;; (let ((modified (buffer-modified-p)))
+  ;;   ;; (remove-text-properties from to '(font-lock-face markdown-link-face))
+  ;;   ;; (remove-text-properties from to '(font-lock-face markdown-missing-link-face))
+  ;;   (remove-text-properties from to '(face markdown-link-face))
+  ;;   (remove-text-properties from to '(face markdown-missing-link-face))
+  ;;   ;; remove-text-properties marks the buffer modified in emacs 24.3,
+  ;;   ;; undo that if it wasn't originally marked modified
+  ;;   (set-buffer-modified-p modified))
+  )
 
+;; TODO: Need to handle this function for a complete solution
 (defun markdown-fontify-region-wiki-links (from to)
   "Search region given by FROM and TO for wiki links and fontify them.
 If a wiki link is found check to see if the backing file exists
@@ -8478,16 +8480,39 @@ and highlight accordingly."
   (save-match-data
     (while (re-search-forward markdown-regex-wiki-link to t)
       (when (not (markdown-code-block-at-point-p))
-        (let ((highlight-beginning (match-beginning 1))
-              (highlight-end (match-end 1))
-              (file-name
-               (markdown-convert-wiki-link-to-filename
-                (markdown-wiki-link-link))))
-          (if (condition-case nil (file-exists-p file-name) (error nil))
-              (markdown-highlight-wiki-link
-               highlight-beginning highlight-end 'markdown-link-face)
-            (markdown-highlight-wiki-link
-             highlight-beginning highlight-end 'markdown-missing-link-face)))))))
+        (markdown-fontify-wiki-links to)
+
+        ;; (when markdown-hide-markup
+        ;;   (if markdown-wiki-link-alias-first
+        ;;       (progn
+        ;;         (add-text-properties (match-beginning 3) (match-end 3)
+        ;;                              '(face markdown-link-face))
+        ;;         (add-text-properties (match-beginning 5) (match-end 5)
+        ;;                              '(invisible markdown-markup face markdown-url-face)))
+        ;;     (progn
+        ;;       (add-text-properties (match-beginning 3) (match-end 3)
+        ;;                            '(invisible markdown-markup face markdown-url-face))
+        ;;       (add-text-properties (match-beginning 5) (match-end 5)
+        ;;                            '(face markdown-link-face))))
+        ;;   (add-text-properties (match-beginning 2) (match-end 2)
+        ;;                        '(invisible markdown-markup face markdown-markup-face))
+        ;;   (add-text-properties (match-beginning 4) (match-end 4)
+        ;;                        '(invisible markdown-markup face markdown-markup-face))
+        ;;   (add-text-properties (match-beginning 6) (match-end 6)
+        ;;                        '(invisible markdown-markup face markdown-markup-face)))
+
+        ;; (let ((begin (match-beginning 1))
+        ;;       (end (match-end 1))
+        ;;       (file-name
+        ;;        (markdown-convert-wiki-link-to-filename
+        ;;         (markdown-wiki-link-link))))
+        ;;   (if (condition-case nil (file-exists-p file-name) (error nil))
+        ;;       (add-text-properties begin end '(face markdown-link-face))
+        ;;     (add-text-properties begin end '(face markdown-missing-link-face))))
+
+        ))
+
+    ))
 
 (defun markdown-extend-changed-region (from to)
   "Extend region given by FROM and TO so that we can fontify all links.
@@ -8528,7 +8553,8 @@ newline after."
                 ;; Only refontify when the range contains text with a
                 ;; wiki link face or if the wiki link regexp matches.
                 (when (or (markdown-range-property-any
-                           new-from new-to 'font-lock-face
+                           ;; new-from new-to 'font-lock-face
+                           new-from new-to 'face
                            '(markdown-link-face markdown-missing-link-face))
                           (re-search-forward
                            markdown-regex-wiki-link new-to t))
@@ -8568,24 +8594,26 @@ and disable it otherwise."
   "Add or remove hooks for fontifying wiki links.
 These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
   ;; Anytime text changes make sure it gets fontified correctly
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (add-hook 'after-change-functions
-                #'markdown-check-change-for-wiki-link-after-change t t)
-    (remove-hook 'after-change-functions
-                 #'markdown-check-change-for-wiki-link-after-change t))
-  ;; If we left the buffer there is a really good chance we were
+  ;; And if we left the buffer there is a really good chance we were
   ;; creating one of the wiki link documents. Make sure we get
   ;; refontified when we come back.
   (if (and markdown-enable-wiki-links
            markdown-wiki-link-fontify-missing)
+
       (progn
+        (add-hook 'after-change-functions
+                  #'markdown-check-change-for-wiki-link-after-change t t)
         (add-hook 'window-configuration-change-hook
                   #'markdown-fontify-buffer-wiki-links t t)
         (markdown-fontify-buffer-wiki-links))
-    (remove-hook 'window-configuration-change-hook
-                 #'markdown-fontify-buffer-wiki-links t)
-    (markdown-unfontify-region-wiki-links (point-min) (point-max))))
+
+    (progn
+      (remove-hook 'after-change-functions
+                   #'markdown-check-change-for-wiki-link-after-change t)
+      (remove-hook 'window-configuration-change-hook
+                   #'markdown-fontify-buffer-wiki-links t)
+      ;; (markdown-unfontify-region-wiki-links (point-min) (point-max))
+      )))
 
 
 ;;; Following & Doing =========================================================
