@@ -6184,15 +6184,29 @@ bar baz"
 
 (ert-deftest test-markdown-export/buffer-local-css-path ()
   "Test buffer local `markdown-css-paths'"
-  (let ((markdown-css-paths '("./global.css")))
+  (let ((markdown-css-paths '("/global.css")))
     (markdown-test-temp-file "inline.text"
-      (setq-local markdown-css-paths '("./local.css"))
+      (setq-local markdown-css-paths '("/local.css"))
       (let* ((markdown-export-kill-buffer nil)
              (file (markdown-export))
              (buffer (get-file-buffer file)))
         (with-current-buffer buffer
           (goto-char (point-min))
-          (should (search-forward "href=\"./local.css\"")))
+          (should (search-forward "href=\"/local.css\"")))
+        (kill-buffer buffer)
+        (delete-file file)))))
+
+(ert-deftest test-markdown-export/relative-css-path ()
+  "Test relative `markdown-css-paths'."
+  (let ((markdown-css-paths '("style.css")))
+    (markdown-test-temp-file "inline.text"
+      (let* ((markdown-export-kill-buffer nil)
+             (file (markdown-export))
+             (buffer (get-file-buffer file))
+             (expanded-path (file-name-concat default-directory "style.css")))
+        (with-current-buffer buffer
+          (goto-char (point-min))
+          (should (search-forward (format "href=\"%s\"" expanded-path))))
         (kill-buffer buffer)
         (delete-file file)))))
 

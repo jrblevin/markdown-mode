@@ -29,6 +29,8 @@
     - Copy `markdown-css-paths` in the output buffer [GH-834][]
     - Change temporary buffer name according to the Emacs naming convention [GH-848][]
     - Mark `markdown-css-paths` safe as file local variables [GH-834][]
+    - Resolve style sheets in `markdown-css-paths` relative to the Markdown file
+      [GH-834][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
