@@ -6203,7 +6203,7 @@ bar baz"
       (let* ((markdown-export-kill-buffer nil)
              (file (markdown-export))
              (buffer (get-file-buffer file))
-             (expanded-path (file-name-concat default-directory "style.css")))
+             (expanded-path (concat default-directory "style.css")))
         (with-current-buffer buffer
           (goto-char (point-min))
           (should (search-forward (format "href=\"%s\"" expanded-path))))
