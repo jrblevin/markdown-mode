@@ -370,6 +370,7 @@ Math support can be enabled, disabled, or toggled later using
 (defcustom markdown-css-paths nil
   "List of URLs of CSS files to link to in the output XHTML."
   :group 'markdown
+  :safe (apply-partially #'seq-every-p #'stringp)
   :type '(repeat (string :tag "CSS File Path")))
 
 (defcustom markdown-content-type "text/html"
