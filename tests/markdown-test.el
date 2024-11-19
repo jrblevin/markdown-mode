@@ -3073,19 +3073,17 @@ puts markdown.to_html
   (let ((markdown-fontify-whole-heading-line t))
     (let ((markdown-hide-markup nil))
       (markdown-test-string "## abc  \n"
-                            (markdown-test-range-has-face 4 9 'markdown-header-face-2))
+        (markdown-test-range-has-face 1 8 'markdown-header-face-2))
       (markdown-test-string "## abc ##\n"
-                            (markdown-test-range-has-face 4 6 'markdown-header-face-2)
-                            (markdown-test-range-has-face 7 10 'markdown-header-delimiter-face)))
+        (markdown-test-range-has-face 1 9 'markdown-header-face-2)))
 
     (let ((markdown-hide-markup t))
       (markdown-test-string "## abc  \n"
-                            (markdown-test-range-has-face 4 9 'markdown-header-face-2))
+        (markdown-test-range-has-face 4 9 'markdown-header-face-2))
       (markdown-test-string "## abc ##\n"
-                            (markdown-test-range-has-face 4 6 'markdown-header-face-2)
-                            (markdown-test-range-has-face 7 9 'markdown-header-delimiter-face)
-                            (markdown-test-range-has-face 10 10 'markdown-header-face-2))
-      )))
+        (markdown-test-range-has-face 4 6 'markdown-header-face-2)
+        (markdown-test-range-has-face 7 9 'markdown-header-delimiter-face)
+        (markdown-test-range-has-face 10 10 'markdown-header-face-2)))))
 
 (ert-deftest test-markdown-font-lock/setext-1-letter ()
   "An edge case for level-one setext headers."
@@ -6109,6 +6107,16 @@ bar baz"
     (markdown-fill-paragraph)
     (should (string= (buffer-string) "- foo bar baz"))))
 
+(ert-deftest test-markdown-filling/gfm-alert ()
+  "Fill paragraph at GFM alert."
+  (let ((levels '("NOTE" "TIP" "IMPORTANT" "WARNING" "CAUTION"))
+        (template "> [!%s]\foo bar baz"))
+    (dolist (level levels)
+      (let ((input (format template level)))
+        (markdown-test-string-mode 'gfm-mode input
+          (markdown-fill-paragraph)
+          (should (string= (buffer-string) input)))))))
+
 ;;; Export tests:
 
 (ert-deftest test-markdown-hook/xhtml-standalone ()
@@ -6176,15 +6184,29 @@ bar baz"
 
 (ert-deftest test-markdown-export/buffer-local-css-path ()
   "Test buffer local `markdown-css-paths'"
-  (let ((markdown-css-paths '("./global.css")))
+  (let ((markdown-css-paths '("/global.css")))
     (markdown-test-temp-file "inline.text"
-      (setq-local markdown-css-paths '("./local.css"))
+      (setq-local markdown-css-paths '("/local.css"))
       (let* ((markdown-export-kill-buffer nil)
              (file (markdown-export))
              (buffer (get-file-buffer file)))
         (with-current-buffer buffer
           (goto-char (point-min))
-          (should (search-forward "href=\"./local.css\"")))
+          (should (search-forward "href=\"/local.css\"")))
+        (kill-buffer buffer)
+        (delete-file file)))))
+
+(ert-deftest test-markdown-export/relative-css-path ()
+  "Test relative `markdown-css-paths'."
+  (let ((markdown-css-paths '("style.css")))
+    (markdown-test-temp-file "inline.text"
+      (let* ((markdown-export-kill-buffer nil)
+             (file (markdown-export))
+             (buffer (get-file-buffer file))
+             (expanded-path (concat default-directory "style.css")))
+        (with-current-buffer buffer
+          (goto-char (point-min))
+          (should (search-forward (format "href=\"%s\"" expanded-path))))
         (kill-buffer buffer)
         (delete-file file)))))
 

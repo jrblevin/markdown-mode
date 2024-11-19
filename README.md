@@ -148,7 +148,7 @@ maintainer if not).
    * Ubuntu Linux: [elpa-markdown-mode][elpa-ubuntu] and [emacs-goodies-el][emacs-goodies-el-ubuntu]
    * RedHat and Fedora Linux: [emacs-goodies][]
    * NetBSD: [textproc/markdown-mode][]
-   * MacPorts: [markdown-mode.el][macports-package] ([pending][macports-ticket])
+   * MacPorts: [markdown-mode.el][macports-package]
    * FreeBSD: [textproc/markdown-mode.el][freebsd-port]
 
  [elpa-markdown-mode]: https://packages.debian.org/sid/lisp/elpa-markdown-mode
@@ -157,8 +157,7 @@ maintainer if not).
  [emacs-goodies-el-ubuntu]: http://packages.ubuntu.com/search?keywords=emacs-goodies-el
  [emacs-goodies]: https://apps.fedoraproject.org/packages/emacs-goodies
  [textproc/markdown-mode]: http://pkgsrc.se/textproc/markdown-mode
- [macports-package]: https://trac.macports.org/browser/trunk/dports/editors/markdown-mode.el/Portfile
- [macports-ticket]: http://trac.macports.org/ticket/35716
+ [macports-package]: https://ports.macports.org/port/markdown-mode.el/
  [freebsd-port]: http://svnweb.freebsd.org/ports/head/textproc/markdown-mode.el
 
 **Dependencies**

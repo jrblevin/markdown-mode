@@ -13,6 +13,7 @@
       variable `markdown-special-ctrl-a/e`, like Org mode.
     - Trailing whitespace characters for line breaks are hidden when using
       `markdown-hide-markup`
+    - `fill-paragraph` considers GFM alert syntax [GH-838][]
 
 *   Bug fixes:
     - Don't highlight superscript/subscript in math inline/block [GH-802][]
@@ -20,11 +21,16 @@
     - Fix the regexp in the download languages script [GH-827][]
     - Don't hide backslashes in code blocks when using `markdown-hide-markup`
       and `markdown-fontify-code-blocks-natively` together [GH-766][]
+    - Fix `markdown-fontify-whole-heading-line` regression [GH-848][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
     - Show mode toggle message only if it is called interactively
     - Copy `markdown-css-paths` in the output buffer [GH-834][]
+    - Change temporary buffer name according to the Emacs naming convention [GH-848][]
+    - Mark `markdown-css-paths` safe as file local variables [GH-834][]
+    - Resolve style sheets in `markdown-css-paths` relative to the Markdown file
+      [GH-855][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
@@ -33,6 +39,10 @@
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
   [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
+  [gh-838]: https://github.com/jrblevin/markdown-mode/issues/838
+  [gh-845]: https://github.com/jrblevin/markdown-mode/issues/845
+  [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
+  [gh-855]: https://github.com/jrblevin/markdown-mode/issues/855
 
 # Markdown Mode 2.6
 

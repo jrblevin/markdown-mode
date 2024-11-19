@@ -370,6 +370,7 @@ Math support can be enabled, disabled, or toggled later using
 (defcustom markdown-css-paths nil
   "List of URLs of CSS files to link to in the output XHTML."
   :group 'markdown
+  :safe (lambda (x) (and (listp x) (cl-every #'stringp x)))
   :type '(repeat (string :tag "CSS File Path")))
 
 (defcustom markdown-content-type "text/html"
@@ -3614,30 +3615,25 @@ SEQ may be an atom or a sequence."
                    (add-text-properties
                     (match-beginning 3) (match-end 3) rule-props)))
         ;; atx heading
-        (let ((header-end
+        (let ((fontified-start
+               (if (or markdown-hide-markup (not markdown-fontify-whole-heading-line))
+                   (match-beginning 5)
+                 (match-beginning 0)))
+              (fontified-end
                (if markdown-fontify-whole-heading-line
                    (min (point-max) (1+ (match-end 0)))
-                 (match-end 0))))
+                 (match-end 5))))
           (add-text-properties
            (match-beginning 4) (match-end 4) left-markup-props)
 
           ;; If closing tag is present
           (if (match-end 6)
               (progn
-                (if markdown-hide-markup
-                    (progn
-                      (add-text-properties
-                       (match-beginning 5) header-end heading-props)
-                      (add-text-properties
-                       (match-beginning 6) (match-end 6) right-markup-props))
-                  (add-text-properties
-                   (match-beginning 5) (match-end 5) heading-props)
-                  (add-text-properties
-                   (match-beginning 6) header-end right-markup-props)))
+                (add-text-properties fontified-start fontified-end heading-props)
+                (when (or markdown-hide-markup (not markdown-fontify-whole-heading-line))
+                  (add-text-properties (match-beginning 6) (match-end 6) right-markup-props)))
             ;; If closing tag is not present
-            (add-text-properties
-             (match-beginning 5) header-end heading-props))
-          )))
+            (add-text-properties fontified-start fontified-end heading-props)))))
     t))
 
 (defun markdown-fontify-tables (last)
@@ -7795,9 +7791,7 @@ Standalone XHTML output is identified by an occurrence of
 
 (defun markdown-stylesheet-link-string (stylesheet-path)
   (concat "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
-          (or (and (string-prefix-p "~" stylesheet-path)
-                   (expand-file-name stylesheet-path))
-              stylesheet-path)
+          (expand-file-name stylesheet-path)
           "\"  />"))
 
 (defun markdown-escape-title (title)
@@ -9232,7 +9226,7 @@ position."
         (remove-text-properties start end '(face nil))
         (with-current-buffer
             (get-buffer-create
-             (concat " markdown-code-fontification:" (symbol-name lang-mode)))
+             (format " *markdown-code-fontification:%s*" (symbol-name lang-mode)))
           ;; Make sure that modification hooks are not inhibited in
           ;; the org-src-fontification buffer in case we're called
           ;; from `jit-lock-function' (Bug#25132).
@@ -10398,6 +10392,11 @@ rows and columns and the column alignment."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
   (setq-local markdown-table-at-point-p-function #'gfm--table-at-point-p)
+  (setq-local paragraph-separate
+              (concat paragraph-separate
+                      "\\|"
+                      ;; GFM alert syntax
+                      "^>\s-*\\[!\\(?:NOTE\\|TIP\\|IMPORTANT\\|WARNING\\|CAUTION\\)\\]"))
   (add-hook 'post-self-insert-hook #'gfm--electric-pair-fence-code-block 'append t)
   (markdown-gfm-parse-buffer-for-languages))
 
