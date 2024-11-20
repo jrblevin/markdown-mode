@@ -264,9 +264,9 @@ This is the default search behavior of Ikiwiki."
 (defcustom markdown-wiki-link-search-type nil
   "Searching type for markdown wiki link.
 
-sub-directories: search for wiki link targets in sub directories
-parent-directories: search for wiki link targets in parent directories
-project: search for wiki link targets under project root"
+`sub-directories': search for wiki link targets in sub directories
+`parent-directories': search for wiki link targets in parent directories
+`project': search for wiki link targets under project root"
   :group 'markdown
   :type '(set
           (const :tag "search wiki link from subdirectories" sub-directories)
@@ -8273,7 +8273,6 @@ Translate filenames using `markdown-filename-translate-function'."
         ;; Add text properties for hiding markup
         (progn
           ;; Propertize opening and closing brackets
-          (remove-text-properties begin end '(font-lock-face nil))
           (add-text-properties    beg2 end2 markdown--markup-props)
           (add-face-text-property beg2 end2 'markdown-markup-face)
           (add-text-properties    beg6 end6 markdown--markup-props)
@@ -8292,7 +8291,7 @@ Translate filenames using `markdown-filename-translate-function'."
                       (add-text-properties    beg5 end5 '(invisible markdown-markup))
                       (add-face-text-property beg5 end5 'markdown-url-face)
                       (when (and file-missing-p markdown-wiki-link-fontify-missing)
-                        (put-text-property beg3 end3 'font-lock-face 'markdown-missing-link-face)))
+                        (put-text-property beg3 end3 'face 'markdown-missing-link-face)))
                   (progn
                     ;; Properties URL portion of link
                     (add-text-properties    beg3 end3 markdown--url-props)
@@ -8301,13 +8300,13 @@ Translate filenames using `markdown-filename-translate-function'."
                     (add-text-properties    beg5 end5 (markdown--link-props part1))
                     (add-face-text-property beg5 end5 'markdown-link-face)
                     (when (and file-missing-p markdown-wiki-link-fontify-missing)
-                      (put-text-property beg5 end5 'font-lock-face 'markdown-missing-link-face)))))
+                      (put-text-property beg5 end5 'face 'markdown-missing-link-face)))))
             (progn
               ;; Properties link as link text
               (add-text-properties    beg3 end3 (markdown--link-props part1))
               (add-face-text-property beg3 end3 'markdown-link-face)
               (when (and file-missing-p markdown-wiki-link-fontify-missing)
-                (put-text-property beg3 end3 'font-lock-face 'markdown-missing-link-face)))))
+                (put-text-property beg3 end3 'face 'markdown-missing-link-face)))))
         (set-match-data (list begin end))
         t))))
 
@@ -8412,12 +8411,9 @@ The location of the alias component depends on the value of
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
 Spaces in NAME are replaced with `markdown-link-space-sub-char'.
+Search depth is determined by `markdown-wiki-link-search-type'.
 When in `gfm-mode', follow GitHub's conventions where [[Test Test]]
-and [[test test]] both map to Test-test.ext.  Look in the current
-directory first, then in subdirectories if
-`markdown-wiki-link-search-subdirectories' is non-nil, and then
-in parent directories if
-`markdown-wiki-link-search-parent-directories' is non-nil."
+and [[test test]] both map to Test-test.ext."
   (save-match-data
     ;; This function must not overwrite match data(PR #590)
     (let* ((basename (replace-regexp-in-string
@@ -8510,20 +8506,6 @@ and disable it otherwise."
           (> (prefix-numeric-value arg) 0)))
   (when (called-interactively-p 'interactive)
     (message "markdown-mode wiki link support %s"
-             (if markdown-enable-wiki-links "enabled" "disabled")))
-  (markdown-reload-extensions))
-
-(defun markdown-toggle-fontify-missing-wiki-links (&optional arg)
-  "Toggle wiki link face to show whether or not target file exists.
-With a prefix argument ARG, enable missing link fontification if ARG
-is positive,and disable it otherwise."
-  (interactive (list (or current-prefix-arg 'toggle)))
-  (setq markdown-wiki-link-fontify-missing
-        (if (eq arg 'toggle)
-            (not markdown-wiki-link-fontify-missing)
-          (> (prefix-numeric-value arg) 0)))
-  (when (called-interactively-p 'interactive)
-    (message "markdown-mode fontification of missing wiki links %s"
              (if markdown-enable-wiki-links "enabled" "disabled")))
   (markdown-reload-extensions))
 
