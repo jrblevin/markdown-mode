@@ -178,8 +178,7 @@ tend to be associated with paired delimiters such as <kbd>M-{</kbd> and
 <kbd>M-}</kbd> or <kbd>C-c <</kbd> and <kbd>C-c ></kbd>.  Outline navigation keybindings the
 same as in `org-mode`.  Finally, commands for running Markdown or
 doing maintenance on an open file are grouped under the <kbd>C-c C-c</kbd>
-prefix.  The most commonly used commands are described below. You
-can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
+prefix.  The most commonly used commands are described below.
 
   * Links and Images: <kbd>C-c C-l</kbd> and <kbd>C-c C-i</kbd>
 
