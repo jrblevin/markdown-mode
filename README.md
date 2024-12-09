@@ -1073,13 +1073,13 @@ by `markdown-mode` and `gfm-mode` as described below.
     ```
 
 * **Preview:** GFM-specific preview can be powered by setting
-  `markdown-command` to use [Docter][].  This may also be
+  `markdown-command` to use [marked][].  This may also be
   configured to work with [Marked 2][] for `markdown-open-command`.
 
 [GFM]: http://github.github.com/github-flavored-markdown/
 [GFM comments]: https://help.github.com/articles/writing-on-github/
 [since 2014]: https://github.com/blog/1825-task-lists-in-all-markdown-documents
-[Docter]: https://github.com/alampros/Docter
+[marked]: https://marked.js.org/
 
 ## Acknowledgments
 
