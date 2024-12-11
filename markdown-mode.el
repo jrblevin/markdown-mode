@@ -5211,8 +5211,7 @@ Otherwise, do normal delete by repeating
         (back-to-indentation)
         (unless (looking-at-p "[ \t]*$")
           (setq mincol (min mincol (current-column))))
-        (forward-line 1)
-        ))
+        (forward-line 1)))
     mincol))
 
 (defun markdown-indent-region (beg end arg)
