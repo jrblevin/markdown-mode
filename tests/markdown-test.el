@@ -151,7 +151,7 @@ This file is not saved."
                 (unless (eq vals value)
                   (throw 'fail loc))))))
     (when fail-loc
-      (message "Testing range (%d,%d) for property %s equal to %s."
+      (message "Testing that range (%d,%d) for property %s includes %s."
                begin end prop value)
       (message "Expected value (%s) not found in property (%s) at location %d" value prop fail-loc)
       (markdown-test-report-property-range begin end prop))
@@ -162,12 +162,12 @@ This file is not saved."
   (let ((fail-loc
          (catch 'fail
            (dolist (loc (number-sequence begin end))
-             (unless (eq (get-char-property loc prop) value)
+             (unless (equal (get-char-property loc prop) value)
                (throw 'fail loc))))))
     (when fail-loc
-      (message "Testing range (%d,%d) for property %s equal to %s."
+      (message "Testing that range (%d,%d) for property %s equal to %s."
                begin end prop value)
-      (message "Expected value (%s) not found in property (%s) at location %d" value prop fail-loc)
+      (message "Expected value (%s) does not equal property (%s) at location %d" value prop fail-loc)
       (markdown-test-report-property-range begin end prop))
     (should-not fail-loc)))
 
@@ -5728,39 +5728,24 @@ http://example.com \"title\"  )
 
 (ert-deftest test-markdown-wiki-link/font-lock ()
   "Test font lock faces for wiki links."
-  ;; If `temporary-file-directory' contains an inaccessible
-  ;; subdirectory, `markdown-fontify-buffer-wiki-links' fails because
-  ;; it calls `directory-files-recursively' on the directory, which
-  ;; fails because of
-  ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=28567>.  To fix
-  ;; this, we run the entire test in a new subdirectory of
-  ;; `temporary-file-directory', which is guaranteed to not contain
-  ;; any inaccessible directories.
-  (let ((temporary-file-directory
-         (file-name-as-directory (make-temp-file "markdown-test" :dir-flag))))
-    (markdown-test-temp-file "wiki-links.text"
-      (let* ((fn (concat (file-name-directory buffer-file-name)
-                         "inline.text"))
-             (markdown-enable-wiki-links t))
-        ;; Create inline.text in the same temp directory, refontify
-        (write-region "" nil fn nil 1)
-        (markdown-fontify-buffer-wiki-links)
-        ;; Confirm location of first wiki link
-        (should (eq (markdown-next-link) 8))
-        ;; First wiki link doesn't have a corresponding file
-        (markdown-test-range-has-property 8 20 'font-lock-face 'markdown-missing-link-face)
-        ;; Second wiki link doesn't have a corresponding file
-        (should (eq (markdown-next-link) 73))
-        (markdown-test-range-has-property 73 88 'font-lock-face 'markdown-missing-link-face)
-        ;; Move to third wiki link, and create the missing file
-        (should (eq (markdown-next-link) 155))
-        (should (string-equal (markdown-wiki-link-link) "inline"))
-        (markdown-test-range-has-property 155 164 'font-lock-face 'markdown-link-face)
-        ;; Check wiki links in code blocks
-        (markdown-test-range-has-face 360 395 'markdown-pre-face)
-        ;; Remove temporary files
-        (delete-file fn)))
-    (delete-directory temporary-file-directory)))
+  (let ((markdown-wiki-link-alias-first nil)
+        (markdown-wiki-link-search-type '(project))
+        (markdown-wiki-link-fontify-missing t)
+        (markdown-enable-wiki-links t))
+    (markdown-test-file "wiki-links.text"
+      ;; Confirm location of first wiki link
+      (should (eq (markdown-next-link) 8))
+      ;; First wiki link doesn't have a corresponding file
+      (markdown-test-range-has-property 10 18 'face 'markdown-missing-link-face)
+      ;; Second wiki link doesn't have a corresponding file
+      (should (eq (markdown-next-link) 73))
+      (markdown-test-range-has-property 81 86 'face 'markdown-missing-link-face)
+      ;; Third link DOES have a corresponding file
+      (should (eq (markdown-next-link) 155))
+      (should (string-equal (markdown-wiki-link-link) "inline"))
+      (markdown-test-range-has-property 157 162 'face 'markdown-missing-link-face)
+      ;; Check wiki links in code blocks
+      (markdown-test-range-has-face 370 405 'markdown-code-face))))
 
 (ert-deftest test-markdown-wiki-link/kill ()
   "Simple tests for `markdown-kill-thing-at-point' for wiki links."
@@ -7044,6 +7029,7 @@ x|"
       (unwind-protect
           (progn
             (markdown-mode)
+            (font-lock-ensure)
             ;; search rules
             (should (string-match-p
                      "/sub/foo$"
@@ -7052,16 +7038,18 @@ x|"
                      (markdown-convert-wiki-link-to-filename "doesnotexist")
                      "doesnotexist"))
             ;; font lock
-            (markdown-test-range-has-property 1 11 'font-lock-face 'markdown-link-face)
-            (markdown-test-range-has-property 14 33 'font-lock-face 'markdown-missing-link-face)
-            (markdown-test-range-has-property 36 42 'font-lock-face 'markdown-link-face)
-            (markdown-test-range-has-property 45 60 'font-lock-face 'markdown-missing-link-face))
+            (markdown-test-range-has-property  3  9 'face 'markdown-link-face)
+            (markdown-test-range-has-property 16 31 'face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 38 40 'face 'markdown-link-face)
+            (markdown-test-range-has-property 47 58 'face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 65 74 'face 'markdown-link-face))
         (kill-buffer)))
     (progn
       (find-file (expand-file-name "wiki/sub/foo" markdown-test-dir))
       (unwind-protect
           (progn
             (markdown-mode)
+            (font-lock-ensure)
             ;; search rules
             (should (string-match-p
                      "/wiki/root$"
@@ -7070,8 +7058,8 @@ x|"
                      (markdown-convert-wiki-link-to-filename "doesnotexist")
                      "doesnotexist"))
             ;; font lock
-            (markdown-test-range-has-property 1 16 'font-lock-face 'markdown-missing-link-face)
-            (markdown-test-range-has-property 19 26 'font-lock-face 'markdown-link-face))
+            (markdown-test-range-has-property  3 14 'face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 21 24 'face 'markdown-link-face))
         (kill-buffer)))))
 
 (ert-deftest test-markdown-ext/wiki-link-keep-match-data ()

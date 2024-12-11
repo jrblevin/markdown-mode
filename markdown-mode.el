@@ -262,7 +262,7 @@ This is the default search behavior of Ikiwiki."
   :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-wiki-link-search-type nil
-  "Searching type for markdown wiki link.
+  "A list of options for searching for markdown wiki links.
 
 `sub-directories': search for wiki link targets in sub directories
 `parent-directories': search for wiki link targets in parent directories
@@ -8386,6 +8386,11 @@ The location of the alias component depends on the value of
     (or (match-string-no-properties 5) (match-string-no-properties 3))))
 
 (defun markdown--wiki-link-search-types ()
+  "Return a list of the currently selected search types.
+
+Due to deprecated variables, as of markdown-mode version 2.5, the return value
+of this function is the same as the value of the variable
+`markdown-wiki-link-search-type'."
   (let ((ret (and markdown-wiki-link-search-type
                   (cl-copy-list markdown-wiki-link-search-type))))
     (when (and markdown-wiki-link-search-subdirectories
@@ -8397,6 +8402,7 @@ The location of the alias component depends on the value of
     ret))
 
 (defun markdown--project-root ()
+  "Try various approaches to find the project root."
   (or (cl-loop for dir in '(".git" ".hg" ".svn")
                when (locate-dominating-file default-directory dir)
                return it)
