@@ -7736,7 +7736,9 @@ Standalone XHTML output is identified by an occurrence of
 
 (defun markdown-stylesheet-link-string (stylesheet-path)
   (concat "<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\""
-          (expand-file-name stylesheet-path)
+          (or (and (string-match-p (rx (or "~" "./" "../")) stylesheet-path)
+                   (expand-file-name stylesheet-path))
+              stylesheet-path)
           "\"  />"))
 
 (defun markdown-escape-title (title)

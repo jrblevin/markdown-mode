@@ -30,7 +30,7 @@
     - Change temporary buffer name according to the Emacs naming convention [GH-848][]
     - Mark `markdown-css-paths` safe as file local variables [GH-834][]
     - Resolve style sheets in `markdown-css-paths` relative to the Markdown file
-      [GH-855][]
+      (if the path starts with `./` or `../`) [GH-855][] [GH-870][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
@@ -43,6 +43,7 @@
   [gh-845]: https://github.com/jrblevin/markdown-mode/issues/845
   [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
   [gh-855]: https://github.com/jrblevin/markdown-mode/issues/855
+  [gh-870]: https://github.com/jrblevin/markdown-mode/issues/870
 
 # Markdown Mode 2.6
 

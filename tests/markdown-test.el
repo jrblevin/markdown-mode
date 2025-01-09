@@ -6182,6 +6182,19 @@ bar baz"
       (kill-buffer obuffer)
       (delete-file ofile))))
 
+(ert-deftest test-markdown-export/url-css-path ()
+  "Test `markdown-css-paths' as URL."
+  (let ((markdown-css-paths '("http://www.example.com/style.css")))
+    (markdown-test-temp-file "inline.text"
+      (let* ((markdown-export-kill-buffer nil)
+             (file (markdown-export))
+             (buffer (get-file-buffer file)))
+        (with-current-buffer buffer
+          (goto-char (point-min))
+          (should (search-forward "href=\"http://www.example.com/style.css\"")))
+        (kill-buffer buffer)
+        (delete-file file)))))
+
 (ert-deftest test-markdown-export/buffer-local-css-path ()
   "Test buffer local `markdown-css-paths'"
   (let ((markdown-css-paths '("/global.css")))
@@ -6198,7 +6211,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/relative-css-path ()
   "Test relative `markdown-css-paths'."
-  (let ((markdown-css-paths '("style.css")))
+  (let ((markdown-css-paths '("./style.css")))
     (markdown-test-temp-file "inline.text"
       (let* ((markdown-export-kill-buffer nil)
              (file (markdown-export))
