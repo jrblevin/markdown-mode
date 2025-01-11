@@ -6,23 +6,60 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
-        emacs_version:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        emacs-version:
           - 27.2
           - 28.2
-          - 29.3
-          - snapshot
-    steps:
-    - uses: purcell/setup-emacs@master
-      with:
-        version: ${{ matrix.emacs_version }}
+          - 29.4
+        experimental: [false]
+        include:
+        - os: ubuntu-latest
+          emacs-version: snapshot
+          experimental: true
+        - os: macos-latest
+          emacs-version: snapshot
+          experimental: true
+        - os: windows-latest
+          emacs-version: snapshot
+          experimental: true
+        exclude:
+          - os: macos-latest
+            emacs-version: 27.2
 
-    - uses: actions/checkout@v3
-    - name: Install dependencies
+    steps:
+    - uses: jcs090218/setup-emacs@master
+      with:
+        version: ${{ matrix.emacs-version }}
+
+    - uses: emacs-eask/setup-eask@master
+      with:
+        version: 'snapshot'
+
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
       run: sudo apt install pandoc aspell
-    - name: Run tests
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install pandoc aspell
+
+    - name: Run tests (Unix)
+      if: runner.os == 'Linux' || runner.os == 'macOS'
       run: |
         make clean
-        make test
+        make build
+        make test-unix
+
+    - name: Run tests (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        make clean
+        make build
+        make test-windows

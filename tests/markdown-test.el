@@ -1563,7 +1563,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-do/jump-wiki-link ()
   "Test `markdown-do' jumps to wiki links"
-  (with-current-buffer (find-file-noselect "wiki/pr666/jump_wiki_link.md")
+  (with-current-buffer (find-file-noselect "tests/wiki/pr666/jump_wiki_link.md")
     (let ((markdown-enable-wiki-links t))
       (goto-char 3)
       (markdown-do)
@@ -1581,7 +1581,7 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-do/wiki-link-in-table ()
   "Test `markdown-do' jumps to markdown links"
-  (with-current-buffer (find-file-noselect "wiki/pr666/wiki_link_in_table.md")
+  (with-current-buffer (find-file-noselect "tests/wiki/pr666/wiki_link_in_table.md")
     (let ((markdown-enable-wiki-links t))
       ;; alignment
       (markdown-do)
@@ -7278,7 +7278,7 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
 Detail: https://github.com/jrblevin/markdown-mode/issues/737"
     (let ((markdown-command #'markdown-command-identity))
       (let ((eww-auto-rename-buffer 'title))
-        (should (markdown-live-preview-window-eww "Markdown.md"))))))
+        (should (markdown-live-preview-window-eww "tests/Markdown.md"))))))
 
 ;;; Tests for imenu
 
