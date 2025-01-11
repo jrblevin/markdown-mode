@@ -9,7 +9,7 @@ point 155.
 Bracketed expressions in code blocks should not be matched as wiki
 links:
 
-```
+```clojure
 {
  :user {
    :repositories [["clojars" {:sign-releases false}]]
