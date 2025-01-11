@@ -1,3 +1,6 @@
 *.elc
 index.text
 *~
+
+/.eask
+/dist

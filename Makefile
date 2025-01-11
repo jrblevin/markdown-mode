@@ -1,4 +1,5 @@
 EMACS=emacs
+EASK=eask
 
 PACKAGE=markdown-mode
 
@@ -16,25 +17,25 @@ all: $(COMPILED)
 
 .PHONY: dist test
 
-test:
-	SELECTOR=$(SELECTOR)
-	export SELECTOR
-	make -C tests test
+build:
+	$(EASK) package
+	$(EASK) install
+
+test-unix:
+	$(EASK) compile
+	$(EASK) test ert ./tests/markdown-test.el
+	$(EASK) lint checkdoc
+
+test-windows:
+	$(EASK) compile
+	#$(EASK) test ert ./tests/markdown-test.el
+	$(EASK) lint checkdoc
 
 clean:
-	rm -f $(COMPILED)
-	make -C tests clean
+	$(EASK) clean all
 
 dist:
-	DIR=$$(mktemp -d -t "$(PACKAGE)"); \
-	DESTDIR="$$DIR/$(PACKAGE)-$(VERSION)"; \
-	mkdir -p $$DESTDIR; \
-	cp -a $(SOURCE) $$DESTDIR; \
-	mkdir -p $$DESTDIR/tests; \
-	cp -a $(TEST_FILES) $$DESTDIR/tests; \
-	tar zcf $(CURDIR)/$(PACKAGE)-$(VERSION).tar.gz -C $$DIR .; \
-	rm -r $$DIR; \
-	echo "$(PACKAGE)-$(VERSION).tar.gz has been created"
+	$(EASK) package
 
 update: $(COMPILED)
 	cp -a $(SOURCE) $(COMPILED) $(HOME)/.emacs.d/site-lisp
