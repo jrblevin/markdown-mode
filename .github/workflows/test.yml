@@ -36,18 +36,29 @@ jobs:
       with:
         version: ${{ matrix.emacs-version }}
 
+    - uses: emacs-eask/setup-eask@master
+      with:
+        version: 'snapshot'
+
     - uses: actions/checkout@v4
 
-    - name: Install dependencies
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
       run: sudo apt install pandoc aspell
 
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install pandoc aspell
+
     - name: Run tests (Unix)
+      if: runner.os == 'Linux' || runner.os == 'macOS'
       run: |
         make clean
         make build
         make test-unix
 
     - name: Run tests (Windows)
+      if: runner.os == 'Windows'
       run: |
         make clean
         make build
