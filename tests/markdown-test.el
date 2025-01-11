@@ -7278,7 +7278,7 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
 Detail: https://github.com/jrblevin/markdown-mode/issues/737"
     (let ((markdown-command #'markdown-command-identity))
       (let ((eww-auto-rename-buffer 'title))
-        (should (markdown-live-preview-window-eww "Markdown.md"))))))
+        (should (markdown-live-preview-window-eww "tests/Markdown.md"))))))
 
 ;;; Tests for imenu
 
