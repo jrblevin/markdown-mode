@@ -5761,112 +5761,6 @@ http://example.com \"title\"  )
         (call-interactively 'markdown-kill-thing-at-point)
         (should (string-equal (current-kill 0) (cdr test)))))))
 
-(ert-deftest test-markdown/wiki-link-rules ()
-  "Test wiki link search rules and font lock for missing pages."
-  (let ((markdown-enable-wiki-links t)
-        (markdown-wiki-link-fontify-missing t)
-        (markdown-wiki-link-search-type '(project)))
-    (progn
-      (find-file (expand-file-name "wiki/root" markdown-test-dir))
-      (unwind-protect
-          (progn
-            (markdown-mode)
-            (font-lock-ensure)
-            ;; search rules
-            (should (string-match-p
-                     "/sub/foo$"
-                     (markdown-convert-wiki-link-to-filename "foo")))
-            (should (string-equal
-                     (markdown-convert-wiki-link-to-filename "doesnotexist")
-                     "doesnotexist"))
-            ;; font lock
-            (markdown-test-range-has-property  1  2 'face 'markdown-markup-face)
-            (markdown-test-range-has-property  3  9 'face 'markdown-link-face)
-            (markdown-test-range-has-property 10 11 'face 'markdown-markup-face)
-            (markdown-test-range-has-property 16 31 'face 'markdown-missing-link-face)
-            (markdown-test-range-has-property 38 40 'face 'markdown-link-face)
-            (markdown-test-range-has-property 47 58 'face 'markdown-missing-link-face)
-            (markdown-test-range-has-property 65 74 'face 'markdown-link-face))
-        (kill-buffer)))
-    (progn
-      (find-file (expand-file-name "wiki/sub/foo" markdown-test-dir))
-      (unwind-protect
-          (progn
-            (markdown-mode)
-            (font-lock-ensure)
-            ;; search rules
-            (should (string-match-p
-                     "/wiki/root$"
-                     (markdown-convert-wiki-link-to-filename "root")))
-            (should (string-equal
-                     (markdown-convert-wiki-link-to-filename "doesnotexist")
-                     "doesnotexist"))
-            ;; font lock
-            (markdown-test-range-has-property  3 14 'face 'markdown-missing-link-face)
-            (markdown-test-range-has-property 21 24 'face 'markdown-link-face))
-        (kill-buffer)))))
-
-(ert-deftest test-markdown/wiki-link-keep-match-data ()
-  "Test that markdown-wiki-link-p keeps expected match data.
-Detail: https://github.com/jrblevin/markdown-mode/pull/590"
-  (let ((markdown-enable-wiki-links t)
-        (markdown-link-space-sub-char " ")
-        (markdown-wiki-link-search-type '(sub-directories)))
-    (progn
-      (find-file (expand-file-name "wiki/pr590/Guide.md" markdown-test-dir))
-      (unwind-protect
-          (progn
-            (markdown-mode)
-            (re-search-forward "Zettel Markdown")
-            (goto-char (match-beginning 0))
-            (should (markdown-wiki-link-p)) ;; create match-data
-            (should (string= (markdown-wiki-link-link) "Zettel Markdown")))
-        (kill-buffer)))))
-
-(ert-deftest test-markdown/wiki-link-search-under-project ()
-  "Test that searching link under project root."
-  (let ((markdown-enable-wiki-links t)
-        (markdown-link-space-sub-char " ")
-        (markdown-wiki-link-search-type '(project))
-        (expected (expand-file-name "wiki/pr590/Guide/Zettel Markdown/math.md"
-                                    markdown-test-dir)))
-    (progn
-      (find-file (expand-file-name "wiki/pr590/Guide/Plugin/Link.md" markdown-test-dir))
-      (unwind-protect
-          (progn
-            (markdown-mode)
-            (re-search-forward "math")
-            (goto-char (match-beginning 0))
-            (markdown-wiki-link-p) ;; create match-data
-            (let ((link (markdown-convert-wiki-link-to-filename (markdown-wiki-link-link))))
-              (should (string= (expand-file-name link) expected))))
-        (kill-buffer)))))
-
-(ert-deftest test-markdown/wiki-link-major-mode ()
-  "Test major-mode of linked page."
-  (let ((markdown-enable-wiki-links t)
-        (auto-mode-alist (cons '("bar\\.md" . gfm-mode) auto-mode-alist)))
-    (find-file (expand-file-name "wiki/root" markdown-test-dir))
-    (unwind-protect
-        (progn
-          (markdown-mode)
-          (search-forward "sub/bar.md")
-          (markdown-follow-wiki-link-at-point)
-          (should (eq major-mode 'gfm-mode)))
-      (kill-buffer))))
-
-(ert-deftest test-markdown/wiki-link-nonexistent-file ()
-  "Test following wiki link to nonexistent file visits the buffer."
-  (let ((markdown-enable-wiki-links t))
-    (find-file (expand-file-name "wiki/foo.md" markdown-test-dir))
-    (unwind-protect
-        (progn
-          (markdown-mode)
-          (search-forward "[[doesnotexist]]")
-          (markdown-follow-wiki-link-at-point)
-          (should (string= (buffer-name) "doesnotexist.md")))
-      (kill-buffer))))
-
 ;;; Filling tests:
 
 (ert-deftest test-markdown-filling/blockquote ()
@@ -6273,6 +6167,19 @@ bar baz"
       (kill-buffer obuffer)
       (delete-file ofile))))
 
+(ert-deftest test-markdown-export/url-css-path ()
+  "Test `markdown-css-paths' as URL."
+  (let ((markdown-css-paths '("http://www.example.com/style.css")))
+    (markdown-test-temp-file "inline.text"
+      (let* ((markdown-export-kill-buffer nil)
+             (file (markdown-export))
+             (buffer (get-file-buffer file)))
+        (with-current-buffer buffer
+          (goto-char (point-min))
+          (should (search-forward "href=\"http://www.example.com/style.css\"")))
+        (kill-buffer buffer)
+        (delete-file file)))))
+
 (ert-deftest test-markdown-export/buffer-local-css-path ()
   "Test buffer local `markdown-css-paths'"
   (let ((markdown-css-paths '("/global.css")))
@@ -6289,7 +6196,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/relative-css-path ()
   "Test relative `markdown-css-paths'."
-  (let ((markdown-css-paths '("style.css")))
+  (let ((markdown-css-paths '("./style.css")))
     (markdown-test-temp-file "inline.text"
       (let* ((markdown-export-kill-buffer nil)
              (file (markdown-export))
@@ -7124,6 +7031,112 @@ x|"
     (should (string-equal (buffer-string) " #. abc\n def\n"))
     (markdown-indent-region (line-beginning-position) (line-end-position) nil)
     (should (string-equal (buffer-string) " #. abc\n    def\n"))))
+
+(ert-deftest test-markdown/wiki-link-rules ()
+  "Test wiki link search rules and font lock for missing pages."
+  (let ((markdown-enable-wiki-links t)
+        (markdown-wiki-link-fontify-missing t)
+        (markdown-wiki-link-search-type '(project)))
+    (progn
+      (find-file (expand-file-name "wiki/root" markdown-test-dir))
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            (font-lock-ensure)
+            ;; search rules
+            (should (string-match-p
+                     "/sub/foo$"
+                     (markdown-convert-wiki-link-to-filename "foo")))
+            (should (string-equal
+                     (markdown-convert-wiki-link-to-filename "doesnotexist")
+                     "doesnotexist"))
+            ;; font lock
+            (markdown-test-range-has-property  1  2 'face 'markdown-markup-face)
+            (markdown-test-range-has-property  3  9 'face 'markdown-link-face)
+            (markdown-test-range-has-property 10 11 'face 'markdown-markup-face)
+            (markdown-test-range-has-property 16 31 'face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 38 40 'face 'markdown-link-face)
+            (markdown-test-range-has-property 47 58 'face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 65 74 'face 'markdown-link-face))
+        (kill-buffer)))
+    (progn
+      (find-file (expand-file-name "wiki/sub/foo" markdown-test-dir))
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            (font-lock-ensure)
+            ;; search rules
+            (should (string-match-p
+                     "/wiki/root$"
+                     (markdown-convert-wiki-link-to-filename "root")))
+            (should (string-equal
+                     (markdown-convert-wiki-link-to-filename "doesnotexist")
+                     "doesnotexist"))
+            ;; font lock
+            (markdown-test-range-has-property  3 14 'face 'markdown-missing-link-face)
+            (markdown-test-range-has-property 21 24 'face 'markdown-link-face))
+        (kill-buffer)))))
+
+(ert-deftest test-markdown/wiki-link-keep-match-data ()
+  "Test that markdown-wiki-link-p keeps expected match data.
+Detail: https://github.com/jrblevin/markdown-mode/pull/590"
+  (let ((markdown-enable-wiki-links t)
+        (markdown-link-space-sub-char " ")
+        (markdown-wiki-link-search-type '(sub-directories)))
+    (progn
+      (find-file (expand-file-name "wiki/pr590/Guide.md" markdown-test-dir))
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            (re-search-forward "Zettel Markdown")
+            (goto-char (match-beginning 0))
+            (should (markdown-wiki-link-p)) ;; create match-data
+            (should (string= (markdown-wiki-link-link) "Zettel Markdown")))
+        (kill-buffer)))))
+
+(ert-deftest test-markdown/wiki-link-search-under-project ()
+  "Test that searching link under project root."
+  (let ((markdown-enable-wiki-links t)
+        (markdown-link-space-sub-char " ")
+        (markdown-wiki-link-search-type '(project))
+        (expected (expand-file-name "wiki/pr590/Guide/Zettel Markdown/math.md"
+                                    markdown-test-dir)))
+    (progn
+      (find-file (expand-file-name "wiki/pr590/Guide/Plugin/Link.md" markdown-test-dir))
+      (unwind-protect
+          (progn
+            (markdown-mode)
+            (re-search-forward "math")
+            (goto-char (match-beginning 0))
+            (markdown-wiki-link-p) ;; create match-data
+            (let ((link (markdown-convert-wiki-link-to-filename (markdown-wiki-link-link))))
+              (should (string= (expand-file-name link) expected))))
+        (kill-buffer)))))
+
+(ert-deftest test-markdown/wiki-link-major-mode ()
+  "Test major-mode of linked page."
+  (let ((markdown-enable-wiki-links t)
+        (auto-mode-alist (cons '("bar\\.md" . gfm-mode) auto-mode-alist)))
+    (find-file (expand-file-name "wiki/root" markdown-test-dir))
+    (unwind-protect
+        (progn
+          (markdown-mode)
+          (search-forward "sub/bar.md")
+          (markdown-follow-wiki-link-at-point)
+          (should (eq major-mode 'gfm-mode)))
+      (kill-buffer))))
+
+(ert-deftest test-markdown/wiki-link-nonexistent-file ()
+  "Test following wiki link to nonexistent file visits the buffer."
+  (let ((markdown-enable-wiki-links t))
+    (find-file (expand-file-name "wiki/foo.md" markdown-test-dir))
+    (unwind-protect
+        (progn
+          (markdown-mode)
+          (search-forward "[[doesnotexist]]")
+          (markdown-follow-wiki-link-at-point)
+          (should (string= (buffer-name) "doesnotexist.md")))
+      (kill-buffer))))
 
 (defun markdown-test-live-preview-window-eww (_orig-fun &rest _args)
   (get-buffer-create "*eww*"))

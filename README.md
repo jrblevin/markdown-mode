@@ -178,8 +178,7 @@ tend to be associated with paired delimiters such as <kbd>M-{</kbd> and
 <kbd>M-}</kbd> or <kbd>C-c <</kbd> and <kbd>C-c ></kbd>.  Outline navigation keybindings the
 same as in `org-mode`.  Finally, commands for running Markdown or
 doing maintenance on an open file are grouped under the <kbd>C-c C-c</kbd>
-prefix.  The most commonly used commands are described below. You
-can obtain a list of all keybindings by pressing <kbd>C-c C-h</kbd>.
+prefix.  The most commonly used commands are described below.
 
   * Links and Images: <kbd>C-c C-l</kbd> and <kbd>C-c C-i</kbd>
 
@@ -1086,13 +1085,13 @@ by `markdown-mode` and `gfm-mode` as described below.
     ```
 
 * **Preview:** GFM-specific preview can be powered by setting
-  `markdown-command` to use [Docter][].  This may also be
+  `markdown-command` to use [marked][].  This may also be
   configured to work with [Marked 2][] for `markdown-open-command`.
 
 [GFM]: http://github.github.com/github-flavored-markdown/
 [GFM comments]: https://help.github.com/articles/writing-on-github/
 [since 2014]: https://github.com/blog/1825-task-lists-in-all-markdown-documents
-[Docter]: https://github.com/alampros/Docter
+[marked]: https://marked.js.org/
 
 ## Acknowledgments
 
