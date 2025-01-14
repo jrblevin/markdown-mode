@@ -287,6 +287,13 @@ cause lag when typing on slower machines."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.2"))
 
+(defcustom markdown-wiki-link-retain-case nil
+  "When non-nil, wiki link file names do not have their case changed."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.7"))
+
 (defcustom markdown-uri-types
   '("acap" "cid" "data" "dav" "fax" "file" "ftp"
     "geo" "gopher" "http" "https" "imap" "ldap" "mailto"
@@ -8374,10 +8381,12 @@ in parent directories if
     ;; This function must not overwrite match data(PR #590)
     (let* ((basename (replace-regexp-in-string
                       "[[:space:]\n]" markdown-link-space-sub-char name))
-           (basename (if (derived-mode-p 'gfm-mode)
-                         (concat (upcase (substring basename 0 1))
-                                 (downcase (substring basename 1 nil)))
-                       basename))
+           (basename (if markdown-wiki-link-retain-case
+                         basename
+                       (if (derived-mode-p 'gfm-mode)
+                           (concat (upcase (substring basename 0 1))
+                                   (downcase (substring basename 1 nil)))
+                         basename)))
            (search-types (markdown--wiki-link-search-types))
            directory extension default candidates dir)
       (when buffer-file-name
