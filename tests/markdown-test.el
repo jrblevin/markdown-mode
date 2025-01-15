@@ -7123,6 +7123,25 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
               (should (string= (expand-file-name link) expected))))
         (kill-buffer)))))
 
+(ert-deftest test-markdown-ext/wiki-link-retain-case ()
+  "Test that searching link under project root."
+  (let ((markdown-wiki-link-retain-case nil))
+    (find-file "wiki/pr666/jump_wiki_link.md")
+    (unwind-protect
+        (progn
+          (gfm-mode)
+          (let ((link-file-name (markdown-convert-wiki-link-to-filename "FOOBAR")))
+            (should (string= "Foobar.md" (file-name-nondirectory link-file-name)))))
+      (kill-buffer)))
+  (let ((markdown-wiki-link-retain-case t))
+    (find-file "wiki/pr666/jump_wiki_link.md")
+    (unwind-protect
+        (progn
+          (gfm-mode)
+          (let ((link-file-name (markdown-convert-wiki-link-to-filename "FOOBAR")))
+            (should (string= "FOOBAR.md" (file-name-nondirectory link-file-name)))))
+      (kill-buffer))))
+
 (ert-deftest test-markdown-ext/wiki-link-major-mode ()
   "Test major-mode of linked page."
   (let ((markdown-enable-wiki-links t)
