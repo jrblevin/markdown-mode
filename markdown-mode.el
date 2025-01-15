@@ -5188,6 +5188,7 @@ list simply adds a blank line)."
    (markdown-indent-on-enter
     (let (bounds)
       (if (and (memq markdown-indent-on-enter '(indent-and-new-item))
+               (not (markdown-code-block-at-point-p))
                (setq bounds (markdown-cur-list-item-bounds)))
           (let ((beg (cl-first bounds))
                 (end (cl-second bounds))

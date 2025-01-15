@@ -33,6 +33,7 @@
     - Mark `markdown-css-paths` safe as file local variables [GH-834][]
     - Resolve style sheets in `markdown-css-paths` relative to the Markdown file
       (if the path starts with `./` or `../`) [GH-855][] [GH-870][]
+    - Don't insert list item in code block [GH-841][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
@@ -43,6 +44,7 @@
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
   [gh-838]: https://github.com/jrblevin/markdown-mode/issues/838
   [gh-839]: https://github.com/jrblevin/markdown-mode/issues/839
+  [gh-841]: https://github.com/jrblevin/markdown-mode/issues/841
   [gh-845]: https://github.com/jrblevin/markdown-mode/issues/845
   [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
   [gh-855]: https://github.com/jrblevin/markdown-mode/issues/855

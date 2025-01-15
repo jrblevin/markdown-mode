@@ -2109,6 +2109,17 @@ See GH-245."
       (should (string-equal (buffer-string) "   -   [X] item\n\n"))
       (should (= (point) 18)))))
 
+(ert-deftest test-markdown-indentation/not-insert-list-item-in-code-block ()
+  "Don't insert new item if here is in code."
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (markdown-test-string "```
+  - foo
+```"
+      (forward-line)
+      (end-of-line)
+      (call-interactively #'markdown-enter-key)
+      (should-not (looking-back "- ")))))
+
 ;;; Markup hiding tests:
 
 (ert-deftest test-markdown-markup-hiding/italics-1 ()
