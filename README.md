@@ -772,6 +772,9 @@ provides an interface to all of the possible customizations:
     (default: `t`).  When set to nil, they will be treated as
     `[[PageName|link text]]`.
 
+  * `markdown-wiki-link-retain-case nil` - set a non-nil value not to
+     change wiki link file name case
+
   * `markdown-uri-types` - a list of protocol schemes (e.g., "http")
     for URIs that `markdown-mode` should highlight.
 
