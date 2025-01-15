@@ -8381,12 +8381,10 @@ in parent directories if
     ;; This function must not overwrite match data(PR #590)
     (let* ((basename (replace-regexp-in-string
                       "[[:space:]\n]" markdown-link-space-sub-char name))
-           (basename (if markdown-wiki-link-retain-case
-                         basename
-                       (if (derived-mode-p 'gfm-mode)
-                           (concat (upcase (substring basename 0 1))
-                                   (downcase (substring basename 1 nil)))
-                         basename)))
+           (basename (if (and (derived-mode-p 'gfm-mode) (not markdown-wiki-link-retain-case))
+                         (concat (upcase (substring basename 0 1))
+                                 (downcase (substring basename 1 nil)))
+                       basename))
            (search-types (markdown--wiki-link-search-types))
            directory extension default candidates dir)
       (when buffer-file-name
