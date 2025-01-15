@@ -9099,6 +9099,10 @@ LANG is a string, and the returned major mode is a symbol."
   (and mode
        (fboundp mode)
        (or
+        (not (string-match-p "ts-mode\\'" (symbol-name mode)))
+        ;; Don't load tree-sitter mode if the mode is in neither auto-mode-alist nor major-mode-remap-alist
+        ;; Because some ts-mode overwrites auto-mode-alist and it might break user configurations
+
         ;; https://github.com/jrblevin/markdown-mode/issues/787
         ;; major-mode-remap-alist was introduced at Emacs 29.1
         (cl-loop for pair in (bound-and-true-p major-mode-remap-alist)

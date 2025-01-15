@@ -23,6 +23,7 @@
     - Don't hide backslashes in code blocks when using `markdown-hide-markup`
       and `markdown-fontify-code-blocks-natively` together [GH-766][]
     - Fix `markdown-fontify-whole-heading-line` regression [GH-848][]
+    - Fix using fundamental-mode issue when editting code block [GH-868][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
@@ -45,6 +46,7 @@
   [gh-845]: https://github.com/jrblevin/markdown-mode/issues/845
   [gh-848]: https://github.com/jrblevin/markdown-mode/issues/848
   [gh-855]: https://github.com/jrblevin/markdown-mode/issues/855
+  [gh-868]: https://github.com/jrblevin/markdown-mode/issues/868
   [gh-870]: https://github.com/jrblevin/markdown-mode/issues/870
 
 # Markdown Mode 2.6

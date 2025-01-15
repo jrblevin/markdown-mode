@@ -4379,12 +4379,17 @@ x: x
 
 (ert-deftest test-markdown-parsing/get-lang-mode ()
   "Test `markdown-get-lang-mode'.
-Do not load major-mode function if it isn't in auto-mode-alist.
-Details: https://github.com/jrblevin/markdown-mode/issues/761"
+Do not load tree-sitter-mode function if it is in neither auto-mode-alist nor major-mode-remap-alist.
+Details:
+- https://github.com/jrblevin/markdown-mode/issues/761
+- https://github.com/jrblevin/markdown-mode/issues/868"
   (should (eq (markdown-get-lang-mode "emacs-lisp") 'emacs-lisp-mode))
 
-  (let ((auto-mode-alist nil))
-    (should (null (markdown-get-lang-mode "emacs-lisp")))))
+  (when (and (fboundp 'treesit-language-available-p)
+             (funcall 'treesit-language-available-p 'python))
+    (let ((auto-mode-alist nil)
+          (major-mode-remap-alist nil))
+      (should (null (markdown--lang-mode-predicate 'python-ts-mode))))))
 
 (ert-deftest test-markdown-parsing/get-lang-mode-from-remap-alist ()
   "Test `markdown-get-lang-mode' from major-mode-remap-alist.
