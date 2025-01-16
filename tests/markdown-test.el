@@ -2109,6 +2109,17 @@ See GH-245."
       (should (string-equal (buffer-string) "   -   [X] item\n\n"))
       (should (= (point) 18)))))
 
+(ert-deftest test-markdown-indentation/not-insert-list-item-in-code-block ()
+  "Don't insert new item if here is in code."
+  (let ((markdown-indent-on-enter 'indent-and-new-item))
+    (markdown-test-string "```
+  - foo
+```"
+      (forward-line)
+      (end-of-line)
+      (call-interactively #'markdown-enter-key)
+      (should-not (looking-back "- ")))))
+
 ;;; Markup hiding tests:
 
 (ert-deftest test-markdown-markup-hiding/italics-1 ()
@@ -4379,12 +4390,17 @@ x: x
 
 (ert-deftest test-markdown-parsing/get-lang-mode ()
   "Test `markdown-get-lang-mode'.
-Do not load major-mode function if it isn't in auto-mode-alist.
-Details: https://github.com/jrblevin/markdown-mode/issues/761"
+Do not load tree-sitter-mode function if it is in neither auto-mode-alist nor major-mode-remap-alist.
+Details:
+- https://github.com/jrblevin/markdown-mode/issues/761
+- https://github.com/jrblevin/markdown-mode/issues/868"
   (should (eq (markdown-get-lang-mode "emacs-lisp") 'emacs-lisp-mode))
 
-  (let ((auto-mode-alist nil))
-    (should (null (markdown-get-lang-mode "emacs-lisp")))))
+  (when (and (fboundp 'treesit-language-available-p)
+             (funcall 'treesit-language-available-p 'python))
+    (let ((auto-mode-alist nil)
+          (major-mode-remap-alist nil))
+      (should (null (markdown--lang-mode-predicate 'python-ts-mode))))))
 
 (ert-deftest test-markdown-parsing/get-lang-mode-from-remap-alist ()
   "Test `markdown-get-lang-mode' from major-mode-remap-alist.
@@ -7112,6 +7128,25 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/590"
             (let ((link (markdown-convert-wiki-link-to-filename (markdown-wiki-link-link))))
               (should (string= (expand-file-name link) expected))))
         (kill-buffer)))))
+
+(ert-deftest test-markdown-ext/wiki-link-retain-case ()
+  "Test that searching link under project root."
+  (let ((markdown-wiki-link-retain-case nil))
+    (find-file "wiki/pr666/jump_wiki_link.md")
+    (unwind-protect
+        (progn
+          (gfm-mode)
+          (let ((link-file-name (markdown-convert-wiki-link-to-filename "FOOBAR")))
+            (should (string= "Foobar.md" (file-name-nondirectory link-file-name)))))
+      (kill-buffer)))
+  (let ((markdown-wiki-link-retain-case t))
+    (find-file "wiki/pr666/jump_wiki_link.md")
+    (unwind-protect
+        (progn
+          (gfm-mode)
+          (let ((link-file-name (markdown-convert-wiki-link-to-filename "FOOBAR")))
+            (should (string= "FOOBAR.md" (file-name-nondirectory link-file-name)))))
+      (kill-buffer))))
 
 (ert-deftest test-markdown/wiki-link-major-mode ()
   "Test major-mode of linked page."
