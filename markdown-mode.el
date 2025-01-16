@@ -262,11 +262,11 @@ This is the default search behavior of Ikiwiki."
   :package-version '(markdown-mode . "2.2"))
 
 (defcustom markdown-wiki-link-search-type nil
-  "Searching type for markdown wiki link.
+  "A list of options for searching for markdown wiki links.
 
-sub-directories: search for wiki link targets in sub directories
-parent-directories: search for wiki link targets in parent directories
-project: search for wiki link targets under project root"
+`sub-directories': search for wiki link targets in sub directories
+`parent-directories': search for wiki link targets in parent directories
+`project': search for wiki link targets under project root"
   :group 'markdown
   :type '(set
           (const :tag "search wiki link from subdirectories" sub-directories)
@@ -915,7 +915,6 @@ This matches typical bracketed [[WikiLinks]] as well as \\='aliased
 wiki links of the form [[PageName|link text]].
 The meanings of the first and second components depend
 on the value of `markdown-wiki-link-alias-first'.
-
 Group 1 matches the entire link.
 Group 2 matches the opening square brackets.
 Group 3 matches the first component of the wiki link.
@@ -1988,12 +1987,14 @@ inline code fragments and code blocks."
 
 (defface markdown-link-face
   '((t (:inherit link)))
-  "Face for links."
+  "Face for link text, ie the alias portion of a link.
+If a wiki link does not have an alias portion, use this face
+for the entire link."
   :group 'markdown-faces)
 
 (defface markdown-missing-link-face
   '((t (:inherit font-lock-warning-face)))
-  "Face for missing links."
+  "Face for the link text if the link points to a missing file."
   :group 'markdown-faces)
 
 (defface markdown-reference-face
@@ -2264,6 +2265,7 @@ Depending on your font, some reasonable choices are:
                                 (7 markdown-markup-properties)))
     (markdown-fontify-inline-links)
     (markdown-fontify-reference-links)
+    (markdown-fontify-wiki-links)
     (,markdown-regex-reference-definition . ((1 'markdown-markup-face) ; [
                                              (2 'markdown-reference-face) ; label
                                              (3 'markdown-markup-face)    ; ]
@@ -2300,8 +2302,7 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-sub-superscripts)
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
-    (markdown-fontify-blockquotes)
-    (markdown-match-wiki-link . ((0 'markdown-link-face prepend))))
+    (markdown-fontify-blockquotes))
   "Syntax highlighting for Markdown files.")
 
 ;; Footnotes
@@ -3389,23 +3390,6 @@ the buffer)."
 
 (defun markdown-match-yaml-metadata-key (last)
   (markdown-match-propertized-text 'markdown-metadata-key last))
-
-(defun markdown-match-wiki-link (last)
-  "Match wiki links from point to LAST."
-  (when (and markdown-enable-wiki-links
-             (not markdown-wiki-link-fontify-missing)
-             (markdown-match-inline-generic markdown-regex-wiki-link last))
-    (let ((begin (match-beginning 1)) (end (match-end 1)))
-      (if (or (markdown-in-comment-p begin)
-              (markdown-in-comment-p end)
-              (markdown-inline-code-at-pos-p begin)
-              (markdown-inline-code-at-pos-p end)
-              (markdown-code-block-at-pos begin))
-          (progn (goto-char (min (1+ begin) last))
-                 (when (< (point) last)
-                   (markdown-match-wiki-link last)))
-        (set-match-data (list begin end))
-        t))))
 
 (defun markdown-match-inline-attributes (last)
   "Match inline attributes from point to LAST."
@@ -5235,8 +5219,7 @@ Otherwise, do normal delete by repeating
         (back-to-indentation)
         (unless (looking-at-p "[ \t]*$")
           (setq mincol (min mincol (current-column))))
-        (forward-line 1)
-        ))
+        (forward-line 1)))
     mincol))
 
 (defun markdown-indent-region (beg end arg)
@@ -5710,6 +5693,29 @@ Assumes match data is available for `markdown-regex-italic'."
     map)
   "Keymap for `gfm-mode'.
 See also `markdown-mode-map'.")
+
+
+;;; Text Properties ===========================================================
+
+(defconst markdown--markup-props (list 'invisible 'markdown-markup
+                                       'rear-nonsticky t
+                                       'font-lock-multiline t))
+
+(defconst markdown--url-props (list 'invisible 'markdown-markup
+                                    'keymap markdown-mode-mouse-map
+                                    'mouse-face 'markdown-highlight-face
+                                    'font-lock-multiline t))
+
+(defconst markdown--title-props (list 'invisible 'markdown-markup
+                                      'font-lock-multiline t))
+
+(defun markdown--link-props (url &optional title)
+  "Return a property list for URL with optional TITLE."
+  (let ((echo-text (if title (concat title "\n" url) url)))
+    (list 'keymap markdown-mode-mouse-map
+          'mouse-face 'markdown-highlight-face
+          'font-lock-multiline t
+          'help-echo echo-text)))
 
 
 ;;; Menu ======================================================================
@@ -8189,38 +8195,20 @@ Translate filenames using `markdown-filename-translate-function'."
            (title-start (match-beginning 7))
            (title-end (match-end 7))
            (title (match-string-no-properties 7))
-           ;; Markup part
-           (mp (list 'invisible 'markdown-markup
-                     'rear-nonsticky t
-                     'font-lock-multiline t))
-           ;; Link part (without face)
-           (lp (list 'keymap markdown-mode-mouse-map
-                     'mouse-face 'markdown-highlight-face
-                     'font-lock-multiline t
-                     'help-echo (if title (concat title "\n" url) url)))
-           ;; URL part
-           (up (list 'keymap markdown-mode-mouse-map
-                     'invisible 'markdown-markup
-                     'mouse-face 'markdown-highlight-face
-                     'font-lock-multiline t))
-           ;; URL composition character
-           (url-char (markdown--first-displayable markdown-url-compose-char))
-           ;; Title part
-           (tp (list 'invisible 'markdown-markup
-                     'font-lock-multiline t)))
+           (url-char (markdown--first-displayable markdown-url-compose-char)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
-          (add-text-properties (match-beginning g) (match-end g) mp)
+          (add-text-properties (match-beginning g) (match-end g) markdown--markup-props)
           (add-face-text-property (match-beginning g) (match-end g) 'markdown-markup-face)))
       ;; Preserve existing faces applied to link part (e.g., inline code)
       (when link-start
-        (add-text-properties link-start link-end lp)
+        (add-text-properties link-start link-end (markdown--link-props url title))
         (add-face-text-property link-start link-end 'markdown-link-face))
       (when url-start
-        (add-text-properties url-start url-end up)
+        (add-text-properties url-start url-end markdown--url-props)
         (add-face-text-property url-start url-end 'markdown-url-face))
       (when title-start
-        (add-text-properties url-end title-end tp)
+        (add-text-properties url-end title-end markdown--title-props)
         (add-face-text-property url-end title-end 'markdown-link-title-face))
       (when (and markdown-hide-urls url-start)
         (compose-region url-start (or title-end url-end) url-char))
@@ -8233,11 +8221,7 @@ Translate filenames using `markdown-filename-translate-function'."
            (link-end (match-end 3))
            (ref-start (match-beginning 6))
            (ref-end (match-end 6))
-           ;; Markup part
-           (mp (list 'invisible 'markdown-markup
-                     'rear-nonsticky t
-                     'font-lock-multiline t))
-           ;; Link part
+           ;; Link properties
            (lp (list 'keymap markdown-mode-mouse-map
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
@@ -8249,12 +8233,12 @@ Translate filenames using `markdown-filename-translate-function'."
                                           "Undefined reference"))))))
            ;; URL composition character
            (url-char (markdown--first-displayable markdown-url-compose-char))
-           ;; Reference part
+           ;; Reference properties
            (rp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
-          (add-text-properties (match-beginning g) (match-end g) mp)
+          (add-text-properties (match-beginning g) (match-end g) markdown--markup-props)
           (add-face-text-property (match-beginning g) (match-end g) 'markdown-markup-face)))
       (when link-start
         (add-text-properties link-start link-end lp)
@@ -8266,23 +8250,87 @@ Translate filenames using `markdown-filename-translate-function'."
           (compose-region ref-start ref-end url-char)))
       t)))
 
+(defun markdown-fontify-wiki-links (last)
+  "Add text properties to next wiki link from point to LAST."
+  (when (and markdown-enable-wiki-links
+             (markdown-match-inline-generic markdown-regex-wiki-link last))
+    (let* ((begin (match-beginning 1))
+           (end (match-end 1))
+           (beg2 (match-beginning 2))
+           (end2 (match-end 2))
+           (beg3 (match-beginning 3))
+           (end3 (match-end 3))
+           (beg4 (match-beginning 4))
+           (end4 (match-end 4))
+           (beg5 (match-beginning 5))
+           (end5 (match-end 5))
+           (beg6 (match-beginning 6))
+           (end6 (match-end 6))
+           (part1 (match-string-no-properties 3))
+           (part2 (match-string-no-properties 5))
+           (aliasp (string-equal (match-string-no-properties 4) "|"))
+           (file-name (markdown-convert-wiki-link-to-filename (markdown-wiki-link-link)))
+           (file-missing-p (not (file-exists-p file-name))))
+      (if (or (markdown-in-comment-p begin)
+              (markdown-in-comment-p end)
+              (markdown-inline-code-at-pos-p begin)
+              (markdown-inline-code-at-pos-p end)
+              (markdown-code-block-at-pos begin))
+          (progn (goto-char (min (1+ begin) last))
+                 (when (< (point) last)
+                   (markdown-fontify-wiki-links last)))
+        ;; Add text properties for hiding markup
+        (progn
+          ;; Propertize opening and closing brackets
+          (add-text-properties    beg2 end2 markdown--markup-props)
+          (add-face-text-property beg2 end2 'markdown-markup-face)
+          (add-text-properties    beg6 end6 markdown--markup-props)
+          (add-face-text-property beg6 end6 'markdown-markup-face)
+          (if aliasp
+              (progn
+                ;; Propertize pipe separating URL from link text
+                (add-text-properties    beg4 end4 markdown--markup-props)
+                (add-face-text-property beg4 end4 'markdown-markup-face)
+                (if markdown-wiki-link-alias-first
+                    (progn
+                      ;; Properties alias portion of link
+                      (add-text-properties    beg3 end3 (markdown--link-props part2))
+                      (add-face-text-property beg3 end3 'markdown-link-face)
+                      (add-text-properties    beg5 end5 markdown--url-props)
+                      (add-text-properties    beg5 end5 '(invisible markdown-markup))
+                      (add-face-text-property beg5 end5 'markdown-url-face)
+                      (when (and file-missing-p markdown-wiki-link-fontify-missing)
+                        (put-text-property beg3 end3 'face 'markdown-missing-link-face)))
+                  (progn
+                    ;; Properties URL portion of link
+                    (add-text-properties    beg3 end3 markdown--url-props)
+                    (add-text-properties    beg3 end3 '(invisible markdown-markup))
+                    (add-face-text-property beg3 end3 'markdown-url-face)
+                    (add-text-properties    beg5 end5 (markdown--link-props part1))
+                    (add-face-text-property beg5 end5 'markdown-link-face)
+                    (when (and file-missing-p markdown-wiki-link-fontify-missing)
+                      (put-text-property beg5 end5 'face 'markdown-missing-link-face)))))
+            (progn
+              ;; Properties link as link text
+              (add-text-properties    beg3 end3 (markdown--link-props part1))
+              (add-face-text-property beg3 end3 'markdown-link-face)
+              (when (and file-missing-p markdown-wiki-link-fontify-missing)
+                (put-text-property beg3 end3 'face 'markdown-missing-link-face)))))
+        (set-match-data (list begin end))
+        t))))
+
 (defun markdown-fontify-angle-uris (last)
   "Add text properties to angle URIs from point to LAST."
   (when (markdown-match-angle-uris last)
     (let* ((url-start (match-beginning 2))
            (url-end (match-end 2))
-           ;; Markup part
-           (mp (list 'face 'markdown-markup-face
-                     'invisible 'markdown-markup
-                     'rear-nonsticky t
-                     'font-lock-multiline t))
-           ;; URI part
+           ;; URI properties
            (up (list 'keymap markdown-mode-mouse-map
                      'face 'markdown-plain-url-face
                      'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t)))
       (dolist (g '(1 3))
-        (add-text-properties (match-beginning g) (match-end g) mp))
+        (add-text-properties (match-beginning g) (match-end g) markdown--markup-props))
       (add-text-properties url-start url-end up)
       t)))
 
@@ -8347,6 +8395,11 @@ The location of the alias component depends on the value of
     (or (match-string-no-properties 5) (match-string-no-properties 3))))
 
 (defun markdown--wiki-link-search-types ()
+  "Return a list of the currently selected search types.
+
+Due to deprecated variables, as of markdown-mode version 2.5, the return value
+of this function is the same as the value of the variable
+`markdown-wiki-link-search-type'."
   (let ((ret (and markdown-wiki-link-search-type
                   (cl-copy-list markdown-wiki-link-search-type))))
     (when (and markdown-wiki-link-search-subdirectories
@@ -8358,6 +8411,7 @@ The location of the alias component depends on the value of
     ret))
 
 (defun markdown--project-root ()
+  "Try various approaches to find the project root."
   (or (cl-loop for dir in '(".git" ".hg" ".svn")
                when (locate-dominating-file default-directory dir)
                return it)
@@ -8372,12 +8426,9 @@ The location of the alias component depends on the value of
 (defun markdown-convert-wiki-link-to-filename (name)
   "Generate a filename from the wiki link NAME.
 Spaces in NAME are replaced with `markdown-link-space-sub-char'.
+Search depth is determined by `markdown-wiki-link-search-type'.
 When in `gfm-mode', follow GitHub's conventions where [[Test Test]]
-and [[test test]] both map to Test-test.ext.  Look in the current
-directory first, then in subdirectories if
-`markdown-wiki-link-search-subdirectories' is non-nil, and then
-in parent directories if
-`markdown-wiki-link-search-parent-directories' is non-nil."
+and [[test test]] both map to Test-test.ext."
   (save-match-data
     ;; This function must not overwrite match data(PR #590)
     (let* ((basename (replace-regexp-in-string
@@ -8441,39 +8492,6 @@ See `markdown-wiki-link-p' and `markdown-follow-wiki-link'."
       (markdown-follow-wiki-link (markdown-wiki-link-link) arg)
     (user-error "Point is not at a Wiki Link")))
 
-(defun markdown-highlight-wiki-link (from to face)
-  "Highlight the wiki link in the region between FROM and TO using FACE."
-  (put-text-property from to 'font-lock-face face))
-
-(defun markdown-unfontify-region-wiki-links (from to)
-  "Remove wiki link faces from the region specified by FROM and TO."
-  (interactive "*r")
-  (let ((modified (buffer-modified-p)))
-    (remove-text-properties from to '(font-lock-face markdown-link-face))
-    (remove-text-properties from to '(font-lock-face markdown-missing-link-face))
-    ;; remove-text-properties marks the buffer modified in emacs 24.3,
-    ;; undo that if it wasn't originally marked modified
-    (set-buffer-modified-p modified)))
-
-(defun markdown-fontify-region-wiki-links (from to)
-  "Search region given by FROM and TO for wiki links and fontify them.
-If a wiki link is found check to see if the backing file exists
-and highlight accordingly."
-  (goto-char from)
-  (save-match-data
-    (while (re-search-forward markdown-regex-wiki-link to t)
-      (when (not (markdown-code-block-at-point-p))
-        (let ((highlight-beginning (match-beginning 1))
-              (highlight-end (match-end 1))
-              (file-name
-               (markdown-convert-wiki-link-to-filename
-                (markdown-wiki-link-link))))
-          (if (condition-case nil (file-exists-p file-name) (error nil))
-              (markdown-highlight-wiki-link
-               highlight-beginning highlight-end 'markdown-link-face)
-            (markdown-highlight-wiki-link
-             highlight-beginning highlight-end 'markdown-missing-link-face)))))))
-
 (defun markdown-extend-changed-region (from to)
   "Extend region given by FROM and TO so that we can fontify all links.
 The region is extended to the first newline before and the first
@@ -8492,50 +8510,6 @@ newline after."
         (setq new-to (point)))
     (cl-values new-from new-to)))
 
-(defun markdown-check-change-for-wiki-link (from to)
-  "Check region between FROM and TO for wiki links and re-fontify as needed."
-  (interactive "*r")
-  (let* ((modified (buffer-modified-p))
-         (buffer-undo-list t)
-         (inhibit-read-only t)
-         deactivate-mark
-         buffer-file-truename)
-    (unwind-protect
-        (save-excursion
-          (save-match-data
-            (save-restriction
-              (cursor-intangible-mode +1) ;; inhibit-point-motion-hooks is obsoleted since Emacs 29
-              ;; Extend the region to fontify so that it starts
-              ;; and ends at safe places.
-              (cl-multiple-value-bind (new-from new-to)
-                  (markdown-extend-changed-region from to)
-                (goto-char new-from)
-                ;; Only refontify when the range contains text with a
-                ;; wiki link face or if the wiki link regexp matches.
-                (when (or (markdown-range-property-any
-                           new-from new-to 'font-lock-face
-                           '(markdown-link-face markdown-missing-link-face))
-                          (re-search-forward
-                           markdown-regex-wiki-link new-to t))
-                  ;; Unfontify existing fontification (start from scratch)
-                  (markdown-unfontify-region-wiki-links new-from new-to)
-                  ;; Now do the fontification.
-                  (markdown-fontify-region-wiki-links new-from new-to))))))
-      (cursor-intangible-mode -1)
-      (and (not modified)
-           (buffer-modified-p)
-           (set-buffer-modified-p nil)))))
-
-(defun markdown-check-change-for-wiki-link-after-change (from to _)
-  "Check region between FROM and TO for wiki links and re-fontify as needed.
-Designed to be used with the `after-change-functions' hook."
-  (markdown-check-change-for-wiki-link from to))
-
-(defun markdown-fontify-buffer-wiki-links ()
-  "Refontify all wiki links in the buffer."
-  (interactive)
-  (markdown-check-change-for-wiki-link (point-min) (point-max)))
-
 (defun markdown-toggle-wiki-links (&optional arg)
   "Toggle support for wiki links.
 With a prefix argument ARG, enable wiki link support if ARG is positive,
@@ -8546,33 +8520,10 @@ and disable it otherwise."
             (not markdown-enable-wiki-links)
           (> (prefix-numeric-value arg) 0)))
   (when (called-interactively-p 'interactive)
-    (message "markdown-mode wiki link support %s" (if markdown-enable-wiki-links "enabled" "disabled")))
+    (message "markdown-mode wiki link support %s"
+             (if markdown-enable-wiki-links "enabled" "disabled")))
   (markdown-reload-extensions))
 
-(defun markdown-setup-wiki-link-hooks ()
-  "Add or remove hooks for fontifying wiki links.
-These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
-  ;; Anytime text changes make sure it gets fontified correctly
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (add-hook 'after-change-functions
-                #'markdown-check-change-for-wiki-link-after-change t t)
-    (remove-hook 'after-change-functions
-                 #'markdown-check-change-for-wiki-link-after-change t))
-  ;; If we left the buffer there is a really good chance we were
-  ;; creating one of the wiki link documents. Make sure we get
-  ;; refontified when we come back.
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (progn
-        (add-hook 'window-configuration-change-hook
-                  #'markdown-fontify-buffer-wiki-links t t)
-        (markdown-fontify-buffer-wiki-links))
-    (remove-hook 'window-configuration-change-hook
-                 #'markdown-fontify-buffer-wiki-links t)
-    (markdown-unfontify-region-wiki-links (point-min) (point-max))))
-
-
 ;;; Following & Doing =========================================================
 
 (defun markdown-follow-thing-at-point (arg)
@@ -8759,9 +8710,7 @@ or span."
   (interactive)
   (when (derived-mode-p 'markdown-mode)
     ;; Refontify buffer
-    (font-lock-flush)
-    ;; Add or remove hooks related to extensions
-    (markdown-setup-wiki-link-hooks)))
+    (font-lock-flush)))
 
 (defun markdown-handle-local-variables ()
   "Run in `hack-local-variables-hook' to update font lock rules.
@@ -10069,6 +10018,19 @@ rows and columns and the column alignment."
                    (propertize link 'face 'markdown-reference-face)
                    (propertize "]" 'face 'markdown-markup-face))
                 (propertize link 'face 'markdown-url-face)))))
+   ;; Hidden URL for wiki links
+   ((and (and markdown-enable-wiki-links
+              (thing-at-point-looking-at markdown-regex-wiki-link))
+         (or markdown-hide-urls markdown-hide-markup))
+    (let* ((aliasp (string-equal (match-string-no-properties 4) "|"))
+           (part1 (match-string-no-properties 3))
+           (part2 (match-string-no-properties 5))
+           (link (if (and aliasp markdown-wiki-link-alias-first) part2 part1))
+           (edit-keys (markdown--substitute-command-keys
+                       "\\[markdown-insert-wiki-link]"))
+           (edit-str (propertize edit-keys 'face 'font-lock-constant-face)))
+      (format "Hidden URL (%s to edit): %s"
+              edit-str (propertize link 'face 'markdown-reference-face))))
    ;; Hidden language name for fenced code blocks
    ((and (markdown-code-block-at-point-p)
          (not (get-text-property (point) 'markdown-pre))
@@ -10171,8 +10133,6 @@ rows and columns and the column alignment."
   (if markdown-hide-markup
       (add-to-invisibility-spec 'markdown-markup)
     (remove-from-invisibility-spec 'markdown-markup))
-  ;; Wiki links
-  (markdown-setup-wiki-link-hooks)
   ;; Math mode
   (when markdown-enable-math (markdown-toggle-math t))
   ;; Add a buffer-local hook to reload after file-local variables are read
