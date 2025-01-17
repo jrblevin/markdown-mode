@@ -9156,10 +9156,6 @@ Example:
   (buffer-local-value 'markdown--is-fontify-buffer
                       (or buffer (current-buffer))))
 
-(unless (and (featurep 'markdown-mode)
-             (markdown-is-fontify-buffer-p))
-  (eglot-ensure))
-
 ;; Based on `org-src-font-lock-fontify-block' from org-src.el.
 (defun markdown-fontify-code-block-natively (lang start end)
   "Fontify given GFM or fenced code block.
