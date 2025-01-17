@@ -9150,7 +9150,7 @@ This is useful in a `prog-mode' hook to avoid resource-intensive
 features such as `eglot' inside a fontification buffer.
 
 Example:
-  (unless (and (featurep 'markdown-mode)
+  (unless (and (featurep \\='markdown-mode)
                (markdown-is-fontify-buffer-p))
     (eglot-ensure))"
   (buffer-local-value 'markdown--is-fontify-buffer
