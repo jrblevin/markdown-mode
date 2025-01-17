@@ -9137,6 +9137,29 @@ Use matching function MATCHER."
   "Add text properties to next tilde fenced code block from point to LAST."
   (markdown-fontify-code-blocks-generic 'markdown-match-fenced-code-blocks last))
 
+(defvar-local markdown--is-fontify-buffer nil)
+(put 'markdown--is-fontify-buffer 'permanent-local t) ; needs to survive major-mode housecleaning
+
+;;;###autoload
+(defun markdown-is-fontify-buffer-p (&optional buffer)
+  "Return t if the current buffer is a code-block fontify BUFFER.
+
+If BUFFER is nil, the current buffer is used.
+
+This is useful in a `prog-mode' hook to avoid resource-intensive
+features such as `eglot' inside a fontification buffer.
+
+Example:
+  (unless (and (featurep 'markdown-mode)
+               (markdown-is-fontify-buffer-p))
+    (eglot-ensure))"
+  (buffer-local-value 'markdown--is-fontify-buffer
+                      (or buffer (current-buffer))))
+
+(unless (and (featurep 'markdown-mode)
+             (markdown-is-fontify-buffer-p))
+  (eglot-ensure))
+
 ;; Based on `org-src-font-lock-fontify-block' from org-src.el.
 (defun markdown-fontify-code-block-natively (lang start end)
   "Fontify given GFM or fenced code block.
@@ -9160,7 +9183,9 @@ position."
           (let ((inhibit-modification-hooks nil))
             (delete-region (point-min) (point-max))
             (insert string " ")) ;; so there's a final property change
-          (unless (eq major-mode lang-mode) (funcall lang-mode))
+          (setq markdown--is-fontify-buffer t) ; let the mode know this is a fontify buffer
+          (unless (eq major-mode lang-mode)
+            (funcall lang-mode))
           (font-lock-ensure)
           (setq pos (point-min))
           (while (setq next (next-single-property-change pos 'face))
