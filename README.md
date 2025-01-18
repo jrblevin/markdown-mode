@@ -915,6 +915,18 @@ provides an interface to all of the possible customizations:
     interactively by pressing <kbd>C-c C-x C-f</kbd>
     (`markdown-toggle-fontify-code-blocks-natively`).
 
+    To avoid the cost of expensive resources in `prog-mode` hooks 
+    which are invoked whenever a markdown fontification buffer is
+    created for each language mode, consider adding something like
+    the following to your hook:
+
+```elisp
+  (when (or buffer-file-name
+    (not (string-prefix-p " " (buffer-name))))
+    ;; do something expensive, such as
+    (eglot-ensure))
+```
+
   * `markdown-gfm-uppercase-checkbox` - When non-nil, complete GFM
     task list items with `[X]` instead of `[x]` (default: `nil`).
     This is useful for compatibility with `org-mode`, which doesn't
