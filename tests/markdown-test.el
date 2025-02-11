@@ -2478,6 +2478,16 @@ See GH-275."
     (markdown-test-range-has-face 12 12 'markdown-markup-face)
     (markdown-test-range-has-face 18 18 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/ignore-uri-in-inline-code ()
+  "Avoid rendering URIs inside inline code."
+  (markdown-test-string
+      "`<http:foo>` t `a <http:bar> b` <http:`bar>` t `<http`:bar>`<http:`bar>"
+    (markdown-test-range-has-face 2 11 'markdown-inline-code-face)
+    (markdown-test-range-has-face 17 30 'markdown-inline-code-face)
+    (markdown-test-range-has-face 40 43 'markdown-inline-code-face)
+    (markdown-test-range-has-face 49 53 'markdown-inline-code-face)
+    (markdown-test-range-has-face 61 66 'markdown-inline-code-face)))
+
 (ert-deftest test-markdown-font-lock/italics-in-reference-definitions ()
   "Test not matching italics in reference definitions across lines."
   (markdown-test-string
