@@ -1177,6 +1177,10 @@ escape character (see `markdown-match-escape').")
 If POS is not given, use point instead."
   (get-text-property (or pos (point)) 'markdown-comment))
 
+(defsubst markdown-in-inline-code-p (pos)
+  "Return non-nil if POS is in inline code."
+  (equal (get-text-property pos 'face) '(markdown-inline-code-face)))
+
 (defun markdown--face-p (pos faces)
   "Return non-nil if face of POS contain FACES."
   (let ((face-prop (get-text-property pos 'face)))
@@ -8269,22 +8273,24 @@ Translate filenames using `markdown-filename-translate-function'."
 (defun markdown-fontify-angle-uris (last)
   "Add text properties to angle URIs from point to LAST."
   (when (markdown-match-angle-uris last)
-    (let* ((url-start (match-beginning 2))
-           (url-end (match-end 2))
-           ;; Markup part
-           (mp (list 'face 'markdown-markup-face
-                     'invisible 'markdown-markup
-                     'rear-nonsticky t
-                     'font-lock-multiline t))
-           ;; URI part
-           (up (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-plain-url-face
-                     'mouse-face 'markdown-highlight-face
-                     'font-lock-multiline t)))
-      (dolist (g '(1 3))
-        (add-text-properties (match-beginning g) (match-end g) mp))
-      (add-text-properties url-start url-end up)
-      t)))
+    (let ((url-start (match-beginning 2))
+          (url-end (match-end 2)))
+      (unless (or (markdown-in-inline-code-p url-start)
+                  (markdown-in-inline-code-p url-end))
+        (let* (;; Markup part
+               (mp (list 'face 'markdown-markup-face
+                         'invisible 'markdown-markup
+                         'rear-nonsticky t
+                         'font-lock-multiline t))
+               ;; URI part
+               (up (list 'keymap markdown-mode-mouse-map
+                         'face 'markdown-plain-url-face
+                         'mouse-face 'markdown-highlight-face
+                         'font-lock-multiline t)))
+          (dolist (g '(1 3))
+            (add-text-properties (match-beginning g) (match-end g) mp))
+          (add-text-properties url-start url-end up)
+          t)))))
 
 (defun markdown-fontify-plain-uris (last)
   "Add text properties to plain URLs from point to LAST."

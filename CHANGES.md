@@ -24,6 +24,7 @@
       and `markdown-fontify-code-blocks-natively` together [GH-766][]
     - Fix `markdown-fontify-whole-heading-line` regression [GH-848][]
     - Fix using fundamental-mode issue when editting code block [GH-868][]
+    - Fix highlighting URL in angle brackes[GH-822][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
@@ -40,6 +41,7 @@
   [gh-804]: https://github.com/jrblevin/markdown-mode/issues/804
   [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
+  [gh-822]: https://github.com/jrblevin/markdown-mode/issues/822
   [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
   [gh-838]: https://github.com/jrblevin/markdown-mode/issues/838
