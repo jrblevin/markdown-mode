@@ -8199,19 +8199,20 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part (without face)
            (lp (list 'keymap markdown-mode-mouse-map
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (if title (concat title "\n" url) url)))
            ;; URL part
            (up (list 'keymap markdown-mode-mouse-map
                      'invisible 'markdown-markup
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
            ;; URL composition character
            (url-char (markdown--first-displayable markdown-url-compose-char))
            ;; Title part
            (tp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq lp (append lp '(mouse-face 'markdown-highlight-face)))
+        (setq up (append up '(mouse-face 'markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)
@@ -8243,7 +8244,6 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (lambda (_ __ pos)
                                   (save-match-data
@@ -8256,6 +8256,8 @@ Translate filenames using `markdown-filename-translate-function'."
            ;; Reference part
            (rp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq lp (append lp '(mouse-face markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)
@@ -8285,8 +8287,9 @@ Translate filenames using `markdown-filename-translate-function'."
                ;; URI part
                (up (list 'keymap markdown-mode-mouse-map
                          'face 'markdown-plain-url-face
-                         'mouse-face 'markdown-highlight-face
                          'font-lock-multiline t)))
+          (when markdown-mouse-follow-link
+            (setq up (append up '(mouse-face markdown-highlight-face))))
           (dolist (g '(1 3))
             (add-text-properties (match-beginning g) (match-end g) mp))
           (add-text-properties url-start url-end up)
@@ -8299,9 +8302,10 @@ Translate filenames using `markdown-filename-translate-function'."
            (end (match-end 0))
            (props (list 'keymap markdown-mode-mouse-map
                         'face 'markdown-plain-url-face
-                        'mouse-face 'markdown-highlight-face
                         'rear-nonsticky t
                         'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq props (append props '(mouse-face markdown-highlight-face))))
       (add-text-properties start end props)
       t)))
 

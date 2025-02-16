@@ -3199,6 +3199,18 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/716"
       (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-markup-face)
       (markdown-test-range-has-face (match-beginning 0) (1- (match-end 0)) 'markdown-table-face))))
 
+(ert-deftest test-markdown-font-lock/mouse-face-in-link ()
+  "Test links of mouse face.
+Detail: https://github.com/jrblevin/markdown-mode/issues/879"
+  (markdown-test-string "[foo](https://example.com)"
+    (should (get-text-property 7 'mouse-face))
+    (should (get-text-property 25 'mouse-face)))
+
+  (let ((markdown-mouse-follow-link nil))
+    (markdown-test-string "[foo](https://example.com)"
+      (should-not (get-text-property 7 'mouse-face))
+      (should-not (get-text-property 25 'mouse-face)))))
+
 (ert-deftest test-markdown-font-lock/comment-hanging-indent ()
   "Test comments with hanging indentation."
   (markdown-test-string "<!-- This comment has\n    hanging indentation -->"

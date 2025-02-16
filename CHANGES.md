@@ -35,6 +35,7 @@
     - Resolve style sheets in `markdown-css-paths` relative to the Markdown file
       (if the path starts with `./` or `../`) [GH-855][] [GH-870][]
     - Don't insert list item in code block [GH-841][]
+    - Don't set mouse face if `markdown-mouse-follow-link` is nil [GH-879][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
@@ -52,6 +53,7 @@
   [gh-855]: https://github.com/jrblevin/markdown-mode/issues/855
   [gh-868]: https://github.com/jrblevin/markdown-mode/issues/868
   [gh-870]: https://github.com/jrblevin/markdown-mode/issues/870
+  [gh-879]: https://github.com/jrblevin/markdown-mode/issues/879
 
 # Markdown Mode 2.6
 
