@@ -24,6 +24,7 @@
       and `markdown-fontify-code-blocks-natively` together [GH-766][]
     - Fix `markdown-fontify-whole-heading-line` regression [GH-848][]
     - Fix using fundamental-mode issue when editting code block [GH-868][]
+    - Fix highlighting URL in angle brackes[GH-822][]
 
 *   Improvements:
     - Apply url-unescape against URL in an inline link [GH-805][]
@@ -34,12 +35,14 @@
     - Resolve style sheets in `markdown-css-paths` relative to the Markdown file
       (if the path starts with `./` or `../`) [GH-855][] [GH-870][]
     - Don't insert list item in code block [GH-841][]
+    - Don't set mouse face if `markdown-mouse-follow-link` is nil [GH-879][]
 
   [gh-780]: https://github.com/jrblevin/markdown-mode/issues/780
   [gh-802]: https://github.com/jrblevin/markdown-mode/issues/802
   [gh-804]: https://github.com/jrblevin/markdown-mode/issues/804
   [gh-805]: https://github.com/jrblevin/markdown-mode/issues/805
   [gh-817]: https://github.com/jrblevin/markdown-mode/issues/817
+  [gh-822]: https://github.com/jrblevin/markdown-mode/issues/822
   [gh-827]: https://github.com/jrblevin/markdown-mode/issues/827
   [gh-834]: https://github.com/jrblevin/markdown-mode/issues/834
   [gh-838]: https://github.com/jrblevin/markdown-mode/issues/838
@@ -50,6 +53,7 @@
   [gh-855]: https://github.com/jrblevin/markdown-mode/issues/855
   [gh-868]: https://github.com/jrblevin/markdown-mode/issues/868
   [gh-870]: https://github.com/jrblevin/markdown-mode/issues/870
+  [gh-879]: https://github.com/jrblevin/markdown-mode/issues/879
 
 # Markdown Mode 2.6
 

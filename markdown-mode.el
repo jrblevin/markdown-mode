@@ -1176,6 +1176,10 @@ escape character (see `markdown-match-escape').")
 If POS is not given, use point instead."
   (get-text-property (or pos (point)) 'markdown-comment))
 
+(defsubst markdown-in-inline-code-p (pos)
+  "Return non-nil if POS is in inline code."
+  (equal (get-text-property pos 'face) '(markdown-inline-code-face)))
+
 (defun markdown--face-p (pos faces)
   "Return non-nil if face of POS contain FACES."
   (let ((face-prop (get-text-property pos 'face)))
@@ -8195,7 +8199,26 @@ Translate filenames using `markdown-filename-translate-function'."
            (title-start (match-beginning 7))
            (title-end (match-end 7))
            (title (match-string-no-properties 7))
-           (url-char (markdown--first-displayable markdown-url-compose-char)))
+           ;; Markup part
+           (mp (list 'invisible 'markdown-markup
+                     'rear-nonsticky t
+                     'font-lock-multiline t))
+           ;; Link part (without face)
+           (lp (list 'keymap markdown-mode-mouse-map
+                     'font-lock-multiline t
+                     'help-echo (if title (concat title "\n" url) url)))
+           ;; URL part
+           (up (list 'keymap markdown-mode-mouse-map
+                     'invisible 'markdown-markup
+                     'font-lock-multiline t))
+           ;; URL composition character
+           (url-char (markdown--first-displayable markdown-url-compose-char))
+           ;; Title part
+           (tp (list 'invisible 'markdown-markup
+                     'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq lp (append lp '(mouse-face 'markdown-highlight-face)))
+        (setq up (append up '(mouse-face 'markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) markdown--markup-props)
@@ -8223,7 +8246,6 @@ Translate filenames using `markdown-filename-translate-function'."
            (ref-end (match-end 6))
            ;; Link properties
            (lp (list 'keymap markdown-mode-mouse-map
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (lambda (_ __ pos)
                                   (save-match-data
@@ -8236,6 +8258,8 @@ Translate filenames using `markdown-filename-translate-function'."
            ;; Reference properties
            (rp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq lp (append lp '(mouse-face markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) markdown--markup-props)
@@ -8322,17 +8346,25 @@ Translate filenames using `markdown-filename-translate-function'."
 (defun markdown-fontify-angle-uris (last)
   "Add text properties to angle URIs from point to LAST."
   (when (markdown-match-angle-uris last)
-    (let* ((url-start (match-beginning 2))
-           (url-end (match-end 2))
-           ;; URI properties
-           (up (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-plain-url-face
-                     'mouse-face 'markdown-highlight-face
-                     'font-lock-multiline t)))
-      (dolist (g '(1 3))
-        (add-text-properties (match-beginning g) (match-end g) markdown--markup-props))
-      (add-text-properties url-start url-end up)
-      t)))
+    (let ((url-start (match-beginning 2))
+          (url-end (match-end 2)))
+      (unless (or (markdown-in-inline-code-p url-start)
+                  (markdown-in-inline-code-p url-end))
+        (let* (;; Markup part
+               (mp (list 'face 'markdown-markup-face
+                         'invisible 'markdown-markup
+                         'rear-nonsticky t
+                         'font-lock-multiline t))
+               ;; URI part
+               (up (list 'keymap markdown-mode-mouse-map
+                         'face 'markdown-plain-url-face
+                         'font-lock-multiline t)))
+          (when markdown-mouse-follow-link
+            (setq up (append up '(mouse-face markdown-highlight-face))))
+          (dolist (g '(1 3))
+            (add-text-properties (match-beginning g) (match-end g) mp))
+          (add-text-properties url-start url-end up)
+          t)))))
 
 (defun markdown-fontify-plain-uris (last)
   "Add text properties to plain URLs from point to LAST."
@@ -8341,9 +8373,10 @@ Translate filenames using `markdown-filename-translate-function'."
            (end (match-end 0))
            (props (list 'keymap markdown-mode-mouse-map
                         'face 'markdown-plain-url-face
-                        'mouse-face 'markdown-highlight-face
                         'rear-nonsticky t
                         'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq props (append props '(mouse-face markdown-highlight-face))))
       (add-text-properties start end props)
       t)))
 
