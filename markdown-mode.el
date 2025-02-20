@@ -8208,10 +8208,7 @@ Translate filenames using `markdown-filename-translate-function'."
                      'invisible 'markdown-markup
                      'font-lock-multiline t))
            ;; URL composition character
-           (url-char (markdown--first-displayable markdown-url-compose-char))
-           ;; Title part
-           (tp (list 'invisible 'markdown-markup
-                     'font-lock-multiline t)))
+           (url-char (markdown--first-displayable markdown-url-compose-char)))
       (when markdown-mouse-follow-link
         (setq lp (append lp '(mouse-face 'markdown-highlight-face)))
         (setq up (append up '(mouse-face 'markdown-highlight-face))))
