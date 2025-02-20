@@ -8199,10 +8199,6 @@ Translate filenames using `markdown-filename-translate-function'."
            (title-start (match-beginning 7))
            (title-end (match-end 7))
            (title (match-string-no-properties 7))
-           ;; Markup part
-           (mp (list 'invisible 'markdown-markup
-                     'rear-nonsticky t
-                     'font-lock-multiline t))
            ;; Link part (without face)
            (lp (list 'keymap markdown-mode-mouse-map
                      'font-lock-multiline t
