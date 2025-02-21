@@ -5705,23 +5705,32 @@ See also `markdown-mode-map'.")
                                        'rear-nonsticky t
                                        'font-lock-multiline t))
 
-(defconst markdown--url-props (list 'invisible 'markdown-markup
-                                    'keymap markdown-mode-mouse-map
-                                    'mouse-face 'markdown-highlight-face
-                                    'font-lock-multiline t))
-
 (defconst markdown--title-props (list 'invisible 'markdown-markup
                                       'font-lock-multiline t))
+
+(defun markdown--url-props ()
+  (if markdown-mouse-follow-link
+      (list 'invisible 'markdown-markup
+            'keymap markdown-mode-mouse-map
+            'mouse-face 'markdown-highlight-face
+            'font-lock-multiline t)
+    (list 'invisible 'markdown-markup
+          'keymap markdown-mode-mouse-map
+          'font-lock-multiline t)))
 
 (defun markdown--link-props (url &optional title)
   "Return a property list for URL with optional TITLE."
   (let ((echo-text (if title (concat title "\n" url) url)))
-    (list 'keymap markdown-mode-mouse-map
-          'mouse-face 'markdown-highlight-face
-          'font-lock-multiline t
-          'help-echo echo-text)))
+    (if markdown-mouse-follow-link
+        (list 'keymap markdown-mode-mouse-map
+              'mouse-face 'markdown-highlight-face
+              'font-lock-multiline t
+              'help-echo echo-text)
+      (list 'keymap markdown-mode-mouse-map
+            'font-lock-multiline t
+            'help-echo echo-text))))
 
-
+
 ;;; Menu ======================================================================
 
 (easy-menu-define markdown-mode-menu markdown-mode-map
@@ -8199,19 +8208,7 @@ Translate filenames using `markdown-filename-translate-function'."
            (title-start (match-beginning 7))
            (title-end (match-end 7))
            (title (match-string-no-properties 7))
-           ;; Link part (without face)
-           (lp (list 'keymap markdown-mode-mouse-map
-                     'font-lock-multiline t
-                     'help-echo (if title (concat title "\n" url) url)))
-           ;; URL part
-           (up (list 'keymap markdown-mode-mouse-map
-                     'invisible 'markdown-markup
-                     'font-lock-multiline t))
-           ;; URL composition character
            (url-char (markdown--first-displayable markdown-url-compose-char)))
-      (when markdown-mouse-follow-link
-        (setq lp (append lp '(mouse-face 'markdown-highlight-face)))
-        (setq up (append up '(mouse-face 'markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) markdown--markup-props)
@@ -8221,7 +8218,7 @@ Translate filenames using `markdown-filename-translate-function'."
         (add-text-properties link-start link-end (markdown--link-props url title))
         (add-face-text-property link-start link-end 'markdown-link-face))
       (when url-start
-        (add-text-properties url-start url-end markdown--url-props)
+        (add-text-properties url-start url-end (markdown--url-props))
         (add-face-text-property url-start url-end 'markdown-url-face))
       (when title-start
         (add-text-properties url-end title-end markdown--title-props)
@@ -8313,14 +8310,14 @@ Translate filenames using `markdown-filename-translate-function'."
                       ;; Properties alias portion of link
                       (add-text-properties    beg3 end3 (markdown--link-props part2))
                       (add-face-text-property beg3 end3 'markdown-link-face)
-                      (add-text-properties    beg5 end5 markdown--url-props)
+                      (add-text-properties    beg5 end5 (markdown--url-props))
                       (add-text-properties    beg5 end5 '(invisible markdown-markup))
                       (add-face-text-property beg5 end5 'markdown-url-face)
                       (when (and file-missing-p markdown-wiki-link-fontify-missing)
                         (put-text-property beg3 end3 'face 'markdown-missing-link-face)))
                   (progn
                     ;; Properties URL portion of link
-                    (add-text-properties    beg3 end3 markdown--url-props)
+                    (add-text-properties    beg3 end3 (markdown--url-props))
                     (add-text-properties    beg3 end3 '(invisible markdown-markup))
                     (add-face-text-property beg3 end3 'markdown-url-face)
                     (add-text-properties    beg5 end5 (markdown--link-props part1))
