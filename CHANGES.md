@@ -1,3 +1,14 @@
+# Markdown Mode 2.8
+
+*   **Breaking changes:**
+    - GNU Emacs 28.1 or later is required.
+
+*   New Features:
+
+*   Bug fixes:
+
+*   Improvements:
+
 # Markdown Mode 2.7
 
 *   New Features:
