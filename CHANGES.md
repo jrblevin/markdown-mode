@@ -1,7 +1,5 @@
 # Markdown Mode 2.7
 
-*Under development*
-
 *   New Features:
     - Variable `markdown-follow-link-functions` extends
       `markdown-follow-link-at-point` similarly to Org's
