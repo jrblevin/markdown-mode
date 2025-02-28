@@ -8,6 +8,7 @@
 *   Bug fixes:
 
 *   Improvements:
+    - Support drag and drop features on Windows and multiple files' drag and drop
 
 # Markdown Mode 2.7
 
