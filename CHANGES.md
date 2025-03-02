@@ -1,6 +1,16 @@
-# Markdown Mode 2.7
+# Markdown Mode 2.8
 
-*Under development*
+*   **Breaking changes:**
+    - GNU Emacs 28.1 or later is required.
+
+*   New Features:
+
+*   Bug fixes:
+
+*   Improvements:
+    - Support drag and drop features on Windows and multiple files' drag and drop
+
+# Markdown Mode 2.7
 
 *   New Features:
     - Variable `markdown-follow-link-functions` extends

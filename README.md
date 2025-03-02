@@ -1138,6 +1138,7 @@ first version was released on May 24, 2007.
   * 2020-05-30: [Version 2.4][]
   * 2022-02-12: [Version 2.5][]
   * 2023-08-30: [Version 2.6][]
+  * 2025-02-26: [Version 2.7][]
 
 [Version 1.1]: https://jblevins.org/projects/markdown-mode/rev-1-1
 [Version 1.2]: https://jblevins.org/projects/markdown-mode/rev-1-2
@@ -1156,3 +1157,4 @@ first version was released on May 24, 2007.
 [Version 2.4]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.4
 [Version 2.5]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.5
 [Version 2.6]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.6
+[Version 2.7]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.7
