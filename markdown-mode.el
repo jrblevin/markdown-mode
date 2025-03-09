@@ -53,6 +53,7 @@
 (declare-function sh-set-shell "sh-script")
 (declare-function mailcap-file-name-to-mime-type "mailcap")
 (declare-function dnd-get-local-file-name "dnd")
+(declare-function dnd-open-local-file "dnd")
 
 ;; for older emacs<29
 (declare-function mailcap-mime-type-to-extension "mailcap")
