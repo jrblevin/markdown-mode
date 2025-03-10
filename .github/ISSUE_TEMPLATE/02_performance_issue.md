@@ -7,7 +7,8 @@ title: ''
 ### Description
 
 <!--
-What is the issue ? When does markdown-mode become slow ? syntax, file size etc
+What is the issue ? Regression ?
+When does markdown-mode become slow ? syntax, file size etc
 -->
 
 ## Software Versions
