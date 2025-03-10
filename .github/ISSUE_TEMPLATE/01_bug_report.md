@@ -1,3 +1,9 @@
+---
+name: Bug report
+about: Report a bug
+title: ''
+---
+
 <!--- Provide a general summary of the issue in the Title above -->
 
 ## Expected Behavior
@@ -43,10 +49,10 @@ Markdown Mode and Emacs version numbers.
 Examples:
 
 - Markdown Mode: From Git on 2017-10-17, 2.4-dev, or 2.3
-- Emacs: 25.3.2
-- OS: macOS High Sierra
+- Emacs: 30.1
+- OS: macOS Sequoia
 -->
 
-- Markdown Mode: 
-- Emacs: 
-- OS: 
+- Markdown Mode:
+- Emacs:
+- OS:
