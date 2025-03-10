@@ -1,3 +1,6 @@
+*   Improvements:
+    - Added cmark and cmark-gfm to the markdown command list.
+
 # Markdown Mode 2.8
 
 *   **Breaking changes:**
