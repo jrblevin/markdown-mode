@@ -10231,10 +10231,10 @@ rows and columns and the column alignment."
   ;; Add a buffer-local hook to reload after file-local variables are read
   (add-hook 'hack-local-variables-hook #'markdown-handle-local-variables nil t)
   ;; For imenu support
-  (setq imenu-create-index-function
-        (if markdown-nested-imenu-heading-index
-            #'markdown-imenu-create-nested-index
-          #'markdown-imenu-create-flat-index))
+  (setq-local imenu-create-index-function (if markdown-nested-imenu-heading-index
+                                              #'markdown-imenu-create-nested-index
+                                            #'markdown-imenu-create-flat-index)
+              imenu-submenus-on-top nil)
 
   ;; Defun movement
   (setq-local beginning-of-defun-function #'markdown-beginning-of-defun)
