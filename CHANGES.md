@@ -6,6 +6,8 @@
     - GNU Emacs 28.1 or later is required.
 
 *   New Features:
+    - Introduce `markdown-yank-dnd-method` what action to perform on the dropped files
+      like `org-mode`.
 
 *   Bug fixes:
 
