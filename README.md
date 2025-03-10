@@ -48,7 +48,7 @@ a complete list of keybindings is available using <kbd>C-h m</kbd>
 
 _Note:_ To use all of the features of `markdown-mode`, you'll need
 to install the Emacs package itself and also have a local Markdown
-processor installed (e.g., Markdown.pl, MultiMarkdown, or Pandoc).
+processor installed (e.g., Markdown.pl, MultiMarkdown, Pandoc, or CommonMark).
 The external processor is not required for editing, but will be
 used for rendering HTML for preview and export. After installing
 the Emacs package, be sure to configure `markdown-command` to point
