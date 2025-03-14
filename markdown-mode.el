@@ -7709,8 +7709,8 @@ Return the name of the output buffer used."
                    (erase-buffer))
                  (if (stringp command)
                      (if (not (null command-args))
-                         (apply #'call-process-region begin-region end-region command nil buf nil command-args)
-                       (call-process-region begin-region end-region command nil buf))
+                         (apply #'call-process-region begin-region end-region command nil (list buf nil) nil command-args)
+                       (call-process-region begin-region end-region command nil (list buf nil)))
                    (if markdown-command-needs-filename
                        (if (not buffer-file-name)
                            (user-error "Must be visiting a file")
