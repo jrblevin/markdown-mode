@@ -10,6 +10,7 @@
       like `org-mode`.
 
 *   Bug fixes:
+    - `markdown-export` should not output stderr content to output file
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -17,6 +18,7 @@
     - Disable `imenu-submenus-on-top` by default [GH-882][]
 
   [gh-882]: https://github.com/jrblevin/markdown-mode/issues/882
+  [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
 
 # Markdown Mode 2.7
 
