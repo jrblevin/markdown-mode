@@ -6,12 +6,19 @@
     - GNU Emacs 28.1 or later is required.
 
 *   New Features:
+    - Introduce `markdown-yank-dnd-method` what action to perform on the dropped files
+      like `org-mode`.
 
 *   Bug fixes:
+    - `markdown-export` should not output stderr content to output file
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
     - Added cmark and cmark-gfm to the markdown command list.
+    - Disable `imenu-submenus-on-top` by default [GH-882][]
+
+  [gh-882]: https://github.com/jrblevin/markdown-mode/issues/882
+  [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
 
 # Markdown Mode 2.7
 
