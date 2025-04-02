@@ -278,6 +278,16 @@ This is the default search behavior of Ikiwiki."
 (make-obsolete-variable 'markdown-wiki-link-search-subdirectories 'markdown-wiki-link-search-type "2.5")
 (make-obsolete-variable 'markdown-wiki-link-search-parent-directories 'markdown-wiki-link-search-type "2.5")
 
+(make-obsolete 'markdown-match-wiki-link nil "2.3")
+(make-obsolete 'markdown-highlight-wiki-link nil "2.3")
+(make-obsolete 'markdown-unfontify-region-wiki-links nil "2.3")
+(make-obsolete 'markdown-fontify-region-wiki-links nil "2.3")
+(make-obsolete 'markdown-extend-changed-region nil "2.3")
+(make-obsolete 'markdown-check-change-for-wiki-link nil "2.3")
+(make-obsolete 'markdown-check-change-for-wiki-link-after-change nil "2.3")
+(make-obsolete 'markdown-fontify-buffer-wiki-links nil "2.3")
+(make-obsolete 'markdown-setup-wiki-link-hooks nil "2.3")
+
 (defcustom markdown-wiki-link-fontify-missing nil
   "When non-nil, change wiki link face according to existence of target files.
 This is expensive because it requires checking for the file each time the buffer
