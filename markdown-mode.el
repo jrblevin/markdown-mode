@@ -3433,7 +3433,8 @@ the buffer)."
               (markdown-code-block-at-pos begin))
           (progn (goto-char (min (1+ begin) last))
                  (when (< (point) last)
-                   (markdown-match-wiki-link last)))
+                   (with-no-warnings
+                     (markdown-match-wiki-link last))))
         (set-match-data (list begin end))
         t))))
 
@@ -8579,11 +8580,12 @@ and highlight accordingly."
               (file-name
                (markdown-convert-wiki-link-to-filename
                 (markdown-wiki-link-link))))
-          (if (condition-case nil (file-exists-p file-name) (error nil))
+          (with-no-warnings
+            (if (condition-case nil (file-exists-p file-name) (error nil))
+                (markdown-highlight-wiki-link
+                 highlight-beginning highlight-end 'markdown-link-face)
               (markdown-highlight-wiki-link
-               highlight-beginning highlight-end 'markdown-link-face)
-            (markdown-highlight-wiki-link
-             highlight-beginning highlight-end 'markdown-missing-link-face)))))))
+               highlight-beginning highlight-end 'markdown-missing-link-face))))))))
 
 (defun markdown-extend-changed-region (from to)
   "Extend region given by FROM and TO so that we can fontify all links.
@@ -8619,7 +8621,8 @@ newline after."
               ;; Extend the region to fontify so that it starts
               ;; and ends at safe places.
               (cl-multiple-value-bind (new-from new-to)
-                  (markdown-extend-changed-region from to)
+                  (with-no-warnings
+                    (markdown-extend-changed-region from to))
                 (goto-char new-from)
                 ;; Only refontify when the range contains text with a
                 ;; wiki link face or if the wiki link regexp matches.
@@ -8628,10 +8631,11 @@ newline after."
                            '(markdown-link-face markdown-missing-link-face))
                           (re-search-forward
                            markdown-regex-wiki-link new-to t))
-                  ;; Unfontify existing fontification (start from scratch)
-                  (markdown-unfontify-region-wiki-links new-from new-to)
-                  ;; Now do the fontification.
-                  (markdown-fontify-region-wiki-links new-from new-to))))))
+                  (with-no-warnings
+                   ;; Unfontify existing fontification (start from scratch)
+                   (markdown-unfontify-region-wiki-links new-from new-to)
+                   ;; Now do the fontification.
+                   (markdown-fontify-region-wiki-links new-from new-to)))))))
       (cursor-intangible-mode -1)
       (and (not modified)
            (buffer-modified-p)
@@ -8640,12 +8644,14 @@ newline after."
 (defun markdown-check-change-for-wiki-link-after-change (from to _)
   "Check region between FROM and TO for wiki links and re-fontify as needed.
 Designed to be used with the `after-change-functions' hook."
-  (markdown-check-change-for-wiki-link from to))
+  (with-no-warnings
+    (markdown-check-change-for-wiki-link from to)))
 
 (defun markdown-fontify-buffer-wiki-links ()
   "Refontify all wiki links in the buffer."
   (interactive)
-  (markdown-check-change-for-wiki-link (point-min) (point-max)))
+  (with-no-warnings
+    (markdown-check-change-for-wiki-link (point-min) (point-max))))
 
 (defun markdown-toggle-wiki-links (&optional arg)
   "Toggle support for wiki links.
@@ -8665,24 +8671,26 @@ and disable it otherwise."
   "Add or remove hooks for fontifying wiki links.
 These are only enabled when `markdown-wiki-link-fontify-missing' is non-nil."
   ;; Anytime text changes make sure it gets fontified correctly
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (add-hook 'after-change-functions
-                #'markdown-check-change-for-wiki-link-after-change t t)
-    (remove-hook 'after-change-functions
-                 #'markdown-check-change-for-wiki-link-after-change t))
-  ;; If we left the buffer there is a really good chance we were
-  ;; creating one of the wiki link documents. Make sure we get
-  ;; refontified when we come back.
-  (if (and markdown-enable-wiki-links
-           markdown-wiki-link-fontify-missing)
-      (progn
-        (add-hook 'window-configuration-change-hook
-                  #'markdown-fontify-buffer-wiki-links t t)
-        (markdown-fontify-buffer-wiki-links))
-    (remove-hook 'window-configuration-change-hook
-                 #'markdown-fontify-buffer-wiki-links t)
-    (markdown-unfontify-region-wiki-links (point-min) (point-max))))
+  (with-no-warnings
+    (if (and markdown-enable-wiki-links
+             markdown-wiki-link-fontify-missing)
+        (add-hook 'after-change-functions
+                  #'markdown-check-change-for-wiki-link-after-change t t)
+      (remove-hook 'after-change-functions
+                   #'markdown-check-change-for-wiki-link-after-change t))
+    ;; If we left the buffer there is a really good chance we were
+    ;; creating one of the wiki link documents. Make sure we get
+    ;; refontified when we come back.
+    (if (and markdown-enable-wiki-links
+             markdown-wiki-link-fontify-missing)
+        (progn
+          (add-hook 'window-configuration-change-hook
+                    #'markdown-fontify-buffer-wiki-links t t)
+          (markdown-fontify-buffer-wiki-links))
+      (remove-hook 'window-configuration-change-hook
+                   #'markdown-fontify-buffer-wiki-links t)
+      (with-no-warnings
+        (markdown-unfontify-region-wiki-links (point-min) (point-max)))))  )
 
 
 ;;; Following & Doing =========================================================
