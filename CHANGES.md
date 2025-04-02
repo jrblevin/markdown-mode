@@ -11,6 +11,7 @@
 
 *   Bug fixes:
     - `markdown-export` should not output stderr content to output file
+    - Hide wikilink markup as part of `markdown-toggle-markup-hiding` [GH-847][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
