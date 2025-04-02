@@ -18,6 +18,7 @@
     - Added cmark and cmark-gfm to the markdown command list.
     - Disable `imenu-submenus-on-top` by default [GH-882][]
 
+  [gh-847]: https://github.com/jrblevin/markdown-mode/issues/847
   [gh-882]: https://github.com/jrblevin/markdown-mode/issues/882
   [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
 
