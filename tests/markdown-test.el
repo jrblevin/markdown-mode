@@ -2401,6 +2401,13 @@ Detail: https://github.com/jrblevin/markdown-mode/pull/674"
       "[cd\\_z\\_path.m](http://jblevins.org/research/centroid/cd_z_path.m)"
     (markdown-test-range-face-equals 17 65 'markdown-url-face)))
 
+(ert-deftest test-markdown-font-lock/angle-url ()
+  "Test URL highlighting with comma and parenthesis.
+Detail: https://github.com/jrblevin/markdown-mode/issues/895"
+  (markdown-test-string "<https://github.com/jonathanchu/atom-one-dark-theme>"
+    (markdown-test-range-has-face 1 1 'markdown-markup-face)
+    (markdown-test-range-has-face 52 52 'markdown-markup-face)))
+
 (ert-deftest test-markdown-font-lock/url-face-with-comma-and-parenthesis ()
   "Test URL highlighting with comma and parenthesis.
 Detail: https://github.com/jrblevin/markdown-mode/issues/649"

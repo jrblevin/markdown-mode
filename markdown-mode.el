@@ -8383,14 +8383,15 @@ Translate filenames using `markdown-filename-translate-function'."
           (url-end (match-end 2)))
       (unless (or (markdown-in-inline-code-p url-start)
                   (markdown-in-inline-code-p url-end))
-        (let* (;; URI part
-               (up (list 'keymap markdown-mode-mouse-map
-                         'face 'markdown-plain-url-face
-                         'font-lock-multiline t)))
+        (let ((mp (append '(face markdown-markup-face) (cl-copy-list markdown--markup-props)))
+              ;; URI part
+              (up (list 'keymap markdown-mode-mouse-map
+                        'face 'markdown-plain-url-face
+                        'font-lock-multiline t)))
           (when markdown-mouse-follow-link
             (setq up (append up '(mouse-face markdown-highlight-face))))
           (dolist (g '(1 3))
-            (add-text-properties (match-beginning g) (match-end g) markdown--markup-props))
+            (add-text-properties (match-beginning g) (match-end g) mp))
           (add-text-properties url-start url-end up)
           t)))))
 

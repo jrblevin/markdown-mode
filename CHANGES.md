@@ -12,6 +12,7 @@
 *   Bug fixes:
     - `markdown-export` should not output stderr content to output file
     - Hide wikilink markup as part of `markdown-toggle-markup-hiding` [GH-847][]
+    - Angle URL fontify issue which was introduced by [GH-861][] [GH-895][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -19,8 +20,10 @@
     - Disable `imenu-submenus-on-top` by default [GH-882][]
 
   [gh-847]: https://github.com/jrblevin/markdown-mode/issues/847
+  [gh-861]: https://github.com/jrblevin/markdown-mode/pull/861
   [gh-882]: https://github.com/jrblevin/markdown-mode/issues/882
   [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
+  [gh-895]: https://github.com/jrblevin/markdown-mode/issues/895
 
 # Markdown Mode 2.7
 
