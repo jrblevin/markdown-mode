@@ -8250,9 +8250,30 @@ it exists."
         (message "Copied: %s" url)
         (kill-new url))))
 
+(defun markdown--collect-headings (&optional buffer)
+  "Return all headings within BUFFER in a list as targets."
+  (with-current-buffer (or buffer (current-buffer))
+    (let (targets)
+      (save-mark-and-excursion
+        (goto-char (point-min))
+        (while (re-search-forward markdown-regex-header (buffer-end 1) t)
+          (setq targets
+                (append targets
+                        (list (cons (match-string 5)
+                                    (match-beginning 5)))))))
+      targets)))
+
+(defun markdown-jump-to-heading (target)
+  "Push mark to current location and jump to TARGET."
+  (interactive (list (let ((targets (markdown--collect-headings)))
+                       (assoc (completing-read "Jump to target heading: " targets) targets))))
+  (let* ((pos (cdr target)))
+    (push-mark)
+    (goto-char pos)))
+
 (defun markdown--collect-targets (&optional buffer)
   "Return all headings within BUFFER in a list as targets."
-  (with-current-buffer (current-buffer)
+  (with-current-buffer (or buffer (current-buffer))
     (let (targets)
       (save-mark-and-excursion
         (goto-char (point-min))
