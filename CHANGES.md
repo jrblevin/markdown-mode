@@ -18,6 +18,7 @@
     - Support drag and drop features on Windows and multiple files' drag and drop
     - Added cmark and cmark-gfm to the markdown command list.
     - Disable `imenu-submenus-on-top` by default [GH-882][]
+    - Add $%*+/<=>_|&' to the markdown-mode syntax table as punctuation.
 
   [gh-847]: https://github.com/jrblevin/markdown-mode/issues/847
   [gh-861]: https://github.com/jrblevin/markdown-mode/pull/861
