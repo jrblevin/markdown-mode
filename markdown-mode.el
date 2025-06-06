@@ -10522,7 +10522,7 @@ rows and columns and the column alignment."
     (define-key map (kbd "SPC") #'scroll-up-command)
     (define-key map (kbd ">") #'end-of-buffer)
     (define-key map (kbd "<") #'beginning-of-buffer)
-    (define-key map (kbd "q") #'kill-this-buffer)
+    (define-key map (kbd "q") #'kill-current-buffer)
     (define-key map (kbd "?") #'describe-mode)
     map)
   "Keymap for `markdown-view-mode'.")
