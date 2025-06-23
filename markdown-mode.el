@@ -2612,7 +2612,11 @@ Return the point at the end when a list item was found at the
 original point.  If the point is not in a list item, do nothing."
   (let (indent)
     (forward-line)
-    (setq indent (current-indentation))
+    ;; #904 consider a space indentation and tab indentation case
+    (save-excursion
+      (let ((pos (point)))
+        (back-to-indentation)
+        (setq indent (- (point) pos))))
     (while
         (cond
          ;; Stop at end of the buffer.

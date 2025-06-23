@@ -13,6 +13,7 @@
     - `markdown-export` should not output stderr content to output file
     - Hide wikilink markup as part of `markdown-toggle-markup-hiding` [GH-847][]
     - Angle URL fontify issue which was introduced by [GH-861][] [GH-895][]
+    - Fix list item bound calculation when tab indentation is used [GH-904][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -25,6 +26,7 @@
   [gh-882]: https://github.com/jrblevin/markdown-mode/issues/882
   [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
   [gh-895]: https://github.com/jrblevin/markdown-mode/issues/895
+  [gh-904]: https://github.com/jrblevin/markdown-mode/issues/904
 
 # Markdown Mode 2.7
 
