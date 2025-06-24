@@ -4595,6 +4595,25 @@ puts 'hello, world'
     (forward-line)
     (should (markdown-cur-list-item-bounds))))
 
+(ert-deftest test-markdown-lists/bounds-3 ()
+  "Function `markdown-cur-list-item-bounds' with tab indentations.
+Detail: https://github.com/jrblevin/markdown-mode/issues/904"
+  ;; tab indentation
+  (markdown-test-string "- item
+\t- subitem1
+\t- subitem2"
+    (forward-line)
+    (let ((bounds (markdown-cur-list-item-bounds)))
+      (should (= (nth 1 bounds) 19))))
+
+  ;; space indentation
+  (markdown-test-string "- item
+    - subitem1
+    - subitem2"
+    (forward-line)
+    (let ((bounds (markdown-cur-list-item-bounds)))
+      (should (= (nth 1 bounds) 22)))))
+
 (ert-deftest test-markdown-lists/bounds-prev ()
   "Test list item bounds function `markdown-prev-list-item-bounds'."
   (markdown-test-file "lists.text"
