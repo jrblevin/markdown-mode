@@ -9201,7 +9201,7 @@ and disable otherwise."
     ("asymptote" . asy-mode) ("dot" . fundamental-mode) ("sqlite" . sql-mode)
     ("calc" . fundamental-mode) ("C" . c-mode) ("cpp" . c++-mode)
     ("C++" . c++-mode) ("screen" . shell-script-mode) ("shell" . sh-mode)
-    ("bash" . sh-mode))
+    ("bash" . sh-mode) ("php" . php-ts-mode))
   "Alist mapping languages to their major mode.
 The key is the language name, the value is the major mode.  For
 many languages this is simple, but for language where this is not
