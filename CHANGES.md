@@ -20,6 +20,7 @@
     - Added cmark and cmark-gfm to the markdown command list.
     - Disable `imenu-submenus-on-top` by default [GH-882][]
     - Add $%*+/<=>_|&' to the markdown-mode syntax table as punctuation.
+    * Add a mapping for `php` to `php-ts-mode` to the list of code block languages.
 
   [gh-847]: https://github.com/jrblevin/markdown-mode/issues/847
   [gh-861]: https://github.com/jrblevin/markdown-mode/pull/861
@@ -27,6 +28,7 @@
   [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
   [gh-895]: https://github.com/jrblevin/markdown-mode/issues/895
   [gh-904]: https://github.com/jrblevin/markdown-mode/issues/904
+  [gh-909]: https://github.com/jrblevin/markdown-mode/pull/909
 
 # Markdown Mode 2.7
 
