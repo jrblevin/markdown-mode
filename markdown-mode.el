@@ -187,12 +187,10 @@ fewer than six nested heading levels are used."
   :safe 'natnump
   :package-version '(markdown-mode . "2.4"))
 
-(defcustom markdown-asymmetric-header nil
+(defcustom markdown-asymmetric-header t
   "Determines if atx header style will be asymmetric.
 Set to a non-nil value to use asymmetric header styling, placing
-header markup only at the beginning of the line. By default,
-balanced markup will be inserted at the beginning and end of the
-line around the header title."
+header markup only at the beginning of the line."
   :group 'markdown
   :type 'boolean)
 
