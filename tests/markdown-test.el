@@ -589,93 +589,102 @@ When region starts/ends with spaces"
 
 (ert-deftest test-markdown-insertion/atx-line ()
   "Test ATX header insertion without region."
-  (markdown-test-string "line one\nline two\n"
-    (forward-word)
-    (markdown-insert-header-atx-1)
-    (should (= (point) 11))
-    (should (string-equal (buffer-substring (point-min) (point-max))
-                          "# line one #\n\nline two\n"))
-    (forward-line 2)
-    (markdown-insert-header-atx-2)
-    (should (= (point) 26))
-    (should (string-equal (buffer-substring (point-min) (point-max))
-                          "# line one #\n\n## line two ##\n\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "line one\nline two\n"
+      (forward-word)
+      (markdown-insert-header-atx-1)
+      (should (= (point) 11))
+      (should (string-equal (buffer-substring (point-min) (point-max))
+                            "# line one #\n\nline two\n"))
+      (forward-line 2)
+      (markdown-insert-header-atx-2)
+      (should (= (point) 26))
+      (should (string-equal (buffer-substring (point-min) (point-max))
+                            "# line one #\n\n## line two ##\n\n")))))
 
 (ert-deftest test-markdown-insertion/atx-region ()
   "Test ATX header insertion with region."
-  (markdown-test-string "line one\nline two\n"
-    (transient-mark-mode)
-    (forward-char 5)
-    (push-mark (point) t t)
-    (forward-word)
-    (should (string-equal (buffer-substring (region-beginning) (region-end))
-                          "one"))
-    (markdown-insert-header-atx-4)
-    (should (= (point) 16))
-    (should (string-equal (buffer-substring (point-min) (point-max))
-                          "line \n\n#### one ####\n\nline two\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "line one\nline two\n"
+      (transient-mark-mode)
+      (forward-char 5)
+      (push-mark (point) t t)
+      (forward-word)
+      (should (string-equal (buffer-substring (region-beginning) (region-end))
+                            "one"))
+      (markdown-insert-header-atx-4)
+      (should (= (point) 16))
+      (should (string-equal (buffer-substring (point-min) (point-max))
+                            "line \n\n#### one ####\n\nline two\n")))))
 
 (ert-deftest test-markdown-insertion/atx-blank ()
   "Test ATX header insertion on blank line."
-  (markdown-test-string "line one\n\nline two\n"
-    (forward-line)
-    (markdown-insert-header-atx-3)
-    (should (string-equal (buffer-substring (point-min) (point-max))
-                          "line one\n\n###  ###\n\nline two\n"))
-    (should (= (point) 15))
-    (should (looking-at " ###\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "line one\n\nline two\n"
+      (forward-line)
+      (markdown-insert-header-atx-3)
+      (should (string-equal (buffer-substring (point-min) (point-max))
+                            "line one\n\n###  ###\n\nline two\n"))
+      (should (= (point) 15))
+      (should (looking-at " ###\n")))))
 
 (ert-deftest test-markdown-insertion/atx-region-whitespace ()
   "Test ATX header insertion using a region with whitespace."
-  (markdown-test-string "  line one\n\nline two\n  \n"
-    (transient-mark-mode)
-    (push-mark (point) t t)
-    (goto-char (point-max))
-    (markdown-insert-header-atx-2)
-    (should (string-equal (buffer-substring (point-min) (point-max))
-                          "## line one line two ##"))
-    (should (= (point) 21))
-    (should (looking-at " ##"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "  line one\n\nline two\n  \n"
+      (transient-mark-mode)
+      (push-mark (point) t t)
+      (goto-char (point-max))
+      (markdown-insert-header-atx-2)
+      (should (string-equal (buffer-substring (point-min) (point-max))
+                            "## line one line two ##"))
+      (should (= (point) 21))
+      (should (looking-at " ##")))))
 
 (ert-deftest test-markdown-insertion/atx-line-whitespace ()
   "Test ATX header insertion using current line with whitespace."
-  (markdown-test-string "  line one  \n\nline two\n"
-    (goto-char (line-end-position))
-    (markdown-insert-header-atx-3)
-    (should (string-equal (buffer-substring (point-min) (point-max))
-                          "### line one ###\n\nline two\n"))
-    (should (= (point) 13))
-    (should (looking-at " ###\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "  line one  \n\nline two\n"
+      (goto-char (line-end-position))
+      (markdown-insert-header-atx-3)
+      (should (string-equal (buffer-substring (point-min) (point-max))
+                            "### line one ###\n\nline two\n"))
+      (should (= (point) 13))
+      (should (looking-at " ###\n")))))
 
 (ert-deftest test-markdown-insertion/atx-replace-atx ()
   "Test ATX header insertion when replacing an existing ATX header."
-  (markdown-test-string "## replace ##\n"
-    (markdown-insert-header-atx-4)
-    (should (string-equal (buffer-string) "#### replace ####\n\n"))
-    (should (looking-at " ####\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "## replace ##\n"
+      (markdown-insert-header-atx-4)
+      (should (string-equal (buffer-string) "#### replace ####\n\n"))
+      (should (looking-at " ####\n")))))
 
 (ert-deftest test-markdown-insertion/atx-replace-setext-1 ()
   "Test ATX header insertion when replacing an existing setext header."
-  (markdown-test-string "replace\n=======\n"
-    (markdown-insert-header-atx-2)
-    (should (string-equal (buffer-string) "## replace ##\n\n"))
-    (should (looking-at " ##\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "replace\n=======\n"
+      (markdown-insert-header-atx-2)
+      (should (string-equal (buffer-string) "## replace ##\n\n"))
+      (should (looking-at " ##\n")))))
 
 (ert-deftest test-markdown-insertion/atx-replace-setext-2 ()
   "Test ATX header insertion when replacing an existing setext header."
-  (markdown-test-string "replace\n-------\n"
-    (markdown-insert-header-atx-5)
-    (should (string-equal (buffer-string) "##### replace #####\n\n"))
-    (should (looking-at " #####\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "replace\n-------\n"
+      (markdown-insert-header-atx-5)
+      (should (string-equal (buffer-string) "##### replace #####\n\n"))
+      (should (looking-at " #####\n")))))
 
 (ert-deftest test-markdown-insertion/atx-asymmetric-point ()
   "Test point after ATX header insertion with `markdown-asymmetric-header'."
-  (markdown-test-string
-      "Test"
-    (let ((markdown-asymmetric-header t))
-      (markdown-insert-header-atx-5)
-      (should (= (point) 11))
-      (should (string-equal (buffer-string) "##### Test")))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string
+        "Test"
+      (let ((markdown-asymmetric-header t))
+        (markdown-insert-header-atx-5)
+        (should (= (point) 11))
+        (should (string-equal (buffer-string) "##### Test"))))))
 
 (ert-deftest test-markdown-insertion/setext-line ()
   "Test setext header insertion without region."
@@ -757,17 +766,18 @@ When region starts/ends with spaces"
 
 (ert-deftest test-markdown-insertion/header-dwim ()
   "Test 'do what I mean' header insertion."
-  (markdown-test-file "outline.text"
-    (call-interactively 'markdown-insert-header-dwim)
-    (should (looking-at " #$"))
-    (end-of-defun 2)
-    (call-interactively 'markdown-insert-header-dwim)
-    (beginning-of-line)
-    (should (looking-at "^#  #$"))
-    (end-of-defun 3)
-    (call-interactively 'markdown-insert-header-dwim)
-    (beginning-of-line)
-    (should (looking-at "^###  ###$"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-file "outline.text"
+      (call-interactively 'markdown-insert-header-dwim)
+      (should (looking-at " #$"))
+      (end-of-defun 2)
+      (call-interactively 'markdown-insert-header-dwim)
+      (beginning-of-line)
+      (should (looking-at "^#  #$"))
+      (end-of-defun 3)
+      (call-interactively 'markdown-insert-header-dwim)
+      (beginning-of-line)
+      (should (looking-at "^###  ###$")))))
 
 (ert-deftest test-markdown-insertion/header-dwim-prefix ()
   "Test 'do what I mean' header insertion with prefix arguments."
@@ -779,7 +789,8 @@ When region starts/ends with spaces"
                      '(5 . "##### abc #####")
                      '(6 . "###### abc ######")
                      '((4) . "# abc #")
-                     '((16) . "### abc ###"))))
+                     '((16) . "### abc ###")))
+        (markdown-asymmetric-header nil))
     (dolist (test tests)
       (markdown-test-string "## atx\n\nabc"
         (goto-char (point-max))
@@ -799,7 +810,8 @@ When region starts/ends with spaces"
                      '(5 . "##### abc #####")
                      '(6 . "###### abc ######")
                      '((4) . "abc\n===")
-                     '((16) . "### abc ###"))))
+                     '((16) . "### abc ###")))
+        (markdown-asymmetric-header nil))
     (dolist (test tests)
       (markdown-test-string "atx\n---\n\nabc"
         (goto-char (point-max))
@@ -1736,31 +1748,33 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-promote/atx-header ()
   "Test `markdown-promote' for atx headers."
-  (markdown-test-string "###### test ######"
-    (markdown-promote)
-    (should (string-equal (buffer-string) "##### test #####"))
-    (markdown-promote)
-    (should (string-equal (buffer-string) "#### test ####"))
-    (markdown-promote)
-    (should (string-equal (buffer-string) "### test ###"))
-    (markdown-promote)
-    (should (string-equal (buffer-string) "## test ##"))
-    (markdown-promote)
-    (should (string-equal (buffer-string) "# test #"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "###### test ######"
+      (markdown-promote)
+      (should (string-equal (buffer-string) "##### test #####"))
+      (markdown-promote)
+      (should (string-equal (buffer-string) "#### test ####"))
+      (markdown-promote)
+      (should (string-equal (buffer-string) "### test ###"))
+      (markdown-promote)
+      (should (string-equal (buffer-string) "## test ##"))
+      (markdown-promote)
+      (should (string-equal (buffer-string) "# test #")))))
 
 (ert-deftest test-markdown-demote/atx-header ()
   "Test `markdown-demote' for atx headers."
-  (markdown-test-string "# test #"
-    (markdown-demote)
-    (should (string-equal (buffer-string) "## test ##"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "### test ###"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "#### test ####"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "##### test #####"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "###### test ######"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "# test #"
+      (markdown-demote)
+      (should (string-equal (buffer-string) "## test ##"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "### test ###"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "#### test ####"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "##### test #####"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "###### test ######")))))
 
 (ert-deftest test-markdown-promote/setext-header ()
   "Test `markdown-promote' for setext headers."
@@ -1770,17 +1784,18 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-demote/setext-header ()
   "Test `markdown-demote' for setext headers."
-  (markdown-test-string "test\n===="
-    (markdown-demote)
-    (should (string-equal (buffer-string) "test\n----"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "### test ###"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "#### test ####"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "##### test #####"))
-    (markdown-demote)
-    (should (string-equal (buffer-string) "###### test ######"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "test\n===="
+      (markdown-demote)
+      (should (string-equal (buffer-string) "test\n----"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "### test ###"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "#### test ####"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "##### test #####"))
+      (markdown-demote)
+      (should (string-equal (buffer-string) "###### test ######")))))
 
 (ert-deftest test-markdown-promote/hr ()
   "Test `markdown-promote' for horizontal rules."
@@ -1824,43 +1839,46 @@ the opening bracket of [^2], and then subsequent functions would kill [^2])."
 
 (ert-deftest test-markdown-subtree/promote ()
   "Test `markdown-promote-subtree'."
-  (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
-    ;; The first h1 should get promoted away.
-    ;; The second h1 should not be promoted.
-    (markdown-promote-subtree)
-    (should (string-equal (buffer-string) "h1\n\n# h2 #\n\n## h3 ##\n\n# h2 #\n\n# h1 #\n"))
-    ;; Second call should do nothing since point is no longer at a heading.
-    (markdown-promote-subtree)
-    (should (string-equal (buffer-string) "h1\n\n# h2 #\n\n## h3 ##\n\n# h2 #\n\n# h1 #\n"))
-    ;; Move to h2 and promote again.
-    (forward-line 2)
-    (markdown-promote-subtree)
-    (should (string-equal (buffer-string) "h1\n\nh2\n\n# h3 #\n\n# h2 #\n\n# h1 #\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
+      ;; The first h1 should get promoted away.
+      ;; The second h1 should not be promoted.
+      (markdown-promote-subtree)
+      (should (string-equal (buffer-string) "h1\n\n# h2 #\n\n## h3 ##\n\n# h2 #\n\n# h1 #\n"))
+      ;; Second call should do nothing since point is no longer at a heading.
+      (markdown-promote-subtree)
+      (should (string-equal (buffer-string) "h1\n\n# h2 #\n\n## h3 ##\n\n# h2 #\n\n# h1 #\n"))
+      ;; Move to h2 and promote again.
+      (forward-line 2)
+      (markdown-promote-subtree)
+      (should (string-equal (buffer-string) "h1\n\nh2\n\n# h3 #\n\n# h2 #\n\n# h1 #\n")))))
 
 (ert-deftest test-markdown-subtree/promote-single-section ()
   "Test `markdown-promote-subtree' on a single or last section.
 Should not cause an infinite loop."
-  (markdown-test-string "foo\n\n## h2 ##\n\nbar\n"
-    ;; The h2 should get promoted to h1 away.
-    (markdown-test-goto-heading "h2")
-    (markdown-promote-subtree)
-    (should (string-equal (buffer-string) "foo\n\n# h2 #\n\nbar\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "foo\n\n## h2 ##\n\nbar\n"
+      ;; The h2 should get promoted to h1 away.
+      (markdown-test-goto-heading "h2")
+      (markdown-promote-subtree)
+      (should (string-equal (buffer-string) "foo\n\n# h2 #\n\nbar\n")))))
 
 (ert-deftest test-markdown-subtree/demote ()
   "Test `markdown-demote-subtree'."
-  (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
-    ;; The second h1 should not be demoted
-    (markdown-demote-subtree)
-    (should (string-equal (buffer-string) "## h1 ##\n\n### h2 ###\n\n#### h3 ####\n\n### h2 ###\n\n# h1 #\n"))
-    (markdown-demote-subtree)
-    (should (string-equal (buffer-string) "### h1 ###\n\n#### h2 ####\n\n##### h3 #####\n\n#### h2 ####\n\n# h1 #\n"))
-    (markdown-demote-subtree)
-    (should (string-equal (buffer-string) "#### h1 ####\n\n##### h2 #####\n\n###### h3 ######\n\n##### h2 #####\n\n# h1 #\n"))
-    ;; Stop demoting at level six
-    (markdown-demote-subtree)
-    (should (string-equal (buffer-string) "##### h1 #####\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))
-    (markdown-demote-subtree)
-    (should (string-equal (buffer-string) "###### h1 ######\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "# h1 #\n\n## h2 ##\n\n### h3 ###\n\n## h2 ##\n\n# h1 #\n"
+      ;; The second h1 should not be demoted
+      (markdown-demote-subtree)
+      (should (string-equal (buffer-string) "## h1 ##\n\n### h2 ###\n\n#### h3 ####\n\n### h2 ###\n\n# h1 #\n"))
+      (markdown-demote-subtree)
+      (should (string-equal (buffer-string) "### h1 ###\n\n#### h2 ####\n\n##### h3 #####\n\n#### h2 ####\n\n# h1 #\n"))
+      (markdown-demote-subtree)
+      (should (string-equal (buffer-string) "#### h1 ####\n\n##### h2 #####\n\n###### h3 ######\n\n##### h2 #####\n\n# h1 #\n"))
+      ;; Stop demoting at level six
+      (markdown-demote-subtree)
+      (should (string-equal (buffer-string) "##### h1 #####\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n"))
+      (markdown-demote-subtree)
+      (should (string-equal (buffer-string) "###### h1 ######\n\n###### h2 ######\n\n###### h3 ######\n\n###### h2 ######\n\n# h1 #\n")))))
 
 (ert-deftest test-markdown-subtree/move-up ()
   "Test `markdown-move-subtree-up'."
@@ -1924,35 +1942,50 @@ Should not cause an infinite loop."
 
 (ert-deftest test-markdown-cycle/atx-header ()
   "Test `markdown-demote' cycling for atx headers."
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "# test"
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "## test ##"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "### test ###"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "#### test ####"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "##### test #####"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "###### test ######"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "###### test ######"))))
   (markdown-test-string "# test"
     (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "## test ##"))
+    (should (string-equal (buffer-string) "## test"))
     (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "### test ###"))
+    (should (string-equal (buffer-string) "### test"))
     (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "#### test ####"))
+    (should (string-equal (buffer-string) "#### test"))
     (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "##### test #####"))
+    (should (string-equal (buffer-string) "##### test"))
     (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "###### test ######"))
+    (should (string-equal (buffer-string) "###### test"))
     (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "###### test ######"))))
+    (should (string-equal (buffer-string) "###### test"))))
 
 (ert-deftest test-markdown-cycle/setext-header ()
   "Test `markdown-demote' cycling for setext headers."
-  (markdown-test-string "test\n===="
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "test\n----"))
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "### test ###"))
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "#### test ####"))
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "##### test #####"))
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "###### test ######"))
-    (call-interactively 'markdown-demote)
-    (should (string-equal (buffer-string) "###### test ######"))))
+  (let ((markdown-asymmetric-header nil))
+    (markdown-test-string "test\n===="
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "test\n----"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "### test ###"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "#### test ####"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "##### test #####"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "###### test ######"))
+      (call-interactively 'markdown-demote)
+      (should (string-equal (buffer-string) "###### test ######")))))
 
 (ert-deftest test-markdown-cycle/hr ()
   "Test cycling of horizontal rules."

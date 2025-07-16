@@ -4,6 +4,7 @@
 
 *   **Breaking changes:**
     - GNU Emacs 28.1 or later is required.
+    - Default value of `markdown-asymmetric-header` is `t` [GH-910][]
 
 *   New Features:
     - Introduce `markdown-yank-dnd-method` what action to perform on the dropped files
@@ -27,6 +28,7 @@
   [gh-891]: https://github.com/jrblevin/markdown-mode/issues/891
   [gh-895]: https://github.com/jrblevin/markdown-mode/issues/895
   [gh-904]: https://github.com/jrblevin/markdown-mode/issues/904
+  [gh-910]: https://github.com/jrblevin/markdown-mode/issues/910
 
 # Markdown Mode 2.7
 
