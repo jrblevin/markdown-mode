@@ -2904,7 +2904,8 @@ data.  See `markdown-inline-code-at-point-p' for inline code."
 (defun markdown-heading-at-point (&optional pos)
   "Return non-nil if there is a heading at the POS.
 Set match data for `markdown-regex-header'."
-  (let ((match-data (get-text-property (or pos (point)) 'markdown-heading)))
+  (let* ((p (or pos (if (and (eolp) (>= (point) 2)) (1- (point)) (point))))
+         (match-data (get-text-property p 'markdown-heading)))
     (when match-data
       (set-match-data match-data)
       t)))
