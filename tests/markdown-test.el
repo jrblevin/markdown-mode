@@ -4398,7 +4398,11 @@ x: x
       (forward-line -1)
       (should (markdown-heading-at-point))
       (should (equal (match-data t) (get-text-property (point) 'markdown-heading)))
-      (should (equal (match-data t) (get-text-property (point) 'markdown-heading-1-setext))))))
+      (should (equal (match-data t) (get-text-property (point) 'markdown-heading-1-setext))))
+    ;; Detail: https://github.com/jrblevin/markdown-mode/issues/912
+    (markdown-test-string "# header\nsection"
+      (goto-char (line-end-position))
+      (should (markdown-heading-at-point)))))
 
 (ert-deftest test-markdown-parsing/inline-link-in-code-block ()
   "Test `markdown-match-generic-links'."

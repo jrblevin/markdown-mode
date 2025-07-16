@@ -15,6 +15,7 @@
     - Hide wikilink markup as part of `markdown-toggle-markup-hiding` [GH-847][]
     - Angle URL fontify issue which was introduced by [GH-861][] [GH-895][]
     - Fix list item bound calculation when tab indentation is used [GH-904][]
+    - Fix `markdown-heading-at-point` at the end of line [GH-912][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -29,6 +30,7 @@
   [gh-895]: https://github.com/jrblevin/markdown-mode/issues/895
   [gh-904]: https://github.com/jrblevin/markdown-mode/issues/904
   [gh-910]: https://github.com/jrblevin/markdown-mode/issues/910
+  [gh-912]: https://github.com/jrblevin/markdown-mode/issues/912
 
 # Markdown Mode 2.7
 
