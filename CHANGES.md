@@ -22,6 +22,7 @@
     - Added cmark and cmark-gfm to the markdown command list.
     - Disable `imenu-submenus-on-top` by default [GH-882][]
     - Add $%*+/<=>_|&' to the markdown-mode syntax table as punctuation.
+    - Preserve the cursor position when entering and exiting `markdown-edit-code-block`.
 
   [gh-847]: https://github.com/jrblevin/markdown-mode/issues/847
   [gh-861]: https://github.com/jrblevin/markdown-mode/pull/861
