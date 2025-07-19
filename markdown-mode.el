@@ -9331,7 +9331,7 @@ position."
 (defvar-local markdown--edit-indirect-committed-position nil)
 
 (defun markdown--edit-indirect-save-committed-position ()
-  "Set where editing is committed to a local variable in the parent buffer."
+  "Save where editing is committed in a local variable in the parent buffer."
   (if-let* ((parent-buffer (overlay-buffer edit-indirect--overlay))
             ((with-current-buffer parent-buffer
                (derived-mode-p 'markdown-mode)))
@@ -9343,7 +9343,7 @@ position."
   (advice-add #'edit-indirect--commit :after #'markdown--edit-indirect-save-committed-position))
 
 (defun markdown--edit-indirect-move-to-committed-position ()
-  "Move the point in the code block corresponding to the saved committed position'."
+  "Move the point in the code block corresponding to the saved committed position."
   (when-let* ((pos markdown--edit-indirect-committed-position)
               (bounds (markdown-get-enclosing-fenced-block-construct))
               (fence-begin (nth 0 bounds)))
