@@ -9331,7 +9331,7 @@ position."
 (defvar-local markdown--edit-indirect-committed-position nil)
 
 (defun markdown--edit-indirect-save-committed-position ()
-  "Set where editing is committed to a local variable in the parent buffer."
+  "Save where editing is committed in a local variable in the parent buffer."
   (if-let* ((parent-buffer (overlay-buffer edit-indirect--overlay))
             ((with-current-buffer parent-buffer
                (derived-mode-p 'markdown-mode)))
@@ -9343,7 +9343,7 @@ position."
   (advice-add #'edit-indirect--commit :after #'markdown--edit-indirect-save-committed-position))
 
 (defun markdown--edit-indirect-move-to-committed-position ()
-  "Move the point in the code block corresponding to the saved committed position'."
+  "Move the point in the code block corresponding to the saved committed position."
   (when-let* ((pos markdown--edit-indirect-committed-position)
               (bounds (markdown-get-enclosing-fenced-block-construct))
               (fence-begin (nth 0 bounds)))
@@ -9378,13 +9378,14 @@ at the END of code blocks."
     (if (fboundp 'edit-indirect-region)
         (if-let* ((bounds (markdown-get-enclosing-fenced-block-construct))
                   (fence-begin (nth 0 bounds))
-                  (fence-end (nth 1 bounds))
-                  (original-point (point))
-                  (original-column (current-column))
-                  (begin (progn (goto-char fence-begin) (line-beginning-position 2)))
-                  (end (progn (goto-char fence-end) (line-beginning-position 1)))
-                  (original-line (- (line-number-at-pos original-point) (line-number-at-pos begin))))
-            (let* ((indentation (progn (goto-char fence-begin) (current-indentation)))
+                  (fence-end (nth 1 bounds)))
+            (let* ((original-line (line-number-at-pos))
+                   (original-column (current-column))
+                   (begin (progn (goto-char fence-begin) (line-beginning-position 2)))
+                   (line (max 0 (- original-line (line-number-at-pos) 1)))
+                   (indentation (current-indentation))
+                   (column (max 0 (- original-column indentation)))
+                   (end (progn (goto-char fence-end) (line-beginning-position 1)))
                    (lang (markdown-code-block-lang))
                    (mode (or (and lang (markdown-get-lang-mode lang))
                              markdown-edit-code-block-default-mode))
@@ -9404,8 +9405,8 @@ at the END of code blocks."
                 (when (> indentation 0) ;; un-indent in edit-indirect buffer
                   (indent-rigidly (point-min) (point-max) (- indentation)))
                 (goto-char (point-min))
-                (forward-line (max 0 original-line))
-                (move-to-column (max 0 (- original-column indentation)))))
+                (forward-line line)
+                (move-to-column column)))
           (user-error "Not inside a GFM or tilde fenced code block"))
       (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
         (package-refresh-contents)
