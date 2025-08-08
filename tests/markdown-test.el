@@ -3188,7 +3188,15 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/409"
     (markdown-test-range-has-face 2 24 'markdown-link-face)
     (markdown-test-range-has-face 25 26 'markdown-markup-face)
     (markdown-test-range-has-face 27 40 'markdown-url-face)
-    (markdown-test-range-has-face 41 41 'markdown-markup-face)))
+    (markdown-test-range-has-face 41 41 'markdown-markup-face))
+
+  ;; https://github.com/jrblevin/markdown-mode/issues/917
+  (markdown-test-string "[(foo](http://foo.com)"
+    (markdown-test-range-has-face 1 1 'markdown-markup-face)
+    (markdown-test-range-has-face 2 5 'markdown-link-face)
+    (markdown-test-range-has-face 6 7 'markdown-markup-face)
+    (markdown-test-range-has-face 8 21 'markdown-url-face)
+    (markdown-test-range-has-face 22 22 'markdown-markup-face)))
 
 (ert-deftest test-markdown-font-lock/pre-comment ()
   "Test comments inside of a pre block."
