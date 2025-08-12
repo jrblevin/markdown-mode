@@ -16,6 +16,7 @@
     - Angle URL fontify issue which was introduced by [GH-861][] [GH-895][]
     - Fix list item bound calculation when tab indentation is used [GH-904][]
     - Fix `markdown-heading-at-point` at the end of line [GH-912][]
+    - Catch an exception when `scan-sexp` fails [GH-917][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -32,6 +33,7 @@
   [gh-904]: https://github.com/jrblevin/markdown-mode/issues/904
   [gh-910]: https://github.com/jrblevin/markdown-mode/issues/910
   [gh-912]: https://github.com/jrblevin/markdown-mode/issues/912
+  [gh-917]: https://github.com/jrblevin/markdown-mode/issues/917
 
 # Markdown Mode 2.7
 
