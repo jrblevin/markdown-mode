@@ -5703,6 +5703,16 @@ A link can contain spaces if it is wrapped with angle brackets"
   (markdown-test-string "[text](<bar%20baz.md>)"
     (should (equal (nth 3 (markdown-link-at-pos (point))) "bar baz.md"))))
 
+(ert-deftest test-markdown-link/inline-link-with-percent-encoded-characters ()
+  "Test URL decoding in `markdown-link-at-pos'.
+It should decode only control characters and spaces in URL according
+to CommonMark specification.
+
+Details: https://github.com/jrblevin/markdown-mode/issues/921"
+
+  (markdown-test-string "[text](bar%2F%30baz.md)"
+    (should (string= (nth 3 (markdown-link-at-pos (point))) "bar%2F%30baz.md"))))
+
 (ert-deftest test-markdown-link/reference-link-at-pos ()
   "Test `markdown-link-at-pos' return values with a reference link."
   (markdown-test-string "[text][ref]"

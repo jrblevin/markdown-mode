@@ -17,6 +17,7 @@
     - Fix list item bound calculation when tab indentation is used [GH-904][]
     - Fix `markdown-heading-at-point` at the end of line [GH-912][]
     - Catch an exception when `scan-sexp` fails [GH-917][]
+    - `markdown-link-at-pos` should decode both control characters and spaces [GH-921][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -34,6 +35,7 @@
   [gh-910]: https://github.com/jrblevin/markdown-mode/issues/910
   [gh-912]: https://github.com/jrblevin/markdown-mode/issues/912
   [gh-917]: https://github.com/jrblevin/markdown-mode/issues/917
+  [gh-921]: https://github.com/jrblevin/markdown-mode/issues/921
 
 # Markdown Mode 2.7
 
