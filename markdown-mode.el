@@ -7729,6 +7729,16 @@ or remove markup."
 
 ;;; Commands ==================================================================
 
+(defun markdown--replace-rel2abs (output-buffer-name)
+  "Convert relative image URLs to absolute paths in OUTPUT-BUFFER-NAME."
+  (let ((buf (get-buffer-create output-buffer-name))
+        (base-path default-directory))
+    (with-current-buffer buf
+      (goto-char (point-min))
+      (while (re-search-forward "<img src=\"\\(\\.[^\"]+\\)" nil t)
+        (let ((arbitrary-name (match-string 1)))
+          (replace-match (concat "<img src=\"" (expand-file-name arbitrary-name base-path) nil nil)))))))
+
 (defun markdown (&optional output-buffer-name)
   "Run `markdown-command' on buffer, sending output to OUTPUT-BUFFER-NAME.
 The output buffer name defaults to `markdown-output-buffer-name'.
@@ -7790,6 +7800,7 @@ Return the name of the output buffer used."
         (unless (eq exit-code 0)
           (user-error "%s failed with exit code %s"
                       markdown-command exit-code))))
+    (markdown--replace-rel2abs output-buffer-name)
     output-buffer-name))
 
 (defun markdown-standalone (&optional output-buffer-name)
