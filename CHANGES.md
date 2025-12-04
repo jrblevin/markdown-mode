@@ -18,6 +18,7 @@
     - Fix `markdown-heading-at-point` at the end of line [GH-912][]
     - Catch an exception when `scan-sexp` fails [GH-917][]
     - `markdown-link-at-pos` should decode both control characters and spaces [GH-921][]
+    - `markdown-table-align` now aligns centered cells
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
