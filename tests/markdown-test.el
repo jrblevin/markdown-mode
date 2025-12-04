@@ -7750,7 +7750,7 @@ title: asdasdasd
     (search-forward "A")
     (markdown-table-align)
     (should (string= (buffer-string) "
-| A   | B    | C     |      D |
+| A   | B    |   C   |      D |
 |-----|:-----|:-----:|-------:|
 | aaa | bbbb | ccccc | dddddd |
 "))))
@@ -7765,7 +7765,7 @@ title: asdasdasd
     (search-forward "A")
     (markdown-table-align)
     (should (string= (buffer-string) "
-| A   | B    | C     |      D |
+| A   | B    |   C   |      D |
 |-----|:-----|:-----:|-------:|
 | aaa | bbbb | ccccc | dddddd |
 "))))
