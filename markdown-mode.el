@@ -1694,7 +1694,7 @@ MIDDLE-BEGIN is the start of the \"middle\" section of the block."
       (put-text-property close-begin close-end
                          (cl-cadadr fence-spec) close-data))))
 
-(defun markdown--triple-quote-single-line-p (begin)
+(defun markdown--code-fence-single-line-p (begin)
   (save-excursion
     (goto-char begin)
     (save-match-data
@@ -1756,7 +1756,7 @@ start which was previously propertized."
                    0)))
                (prop (cl-cadar correct-entry)))
           (when (or (not (eq prop 'markdown-gfm-block-begin))
-                    (not (markdown--triple-quote-single-line-p block-start)))
+                    (not (markdown--code-fence-single-line-p block-start)))
             ;; get correct match data
             (save-excursion
               (beginning-of-line)
