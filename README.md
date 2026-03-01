@@ -1005,6 +1005,24 @@ either via customize or by placing `(setq markdown-enable-math t)`
 in `.emacs`, and then restarting Emacs or calling
 `markdown-reload-extensions`.
 
+### markdown-indent-mode
+
+`markdown-indent-mode` is a minor mode that provides dynamic virtual
+indentation for Markdown buffers, similar to `org-indent-mode` in Org
+mode. When enabled, content under headings is visually indented
+according to heading level, and leading hash symbols are hidden so
+only the last `#` is visible. Indentation is display-only: the actual
+buffer content is not modified.
+
+To enable it automatically for all Markdown buffers:
+
+```emacs-lisp
+(add-hook 'markdown-mode-hook 'markdown-indent-mode)
+```
+
+Open this `README.md` in Emacs with `markdown-indent-mode` enabled to
+see it in action.
+
 ## GitHub Flavored Markdown (GFM)
 
 A [GitHub Flavored Markdown][GFM] mode, `gfm-mode`, is also

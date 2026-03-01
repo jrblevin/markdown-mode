@@ -10,6 +10,7 @@
     - Introduce `markdown-yank-dnd-method` what action to perform on the dropped files
       like `org-mode`.
     - Add `.mdx` to `auto-mode-alist` [GH-930][]
+    - Add `markdown-indent-mode` [GH-679][]
 
 *   Bug fixes:
     - `markdown-export` should not output stderr content to output file

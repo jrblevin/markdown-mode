@@ -13,6 +13,7 @@ TEST_HTML = $(TEST_SRCS:.text=.html)
 test: compile-all checkdoc
 	$(EMACS) -Q --batch \
 	    -l ert -l ../markdown-mode.elc -l markdown-test.elc \
+	    -l ../markdown-indent.elc -l markdown-indent-test.elc \
 	    --eval '(ert-run-tests-batch-and-exit $(SELECTOR))'
 
 checkdoc:
@@ -24,6 +25,10 @@ compile-all:
 	    --eval '(setq byte-compile-error-on-warn t)' \
 	    -l ../markdown-mode.el \
 	    -f batch-byte-compile ../markdown-mode.el markdown-test.el
+	$(EMACS) -Q --batch \
+	    --eval '(setq byte-compile-error-on-warn t)' \
+	    -l ../markdown-indent.el \
+	    -f batch-byte-compile ../markdown-indent.el markdown-indent-test.el
 
 html: $(TEST_HTML)
 
