@@ -21,6 +21,7 @@
     - `markdown-link-at-pos` should decode both control characters and spaces [GH-921][]
     - `markdown-table-align` now aligns centered cells
     - Fix highlightings of inline code or bold in strike-through  [GH-926][]
+    - Fix fence code block highlighting that uses more than 3 backticks [GH-933][]
 
 *   Improvements:
     - Support drag and drop features on Windows and multiple files' drag and drop
@@ -41,6 +42,7 @@
   [gh-921]: https://github.com/jrblevin/markdown-mode/issues/921
   [gh-926]: https://github.com/jrblevin/markdown-mode/issues/926
   [gh-930]: https://github.com/jrblevin/markdown-mode/issues/930
+  [gh-933]: https://github.com/jrblevin/markdown-mode/issues/933
 
 # Markdown Mode 2.7
 
