@@ -4125,6 +4125,64 @@ echo hey
     (should (equal (markdown-code-block-at-pos 34) '(1 35)))
     (should (equal (markdown-code-block-at-pos 35) nil))))
 
+(ert-deftest test-markdown-parsing/code-block-at-pos-gfm-fenced-4-backticks ()
+  "Ensure `markdown-code-block-at-pos' works with 4-backtick fenced blocks."
+  (markdown-test-string
+      "```` markdown
+# Not a heading
+```
+inner
+```
+````"
+    (should (markdown-code-block-at-pos 1))
+    ;; Inside the block, on the "# Not a heading" line
+    (should (markdown-code-block-at-pos 15))
+    ;; On the inner ``` line — should still be inside the outer block
+    (should (markdown-code-block-at-pos 33))
+    ;; After the closing ```` — should not be in a code block
+    (should-not (markdown-code-block-at-pos (point-max)))))
+
+(ert-deftest test-markdown-parsing/code-block-at-pos-gfm-fenced-5-backticks ()
+  "Ensure `markdown-code-block-at-pos' works with 5-backtick fenced blocks."
+  (markdown-test-string
+      "````` text
+# Not a heading
+`````"
+    (should (markdown-code-block-at-pos 1))
+    (should (markdown-code-block-at-pos 12))
+    (should-not (markdown-code-block-at-pos (point-max)))))
+
+(ert-deftest test-markdown-outline/heading-in-4-backtick-code-block ()
+  "Headers inside 4+ backtick code blocks should not be outline headings.
+See GitHub issue jrblevin/markdown-mode#932."
+  (markdown-test-string-gfm
+      "# Real heading
+
+```` markdown
+# Not a heading
+```
+inner block
+```
+````
+
+## Another real heading
+"
+    ;; The 4-backtick block should be detected as a code block
+    (should (markdown-code-block-at-pos 35))
+    ;; Navigate forward through headings — the fake heading should be skipped
+    (goto-char (point-min))
+    (markdown-next-visible-heading 1)
+    (should (looking-at "^## Another real heading"))))
+
+(ert-deftest test-markdown-font-lock/gfm-code-block-4-backticks ()
+  "Test font-lock for 4-backtick GFM code blocks."
+  (markdown-test-string-gfm
+      "```` markdown
+code line
+````"
+    ;; The code line should have markdown-pre-face
+    (markdown-test-range-has-face 15 23 'markdown-pre-face)))
+
 (ert-deftest test-markdown-parsing/code-block-at-pos-yaml-metadata ()
   "Ensure `markdown-code-block-at-pos' works in YAML metadata blocks."
   (let ((markdown-use-pandoc-style-yaml-metadata t))
