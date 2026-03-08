@@ -1,7 +1,5 @@
 # Markdown Mode 2.8
 
-*Under development*
-
 *   **Breaking changes:**
     - GNU Emacs 28.1 or later is required.
     - Default value of `markdown-asymmetric-header` is `t` [GH-910][]

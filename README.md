@@ -13,15 +13,15 @@
   [leanpub-badge]: https://img.shields.io/badge/leanpub-guide-orange.svg
 
 markdown-mode is a major mode for editing [Markdown][]-formatted
-text.  The latest stable version is markdown-mode 2.6, released on
-Aug 30, 2023.  See the [release notes][] for details.
+text.  The latest stable version is markdown-mode 2.8, released on
+Mar 8, 2026.  See the [release notes][] for details.
 markdown-mode is free software, licensed under the GNU GPL,
 version 3 or later.
 
 ![Markdown Mode Screenshot](https://jblevins.org/projects/markdown-mode/screenshots/20170818-001.png)
 
 [Markdown]: http://daringfireball.net/projects/markdown/
-[release notes]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.6
+[release notes]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.8
 
 ## Documentation
 
@@ -113,7 +113,7 @@ to load automatically by adding the following to your init file:
   (define-key markdown-mode-map (kbd "C-c C-e") #'markdown-do))
 ```
 
-[markdown-mode.el]: https://raw.githubusercontent.com/jrblevin/markdown-mode/v2.6/markdown-mode.el
+[markdown-mode.el]: https://raw.githubusercontent.com/jrblevin/markdown-mode/v2.8/markdown-mode.el
 
 **Development Version**
 
@@ -1139,6 +1139,7 @@ first version was released on May 24, 2007.
   * 2022-02-12: [Version 2.5][]
   * 2023-08-30: [Version 2.6][]
   * 2025-02-26: [Version 2.7][]
+  * 2026-03-08: [Version 2.8][]
 
 [Version 1.1]: https://jblevins.org/projects/markdown-mode/rev-1-1
 [Version 1.2]: https://jblevins.org/projects/markdown-mode/rev-1-2
@@ -1158,3 +1159,4 @@ first version was released on May 24, 2007.
 [Version 2.5]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.5
 [Version 2.6]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.6
 [Version 2.7]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.7
+[Version 2.8]: https://github.com/jrblevin/markdown-mode/releases/tag/v2.8
