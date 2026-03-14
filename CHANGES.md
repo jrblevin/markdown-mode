@@ -8,6 +8,8 @@
 
 *   Bug fixes:
 
+*   Improvements:
+    - `markdown-preview` displays the buffer name as the page title
 
 # Markdown Mode 2.8
 
