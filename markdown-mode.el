@@ -9776,7 +9776,7 @@ This function assumes point is on a table."
        (setq fmt (car fmtspec) fmtspec (cdr fmtspec))
        (setq width (car widths) widths (cdr widths))
        (if (equal fmt 'c)
-           (setq cell (concat (make-string (/ (- width (length cell)) 2) ?\s) cell)))
+           (setq cell (concat (make-string (/ (- width (markdown--string-width cell)) 2) ?\s) cell)))
        (unless (equal fmt 'r) (setq width (- width)))
        (format (format " %%%ds " width) cell))
      cells "|")))
