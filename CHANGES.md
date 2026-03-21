@@ -7,9 +7,12 @@
 *   New Features:
 
 *   Bug fixes:
+    - `markdown-table-align` now handles fullwidth characters correctly [gh-937][]
 
 *   Improvements:
     - `markdown-preview` displays the buffer name as the page title
+
+  [gh-937]: https://github.com/jrblevin/markdown-mode/pull/937
 
 # Markdown Mode 2.8
 

@@ -7836,6 +7836,21 @@ title: asdasdasd
 | aaa | bbbb | ccccc | dddddd |
 "))))
 
+(ert-deftest test-markdown-table/align-with-fullwidth-characters ()
+  "Test table realignment width fullwidth characters"
+  (markdown-test-string "
+| あ | い | う | え |
+|-|:-|:-:|-:|
+| あああ | いいいい | ううううう | えええええ |
+"
+    (search-forward "あ")
+    (markdown-table-align)
+    (should (string= (buffer-string) "
+| あ     | い       |     う     |         え |
+|--------|:---------|:----------:|-----------:|
+| あああ | いいいい | ううううう | えええええ |
+"))))
+
 (ert-deftest test-markdown-table/align-with-seperator-in-inline-code ()
   "Test table realignment when separator is in inline code.
 Detail: https://github.com/jrblevin/markdown-mode/issues/817"
