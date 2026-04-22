@@ -6296,6 +6296,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/kill-buffer-nil ()
   "Test `markdown-export-kill-buffer' equal to nil."
+  (skip-unless (executable-find markdown-command))
   (markdown-test-temp-file "inline.text"
     (let* ((markdown-export-kill-buffer nil)
            (markdown-command #'markdown-command-identity)
@@ -6306,6 +6307,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/kill-buffer-t ()
   "Test `markdown-export-kill-buffer' equal to t."
+  (skip-unless (executable-find markdown-command))
   (markdown-test-temp-file "inline.text"
     (let* ((markdown-export-kill-buffer t)
            (markdown-command #'markdown-command-identity)
@@ -6316,6 +6318,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/body-preamble ()
   "Test `markdown-xhtml-body-preamble'."
+  (skip-unless (executable-find markdown-command))
   (markdown-test-temp-file "inline.text"
     (let* ((str "<!-- body preamble test -->")
            (markdown-xhtml-body-preamble str)
@@ -6331,6 +6334,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/body-epilogue ()
   "Test `markdown-xhtml-body-epilogue'."
+  (skip-unless (executable-find markdown-command))
   (markdown-test-temp-file "inline.text"
     (let* ((str "<!-- body epilogue test -->")
            (markdown-xhtml-body-epilogue str)
@@ -6346,6 +6350,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/url-css-path ()
   "Test `markdown-css-paths' as URL."
+  (skip-unless (executable-find markdown-command))
   (let ((markdown-css-paths '("http://www.example.com/style.css")))
     (markdown-test-temp-file "inline.text"
       (let* ((markdown-export-kill-buffer nil)
@@ -6359,6 +6364,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/buffer-local-css-path ()
   "Test buffer local `markdown-css-paths'"
+  (skip-unless (executable-find markdown-command))
   (let ((markdown-css-paths '("/global.css")))
     (markdown-test-temp-file "inline.text"
       (setq-local markdown-css-paths '("/local.css"))
@@ -6373,6 +6379,7 @@ bar baz"
 
 (ert-deftest test-markdown-export/relative-css-path ()
   "Test relative `markdown-css-paths'."
+  (skip-unless (executable-find markdown-command))
   (let ((markdown-css-paths '("./style.css")))
     (markdown-test-temp-file "inline.text"
       (let* ((markdown-export-kill-buffer nil)
@@ -6389,6 +6396,7 @@ bar baz"
 
 (ert-deftest test-markdown-hook/before-export ()
   "Test hook run before export XHTML."
+  (skip-unless (executable-find markdown-command))
   (markdown-test-temp-file "lists.text"
     (let* ((before-hook-run nil)
            (orig-point (point))
@@ -6424,6 +6432,7 @@ bar baz"
 
 (ert-deftest test-markdown-hook/after-export ()
   "Test hook run after export XHTML."
+  (skip-unless (executable-find markdown-command))
   (markdown-test-temp-file "lists.text"
     (let* ((after-hook-run nil)
            (markdown-command #'markdown-command-identity)
