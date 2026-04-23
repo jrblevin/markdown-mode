@@ -12,6 +12,7 @@
 *   Improvements:
     - `markdown-preview` displays the buffer name as the page title
     - skip export tests if export command is not installed
+    - reduce memory allocations in property checking functions
 
   [gh-937]: https://github.com/jrblevin/markdown-mode/pull/937
 

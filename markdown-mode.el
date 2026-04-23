@@ -2930,22 +2930,24 @@ This may be useful for tables and Pandoc's line_blocks extension."
   "Return t if PROP from BEGIN to END is equal to one of the given PROP-VALUES.
 Also returns t if PROP is a list containing one of the PROP-VALUES.
 Return nil otherwise."
-  (let (props)
-    (catch 'found
-      (dolist (loc (number-sequence begin end))
-        (when (setq props (get-text-property loc prop))
-          (cond ((listp props)
-                 ;; props is a list, check for membership
-                 (dolist (val prop-values)
-                   (when (memq val props) (throw 'found loc))))
-                (t
-                 ;; props is a scalar, check for equality
-                 (dolist (val prop-values)
-                   (when (eq val props) (throw 'found loc))))))))))
+  (catch 'found
+    (cl-loop
+     with props = nil
+     for loc from begin to end
+     do
+     (when (setq props (get-text-property loc prop))
+       (cond ((listp props)
+              ;; props is a list, check for membership
+              (dolist (val prop-values)
+                (when (memq val props) (throw 'found loc))))
+             (t
+              ;; props is a scalar, check for equality
+              (dolist (val prop-values)
+                (when (eq val props) (throw 'found loc)))))))))
 
 (defun markdown-range-properties-exist (begin end props)
   (cl-loop
-   for loc in (number-sequence begin end)
+   for loc from begin to end
    with result = nil
    while (not
           (setq result
