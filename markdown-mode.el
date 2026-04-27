@@ -7512,8 +7512,11 @@ demote."
 (defun markdown-outline-up ()
   "Move to previous list item, when in a list, or previous heading."
   (interactive)
-  (unless (markdown-up-list)
-    (markdown-up-heading 1)))
+  (if (markdown-cur-list-item-bounds)
+      (unless (markdown-up-list)
+	(markdown-back-to-heading))
+      (markdown-up-heading 1)
+    ))
 
 
 ;;; Marking and Narrowing =====================================================
