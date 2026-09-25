@@ -360,6 +360,27 @@ be used."
           (repeat :tag "List of possible definition list characters" character))
   :package-version '(markdown-mode . "2.3"))
 
+(defcustom markdown-gfm-callout-note-icon
+  "󰋽"
+  "Note icon")
+
+(defcustom markdown-gfm-callout-tip-icon
+  ""
+  "Tip icon")
+
+(defcustom markdown-gfm-callout-important-icon
+  "󰅾"
+  "Important icon")
+
+(defcustom markdown-gfm-callout-warning-icon
+  ""
+  "Warning icon")
+
+(defcustom markdown-gfm-callout-caution-icon
+  "󰳦"
+  "Note icon")
+
+
 (defcustom markdown-enable-math nil
   "Syntax highlighting for inline LaTeX and itex expressions.
 Set this to a non-nil value to turn on math support by default.
@@ -924,6 +945,19 @@ Group 1 matches the leading angle bracket.
 Group 2 matches the separating whitespace.
 Group 3 matches the text.")
 
+(defconst markdown-regex-gfm-callout
+  "^[ \t]*\\(?1:>\\) \\(?2:\\[!\\)\\(?3:NOTE\\|TIP\\|IMPORTANT\\|WARNING\\|CAUTION\\)\\(?4:\\]\\)[ \t]*\n[ \t]*\\(?5:>\\) \\(?6:[^\n]*[ \t]*\\)\n"
+  "Regular expression for matching GFM callouts blocks.
+Also accounts for a potential capital letter preceding the angle
+bracket, for use with Leanpub blocks (asides, warnings, info
+blocks, etc.).
+Group 1 matches the leading angle bracket
+Group 2 matches the callout type opening
+Group 3 matches the callout type
+Group 4 matches the callout type closing
+Group 5 matches the next line angle bracket
+Group 6 matches the text.")
+
 (defconst markdown-regex-line-break
   "[^ \n\t][ \t]*\\(  \\)\n"
   "Regular expression for matching line breaks.")
@@ -1162,6 +1196,7 @@ Group 4 matches the text inside the delimiters.")
         'markdown-list-item nil
         'markdown-pre nil
         'markdown-blockquote nil
+        'markdown-gfm-callout nil
         'markdown-hr nil
         'markdown-comment nil
         'markdown-heading nil
@@ -1793,6 +1828,16 @@ start which was previously propertized."
                          'markdown-blockquote
                          (match-data t)))))
 
+(defun markdown-syntax-propertize-gfm-callouts (start end)
+  "Match blockquotes from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (and (re-search-forward markdown-regex-gfm-callout end t)
+                (not (markdown-code-block-at-pos (match-beginning 0))))
+      (put-text-property (match-beginning 0) (match-end 0)
+                         'markdown-gfm-callout
+                         (match-data t)))))
+
 (defun markdown-syntax-propertize-hrs (start end)
   "Match horizontal rules from START to END."
   (save-excursion
@@ -1886,6 +1931,7 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-list-items start end)
       (markdown-syntax-propertize-pre-blocks start end)
       (markdown-syntax-propertize-blockquotes start end)
+      (markdown-syntax-propertize-gfm-callouts start end)
       (markdown-syntax-propertize-headings start end)
       (markdown-syntax-propertize-hrs start end)
       (markdown-syntax-propertize-comments start end))))
@@ -2001,6 +2047,43 @@ See `markdown-hide-markup' for additional details."
 (defface markdown-blockquote-face
   '((t (:inherit font-lock-doc-face)))
   "Face for blockquote sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-face
+  '((t (:inherit font-lock-doc-face)))
+  "Face for GFM callout sections."
+  :group 'markdown-faces)
+
+
+(defface markdown-gfm-callout-note-face
+  '((((background light)) :foreground "#0969da")
+    (((background dark)) :foreground "#478be6"))
+  "Face for GFM note callout sections."
+  :group 'markdown-faces)
+
+
+(defface markdown-gfm-callout-tip-face
+  '((((background light)) :foreground "#1a7f37")
+    (((background dark)) :foreground "#57ab5a"))
+  "Face for GFM tip callout sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-important-face
+  '((((background light)) :foreground "#8250df")
+    (((background dark)) :foreground "#986ee2"))
+  "Face for GFM important callout sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-warning-face
+  '((((background light)) :foreground "#9a6700")
+    (((background dark)) :foreground "#c69026"))
+  "Face for GFM warning callout sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-caution-face
+  '((((background light)) :foreground "#d1242f")
+    (((background dark)) :foreground "#e5534b"))
+  "Face for GFM caution callout sections."
   :group 'markdown-faces)
 
 (defface markdown-code-face
@@ -2352,7 +2435,8 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-sub-superscripts)
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
-    (markdown-fontify-blockquotes))
+    (markdown-fontify-blockquotes)
+    (markdown-fontify-gfm-callouts))
   "Syntax highlighting for Markdown files.")
 
 ;; Footnotes
@@ -3241,6 +3325,12 @@ Use data stored in \\='markdown-blockquote text property during syntax
 analysis."
   (markdown-match-propertized-text 'markdown-blockquote last))
 
+(defun markdown-match-gfm-callouts (last)
+  "Match blockquotes from point to LAST.
+Use data stored in \\='markdown-blockquote text property during syntax
+analysis."
+  (markdown-match-propertized-text 'markdown-gfm-callout last))
+
 (defun markdown-match-hr (last)
   "Match horizontal rules comments from the point to LAST."
   (markdown-match-propertized-text 'markdown-hr last))
@@ -3691,6 +3781,52 @@ regardless of what is hidden before them."
          `(face markdown-markup-face)))
       (font-lock-append-text-property
        (match-beginning 0) (match-end 0) 'face 'markdown-blockquote-face)
+      t)))
+
+
+(defun markdown-fontify-gfm-callouts (last)
+  "Apply font-lock properties to blockquotes from point to LAST."
+  (when (markdown-match-gfm-callouts last)
+    (let* ((display-string
+            (markdown--first-displayable markdown-blockquote-display-char))
+           (callout-level (downcase (match-string 3)))
+           (callout-title (capitalize callout-level))
+           (callout-face
+            (intern (format "markdown-gfm-callout-%s-face" callout-level)))
+           (callout-icon
+            (symbol-value
+             (intern (format "markdown-gfm-callout-%s-icon" callout-level))))
+           (callout-prefix
+            (if (string-empty-p callout-icon)
+                "" (format "%s " callout-icon))))
+
+      (add-text-properties
+       (match-beginning 1) (match-end 1)
+       (if markdown-hide-markup
+           `(face ,callout-face display ,display-string)
+         `(face ,callout-face)))
+      (add-text-properties
+       (match-beginning 2) (match-end 2)
+       (if markdown-hide-markup
+           `(face ,callout-face display ,callout-prefix)
+         `(face markdown-markup-face)))
+      (add-text-properties
+       (match-beginning 3) (match-end 3)
+       (if markdown-hide-markup
+           `(face ,callout-face display ,callout-title)
+         `(face ,callout-face)))
+      (add-text-properties
+       (match-beginning 4) (match-end 4)
+       (if markdown-hide-markup
+           `(display "")
+         `(face markdown-markup-face)))
+      (add-text-properties
+       (match-beginning 5) (match-end 5)
+       (if markdown-hide-markup
+           `(face ,callout-face display ,display-string)
+         `(face ,callout-face)))
+      (font-lock-append-text-property
+       (match-beginning 0) (match-end 0) 'face 'markdown-gfm-callout-face)
       t)))
 
 (defun markdown-fontify-list-items (last)
