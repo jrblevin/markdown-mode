@@ -5042,6 +5042,69 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/392"
 
 ;;; Outline minor mode tests:
 
+(ert-deftest test-markdown-outline/navigation-pulse ()
+  "Pulse destination items and subtrees without changing navigation results."
+  (dolist (mode '(markdown-mode gfm-mode markdown-view-mode gfm-view-mode))
+    (dolist (text '("# Parent\n\n## First\n\nfirst body\n\n## Second\n\nsecond body\n\n# End\n"
+                    "Parent\n======\n\nFirst\n-----\n\nfirst body\n\nSecond\n------\n\nsecond body\n\nEnd\n===\n"
+                    "- Parent\n    - First\n      first body\n    - Second\n      second body\n\nOutside\n"))
+      (dolist (case '((markdown-outline-next "Parent" "First" "first body")
+                      (markdown-outline-previous "Second" "First" "first body")
+                      (markdown-outline-next-same-level "First" "Second" "second body")
+                      (markdown-outline-previous-same-level "Second" "First" "first body")
+                      (markdown-outline-up "First" "Parent" "second body")))
+        (markdown-test-string-mode mode text
+          (let* ((command (nth 0 case))
+                 (start (progn (search-forward (nth 1 case))
+                               (line-beginning-position)))
+                 (begin (save-excursion
+                          (goto-char (point-min))
+                          (search-forward (nth 2 case))
+                          (line-beginning-position)))
+                 (end (save-excursion
+                        (goto-char begin)
+                        (search-forward (nth 3 case))
+                        (point)))
+                 (original (buffer-string))
+                 pulses result destination matches)
+            (cl-letf (((symbol-function 'pulse-momentary-highlight-region)
+                       (lambda (beg end &optional _face)
+                         (push (list beg end) pulses)
+                         ;; The pulse must not disturb navigation state.
+                         (goto-char (point-max))
+                         (set-match-data nil))))
+              (goto-char start)
+              (let ((markdown-enable-outline-pulse nil))
+                (setq result (funcall command)
+                      destination (point)
+                      matches (match-data t)))
+              (should-not pulses)
+              (goto-char start)
+              (let ((markdown-enable-outline-pulse t))
+                (should (equal (funcall command) result)))
+              (should (= (point) destination))
+              (should (equal (match-data t) matches))
+              (should (equal pulses (list (list begin end))))
+              (should (equal (buffer-string) original)))))))))
+
+(ert-deftest test-markdown-outline/navigation-pulse-boundaries ()
+  "Do not pulse when navigation fails or does not reach an entry."
+  (markdown-test-string-view "# Only\n\nbody\n"
+    (let ((markdown-enable-outline-pulse t)
+          pulses)
+      (cl-letf (((symbol-function 'pulse-momentary-highlight-region)
+                 (lambda (&rest args) (push args pulses))))
+        ;; Reaching the end of the buffer does not select a heading.
+        (markdown-outline-next)
+        (should (eobp))
+        (should-not pulses)
+        ;; Staying at the end of the buffer should not pulse either.
+        (markdown-outline-next)
+        (should-not pulses)
+        (goto-char (point-min))
+        (should-error (markdown-outline-up) :type 'error)
+        (should-not pulses)))))
+
 (ert-deftest test-markdown-outline/navigation ()
   "Test outline navigation functions."
   (markdown-test-file "outline.text"

@@ -508,6 +508,12 @@ prefix.  The most commonly used commands are described below.
     list items at the same level as the one at the point.  Finally,
     <kbd>C-c C-u</kbd> will move up to the parent heading or list item.
 
+    Set `markdown-enable-outline-pulse` to `t` to briefly highlight the
+    destination list item or heading subtree after these commands move
+    point. This is disabled by default and also applies to the
+    <kbd>n</kbd>, <kbd>p</kbd>, <kbd>f</kbd>, <kbd>b</kbd>, and <kbd>u</kbd>
+    navigation keys in viewing modes.
+
   * Movement by Markdown paragraph: <kbd>M-{</kbd>, <kbd>M-}</kbd>, and <kbd>M-h</kbd>
 
     Paragraphs in `markdown-mode` are regular paragraphs,

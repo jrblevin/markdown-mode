@@ -35,6 +35,7 @@
 
 (require 'easymenu)
 (require 'outline)
+(require 'pulse)
 (require 'thingatpt)
 (require 'cl-lib)
 (require 'url-parse)
@@ -491,6 +492,17 @@ While nil, always uses '1.' for the marker"
   :group 'markdown
   :type 'boolean
   :package-version '(markdown-mode . "2.5"))
+
+(defcustom markdown-enable-outline-pulse nil
+  "Non-nil means pulse the destination after outline navigation.
+Highlight the destination list item or heading subtree after
+`markdown-outline-next', `markdown-outline-previous',
+`markdown-outline-next-same-level', `markdown-outline-previous-same-level',
+or `markdown-outline-up' moves point.  This also applies in viewing modes."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.9"))
 
 (defcustom markdown-nested-imenu-heading-index t
   "Use nested or flat imenu heading index.
@@ -7512,43 +7524,78 @@ demote."
   (interactive)
   (outline-move-subtree-down 1))
 
+(defun markdown--pulse-outline-entry (previous-point)
+  "Pulse the destination of outline navigation from PREVIOUS-POINT.
+Do nothing unless `markdown-enable-outline-pulse' is non-nil and
+point moved to a list item or heading.  Preserve point and match data."
+  (when (and markdown-enable-outline-pulse (/= (point) previous-point))
+    (save-excursion
+      (save-match-data
+        (let* ((begin (line-beginning-position))
+               (bounds (markdown-cur-list-item-bounds))
+               (end (cond (bounds (cadr bounds))
+                          ((markdown-heading-at-point)
+                           (markdown-end-of-subtree t)))))
+          (when (and end (> end begin))
+            (pulse-momentary-highlight-region begin end)))))))
+
 (defun markdown-outline-next ()
-  "Move to next list item, when in a list, or next visible heading."
+  "Move to next list item, when in a list, or next visible heading.
+Pulse the destination when `markdown-enable-outline-pulse' is non-nil."
   (interactive)
-  (let ((bounds (markdown-next-list-item-bounds)))
-    (if bounds
-        (goto-char (nth 0 bounds))
-      (markdown-next-visible-heading 1))))
+  (let ((previous-point (point)))
+    (prog1
+        (let ((bounds (markdown-next-list-item-bounds)))
+          (if bounds
+              (goto-char (nth 0 bounds))
+            (markdown-next-visible-heading 1)))
+      (markdown--pulse-outline-entry previous-point))))
 
 (defun markdown-outline-previous ()
-  "Move to previous list item, when in a list, or previous visible heading."
+  "Move to previous list item, when in a list, or previous visible heading.
+Pulse the destination when `markdown-enable-outline-pulse' is non-nil."
   (interactive)
-  (let ((bounds (markdown-prev-list-item-bounds)))
-    (if bounds
-        (goto-char (nth 0 bounds))
-      (markdown-previous-visible-heading 1))))
+  (let ((previous-point (point)))
+    (prog1
+        (let ((bounds (markdown-prev-list-item-bounds)))
+          (if bounds
+              (goto-char (nth 0 bounds))
+            (markdown-previous-visible-heading 1)))
+      (markdown--pulse-outline-entry previous-point))))
 
 (defun markdown-outline-next-same-level ()
-  "Move to next list item or heading of same level."
+  "Move to next list item or heading of same level.
+Pulse the destination when `markdown-enable-outline-pulse' is non-nil."
   (interactive)
-  (let ((bounds (markdown-cur-list-item-bounds)))
-    (if bounds
-        (markdown-next-list-item (nth 3 bounds))
-      (markdown-forward-same-level 1))))
+  (let ((previous-point (point)))
+    (prog1
+        (let ((bounds (markdown-cur-list-item-bounds)))
+          (if bounds
+              (markdown-next-list-item (nth 3 bounds))
+            (markdown-forward-same-level 1)))
+      (markdown--pulse-outline-entry previous-point))))
 
 (defun markdown-outline-previous-same-level ()
-  "Move to previous list item or heading of same level."
+  "Move to previous list item or heading of same level.
+Pulse the destination when `markdown-enable-outline-pulse' is non-nil."
   (interactive)
-  (let ((bounds (markdown-cur-list-item-bounds)))
-    (if bounds
-        (markdown-prev-list-item (nth 3 bounds))
-      (markdown-backward-same-level 1))))
+  (let ((previous-point (point)))
+    (prog1
+        (let ((bounds (markdown-cur-list-item-bounds)))
+          (if bounds
+              (markdown-prev-list-item (nth 3 bounds))
+            (markdown-backward-same-level 1)))
+      (markdown--pulse-outline-entry previous-point))))
 
 (defun markdown-outline-up ()
-  "Move to previous list item, when in a list, or previous heading."
+  "Move to previous list item, when in a list, or previous heading.
+Pulse the destination when `markdown-enable-outline-pulse' is non-nil."
   (interactive)
-  (unless (markdown-up-list)
-    (markdown-up-heading 1)))
+  (let ((previous-point (point)))
+    (prog1
+        (unless (markdown-up-list)
+          (markdown-up-heading 1))
+      (markdown--pulse-outline-entry previous-point))))
 
 
 ;;; Marking and Narrowing =====================================================
