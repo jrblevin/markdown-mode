@@ -10,6 +10,7 @@
     - `markdown-table-align` now handles fullwidth characters correctly [gh-937][]
     - Bold, italic, and other inline constructs spanning a line break are
       now fontified when `jit-lock` fontifies the buffer in chunks
+    - Do not create the checkbox button multiple times [gh-953][]
 
 *   Improvements:
     - Tables aligned in the source stay visually aligned when markup
@@ -20,6 +21,7 @@
     - improve performance to check properties in range by using c functions
 
   [gh-937]: https://github.com/jrblevin/markdown-mode/pull/937
+  [gh-953]: https://github.com/jrblevin/markdown-mode/issues/953
 
 # Markdown Mode 2.8
 

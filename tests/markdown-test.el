@@ -4957,6 +4957,37 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/904"
     (should (string-equal (markdown-toggle-gfm-checkbox) "[x]"))
     (should (string-equal (buffer-string) "   -   [x] GFM task list item"))))
 
+(ert-deftest test-markdown-lists/create-checkbox-button-once ()
+  "Test for not creating same buttons.
+Detail: https://github.com/jrblevin/markdown-mode/issues/953"
+  (cl-flet ((checkbox-buttons ()
+              (cl-loop for ov in (overlays-in (point-min) (point-max))
+                       when (and (overlay-get ov 'button)
+                                 (eq (overlay-get ov 'type) 'markdown-gfm-checkbox-button))
+                       collect ov)))
+    (markdown-test-string "- [X] test"
+      ;; Rescan directly
+      (markdown-make-gfm-checkboxes-buttons (point-min) (point-max))
+      (markdown-make-gfm-checkboxes-buttons (point-min) (point-max))
+      (should (= (length (checkbox-buttons)) 1))
+      ;; Rescan via `after-change-functions' by typing
+      (goto-char (point-max))
+      (dotimes (_ 10)
+        (insert "a"))
+      (should (= (length (checkbox-buttons)) 1))
+      ;; Rescan via `after-change-functions' by changing text properties
+      (dotimes (_ 10)
+        (put-text-property (point-min) (point-max) 'foo 'bar))
+      (should (= (length (checkbox-buttons)) 1))
+      ;; Stale button whose range differs from the checkbox is removed
+      (make-button (+ (point-min) 2) (+ (point-min) 4)
+                   :type 'markdown-gfm-checkbox-button)
+      (markdown-make-gfm-checkboxes-buttons (point-min) (point-max))
+      (let ((buttons (checkbox-buttons)))
+        (should (= (length buttons) 1))
+        (should (= (overlay-start (car buttons)) (+ (point-min) 2)))
+        (should (= (overlay-end (car buttons)) (+ (point-min) 5)))))))
+
 (ert-deftest test-markdown-lists/clean-list-numbers ()
   "Test for `markdown-cleanup-list-numbers'.
 Detail: https://github.com/jrblevin/markdown-mode/issues/392"
