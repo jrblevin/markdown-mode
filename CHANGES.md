@@ -13,6 +13,8 @@
     - Do not create the checkbox button multiple times [gh-953][]
 
 *   Improvements:
+    - Avoid unnecessary tree-sitter grammar checks when resolving fenced
+      code block languages [gh-955][]
     - Tables aligned in the source stay visually aligned when markup
       hiding or URL hiding narrows the displayed cell contents
     - `markdown-preview` displays the buffer name as the page title
@@ -22,6 +24,7 @@
 
   [gh-937]: https://github.com/jrblevin/markdown-mode/pull/937
   [gh-953]: https://github.com/jrblevin/markdown-mode/issues/953
+  [gh-955]: https://github.com/jrblevin/markdown-mode/issues/955
 
 # Markdown Mode 2.8
 

@@ -9305,18 +9305,24 @@ mode to use is `tuareg-mode'."
 (defun markdown-get-lang-mode (lang)
   "Return major mode that should be used for LANG.
 LANG is a string, and the returned major mode is a symbol."
-  (cl-find-if
-   #'markdown--lang-mode-predicate
-   (nconc (list (cdr (assoc lang markdown-code-lang-modes))
-                (cdr (assoc (downcase lang) markdown-code-lang-modes)))
-          (and (fboundp 'treesit-language-available-p)
-               (list (and (treesit-language-available-p (intern lang))
-                          (intern (concat lang "-ts-mode")))
-                     (and (treesit-language-available-p (intern (downcase lang)))
-                          (intern (concat (downcase lang) "-ts-mode")))))
-          (list
-           (intern (concat lang "-mode"))
-           (intern (concat (downcase lang) "-mode"))))))
+  (let ((down (downcase lang)))
+    (or
+     (cl-find-if #'markdown--lang-mode-predicate
+                 (list (cdr (assoc lang markdown-code-lang-modes))
+                       (cdr (assoc down markdown-code-lang-modes))))
+     ;; Only probe grammars when an eligible tree-sitter mode could win.
+     ;; Avoid caching so newly installed grammars and mode mappings take
+     ;; effect immediately.
+     (and (fboundp 'treesit-language-available-p)
+          (cl-loop for name in (if (equal lang down) (list lang)
+                                (list lang down))
+                   for mode = (intern (concat name "-ts-mode"))
+                   when (and (markdown--lang-mode-predicate mode)
+                             (treesit-language-available-p (intern name)))
+                   return mode))
+     (cl-find-if #'markdown--lang-mode-predicate
+                 (list (intern (concat lang "-mode"))
+                       (intern (concat down "-mode")))))))
 
 (defun markdown--lang-mode-predicate (mode)
   (and mode
