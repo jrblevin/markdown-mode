@@ -4599,6 +4599,98 @@ Details: https://github.com/jrblevin/markdown-mode/issues/787"
     (let ((major-mode-remap-alist '((python-mode . python-ts-mode))))
       (should (eq (markdown-get-lang-mode "python") 'python-ts-mode)))))
 
+(ert-deftest test-markdown-parsing/get-lang-mode-explicit-mapping-no-probes ()
+  "Resolve explicit mappings without probing tree-sitter grammars."
+  (let ((markdown-code-lang-modes '(("Elisp" . text-mode)
+                                   ("elisp" . emacs-lisp-mode))))
+    (cl-letf (((symbol-function 'treesit-language-available-p)
+               (lambda (&rest _) (ert-fail "Unnecessary grammar probe"))))
+      (should (eq (markdown-get-lang-mode "Elisp") 'text-mode))
+      (should (eq (markdown-get-lang-mode "ELISP") 'emacs-lisp-mode)))))
+
+(ert-deftest test-markdown-parsing/get-lang-mode-probe-only-eligible-modes ()
+  "Avoid grammar checks for undefined or unconfigured modes."
+  (let ((markdown-code-lang-modes nil)
+        (auto-mode-alist nil)
+        (major-mode-remap-alist nil))
+    (cl-letf (((symbol-function 'markdown-test-language-ts-mode) #'ignore)
+              ((symbol-function 'markdown-test-language-mode) #'ignore)
+              ((symbol-function 'treesit-language-available-p)
+               (lambda (&rest _) (ert-fail "Ineligible grammar probe"))))
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'markdown-test-language-mode))
+      (should-not (markdown-get-lang-mode "markdown-test-undefined")))))
+
+(ert-deftest test-markdown-parsing/get-lang-mode-one-probe-per-language ()
+  "Probe a lowercase language only once, retaining ordinary fallback."
+  (let ((markdown-code-lang-modes nil)
+        (auto-mode-alist nil)
+        (major-mode-remap-alist
+         '((markdown-test-language-mode . markdown-test-language-ts-mode)))
+        probes)
+    (cl-letf (((symbol-function 'markdown-test-language-ts-mode) #'ignore)
+              ((symbol-function 'markdown-test-language-mode) #'ignore)
+              ((symbol-function 'treesit-language-available-p)
+               (lambda (lang &rest _) (push lang probes) nil)))
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'markdown-test-language-mode))
+      (should (equal probes '(markdown-test-language))))))
+
+(ert-deftest test-markdown-parsing/get-lang-mode-case-sensitive-ts-priority ()
+  "Try eligible tree-sitter modes in original then lowercase order."
+  (let ((markdown-code-lang-modes nil)
+        (auto-mode-alist '(("first" . Markdown-test-ts-mode)
+                           ("second" . markdown-test-ts-mode)))
+        (major-mode-remap-alist nil)
+        probes
+        available)
+    (cl-letf (((symbol-function 'Markdown-test-ts-mode) #'ignore)
+              ((symbol-function 'markdown-test-ts-mode) #'ignore)
+              ((symbol-function 'treesit-language-available-p)
+               (lambda (lang &rest _)
+                 (push lang probes)
+                 (memq lang available))))
+      (setq available '(Markdown-test markdown-test))
+      (should (eq (markdown-get-lang-mode "Markdown-test")
+                  'Markdown-test-ts-mode))
+      (should (equal probes '(Markdown-test)))
+      (setq probes nil available '(markdown-test))
+      (should (eq (markdown-get-lang-mode "Markdown-test")
+                  'markdown-test-ts-mode))
+      (should (equal (reverse probes) '(Markdown-test markdown-test))))))
+
+(ert-deftest test-markdown-parsing/get-lang-mode-observes-runtime-changes ()
+  "Honor grammar availability and mapping changes without stale caches."
+  (let ((markdown-code-lang-modes nil)
+        (auto-mode-alist nil)
+        (major-mode-remap-alist
+         '((markdown-test-language-mode . markdown-test-language-ts-mode)))
+        available)
+    (cl-letf (((symbol-function 'markdown-test-language-ts-mode) #'ignore)
+              ((symbol-function 'markdown-test-language-mode) #'ignore)
+              ((symbol-function 'treesit-language-available-p)
+               (lambda (&rest _) available)))
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'markdown-test-language-mode))
+      (setq available t)
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'markdown-test-language-ts-mode))
+      (setq major-mode-remap-alist nil)
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'markdown-test-language-mode))
+      (setq auto-mode-alist '(("test" . markdown-test-language-ts-mode)))
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'markdown-test-language-ts-mode))
+      (setq markdown-code-lang-modes '(("markdown-test-language" . text-mode)))
+      (should (eq (markdown-get-lang-mode "markdown-test-language")
+                  'text-mode)))))
+
+(ert-deftest test-markdown-parsing/get-lang-mode-no-treesit ()
+  "Resolve conventional modes on builds without tree-sitter."
+  (let ((markdown-code-lang-modes nil))
+    (cl-letf (((symbol-function 'treesit-language-available-p) nil))
+      (should (eq (markdown-get-lang-mode "emacs-lisp") 'emacs-lisp-mode)))))
+
 (ert-deftest test-markdown-parsing/code-block-lang-period ()
   "Test `markdown-code-block-lang' when language name begins with a period."
   (markdown-test-string "~~~ { .ruby }
