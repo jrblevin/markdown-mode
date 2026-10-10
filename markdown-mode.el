@@ -6,7 +6,7 @@
 ;; Author: Jason R. Blevins <jblevins@xbeta.org>
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
-;; Version: 2.9-alpha
+;; Version: 2.10
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
@@ -64,7 +64,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.8-alpha"
+(defconst markdown-mode-version "2.10"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
@@ -359,6 +359,27 @@ be used."
           (character :tag "Single definition list character")
           (repeat :tag "List of possible definition list characters" character))
   :package-version '(markdown-mode . "2.3"))
+
+(defcustom markdown-gfm-callout-note-icon
+  "󰋽"
+  "Note icon")
+
+(defcustom markdown-gfm-callout-tip-icon
+  ""
+  "Tip icon")
+
+(defcustom markdown-gfm-callout-important-icon
+  "󰅾"
+  "Important icon")
+
+(defcustom markdown-gfm-callout-warning-icon
+  ""
+  "Warning icon")
+
+(defcustom markdown-gfm-callout-caution-icon
+  "󰳦"
+  "Note icon")
+
 
 (defcustom markdown-enable-math nil
   "Syntax highlighting for inline LaTeX and itex expressions.
@@ -924,6 +945,15 @@ Group 1 matches the leading angle bracket.
 Group 2 matches the separating whitespace.
 Group 3 matches the text.")
 
+(defconst markdown-regex-gfm-callout
+  "^[ \t]*> \\(?1:\\[!\\)\\(?2:NOTE\\|TIP\\|IMPORTANT\\|WARNING\\|CAUTION\\)\\(?3:\\]\\)[ \t]*\n\\([ \t]*> [^\n]*[ \t]*\n\\)*"
+  "Regular expression for matching GFM callouts blocks.
+Also accounts for a potential capital letter preceding the angle
+bracket, for use with Leanpub blocks (asides, warnings, info
+blocks, etc.).
+Groups 1 and 3 match the opening and closing brackets around callout type
+Group 2 matches the callout type.")
+
 (defconst markdown-regex-line-break
   "[^ \n\t][ \t]*\\(  \\)\n"
   "Regular expression for matching line breaks.")
@@ -1139,7 +1169,7 @@ Group 3 matches all attributes and whitespace following the tag name.")
 
 (defconst markdown-regex-highlighting
   "\\(?1:^\\|[^\\]\\)\\(?2:\\(?3:==\\)\\(?4:[^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(?5:==\\)\\)"
-"Regular expression for matching highlighting text.
+  "Regular expression for matching highlighting text.
 Group 1 matches the character before the opening equal, if any,
 ensuring that it is not a backslash escape.
 Group 2 matches the entire expression, including delimiters.
@@ -1162,6 +1192,7 @@ Group 4 matches the text inside the delimiters.")
         'markdown-list-item nil
         'markdown-pre nil
         'markdown-blockquote nil
+        'markdown-gfm-callout nil
         'markdown-hr nil
         'markdown-comment nil
         'markdown-heading nil
@@ -1793,6 +1824,16 @@ start which was previously propertized."
                          'markdown-blockquote
                          (match-data t)))))
 
+(defun markdown-syntax-propertize-gfm-callouts (start end)
+  "Match blockquotes from START to END."
+  (save-excursion
+    (goto-char start)
+    (while (and (re-search-forward markdown-regex-gfm-callout end t)
+                (not (markdown-code-block-at-pos (match-beginning 0))))
+      (put-text-property (match-beginning 0) (match-end 0)
+                         'markdown-gfm-callout
+                         (match-data t)))))
+
 (defun markdown-syntax-propertize-hrs (start end)
   "Match horizontal rules from START to END."
   (save-excursion
@@ -1886,6 +1927,7 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-list-items start end)
       (markdown-syntax-propertize-pre-blocks start end)
       (markdown-syntax-propertize-blockquotes start end)
+      (markdown-syntax-propertize-gfm-callouts start end)
       (markdown-syntax-propertize-headings start end)
       (markdown-syntax-propertize-hrs start end)
       (markdown-syntax-propertize-comments start end))))
@@ -2001,6 +2043,43 @@ See `markdown-hide-markup' for additional details."
 (defface markdown-blockquote-face
   '((t (:inherit font-lock-doc-face)))
   "Face for blockquote sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-face
+  '((t (:inherit font-lock-doc-face)))
+  "Face for GFM callout sections."
+  :group 'markdown-faces)
+
+
+(defface markdown-gfm-callout-note-face
+  '((((background light)) :foreground "#0969da")
+    (((background dark)) :foreground "#478be6"))
+  "Face for GFM note callout sections."
+  :group 'markdown-faces)
+
+
+(defface markdown-gfm-callout-tip-face
+  '((((background light)) :foreground "#1a7f37")
+    (((background dark)) :foreground "#57ab5a"))
+  "Face for GFM tip callout sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-important-face
+  '((((background light)) :foreground "#8250df")
+    (((background dark)) :foreground "#986ee2"))
+  "Face for GFM important callout sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-warning-face
+  '((((background light)) :foreground "#9a6700")
+    (((background dark)) :foreground "#c69026"))
+  "Face for GFM warning callout sections."
+  :group 'markdown-faces)
+
+(defface markdown-gfm-callout-caution-face
+  '((((background light)) :foreground "#d1242f")
+    (((background dark)) :foreground "#e5534b"))
+  "Face for GFM caution callout sections."
   :group 'markdown-faces)
 
 (defface markdown-code-face
@@ -2187,7 +2266,7 @@ Used when `markdown-header-scaling' is non-nil."
 (defface markdown-header-face
   `((t (:inherit (,@(when markdown-header-scaling '(variable-pitch))
                   font-lock-function-name-face)
-        :weight bold)))
+                 :weight bold)))
   "Base face for headers.")
 
 (markdown--dotimes-when-compile (num 6)
@@ -2195,10 +2274,10 @@ Used when `markdown-header-scaling' is non-nil."
          (face-name (intern (format "markdown-header-face-%s" num1))))
     `(defface ,face-name
        (,'\` ((t (:inherit markdown-header-face
-                  :height
-                  (,'\, (if markdown-header-scaling
-                            (float (nth ,num markdown-header-scaling-values))
-                          1.0))))))
+                           :height
+                           (,'\, (if markdown-header-scaling
+                                     (float (nth ,num markdown-header-scaling-values))
+                                   1.0))))))
        (format "Face for level %s headers.
 You probably don't want to customize this face directly. Instead
 you can customize the base face `markdown-header-face' or the
@@ -2352,7 +2431,8 @@ Depending on your font, some reasonable choices are:
     (markdown-fontify-sub-superscripts)
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
-    (markdown-fontify-blockquotes))
+    (markdown-fontify-blockquotes)
+    (markdown-fontify-gfm-callouts))
   "Syntax highlighting for Markdown files.")
 
 ;; Footnotes
@@ -3069,9 +3149,9 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
           last-inline-code)
       (while (not done)
         (if (and (markdown-match-inline-generic regex last)
-                   (not (markdown--face-p
-                         (match-beginning 1)
-                         '(markdown-html-attr-name-face markdown-html-attr-value-face))))
+                 (not (markdown--face-p
+                       (match-beginning 1)
+                       '(markdown-html-attr-name-face markdown-html-attr-value-face))))
             (let ((begin (match-beginning 1))
                   (end (match-end 1))
                   (close-end (match-end 4)))
@@ -3240,6 +3320,12 @@ analysis."
 Use data stored in \\='markdown-blockquote text property during syntax
 analysis."
   (markdown-match-propertized-text 'markdown-blockquote last))
+
+(defun markdown-match-gfm-callouts (last)
+  "Match blockquotes from point to LAST.
+Use data stored in \\='markdown-blockquote text property during syntax
+analysis."
+  (markdown-match-propertized-text 'markdown-gfm-callout last))
 
 (defun markdown-match-hr (last)
   "Match horizontal rules comments from the point to LAST."
@@ -3691,6 +3777,52 @@ regardless of what is hidden before them."
          `(face markdown-markup-face)))
       (font-lock-append-text-property
        (match-beginning 0) (match-end 0) 'face 'markdown-blockquote-face)
+      t)))
+
+
+(defun markdown-fontify-gfm-callouts (last)
+  "Apply font-lock properties to blockquotes from point to LAST."
+  (when (markdown-match-gfm-callouts last)
+    (let* ((display-string
+            (markdown--first-displayable markdown-blockquote-display-char))
+           (callout-level (downcase (match-string 2)))
+           (callout-title (capitalize callout-level))
+           (callout-face
+            (intern (format "markdown-gfm-callout-%s-face" callout-level)))
+           (callout-icon
+            (symbol-value
+             (intern (format "markdown-gfm-callout-%s-icon" callout-level))))
+           (callout-prefix
+            (if (string-empty-p callout-icon)
+                "" (format "%s  " callout-icon))))
+
+      (add-text-properties
+       (match-beginning 1) (match-end 1)
+       (if markdown-hide-markup
+           `(face ,callout-face display ,callout-prefix)
+         `(face markdown-markup-face)))
+      (add-text-properties
+       (match-beginning 2) (match-end 2)
+       (if markdown-hide-markup
+           `(face ,callout-face display ,callout-title)
+         `(face ,callout-face)))
+      (add-text-properties
+       (match-beginning 3) (match-end 3)
+       (if markdown-hide-markup
+           `(display "")
+         `(face markdown-markup-face)))
+      (let ((pos 0)
+            (beginning (match-beginning 0))
+            (string (match-string 0)))
+        (save-match-data
+          (while (string-match "[ \t]*\\(?1:>\\) " string pos)
+            (add-text-properties
+             (+ beginning (match-beginning 1))
+             (+ beginning (match-end 1))
+             `(face ,callout-face))
+            (setq pos (match-end 0)))))
+      (font-lock-append-text-property
+       (match-beginning 0) (match-end 0) 'face 'markdown-gfm-callout-face)
       t)))
 
 (defun markdown-fontify-list-items (last)
@@ -6234,8 +6366,8 @@ The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
 (defun-markdown-buffer
-  markdown-reference-check-buffer
-  "Name and return buffer for reference checking.")
+ markdown-reference-check-buffer
+ "Name and return buffer for reference checking.")
 
 (defconst markdown-unused-references-buffer
   "*Unused references for %buffer%*"
@@ -6244,8 +6376,8 @@ The string %buffer% will be replaced by the corresponding
 `markdown-mode' buffer name.")
 
 (defun-markdown-buffer
-  markdown-unused-references-buffer
-  "Name and return buffer for unused reference checking.")
+ markdown-unused-references-buffer
+ "Name and return buffer for unused reference checking.")
 
 (defconst markdown-reference-links-buffer
   "*Reference links for %buffer%*"
@@ -6253,8 +6385,8 @@ The string %buffer% will be replaced by the corresponding
 The string %buffer% will be replaced by the corresponding buffer name.")
 
 (defun-markdown-buffer
-  markdown-reference-links-buffer
-  "Name, setup, and return a buffer for listing links.")
+ markdown-reference-links-buffer
+ "Name, setup, and return a buffer for listing links.")
 
 ;; Add an empty Markdown reference definition to buffer
 ;; specified in the 'target-buffer property.  The reference name is
@@ -6431,26 +6563,26 @@ such references found.")
            (forward-line 2))))))
 
 (defun-markdown-ref-checker
-  markdown-check-refs
-  "Show all undefined Markdown references in current `markdown-mode' buffer.
+ markdown-check-refs
+ "Show all undefined Markdown references in current `markdown-mode' buffer.
 
 Links which have empty reference definitions are considered to be
 defined."
-  markdown-get-undefined-refs
-  markdown-reference-check-buffer
-  "No undefined references found"
-  "The following references are undefined:\n\n"
-  markdown-insert-undefined-reference-button)
+ markdown-get-undefined-refs
+ markdown-reference-check-buffer
+ "No undefined references found"
+ "The following references are undefined:\n\n"
+ markdown-insert-undefined-reference-button)
 
 
 (defun-markdown-ref-checker
-  markdown-unused-refs
-  "Show all unused Markdown references in current `markdown-mode' buffer."
-  markdown-get-unused-refs
-  markdown-unused-references-buffer
-  "No unused references found"
-  "The following references are unused:\n\n"
-  markdown-insert-unused-reference-button)
+ markdown-unused-refs
+ "Show all unused Markdown references in current `markdown-mode' buffer."
+ markdown-get-unused-refs
+ markdown-unused-references-buffer
+ "No unused references found"
+ "The following references are unused:\n\n"
+ markdown-insert-unused-reference-button)
 
 
 
@@ -6765,7 +6897,7 @@ With argument N not nil or 1, move forward N - 1 lines first."
             (when (and (= (point) origin) (eq last-command this-command))
               (goto-char refpos))
           (when (or (> origin refpos) (<= origin (line-beginning-position)))
-          (goto-char refpos)))))
+            (goto-char refpos)))))
      ;; No special case, already at beginning of line.
      (t nil))))
 
@@ -7880,8 +8012,8 @@ Standalone XHTML output is identified by an occurrence of
 (defun markdown-escape-title (title)
   "Escape a minimum set of characters in TITLE so they don't clash with html."
   (replace-regexp-in-string ">" "&gt;"
-    (replace-regexp-in-string "<" "&lt;"
-      (replace-regexp-in-string "&" "&amp;" title))))
+                            (replace-regexp-in-string "<" "&lt;"
+                                                      (replace-regexp-in-string "&" "&amp;" title))))
 
 (defun markdown-add-xhtml-header-and-footer (title)
   "Wrap XHTML header and footer with given TITLE around current buffer."
@@ -8723,10 +8855,10 @@ newline after."
                           (re-search-forward
                            markdown-regex-wiki-link new-to t))
                   (with-no-warnings
-                   ;; Unfontify existing fontification (start from scratch)
-                   (markdown-unfontify-region-wiki-links new-from new-to)
-                   ;; Now do the fontification.
-                   (markdown-fontify-region-wiki-links new-from new-to)))))))
+                    ;; Unfontify existing fontification (start from scratch)
+                    (markdown-unfontify-region-wiki-links new-from new-to)
+                    ;; Now do the fontification.
+                    (markdown-fontify-region-wiki-links new-from new-to)))))))
       (cursor-intangible-mode -1)
       (and (not modified)
            (buffer-modified-p)
@@ -9430,8 +9562,8 @@ position."
             ((with-current-buffer parent-buffer
                (derived-mode-p 'markdown-mode)))
             (pos (cons (line-number-at-pos) (current-column))))
-    (with-current-buffer parent-buffer
-      (setq markdown--edit-indirect-committed-position pos))))
+      (with-current-buffer parent-buffer
+        (setq markdown--edit-indirect-committed-position pos))))
 
 (with-eval-after-load 'edit-indirect
   (advice-add #'edit-indirect--commit :after #'markdown--edit-indirect-save-committed-position))
