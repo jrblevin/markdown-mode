@@ -5,6 +5,9 @@
 *   **Breaking changes:**
 
 *   New Features:
+    - Add `markdown-enable-outline-pulse` to optionally highlight the
+      destination list item or heading subtree after outline navigation,
+      including in viewing modes. Disabled by default.
 
 *   Bug fixes:
     - `markdown-table-align` now handles fullwidth characters correctly [gh-937][]
