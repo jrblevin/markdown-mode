@@ -48,6 +48,7 @@
 (defvar flyspell-generic-check-word-predicate)
 (defvar electric-pair-pairs)
 (defvar sh-ancestor-alist)
+(defvar auto-insert)
 
 (declare-function project-roots "project")
 (declare-function sh-set-shell "sh-script")
@@ -7577,6 +7578,7 @@ current filename, but with the extension removed and replaced with .html."
     (let* ((init-buf (current-buffer))
            (init-point (point))
            (init-buf-string (buffer-string))
+           (auto-insert nil)
            (output-buffer (find-file-noselect output-file))
            (output-buffer-name (buffer-name output-buffer)))
       (run-hooks 'markdown-before-export-hook)

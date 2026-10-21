@@ -5869,6 +5869,22 @@ bar baz"
 
 ;;; Export tests:
 
+(require 'autoinsert)
+
+(ert-deftest test-markdown-export/auto-insert ()
+  "Test that `markdown-export' does not trigger `auto-insert-mode'."
+  (skip-unless (executable-find markdown-command))
+  (markdown-test-temp-file "inline.text"
+    (let* ((auto-insert-triggered nil)
+           (auto-insert t)
+           (auto-insert-query nil)
+           (auto-insert-alist `((html-mode . ,(lambda () (setq auto-insert-triggered t)))))
+           (find-file-hook (cons #'auto-insert find-file-hook))
+           (markdown-command #'markdown-command-identity)
+           (ofile (markdown-export)))
+      (delete-file ofile)
+      (should-not auto-insert-triggered))))
+
 (ert-deftest test-markdown-hook/xhtml-standalone ()
   "Test `markdown-xhtml-standalone-regexp' and `markdown-output-standalone-p'."
   (should (string-match markdown-xhtml-standalone-regexp
