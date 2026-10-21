@@ -2865,22 +2865,31 @@ because `thing-at-point-looking-at' does not work reliably with
 The match data is set as follows:
 Group 1 matches the opening backquotes.
 Group 2 matches the code fragment itself, without backquotes.
-Group 3 matches the closing backquotes."
+Group 3 matches the closing backquotes.
+
+A table row cannot contain a code fragment that spans lines, so
+when POS is on a table row only that row is searched.  Otherwise
+every candidate would rescan the whole table, which is a single
+text block, making fontification quadratic in the table size."
   (save-excursion
     (goto-char pos)
-    (let ((old-point (point))
-          (end-of-block (progn (markdown-end-of-text-block) (point)))
-          found)
-      (if from
-          (goto-char from)
-        (markdown-beginning-of-text-block))
-      (while (and (markdown-match-code end-of-block)
-                  (setq found t)
-                  (< (match-end 0) old-point)))
-      (let ((match-group (if (eq (char-after (match-beginning 0)) ?`) 0 1)))
-        (and found                                        ; matched something
-             (<= (match-beginning match-group) old-point) ; match contains old-point
-             (> (match-end 0) old-point))))))
+    (save-restriction
+      (when (progn (beginning-of-line) (looking-at-p "[ \t]*|"))
+        (narrow-to-region (line-beginning-position) (line-end-position)))
+      (goto-char pos)
+      (let ((old-point (point))
+            (end-of-block (progn (markdown-end-of-text-block) (point)))
+            found)
+        (if from
+            (goto-char from)
+          (markdown-beginning-of-text-block))
+        (while (and (markdown-match-code end-of-block)
+                    (setq found t)
+                    (< (match-end 0) old-point)))
+        (let ((match-group (if (eq (char-after (match-beginning 0)) ?`) 0 1)))
+          (and found                                        ; matched something
+               (<= (match-beginning match-group) old-point) ; match contains old-point
+               (> (match-end 0) old-point)))))))
 
 (defun markdown-inline-code-at-pos-p (pos)
   "Return non-nil if there is an inline code fragment at POS.
