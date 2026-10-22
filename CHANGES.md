@@ -21,6 +21,8 @@
     - skip export tests if export command is not installed
     - reduce memory allocations in property checking functions
     - improve performance to check properties in range by using c functions
+    - Fontifying a large table is no longer quadratic in its size: looking
+      for inline code on a table row now only searches that row
 
   [gh-937]: https://github.com/jrblevin/markdown-mode/pull/937
   [gh-953]: https://github.com/jrblevin/markdown-mode/issues/953

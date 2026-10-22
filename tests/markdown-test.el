@@ -2560,6 +2560,36 @@ See GH-275."
     (markdown-test-range-has-face 12 12 'markdown-markup-face)
     (markdown-test-range-has-face 18 18 'markdown-markup-face)))
 
+(ert-deftest test-markdown-font-lock/inline-code-in-table-rows ()
+  "Inline code and bold in table rows are fontified; a `|' in code is not a cell edge."
+  (markdown-test-string "| a | b |\n|---|---|\n| **x** | `y` |\n| `**z**` | w |\n"
+    (font-lock-ensure)
+    (markdown-test-range-has-face 25 25 'markdown-bold-face)
+    (markdown-test-range-has-face 32 32 'markdown-inline-code-face)
+    (markdown-test-range-has-face 40 44 'markdown-inline-code-face)
+    (should-not (memq 'markdown-bold-face (get-text-property 42 'face)))))
+
+(ert-deftest test-markdown-inline-code-at-pos/table-row-scan-is-bounded ()
+  "Looking for inline code on a table row must not scan the rest of the table.
+A table is one text block, so scanning it for every bold or italic
+candidate made fontifying a large table quadratic."
+  (markdown-test-string "| a | b |\n|---|---|\n| **x** | y |\n| z | `w` |\n"
+    (goto-char (point-min))
+    (forward-line 2)
+    (let ((eol (line-end-position))
+          (max-last 0))
+      (cl-letf* ((orig (symbol-function 'markdown-match-code))
+                 ((symbol-function 'markdown-match-code)
+                  (lambda (last)
+                    (setq max-last (max max-last last))
+                    (funcall orig last))))
+        (should-not (markdown-inline-code-at-pos (+ (point) 3))))
+      (should (<= max-last eol)))
+    ;; Code on the row is still found.
+    (goto-char (point-max))
+    (forward-line -1)
+    (should (markdown-inline-code-at-pos (+ (point) 7)))))
+
 (ert-deftest test-markdown-font-lock/ignore-uri-in-inline-code ()
   "Avoid rendering URIs inside inline code."
   (markdown-test-string
