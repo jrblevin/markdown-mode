@@ -8160,6 +8160,20 @@ Detail: https://github.com/jrblevin/markdown-mode/issues/747"
     (goto-char (point-min))
     (should (search-forward "test&lt;&amp;&gt;"))))
 
+(ert-deftest test-markdown-dnd/insert-link ()
+  "Test dropping a file with `file-link' and choosing to insert a link."
+  (let ((file (make-temp-file "markdown-dnd-" nil ".txt")))
+    (unwind-protect
+        (dolist (method '(file-link ask))
+          (markdown-test-string ""
+            (let ((markdown-yank-dnd-method method))
+              (cl-letf (((symbol-function 'read-multiple-choice)
+                         (lambda (&rest _) '(?i "insert link"))))
+                (markdown--dnd-local-file-handler (concat "file://" file) 'copy)))
+            (goto-char (point-min))
+            (should (search-forward (file-name-nondirectory file) nil t))))
+      (delete-file file))))
+
 (provide 'markdown-test)
 
 ;;; markdown-test.el ends here
