@@ -722,7 +722,7 @@ This may also be a cons cell where the behavior for `C-a' and
 When the value is the symbol,
   - `copy-and-insert' -- copy file in current directory and insert its link
   - `open' -- open dropped file in Emacs
-  - `insert-link' -- insert link of dropped/pasted file
+  - `file-link' -- insert link of dropped/pasted file
   - `ask' -- ask what to do out of the above."
   :group 'markdown
   :package-version '(markdown-mode "2.8")
@@ -10413,7 +10413,7 @@ rows and columns and the column alignment."
     (cl-case (car choice)
       (?c 'copy-and-insert)
       (?o 'open)
-      (?i 'insert)
+      (?i 'file-link)
       (otherwise (markdown--dnd-read-method)))))
 
 (defun markdown--dnd-insert-path (filename)
@@ -10439,7 +10439,7 @@ rows and columns and the column alignment."
          (markdown--dnd-insert-path (file-relative-name copied))))
       (open
        (dnd-open-local-file url action))
-      (insert (markdown--dnd-insert-path (file-relative-name filename))))))
+      (file-link (markdown--dnd-insert-path (file-relative-name filename))))))
 
 (defun markdown--dnd-multi-local-file-handler (urls action)
   (let ((multile-urls-p (> (length urls) 1)))
